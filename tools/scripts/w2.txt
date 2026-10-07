@@ -1,0 +1,31 @@
+# W2: Spin range +-30 (steady rotation, no jump on change). (LoadEhr W1: MaskEhr's Library pick test is gone with the library)
+bundle build/LoadEhr.bundle
+size 960 540
+instance
+params
+text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+wait_loaded 60
+get Model A
+# spin continuity on Y: -30, 0, +30, then the top of the range again on X and Z
+set Spin Y -30
+frames 30
+diffs 20
+shot verify/w2/b1_spin_y_minus30.png
+set Spin Y 0
+diffs 20
+set Spin Y 30
+diffs 20
+set Spin Y 12
+diffs 10
+set Spin Y 30
+diffs 20
+shot verify/w2/b2_spin_y_plus30.png
+set Spin Y 0
+set Spin X 30
+set Spin Z -30
+diffs 20
+shot verify/w2/b3_spin_xz.png
+set Spin Y 99
+set Spin X -99
+get Spin Y
+get Spin X

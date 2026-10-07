@@ -1,0 +1,47 @@
+# Stage 1: anchored vs free light across a spin (Spin Y 30 deg/s; 90 frames = 1.5 s = 45 deg)
+bundle build/LoadEhr.bundle
+size 1280 720
+instance
+text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+wait_loaded 60
+set A Enable 1
+set A Pos X 1.2
+set A Pos Y 0.3
+set A Pos Z -1.2
+set A Aim Mode 1
+set A Cone Angle 60
+set Smoke Amount 1.5
+set Spin Y 30
+set A Anchor To Mask 1
+frames 30
+shot verify/w3/a1_anchored_t0.png
+frames 90
+shot verify/w3/a2_anchored_t45deg.png
+frames 90
+shot verify/w3/a3_anchored_t90deg.png
+set A Anchor To Mask 0
+pulse Reset Spin
+frames 30
+shot verify/w3/a4_free_t0.png
+frames 90
+shot verify/w3/a5_free_t45deg.png
+frames 90
+shot verify/w3/a6_free_t90deg.png
+# free aim, anchored: yaw/pitch are relative to the mask
+set A Anchor To Mask 1
+set A Aim Mode 2
+set A Aim Yaw -45
+set A Pos X 1.2
+frames 30
+shot verify/w3/a7_anchored_free_aim.png
+delete
+# model-agnostic: DamagedHelmet (no holes: the glow cloud rims the silhouette)
+bundle build/LoadEhr.bundle
+instance
+text Model_A /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_models/DamagedHelmet/DamagedHelmet.glb
+wait_loaded 60
+set A Enable 1
+set Glow Cloud 3
+set B Enable 1
+frames 30
+shot verify/w3/h1_helmet_two_lights.png

@@ -1,0 +1,86 @@
+# Stage 5: clones (instanced, LOD by screen size), echo trails, ghosts
+bundle build/LoadEhr.bundle
+size 1920 1080
+instance
+text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+wait_loaded 60
+realtime 3
+stats_reset
+frames 60
+stats single mask (baseline)
+set Distance 9
+set Clone Layout 1
+set Clone Count 16
+set Clone Hue Spread 1
+stats_reset
+frames 60
+stats ring 16 clones + original (LOD)
+shot verify/w7/c1_ring16_hue.png
+set Clone Layout 2
+set Clone Count 25
+set Clone Spacing 1.6
+set Clone Scale 0.7
+set Clone Spin Step 20
+set Keep Original 1
+stats_reset
+frames 60
+stats grid 25 clones (LOD)
+shot verify/w7/c2_grid25_spinstep.png
+set LOD Bias 4
+stats_reset
+frames 60
+stats grid 25 clones LOD Bias 4 (mostly full res)
+set LOD Bias 1
+set Clone Layout 3
+set Clone Count 36
+set Clone Spacing 1.8
+set Clone Orbit 0.3
+set Distance 4
+set Clone Spin Step 0
+stats_reset
+frames 60
+stats tunnel 36 clones (LOD)
+shot verify/w7/c3_tunnel36.png
+set Clone Layout 4
+set Clone Count 10
+set Clone Spacing 2.5
+set Clone Orbit 0.1
+set Distance 8
+set Orbit Pitch 15
+set Keep Original 0
+stats_reset
+frames 60
+stats carousel 10 clones
+shot verify/w7/c4_carousel10.png
+set Clone Count 64
+set Clone Scale 0.4
+set Clone Layout 2
+set Clone Spacing 0.9
+stats_reset
+frames 60
+stats grid 64 clones (LOD)
+shot verify/w7/c5_grid64.png
+set Clone Layout 0
+set Distance 4
+set Orbit Pitch 0
+set Clone Orbit 0.1
+set Keep Original 1
+# 15 trails: echoes while spinning / wobbling, then ghosts
+set Spin Y 30
+set Wobble Amount 1.5
+set Wobble Speed 1.5
+set Trail Echoes 6
+set Trail Delay 4
+set Trail Offset X 0.02
+stats_reset
+frames 60
+stats echoes 6
+shot verify/w7/t1_echoes.png
+set Trail Echoes 0
+set Pos X 0
+set Ghosts 6
+set Ghost Spacing 6
+stats_reset
+frames 60
+stats ghosts 6
+shot verify/w7/t2_ghosts.png

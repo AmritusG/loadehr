@@ -1,0 +1,76 @@
+# Stage 2: sweeping spots, bloom + flares, shadow catcher + mirror floor, silhouette
+bundle build/LoadEhr.bundle
+size 1920 1080
+instance
+text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+wait_loaded 60
+bpm 128
+# 17 sweeping spots: 4 spots, rainbow, beams in the haze, beat strobe; two moments of the sweep
+set Spot Count 4
+set Spot Color Mode 1
+set Spot Beat Strobe 1
+set Key Intensity 1
+stats_reset
+frames 60
+stats spots 4 + beams (raymarch 32 half)
+shot verify/w4/s1_spots_rainbow_a.png
+frames 37
+shot verify/w4/s2_spots_rainbow_b.png
+set Spot Pattern 1
+set Spot Color Mode 0
+set Spot Beams 0
+frames 20
+shot verify/w4/s3_spots_circle_no_beams.png
+set Spot Count 0
+set Key Intensity 3
+set Spot Beams 1
+# 18 bloom + flares, with Light A behind the mask as the bright source
+set A Enable 1
+set Bloom 3
+stats_reset
+frames 30
+stats bloom 3 + light A
+shot verify/w4/b1_bloom.png
+set Flare Ghosts 4
+set Flare Streak 3
+stats_reset
+frames 30
+stats bloom + ghosts + streak + light A
+shot verify/w4/b2_bloom_flares.png
+set Bloom 0
+set Flare Ghosts 0
+set Flare Streak 0
+set A Enable 0
+# 19 shadow catcher (floor, then wall) + mirror floor
+set Orbit Pitch 18
+set Distance 5
+set Shadow Catcher 1
+stats_reset
+frames 30
+stats shadow catcher floor
+shot verify/w4/f1_shadow_floor.png
+set Catcher Plane 1
+set Key Azimuth 20
+frames 5
+shot verify/w4/f2_shadow_wall.png
+set Catcher Plane 0
+set Key Azimuth 35
+set Shadow Catcher 0.8
+set Mirror Floor 0.8
+stats_reset
+frames 30
+stats mirror floor + shadow
+shot verify/w4/f3_mirror_floor.png
+set Shadow Catcher 0
+set Mirror Floor 0
+set Orbit Pitch 0
+set Distance 4
+# 20 silhouette, then Fill revealing the lit mask
+set Silhouette 1
+stats_reset
+frames 20
+stats silhouette
+shot verify/w4/h1_silhouette.png
+set Sil Fill 0.5
+frames 2
+shot verify/w4/h2_silhouette_fill50.png

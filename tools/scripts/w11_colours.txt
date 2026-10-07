@@ -1,0 +1,185 @@
+# W11 (a) Light A through the new picker, (b) red vs green through every other colour group. Evidence in verify/w11/.
+bundle build/LoadEhr.bundle
+size 960 540
+instance
+text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+wait_loaded 60
+frames 30
+shot verify/w11/base.png
+# (a) Light A through the new picker: pure red / green / blue / white. delta = what the light adds vs A off
+set A Enable 1
+set A Sat 1
+set A Bri 1
+set A Color 0
+set A Sat 1
+frames 40
+shot verify/w11/a_light_a_red.png
+delta A_red verify/w11/base.png verify/w11/a_light_a_red.png
+set A Color 0.333333
+set A Sat 1
+frames 40
+shot verify/w11/a_light_a_green.png
+delta A_green verify/w11/base.png verify/w11/a_light_a_green.png
+set A Color 0.666667
+set A Sat 1
+frames 40
+shot verify/w11/a_light_a_blue.png
+delta A_blue verify/w11/base.png verify/w11/a_light_a_blue.png
+set A Color 0
+set A Sat 0
+frames 40
+shot verify/w11/a_light_a_white.png
+delta A_white verify/w11/base.png verify/w11/a_light_a_white.png
+set A Enable 0
+set A Color 0.1052632
+set A Sat 0.38
+frames 20
+# (b) every other colour group: red vs green through its picker. b-a = red shot - green shot: R up, G down
+set Tint Mix 1
+set Tint Sat 1
+set Tint Bri 1
+set Tint Color 0.333333
+frames 40
+shot verify/w11/b_Tint_green.png
+set Tint Color 0
+frames 40
+shot verify/w11/b_Tint_red.png
+delta Tint_red-green verify/w11/b_Tint_green.png verify/w11/b_Tint_red.png
+set Tint Mix 0
+set Rim Glow 4
+set Rim Sat 1
+set Rim Bri 1
+set Rim Color 0.333333
+frames 40
+shot verify/w11/b_Rim_green.png
+set Rim Color 0
+frames 40
+shot verify/w11/b_Rim_red.png
+delta Rim_red-green verify/w11/b_Rim_green.png verify/w11/b_Rim_red.png
+set Rim Glow 0
+set Glass 1
+set Glass Sat 1
+set Glass Bri 1
+set Glass Color 0.333333
+frames 40
+shot verify/w11/b_Glass_green.png
+set Glass Color 0
+frames 40
+shot verify/w11/b_Glass_red.png
+delta Glass_red-green verify/w11/b_Glass_green.png verify/w11/b_Glass_red.png
+set Glass 0
+set Hologram 1
+set Holo Sat 1
+set Holo Bri 1
+set Holo Color 0.333333
+frames 40
+shot verify/w11/b_Holo_green.png
+set Holo Color 0
+frames 40
+shot verify/w11/b_Holo_red.png
+delta Holo_red-green verify/w11/b_Holo_green.png verify/w11/b_Holo_red.png
+set Hologram 0
+set Pattern 1
+set Pattern Sat 1
+set Pattern Bri 1
+set Pattern Color 0.333333
+frames 40
+shot verify/w11/b_Pattern_green.png
+set Pattern Color 0
+frames 40
+shot verify/w11/b_Pattern_red.png
+delta Pattern_red-green verify/w11/b_Pattern_green.png verify/w11/b_Pattern_red.png
+set Pattern 0
+set Contours 4
+set Contour Sat 1
+set Contour Bri 1
+set Contour Color 0.333333
+frames 40
+shot verify/w11/b_Contour_green.png
+set Contour Color 0
+frames 40
+shot verify/w11/b_Contour_red.png
+delta Contour_red-green verify/w11/b_Contour_green.png verify/w11/b_Contour_red.png
+set Contours 0
+set Key Sat 1
+set Key Bri 1
+set Key Color 0.333333
+frames 40
+shot verify/w11/b_Key_green.png
+set Key Color 0
+frames 40
+shot verify/w11/b_Key_red.png
+delta Key_red-green verify/w11/b_Key_green.png verify/w11/b_Key_red.png
+set B Enable 1
+set B Sat 1
+set B Bri 1
+set B Color 0.333333
+frames 40
+shot verify/w11/b_B_green.png
+set B Color 0
+frames 40
+shot verify/w11/b_B_red.png
+delta B_red-green verify/w11/b_B_green.png verify/w11/b_B_red.png
+set B Enable 0
+set Spot Count 2
+set Spot Sat 1
+set Spot Bri 1
+set Spot Color 0.333333
+frames 40
+shot verify/w11/b_Spot_green.png
+set Spot Color 0
+frames 40
+shot verify/w11/b_Spot_red.png
+delta Spot_red-green verify/w11/b_Spot_green.png verify/w11/b_Spot_red.png
+set Spot Count 0
+set Silhouette 1
+set Sil Sat 1
+set Sil Bri 1
+set Sil Color 0.333333
+frames 40
+shot verify/w11/b_Sil_green.png
+set Sil Color 0
+frames 40
+shot verify/w11/b_Sil_red.png
+delta Sil_red-green verify/w11/b_Sil_green.png verify/w11/b_Sil_red.png
+set Silhouette 0
+set Background Alpha 1
+set Background Sat 1
+set Background Bri 1
+set Background Color 0.333333
+frames 40
+shot verify/w11/b_Background_green.png
+set Background Color 0
+frames 40
+shot verify/w11/b_Background_red.png
+delta Background_red-green verify/w11/b_Background_green.png verify/w11/b_Background_red.png
+set Background Alpha 0
+set C Enable 1
+set Rotate Y 35
+set C Left Sat 1
+set C Left Bri 1
+set C Left Color 0.333333
+frames 40
+shot verify/w11/b_C_Left_green.png
+set C Left Color 0
+frames 40
+shot verify/w11/b_C_Left_red.png
+delta C_Left_red-green verify/w11/b_C_Left_green.png verify/w11/b_C_Left_red.png
+set C Enable 0
+set Rotate Y 0
+set C Enable 1
+set Rotate Y -35
+set C Link Colors 0
+set C Right Sat 1
+set C Right Bri 1
+set C Right Color 0.333333
+frames 40
+shot verify/w11/b_C_Right_green.png
+set C Right Color 0
+frames 40
+shot verify/w11/b_C_Right_red.png
+delta C_Right_red-green verify/w11/b_C_Right_green.png verify/w11/b_C_Right_red.png
+set C Enable 0
+set Rotate Y 0
+set C Link Colors 1
+delete

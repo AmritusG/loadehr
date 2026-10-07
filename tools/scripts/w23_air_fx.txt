@@ -1,0 +1,76 @@
+# W23: every additive light effect over the textured background, flattened twice: straight alpha (what Arena showed
+# of an FFGL API 2.1 SOURCE) and premultiplied (API 2.3). verify/w23/fx_<effect>_{straight,premult}.png
+bundle build/LoadEhr.bundle
+size 1920 1080
+instance
+text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+wait_loaded 60
+set Spin Y 6
+# beams: Light A spot through the haze
+set A Enable 1
+set A Pos Z -2
+set Haze 0.4
+set Glow Cloud 0
+frames 60
+composite straight
+shot verify/w23/fx_beams_straight.png
+composite arena
+shot verify/w23/fx_beams_premult.png
+# glow cloud round the light
+set Glow Cloud 3
+frames 30
+composite straight
+shot verify/w23/fx_glowcloud_straight.png
+composite arena
+shot verify/w23/fx_glowcloud_premult.png
+# motes
+set Glow Cloud 0
+set Motes 3
+frames 30
+composite straight
+shot verify/w23/fx_motes_straight.png
+composite arena
+shot verify/w23/fx_motes_premult.png
+set Motes 0
+set A Enable 0
+set Haze 0.12
+# bloom + flares
+set Emissive Glow 6
+set Rim Glow 4
+set Bloom 4
+set Bloom Threshold 0.4
+set Flare Ghosts 4
+set Flare Streak 4
+frames 30
+composite straight
+shot verify/w23/fx_bloom_flares_straight.png
+composite arena
+shot verify/w23/fx_bloom_flares_premult.png
+set Bloom 0
+set Flare Ghosts 0
+set Flare Streak 0
+set Rim Glow 0
+set Emissive Glow 1
+# trail glow (echoes)
+set Spin Y 30
+set Trail Echoes 5
+set Trail Glow 4
+set Trail Smear 0.6
+set Trail Offset X 0.04
+set Trail Delay 3
+frames 60
+composite straight
+shot verify/w23/fx_trails_straight.png
+composite arena
+shot verify/w23/fx_trails_premult.png
+set Trail Echoes 0
+set Trail Glow 0
+set Spin Y 6
+# silhouette glow
+set Silhouette 1
+set Sil Glow 4
+frames 10
+composite straight
+shot verify/w23/fx_silhouette_straight.png
+composite arena
+shot verify/w23/fx_silhouette_premult.png

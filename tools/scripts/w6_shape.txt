@@ -1,0 +1,108 @@
+# Stage 4: shape. mask, then DamagedHelmet.
+bundle build/LoadEhr.bundle
+size 1920 1080
+instance
+text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+wait_loaded 60
+realtime 1.5
+set Rotate Y -20
+frames 5
+shot verify/w6/x0_before.png
+# 8 shatter -> reform: the reformed frame must equal the untouched one
+pulse Shatter
+stats_reset
+frames 40
+stats shatter flying (soup + shards)
+shot verify/w6/b1_shatter_flying.png
+pulse Reform
+frames 30
+shot verify/w6/b2_shatter_reforming.png
+frames 60
+shot verify/w6/b3_reformed.png
+compare verify/w6/x0_before.png verify/w6/b3_reformed.png
+# 7 melt / drip
+set Melt 0.5
+stats_reset
+frames 10
+stats melt 0.5
+shot verify/w6/a1_melt50.png
+set Melt 1
+frames 2
+shot verify/w6/a2_melt100.png
+set Melt 0
+frames 2
+compare verify/w6/x0_before.png verify/w6/b3_reformed.png
+# 9 slices
+set Slice Gap 0.6
+set Slice Wave 1
+frames 10
+shot verify/w6/c1_slices_y.png
+set Slice Axis 0
+frames 2
+shot verify/w6/c2_slices_x.png
+set Slice Gap 0
+set Slice Wave 0
+set Slice Axis 1
+# 10 voxel + low poly
+set Voxel 1
+frames 2
+shot verify/w6/d1_voxel.png
+set Voxel 0
+set Low Poly 1
+frames 2
+shot verify/w6/d2_low_poly.png
+set Low Poly 0
+# 11 twist / bend / ripple
+set Twist 2
+frames 2
+shot verify/w6/e1_twist.png
+set Twist 0
+set Bend 1
+frames 2
+shot verify/w6/e2_bend.png
+set Bend 0
+set Ripple 0.05
+frames 2
+shot verify/w6/e3_ripple.png
+set Ripple 0
+# 13 contours
+set Contours 3
+stats_reset
+frames 10
+stats contours
+shot verify/w6/g1_contours_y.png
+set Contour Mode 4
+frames 2
+shot verify/w6/g2_contours_radial.png
+set Contours 0
+# 12 blow to dust, then reform (real time: the sim steps per frame)
+pulse Blow To Dust
+stats_reset
+realtime 1.2
+stats dust 100k blowing
+shot verify/w6/f1_dust_1s.png
+realtime 1.8
+shot verify/w6/f2_dust_3s.png
+pulse Dust Reform
+realtime 0.8
+shot verify/w6/f3_dust_reforming.png
+realtime 3
+shot verify/w6/f4_dust_reformed.png
+delete
+bundle build/LoadEhr.bundle
+instance
+text Model_A /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_models/DamagedHelmet/DamagedHelmet.glb
+wait_loaded 60
+realtime 1
+pulse Shatter
+frames 40
+shot verify/w6/h1_helmet_shatter.png
+pulse Reform
+frames 100
+set Melt 0.6
+frames 2
+shot verify/w6/h2_helmet_melt.png
+set Melt 0
+pulse Blow To Dust
+realtime 1.5
+shot verify/w6/h3_helmet_dust.png

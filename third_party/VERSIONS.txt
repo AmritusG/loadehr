@@ -1,0 +1,4 @@
+ufbx 26a482a; cgltf 85cd623; stb 2c980bb; ffgl 5b6e078
+meshoptimizer 1.3 (MESHOPTIMIZER_VERSION 1030) 4c20343 — simplifier.cpp + allocator.cpp only, MIT
+nanosvg 239e102 (2026-07-09) — nanosvg.h only (parser; rasterizer unused), zlib licence
+libtess2 8dbd648 (2025-10-15) — Source/ + Include/, SGI Free Software License B 2.0

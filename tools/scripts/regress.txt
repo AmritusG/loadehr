@@ -1,0 +1,54 @@
+# LoadEhr regression: the reference set at default params on our generated models (tools/gen_test_models.py), by parameter
+# NAME, into verify/@OUT@/ and diffed against verify/w1/ref (pinned by tools/regress_refs.sha256). Run: tools/regress.sh <out>.
+composite black
+bundle build/LoadEhr.bundle
+size 1920 1080
+instance
+text Model_A @GEN@/mask/mask.obj
+wait_loaded 60
+frames 120
+stats_reset
+frames 120
+stats 1080p default MSAA4
+shot verify/@OUT@/r1_mask_front.png
+set Rotate Y -35
+set Rotate X 8
+set Wireframe Mix 0.5
+frames 60
+shot verify/@OUT@/r2_wireframe50.png
+set Wireframe Mix 0
+set Explode 0.5
+frames 60
+shot verify/@OUT@/r3_explode.png
+delete
+bundle build/LoadEhrFX.bundle
+input bars
+instance
+text Model_A @GEN@/mask/mask.obj
+wait_loaded 60
+set Input Use 2
+set Part 1 Skin 1
+set Env Source 1
+frames 60
+shot verify/@OUT@/r4_fx_skin_env_input.png
+delete
+bundle build/LoadEhr.bundle
+instance
+mark
+text Model_A @GEN@/knot/knot.obj
+text Model_B @GEN@/mask/mask.obj
+text Model_C @GEN@/crystal/crystal.obj
+text Model_D @GEN@/star/star.obj
+wait_slots 4 60
+set Transition 0.5
+frames 30
+shot verify/@OUT@/r5_chain_mid_hop_b_c.png
+set Transition 1
+frames 30
+shot verify/@OUT@/r6_chain_rest_d.png
+compare verify/w1/ref/r1_mask_front.png verify/@OUT@/r1_mask_front.png
+compare verify/w1/ref/r2_wireframe50.png verify/@OUT@/r2_wireframe50.png
+compare verify/w1/ref/r3_explode.png verify/@OUT@/r3_explode.png
+compare verify/w1/ref/r4_fx_skin_env_input.png verify/@OUT@/r4_fx_skin_env_input.png
+compare verify/w1/ref/r5_chain_mid_hop_b_c.png verify/@OUT@/r5_chain_mid_hop_b_c.png
+compare verify/w1/ref/r6_chain_rest_d.png verify/@OUT@/r6_chain_rest_d.png

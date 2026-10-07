@@ -1,0 +1,10 @@
+bundle build/LoadEhr.bundle
+size 1280 720
+instance
+params
+text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+wait_loaded 60
+stats_reset
+frames 60
+stats default
+shot verify/w1/smoke_front.png

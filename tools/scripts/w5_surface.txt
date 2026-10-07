@@ -1,0 +1,90 @@
+# Stage 3: surface effects on the mask, then the helmet; glass refracting the input in the FX build
+bundle build/LoadEhr.bundle
+size 1920 1080
+instance
+text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+wait_loaded 60
+bpm 128
+set Rotate Y -25
+set Oil Film 1.5
+stats_reset
+frames 30
+stats oil film
+shot verify/w5/s1_oil_film.png
+set Oil Film 0
+set Glitter 4
+stats_reset
+frames 30
+stats glitter
+shot verify/w5/s2_glitter.png
+set Glitter 0
+set Liquid Chrome 1
+stats_reset
+frames 30
+stats liquid chrome
+shot verify/w5/s3_liquid_chrome.png
+set Liquid Chrome 0
+set Glass 1
+stats_reset
+frames 30
+stats glass (studio env)
+shot verify/w5/s3b_glass_source.png
+set Glass 0
+set Hologram 1
+set Holo Glitch 2
+stats_reset
+frames 30
+stats hologram
+shot verify/w5/s4_hologram.png
+set Hologram 0
+set Heat Glow 2
+stats_reset
+frames 30
+stats heat glow
+shot verify/w5/s5_heat.png
+set Heat Glow 0
+set Pattern 1
+stats_reset
+frames 30
+stats pattern stripes
+shot verify/w5/s6a_pattern_stripes.png
+set Pattern 2
+frames 10
+shot verify/w5/s6b_pattern_cells.png
+set Pattern 3
+frames 10
+shot verify/w5/s6c_pattern_noise.png
+set Pattern 0
+# per-part Surface: glitter on the gold part only (slot 1)
+set Glitter 4
+set Part 2 Surface 0
+set Part 3 Surface 0
+set Part 4 Surface 0
+frames 10
+shot verify/w5/p1_glitter_part1_only.png
+delete
+bundle build/LoadEhr.bundle
+instance
+text Model_A /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_models/DamagedHelmet/DamagedHelmet.glb
+wait_loaded 60
+set Heat Glow 2
+frames 10
+shot verify/w5/h1_helmet_heat.png
+set Heat Glow 0
+set Oil Film 1.5
+set Glitter 3
+frames 10
+shot verify/w5/h2_helmet_film_glitter.png
+delete
+bundle build/LoadEhrFX.bundle
+input bars
+instance
+text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+wait_loaded 60
+set Input Use 1
+set Glass 1
+set Glass IOR 1.6
+stats_reset
+frames 30
+stats FX glass refracting the input
+shot verify/w5/f1_fx_glass_refracts_input.png

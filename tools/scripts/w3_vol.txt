@@ -1,0 +1,90 @@
+# Stage 1: volume light. Light A behind the mask, anchored, aimed at the camera (defaults), then variants.
+bundle build/LoadEhr.bundle
+size 1920 1080
+instance
+text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+wait_loaded 60
+stats_reset
+frames 60
+stats volume OFF (default)
+set A Enable 1
+frames 30
+shot verify/w3/v1_eyes_smoke.png
+# temporal noise with nothing moving except the smoke
+diffs 10
+# GPU cost per quality step (Half res) and per resolution (32 steps)
+set Vol Quality 0
+stats_reset
+frames 60
+stats raymarch 16 steps half
+set Vol Quality 1
+stats_reset
+frames 60
+stats raymarch 32 steps half
+set Vol Quality 2
+stats_reset
+frames 60
+stats raymarch 64 steps half
+set Vol Quality 3
+stats_reset
+frames 60
+stats raymarch 128 steps half
+shot verify/w3/v1b_128_steps.png
+set Vol Res 0
+stats_reset
+frames 60
+stats raymarch 128 steps FULL
+set Vol Quality 1
+stats_reset
+frames 60
+stats raymarch 32 steps FULL
+set Vol Res 2
+stats_reset
+frames 60
+stats raymarch 32 steps QUARTER
+shot verify/w3/v1c_quarter.png
+set Vol Res 1
+# glow cloud: big cloudy halo, thin beams
+set Glow Cloud 6
+set Smoke Amount 2
+set A Cone Angle 20
+frames 30
+shot verify/w3/v2_glow_cloud.png
+set Glow Cloud 1
+set Smoke Amount 1
+set A Cone Angle 45
+# method B
+set Vol Method 1
+stats_reset
+frames 60
+stats screen rays 32 samples half
+shot verify/w3/v3_screen_rays.png
+set Vol Quality 3
+stats_reset
+frames 60
+stats screen rays 128 samples half
+set Vol Quality 1
+set Vol Method 0
+# point light
+set A Type 1
+frames 30
+shot verify/w3/v6_point_light.png
+set A Type 0
+# over blend
+set Fog Blend 1
+frames 10
+shot verify/w3/v7_over_blend.png
+set Fog Blend 0
+# motes
+set Motes 3
+stats_reset
+frames 60
+stats raymarch 32 half + motes 3
+shot verify/w3/v8_motes.png
+set Motes 0
+# two lights: A behind warm, B side cool, Screen-free raymarch
+set B Enable 1
+set B Intensity 20
+frames 30
+shot verify/w3/v5_two_lights.png
+set B Enable 0

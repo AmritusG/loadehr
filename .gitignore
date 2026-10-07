@@ -1,0 +1,7 @@
+build/
+test_models/
+verify/
+.DS_Store
+.claude/
+test_media/
+__pycache__/

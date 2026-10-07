@@ -1,0 +1,43 @@
+# Stage 7: face tracking (FX). Still with three faces, then the pan/zoom clip as a frame sequence.
+# LoadEhr W1: Face lives in LoadEhr Wow FX (the 512 cap; MaskEhr: MaskEhr FX)
+bundle build/LoadEhrWowFX.bundle
+size 1920 1080
+input test_media/faces_1080.png
+instance
+text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+wait_loaded 60
+set Input Use 1
+frames 5
+shot verify/w9/a0_input_only_face_off.png
+set Face Track 1
+stats_reset
+realtime 1.5
+stats face track still (realtime)
+shot verify/w9/a1_still_three_faces.png
+set Max Faces 1
+realtime 0.6
+shot verify/w9/a2_max_faces_1.png
+set Max Faces 4
+set Follow Roll 0
+set Follow Yaw 0
+set Follow Pitch 0
+realtime 0.4
+shot verify/w9/a3_no_follow_rotation.png
+set Follow Roll 1
+set Follow Yaw 1
+set Follow Pitch 0.6
+delete
+bundle build/LoadEhrWowFX.bundle
+size 1280 720
+input_seq test_media/seq
+instance
+text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+wait_loaded 60
+set Input Use 1
+set Face Track 1
+stats_reset
+realtime 2
+stats face track clip (realtime)
+shot verify/w9/b1_clip_t2s.png
+realtime 1
+shot verify/w9/b2_clip_t3s.png

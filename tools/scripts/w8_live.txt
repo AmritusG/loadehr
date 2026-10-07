@@ -1,0 +1,99 @@
+# Stage 6: beat cuts, poses (store / glide / survive a reload of Pose Data), shake, vertigo, Model B transitions
+bundle build/LoadEhr.bundle
+size 1280 720
+instance
+text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+wait_loaded 60
+bpm 120
+# 21 beat cuts (120 bpm = 30 frames per beat), sequence order
+set Cut Every 1
+set Cut Order 1
+frames 30
+shot verify/w8/a1_cut_beat1.png
+frames 30
+shot verify/w8/a2_cut_beat2.png
+frames 30
+shot verify/w8/a3_cut_beat3.png
+set Cut Every 0
+# 22 poses
+set Orbit Yaw 40
+set Orbit Pitch 15
+set Distance 3
+pulse Store Pose 1
+set Orbit Yaw -60
+set Orbit Pitch -10
+set Distance 6
+set Rotate Z 20
+pulse Store Pose 2
+get Pose_Data
+pulse Go Pose 1
+set Pose Glide 1
+frames 30
+shot verify/w8/b1_glide_halfway.png
+frames 40
+shot verify/w8/b2_at_pose1.png
+get Orbit Yaw
+get Orbit Pitch
+get Distance
+get Rotate Z
+delete
+# a fresh instance gets the saved Pose Data text back (what Arena does on comp load) and can glide to pose 2
+bundle build/LoadEhr.bundle
+instance
+text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+wait_loaded 60
+text Pose_Data 1:40.0000,15.0000,3.0000,35.0000,0.0000,0.0000,0.0000,0.0000,0.0000;2:-60.0000,-10.0000,6.0000,35.0000,0.0000,0.0000,20.0000,0.0000,0.0000;
+set Pose Glide 0
+pulse Go Pose 2
+frames 3
+get Orbit Yaw
+get Distance
+get Rotate Z
+shot verify/w8/b3_reloaded_pose2.png
+set Orbit Yaw 0
+set Orbit Pitch 0
+set Distance 4
+set Rotate Z 0
+# 23 shake + vertigo
+set Beat Shake 2
+frames 32
+shot verify/w8/c1_shake_on_beat.png
+set Beat Shake 0
+frames 60
+set Vertigo -1
+frames 2
+shot verify/w8/c2_vertigo_minus1.png
+set Vertigo 1
+frames 2
+shot verify/w8/c3_vertigo_plus1.png
+set Vertigo 0
+# 24 Model B transitions: mask -> DamagedHelmet
+text Model_B /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_models/DamagedHelmet/DamagedHelmet.glb
+wait_loaded 60
+realtime 1
+set Transition 0.5
+set Transition Style 0
+frames 5
+shot verify/w8/d1_dissolve_50.png
+set Transition Style 1
+frames 5
+shot verify/w8/d2_shatter_50.png
+set Transition Style 3
+frames 5
+shot verify/w8/d4_slice_50.png
+set Transition Style 2
+set Transition 0
+frames 5
+set Transition 0.3
+stats_reset
+realtime 0.6
+stats transition dust (both models)
+set Transition 0.5
+realtime 0.6
+shot verify/w8/d3_dust_50.png
+set Transition 1
+realtime 2
+shot verify/w8/d5_transition_done_B.png
+set Transition 0
+frames 5
+shot verify/w8/d6_back_to_A.png

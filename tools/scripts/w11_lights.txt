@@ -1,0 +1,83 @@
+# W11 (c) hue drift at the new maximum, (d) eye lights on the mask, (e) eye finder on DamagedHelmet.
+bundle build/LoadEhr.bundle
+size 960 540
+instance
+text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+wait_loaded 60
+# (c) Light A, saturated red, Hue Drift 0.7 (one turn in 1.43 s): per-frame change stays small and even
+set A Enable 1
+set A Color 0
+set A Sat 1
+set A Hue Drift 0.7
+frames 30
+diffs 90
+shot verify/w11/c_drift07_t0.png
+frames 21
+shot verify/w11/c_drift07_t1.png
+frames 22
+shot verify/w11/c_drift07_t2.png
+frames 21
+shot verify/w11/c_drift07_t3.png
+# the old maximum for comparison (Arena clamps to the new range; the harness does not)
+set A Hue Drift 2
+diffs 90
+set A Hue Drift 0
+set A Enable 0
+set A Sat 0.38
+set A Color 0.1052632
+# (d) eye lights: auto place on Enable, then Front Only on / off, at 35 deg so the beams read from the side
+set C Enable 1
+frames 20
+get C Left Pos X
+get C Left Pos Y
+get C Left Pos Z
+get C Right Pos X
+get C Right Pos Y
+get C Right Pos Z
+get C Mirror X
+get C Cone Angle
+get C Placed For
+set Rotate Y 35
+frames 60
+shot verify/w11/d1_eyes_front_only.png
+set C Front Only 0
+frames 60
+shot verify/w11/d2_eyes_front_only_off.png
+set C Front Only 1
+set Rotate Y 0
+frames 60
+shot verify/w11/d3_eyes_front_view.png
+# Fit Cone at a deeper Behind Depth: the cone narrows to keep filling the hole
+set C Behind Depth 0.6
+pulse C_Fit_Cone
+frames 2
+get C Cone Angle
+set C Behind Depth 0.3
+pulse C_Fit_Cone
+frames 2
+get C Cone Angle
+stats_reset
+frames 60
+stats eyes C only (2 shadowed spots) raymarch 32 half
+set A Enable 1
+stats_reset
+frames 60
+stats eyes C + A (3 shadowed lights)
+set A Enable 0
+set C Enable 0
+stats_reset
+frames 60
+stats no volume lights
+delete
+# (e) DamagedHelmet: a closed helmet, expect no pair and the reason
+bundle build/LoadEhr.bundle
+size 960 540
+instance
+text Model_A /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_models/DamagedHelmet/DamagedHelmet.glb
+wait_loaded 60
+get C Left Pos X
+pulse C_Place_At_Eyes
+frames 30
+get C Left Pos X
+get C Placed For
+delete
