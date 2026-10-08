@@ -581,10 +581,10 @@ void Renderer::ReleaseShape()
 		glDeleteBuffers( 1, &dummyShardBuf ), dummyShardBuf = 0;
 	for( ShardSlot& sh : shards )
 	{
-		for( GLuint* t : { &sh.ofTex, &sh.dataTex } )
+		for( GLuint* t : { &sh.ofTex, &sh.dataTex, &sh.rankTex } )
 			if( *t )
 				glDeleteTextures( 1, t ), *t = 0;
-		for( GLuint* b : { &sh.ofBuf, &sh.dataBuf } )
+		for( GLuint* b : { &sh.ofBuf, &sh.dataBuf, &sh.rankBuf } )
 			if( *b )
 				glDeleteBuffers( 1, b ), *b = 0;
 		if( sh.job )
@@ -699,6 +699,28 @@ void Renderer::UpdateShards( GpuModel* model, int count, int mode )
 		sh.data   = job->shardData; // W26 Bounce: the CPU flight starts from these
 		sh.radius = job->radius;
 		sh.pathKey = 0;
+		{
+			// W6 Pieces transition: the shards ranked bottom-up (centroid height + a little jitter); texel i = (the rank of shard i,
+			// 0..1; the shard of rank i): a shard flies to the other model's shard of the same rank
+			const int n = int( job->shardData.size() / 4 );
+			std::vector< int > order( static_cast< size_t >( n ) );
+			for( int i = 0; i < n; ++i )
+				order[ size_t( i ) ] = i;
+			auto key = [ & ]( int i ) { return job->shardData[ size_t( i ) * 4 + 1 ] + 0.08f * ( std::fmod( std::fabs( std::sin( float( i ) * 12.9898f ) * 43758.5453f ), 1.0f ) - 0.5f ); };
+			std::stable_sort( order.begin(), order.end(), [ & ]( int a, int b ) { return key( a ) < key( b ); } );
+			std::vector< float > rk( size_t( n ) * 2 );
+			for( int r = 0; r < n; ++r )
+				rk[ size_t( order[ size_t( r ) ] ) * 2 ] = ( float( r ) + 0.5f ) / float( n ), rk[ size_t( r ) * 2 + 1 ] = float( order[ size_t( r ) ] );
+			if( !sh.rankBuf )
+				glGenBuffers( 1, &sh.rankBuf ), glGenTextures( 1, &sh.rankTex );
+			glBindBuffer( GL_ARRAY_BUFFER, sh.rankBuf );
+			glBufferData( GL_ARRAY_BUFFER, std::max< size_t >( 8, rk.size() * sizeof( float ) ), rk.data(), GL_STATIC_DRAW );
+			glBindBuffer( GL_ARRAY_BUFFER, prevArray );
+			glBindTexture( GL_TEXTURE_BUFFER, sh.rankTex );
+			glTexBuffer( GL_TEXTURE_BUFFER, GL_RG32F, sh.rankBuf ); // after glBufferData (Apple GL)
+			glBindTexture( GL_TEXTURE_BUFFER, 0 );
+			sh.count = n;
+		}
 		if( LogVerbose() )
 			Log( "SHARDS %d for %s in %.0f ms (off the render thread)", count, LogName( model->path ).c_str(), job->ms );
 	}

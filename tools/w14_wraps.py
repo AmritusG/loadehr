@@ -113,6 +113,10 @@ SCENES = [
                 ('Smoke Amount', 4), ('Smoke Scale', 1.5), ('Smoke Speed', 4), ('Smoke Rise', 2), ('Motes', 4)]),
     # LoadEhr W1: the chain clock over 4 slots (Loop + Chain Loop, every style in turn, a hold): no drift after 180 min either
     ('chain', [('Transition Play', 3), ('Chain Loop', 1), ('Transition Time', 0.5), ('Hold Time', 0.25), ('Style Order', 1), ('Spin Y', 30)]),
+    # LoadEhr W6: the same chain in the Wow bundle: Style Order Cycle goes round all 23 styles there (Swarm, Burn, Lava, Smoke included)
+    ('chainwow', [('Transition Play', 3), ('Chain Loop', 1), ('Transition Time', 0.5), ('Hold Time', 0.25), ('Style Order', 1), ('Spin Y', 30)]),
+    # W6: with Cycle the style moves on every pass (a pass counter), so each checkpoint shows another style; the clock itself = Fixed
+    ('chainfixed', [('Transition Play', 3), ('Chain Loop', 1), ('Transition Time', 0.5), ('Hold Time', 0.25), ('Style Order', 0), ('Transition Style', 6)]),
     ('surface', [('Pattern', 3), ('Pattern Speed', 4), ('Glitter', 10), ('Glitter Twinkle', 1), ('Liquid Chrome', 0.6), ('Chrome Ripple', 3),
                  ('Oil Film', 2), ('Film Swirl', 2), ('Contours', 5), ('Contour Speed', 4), ('Ripple', 0.1), ('Ripple Speed', 20),
                  ('Slice Wave', 4), ('Dust Wind', 6)]),
@@ -123,12 +127,16 @@ SCENES = [
 MINUTES = [1, 13, 26, 60, 180]
 
 
-def times(out):
-    lines = ['bundle build/LoadEhr.bundle', 'size 960 540']
-    for scene, params in SCENES:
+def times(out, only=()):
+    lines, bundle = ['size 960 540'], None
+    scenes = [sc for sc in SCENES if not only or sc[0] in only]
+    for scene, params in scenes:
+        b = 'LoadEhrWow' if scene in ('chainwow', 'chainfixed') else 'LoadEhr'
+        if b != bundle:
+            lines, bundle = lines + ['bundle build/%s.bundle' % b], b
         for m in MINUTES:
             lines += ['instance', 'text Model_A ' + MODEL, 'wait_loaded 60'] + ['set %s %g' % (k, v) for k, v in params]
-            if scene == 'chain':
+            if scene.startswith('chain'):
                 lines += ['mark'] + SLOTS + ['wait_slots 3 60']
             lines += ['advance %d zero' % (m * 60), 'frames 1', 'diffs 60', 'shot %s/times_%s_%03dmin.png' % (out, scene, m), 'delete']
     script = os.path.join(out, 'times.txt')
@@ -137,7 +145,7 @@ def times(out):
     open(os.path.join(out, 'times.log'), 'w').write(res.stdout + res.stderr)
     diffs = iter([list(map(float, l.split()[1:])) for l in res.stdout.splitlines() if l.startswith('diffs:')])
     print('%-8s %6s | %9s %9s %9s' % ('scene', 'min', 'median', 'p95', 'max'))
-    for scene, _ in SCENES:
+    for scene, _ in scenes:
         for m in MINUTES:
             d = sorted(next(diffs))
             print('%-8s %6d | %9.3f %9.3f %9.3f' % (scene, m, statistics.median(d), d[int(0.95 * (len(d) - 1))], d[-1]))
@@ -146,7 +154,7 @@ def times(out):
 def main():
     if sys.argv[1] == 'times':
         os.makedirs(sys.argv[2], exist_ok=True)
-        return times(sys.argv[2])
+        return times(sys.argv[2], sys.argv[3:])
     mode, out, only = sys.argv[1], sys.argv[2], sys.argv[3:]
     os.makedirs(out, exist_ok=True)
     lines, bundle = ['size 960 540'], None

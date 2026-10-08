@@ -56,7 +56,15 @@ struct XLight
 // per-model cache (shards, dust, letters, liquid SDF, sim obstacle SDF) has one entry per SLOT, so a slot's data is built once,
 // ahead of use, and a hop between any two slots finds it ready.
 static constexpr int kSlots = 4;
-enum SlotUse : unsigned { kUseShards = 1, kUseDust = 2, kUseLiquid = 4, kUseSim = 8, kUsePoints = 16 };
+enum SlotUse : unsigned { kUseShards = 1, kUseDust = 2, kUseLiquid = 4, kUseSim = 8, kUsePoints = 16, kUseCloud = 32 };
+// W6 Stage 2: Transition Style (0..4 as before; the pack 5..22 appended, so saved clips keep their style)
+enum TransStyle : int
+{
+	kStyleDissolve = 0, kStyleShatter, kStyleDust, kStyleSlice, kStyleLiquid,
+	kStylePoints, kStyleShrinkwrap, kStyleWire, kStyleVoxel, kStyleLowPoly, kStylePieces, kStyleImplode, kStyleTwist, kStyleMelt, kStyleScan,
+	kStyleGlitch, kStyleRipple, kStyleSwarm, kStyleSmoke, kStyleBurn, kStyleLava, kStyleSpinSwap, kStyleFold,
+	kStyleCount
+};
 static constexpr int kSKShadowUnit = 21; // W23: the key shadow map in the volume march (Smoke Key Light)
 static constexpr int kMaxVolLights = 4; // A, B, C left, C right (only A/B can be point lights: cube maps 0/1)
 static constexpr int kMaxXLights   = 8;
@@ -274,6 +282,30 @@ struct ProjState
 	bool videoStraight = false;                // W3 Video Alpha: straight alpha = premultiply the frame in the copy pass
 };
 
+// W6 Stage 2: the transition pack's per-side state. The MORPH program variants (`#define MORPH`, Morph.cpp) carry its vertex side
+// (vs: 1 shrinkwrap, 2 pieces, 3 implode, 4 glitch, 5 ripple, 6 spin swap) and its fragment side (mask: 1 scan, 2 glitch, 3 ripple,
+// 4 burn); the point cloud (styles 5 Points / 17 Swarm) is its own draw. side 1 = the hop's outgoing model, 2 = the incoming one.
+struct MorphState
+{
+	int vs = 0, mask = 0, side = 0;
+	float e = 0;       // the hop's progress, eased by Trans Ease
+	float k = 0;       // the style's own progress / amount on this side (see each style)
+	float stagger = 0, spread = 0.6f;
+	float scale = 1;   // spin swap: this side's size
+	float step = 0;    // glitch: the stepped clock (a whole step per 1/30 of the hop: slider-driven)
+	float freq = 12;   // ripple frequency / glitch bands
+	float band = 0.06f; // scan: the wire band's half width (0..1 of the axis)
+	float color[ 3 ] = { 0, 1, 1 }, glow = 0; // scan / ripple edge: Wire Color, Wire Glow
+	float temp = 2000, flame = 2;             // burn: Flame Temp, Flame Glow
+	float lavaGlow = 3;                       // lava: Lava Glow (the style glows whatever Lava Cracks says)
+	float seed[ 3 ] = { 0, 0.4f, 0.9f };       // burn: where the fire starts (fitted)
+	// the point cloud (styles 5 / 17): drawn while cloud > 0 (its fade), flight progress cloudK
+	float cloud = 0, cloudK = 0;
+	bool swarm = false;
+	float cloudColor[ 3 ] = { 0, 1, 1 }, cloudColorMix = 0, cloudPx = 2, cloudGlow = 0, cloudTwinkle = 0, cloudPhase = 0;
+	bool On() const { return vs > 0 || mask > 0; }
+};
+
 // W26 Stage 4: the Liquid transition style (4). ready: both models' SDFs are on the GPU (otherwise it dissolves like style 0)
 struct LiquidState
 {
@@ -331,7 +363,8 @@ struct FrameState
 	float modelScaleB = 1;
 	float transition  = 0; // the hop's progress: 0 = the outgoing model (a), 1 = the incoming one (b)
 	int transitionStyle = 0; // 0 dissolve, 1 shatter, 2 dust, 3 slice
-	float transEase = 1, transStagger = 0.85f, transSpread = 0.6f; // W16: Shatter / Dust timing
+	float transEase = 1, transStagger = 0.85f, transSpread = 0.6f; // W16: Shatter / Dust timing (W6: and the pack's)
+	MorphState morph; // W6 Stage 2 (the pack's dials are filled by the plugin; the per-side state by TransitionOut / In)
 	// material
 	float tint[ 3 ]   = { 1, 1, 1 };
 	float tintMix     = 0;
@@ -407,6 +440,14 @@ struct FrameState
 	// W21 text / logos: per-letter transforms, 12 floats per letter (pivot + scale, quaternion, offset + unused);
 	// empty = the letters are at rest (the plain programs draw)
 	std::vector< float > letterXf;
+};
+
+// W6 Stage 2: a slot's point cloud for the Points / Swarm styles, built on a worker (Morph.cpp)
+struct CloudSlotJob
+{
+	std::atomic< bool > done{ false }, cancel{ false };
+	std::vector< float > pts; // 9 per point: raw xyz, normal xyz, uv, part (sorted by the order key)
+	double ms = 0;
 };
 
 // W6 Stage 1: a model's points for one Point Source (Points.cpp): refs on unit 26, a run per GPU part
@@ -588,6 +629,24 @@ private:
 	} swarmSlot;
 	GLuint progBolt = 0, progBoltAdd = 0, boltVAO = 0, boltVBO = 0, boltTex = 0, boltFBO = 0;
 	int boltW = 0, boltH = 0;
+	// Morph.cpp (W6 Stage 2): the MORPH program variants, their per-pair uniforms, the point cloud of styles 5 / 17
+	bool InitMorph( std::string& error );
+	void ReleaseMorph();
+	void SetMorphUniforms( GLuint prog, const FrameState& fs, GpuModel* model );
+	bool MorphPairReady( const FrameState& fs, GpuModel* a, GpuModel* b ); // the style's per-slot data is on the GPU for this pair
+	bool UpdateCloud( int slot, GpuModel* model );                          // true once the slot's cloud is uploaded and baked
+	void DrawCloud( const FrameState& fsA, const FrameState& fsB, int w, int h, bool glow ); // main pass (sprites) / light (glow)
+	void WarmMorph( const FrameState& fs, GpuModel* model );
+	GLuint progSoupM = 0, progSoupMI = 0, progShadowSoupM = 0, progShadowSoupMI = 0;
+	GLuint progCloud = 0, progCloudBake = 0, cloudBakeFBO = 0, dummySdf3D = 0, cloudVAO = 0, cloudWarmVAO = 0, cloudWarmVBO = 0;
+	struct CloudSlot
+	{
+		uint64_t serial = 0;
+		std::shared_ptr< CloudSlotJob > job;
+		GLuint vbo = 0, colorTex = 0;
+		bool baked = false;
+	} cloud[ kSlots ];
+	bool cloudGlowNow = false; // this frame's cloud lights the composite (DrawCloud glow after it)
 	// Liquid.cpp (W26)
 	bool InitLiquid( std::string& error );
 	void ReleaseLiquid();
@@ -691,6 +750,9 @@ private:
 		std::vector< float > data, radius;
 		GLuint pathBuf = 0, pathTex = 0;
 		uint64_t pathKey = 0;
+		// W6 Pieces transition: per shard (rank of shard i bottom-up, 0..1; the shard of rank i) as RG32F, unit 29 / 30
+		GLuint rankBuf = 0, rankTex = 0;
+		int count = 0;
 	} shards[ kSlots ];
 	void UpdateBounce( const FrameState& fs, GpuModel* model ); // Shape.cpp (W26)
 	GLuint progSoupB = 0, progShadowSoupB = 0;

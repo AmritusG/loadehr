@@ -1284,10 +1284,11 @@ private:
 		BuildFaces( fs, M, pos, V, P, dt );
 #endif
 		fs.transition      = chain.next >= 0 ? chain.t : 0.0f;
-		fs.transitionStyle = chain.style;
+		fs.transitionStyle = StyleHere( chain.style );
 		fs.transEase       = values[ P_TRANS_EASE ];
 		fs.transStagger    = values[ P_TRANS_STAGGER ];
 		fs.transSpread     = values[ P_TRANS_SPREAD ];
+		BuildMorph( fs );
 		// W26 Liquid: the wobble's ripples travel at 0.6 cycles / s x Liquid Speed (W28; phase wraps at 1: whole cycles in the shader)
 		clk.liquid         = Wrap( clk.liquid + dt * 0.6 * values[ P_LIQUID_SPEED ], 1.0 );
 		fs.liquid.goo      = values[ P_LIQUID_GOO ];
@@ -1348,6 +1349,7 @@ private:
 		BuildShape( fs, pulse, dt );
 		BuildLetters( fs, dt );
 		BuildLava( fs, anchor, dt );
+		SmokeStyle( dt ); // W6: before the volume / sim read it
 		BuildVolume( fs, anchor, eye, pulse, dt );
 		BuildProjector( fs, anchor, eye, dt );
 		BuildCaustics( fs, anchor, dt );
@@ -1870,6 +1872,8 @@ private:
 		v.spotBeams         = values[ P_SPOT_BEAMS ];
 		v.fogLights         = v.spotBeams > 0.0f ? n : volLights;
 		v.smokeAmbient      = values[ P_SMOKE_AMBIENT ];
+		if( smokeTail > 0.0f && v.smokeAmbient <= 0.0f ) // W6 Smoke style: the smoke is lit through the hop and its tail
+			v.smokeAmbient = 1.2f * std::min( 1.0f, smokeTail / 1.5f );
 		v.smokeKey          = values[ P_SMOKE_KEY ];
 		BuildTrip( fs, anchor, dt );
 		const TripState& tr = fs.trip; // W24: smoke that glows by itself needs no lamp
@@ -1912,6 +1916,8 @@ private:
 		m.engine    = Opt( P_SMOKE_ENGINE );
 		if( m.engine == 0 && values[ P_FIRE ] > 0.0f )
 			m.engine = 1; // W26: fire burns in the sim
+		if( m.engine == 0 && smokeTail > 0.0f )
+			m.engine = 1; // W6: the Smoke style's smoke
 		if( m.engine == 0 )
 		{
 			simPrevValid = false;
@@ -1975,7 +1981,8 @@ private:
 		m.behindHeat = values[ P_BEHIND_HEAT ];
 		m.emitRim    = values[ P_EMIT_RIM ];
 		m.rimHeat    = values[ P_RIM_HEAT ];
-		m.emitInside = values[ P_EMIT_INSIDE ];
+		m.emitInside = values[ P_EMIT_INSIDE ] + smokeEmit;
+		m.emitRim += 0.5f * smokeEmit; // W6 Smoke style: the dissolving mesh's smoke
 		m.insideHeat = values[ P_INSIDE_HEAT ];
 		// Beat Puff: a burst from every active emitter on the chosen beats (0.1 s attack-free decay), x Audio > Emit
 		const int every = Opt( P_BEAT_PUFF ) == 0 ? 0 : 1 << ( Opt( P_BEAT_PUFF ) - 1 );
@@ -2068,37 +2075,46 @@ private:
 		int style   = 0;
 	};
 	Chain chain;
+	int chainLoops = 0; // W6: Transition Play passes round the chain since its restart, modulo kStyleCount (0 with Play Off)
 	bool SlotFilled( int i ) const
 	{
 		const ModelSlot& m = slots[ i ];
 		return !m.file.empty() && ( m.current || m.pending || m.ticket );
 	}
-	// the style of hop h: Fixed = Transition Style; Cycle = Transition Style + h (round the five); Random = a hash of h (stable
-	// while scrubbing, the same hop always morphs the same way)
-	int HopStyle( int h ) const
+	// the style of hop h: Fixed = Transition Style; Cycle = Transition Style + h (W6: round all the styles); Random = a hash of h
+	// (stable while scrubbing, the same hop always morphs the same way)
+	int HopStyle( int h, int hops ) const
 	{
-		const int base = std::clamp( Opt( P_TRANSITION_STYLE ), 0, 4 ), order = Opt( P_STYLE_ORDER );
+		const int base = std::clamp( Opt( P_TRANSITION_STYLE ), 0, kStyleCount - 1 ), order = Opt( P_STYLE_ORDER );
+		// W6: while Transition Play loops (Loop / Ping-Pong), every pass round the chain moves on by its hops, so a 4-slot loop goes
+		// round all the styles, not the same 4 (chainLoops: passes since the restart, kept modulo kStyleCount; 0 while the slider drives)
+		h += chainLoops * std::max( 1, hops );
 		if( order == 1 )
-			return ( base + h ) % 5;
+			return ( base + h ) % kStyleCount;
 		if( order == 2 )
 		{
 			uint32_t x = uint32_t( h + 1 ) * 2654435761u;
 			x ^= x >> 15, x *= 2246822519u, x ^= x >> 13;
-			return int( x % 5u );
+			return int( x % uint32_t( kStyleCount ) );
 		}
 		return base;
 	}
+	// W6: Swarm, Burn and Lava read the Wow bundles' dials (Firefly, Fire, Lava): in LoadEhr / FX they dissolve
+	static int StyleHere( int st ) { return !LOADEHR_WOW && ( st == kStyleSwarm || st == kStyleBurn || st == kStyleLava ) ? kStyleDissolve : st; }
 	// which per-slot caches the chain's hops need ahead of use (the styles any hop can take)
 	unsigned ChainUses() const
 	{
 		if( chain.hops == 0 )
 			return 0;
 		const int order = Opt( P_STYLE_ORDER );
-		const int style = std::clamp( Opt( P_TRANSITION_STYLE ), 0, 4 );
-		auto use = []( int st ) { return st == 1 ? (unsigned)kUseShards : st == 2 ? (unsigned)kUseDust : st == 4 ? (unsigned)kUseLiquid : 0u; };
+		const int style = StyleHere( std::clamp( Opt( P_TRANSITION_STYLE ), 0, kStyleCount - 1 ) );
+		auto use = []( int st ) {
+			return st == kStyleShatter || st == kStylePieces ? (unsigned)kUseShards : st == kStyleDust ? (unsigned)kUseDust
+			     : st == kStylePoints || st == kStyleSwarm ? (unsigned)kUseCloud : st == kStyleSmoke ? (unsigned)kUseSim : 0u;
+		};
 		// the liquid SDF is built for every filled slot whatever the style (CPU, off the render thread; 1 MB GPU each), so switching
-		// the style to Liquid mid-show finds every hop ready
-		return ( order == 0 ? use( style ) : ( kUseShards | kUseDust ) ) | kUseLiquid;
+		// the style to Liquid (or W6 Shrinkwrap, which slides onto it) mid-show finds every hop ready
+		return ( order == 0 ? use( style ) : ( kUseShards | kUseDust | kUseCloud | kUseSim ) ) | kUseLiquid;
 	}
 
 	// W28 Transition Play over the chain: restarted by a clip trigger (WatchTrigger) and by switching Play on. Each hop = Transition
@@ -2116,7 +2132,10 @@ private:
 		if( c.hops == 0 )
 			return 0.0;
 		if( play == 0 )
+		{
+			chainLoops = 0;
 			return double( values[ P_TRANSITION ] ) * c.hops;
+		}
 		const double T = std::max( 0.5f, values[ P_TRANS_TIME ] ), Hd = std::max( 0.0f, values[ P_HOLD_TIME ] ), seg = T + Hd;
 		const int H    = c.hops;
 		// position along a walk of `hops` forward hops ([morph T][hold Hd] each), 0..hops
@@ -2149,10 +2168,15 @@ private:
 		{
 			if( !slots[ c.filled[ 1 % c.n ] ].current )
 				return 0.0; // the restart waits for the first hop's model (MaskEhr: until Model B is on the GPU)
-			clk.transPlay = 0.0, transRestart = false;
+			clk.transPlay = 0.0, transRestart = false, chainLoops = 0;
 		}
 		else if( pairReady )
-			clk.transPlay = play == 1 ? std::min( clk.transPlay + dt, period ) : Wrap( clk.transPlay + dt, period );
+		{
+			const double before = clk.transPlay;
+			clk.transPlay       = play == 1 ? std::min( clk.transPlay + dt, period ) : Wrap( clk.transPlay + dt, period );
+			if( play != 1 && clk.transPlay < before )
+				chainLoops = ( chainLoops + 1 ) % kStyleCount; // a pass round the chain (W6: Style Order Cycle / Random move on)
+		}
 		return position( clk.transPlay );
 	}
 
@@ -2180,12 +2204,56 @@ private:
 		c.t    = t;
 		c.cur  = c.filled[ h % c.n ];
 		c.next = c.hops > 0 && h < c.hops ? c.filled[ ( h + 1 ) % c.n ] : -1;
-		c.style = c.hops > 0 ? HopStyle( std::min( h, c.hops - 1 ) ) : 0;
+		c.style = c.hops > 0 ? HopStyle( std::min( h, c.hops - 1 ), c.hops ) : 0;
 		if( ( c.cur != chain.cur || c.next != chain.next ) && LogVerbose() )
 			Log( "CHAIN hop %d/%d %c -> %c (%s), position %.3f", h, c.hops, c.cur >= 0 ? "ABCD"[ c.cur ] : '-', c.next >= 0 ? "ABCD"[ c.next ] : '-',
 			     ParamDefs()[ P_TRANSITION_STYLE ].options[ size_t( c.style ) ].c_str(), x );
 		chain = c;
 	}
+
+	// W6 Stage 2: the pack's dials (the per-side state comes from the renderer's TransitionOut / In). The edges and the Points cloud
+	// wear the Wireframe group's look (Wire Color, Glow, Thickness, Point Twinkle), Swarm the fireflies', Burn the fire's, Lava the lava's.
+	void BuildMorph( FrameState& fs )
+	{
+		MorphState& m = fs.morph;
+		const int st  = fs.transitionStyle;
+		Colour( P_WIRE_COL_H, m.color );
+		m.glow     = values[ P_WIRE_GLOW ];
+		m.freq     = st == kStyleGlitch ? std::max( 2.0f, values[ P_GLITCH_BANDS ] ) : values[ P_RIPPLE_FREQ ];
+		m.temp     = values[ P_FLAME_TEMP ];
+		m.flame    = values[ P_FLAME_GLOW ];
+		m.lavaGlow = values[ P_LAVA_GLOW ];
+		m.cloudPhase = float( clk.pointTwinkle );
+		if( st == kStyleSwarm )
+		{
+			Colour( P_FIREFLY_COL_H, m.cloudColor );
+			m.cloudColorMix = 1.0f;
+			m.cloudPx       = values[ P_FIREFLY_SIZE ] * 1.5f;
+			m.cloudGlow     = values[ P_FIREFLY_GLOW ] * Alpha( P_FIREFLY_COL_H ) * 0.04f; // 16k overlapping halos
+			m.cloudTwinkle  = values[ P_TWINKLE ];
+		}
+		else
+		{
+			std::memcpy( m.cloudColor, m.color, sizeof( m.color ) );
+			m.cloudColorMix = Alpha( P_WIRE_COL_H );
+			m.cloudPx       = std::max( 1.5f, 2.0f * values[ P_WIRE_THICKNESS ] );
+			m.cloudGlow     = values[ P_WIRE_GLOW ] * 0.04f;
+			m.cloudTwinkle  = values[ P_POINT_TWINKLE ];
+		}
+	}
+	// W6 Smoke style: while its hop moves, the dissolving part of the mesh turns into sim smoke: Emit Inside (+ half as much Emit Rim) at
+	// a rate set by how fast the hop moves (holding still emits nothing; the smoke already out drifts and fades as the sim says). The sim
+	// runs, and the smoke is lit (Smoke Ambient at least 1.2 when it is 0), through the hop and a 4 s tail (the last 1.5 s fade the light).
+	void SmokeStyle( float dt )
+	{
+		const bool hop = chain.next >= 0 && chain.t > 0.0f && chain.t < 1.0f && StyleHere( chain.style ) == kStyleSmoke;
+		const float t  = chain.t, e = t + values[ P_TRANS_EASE ] * ( t * t * ( 3.0f - 2.0f * t ) - t );
+		smokeEmit      = hop && smokeHop == chain.hop && dt > 0.0f ? std::min( 10.0f, std::fabs( e - smokeE ) / dt * 6.0f ) : 0.0f;
+		smokeE = e, smokeHop = hop ? chain.hop : -1;
+		smokeTail = hop ? 4.0f : std::max( 0.0f, smokeTail - dt );
+	}
+	float smokeEmit = 0.0f, smokeE = 0.0f, smokeTail = 0.0f;
+	int smokeHop    = -1;
 
 	// kelvin -> linear rgb, max 1 (Helland's fit, as the shaders' Blackbody)
 	static void Blackbody( float k, float* rgb )

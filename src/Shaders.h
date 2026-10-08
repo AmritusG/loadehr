@@ -264,6 +264,29 @@ uniform float uSplit; // W26 Lava Split (0..1)
 uniform usamplerBuffer uLetterOf; // per triangle: letter id
 uniform samplerBuffer uLetterXf;  // per letter, 3 texels: pivot (fitted) + scale, rotation (quaternion), offset (fitted)
 #endif
+#ifdef MORPH
+// W6 Stage 2: the transition pack's vertex side (this program variant only). uMorphSide 1 = the hop's outgoing model, 2 = the
+// incoming one; uMorphK = the style's progress on this side; Trans Stagger orders the pieces by a key, Trans Spread = how far / wide
+uniform int uMorphVS;              // 1 shrinkwrap, 2 pieces, 3 implode, 4 glitch, 5 ripple, 6 spin swap
+uniform int uMorphSide;
+uniform float uMorphK, uMorphE, uMorphStagger, uMorphSpread, uMorphScale, uMorphStep, uMorphFreq;
+uniform mat4 uMorphToOther;        // this model's fitted space -> the other model's raw space (both drawn at the frame's pose)
+uniform mat4 uMorphFromOther;      // and back
+uniform sampler3D uMorphSdf;       // shrinkwrap: the other model's liquid SDF (raw units, unit 27)
+uniform vec3 uMorphSdfMin;
+uniform float uMorphSdfSize;
+uniform samplerBuffer uPartnerData; // pieces: the other model's shard centroids (its fitted space) + seed (unit 28)
+uniform samplerBuffer uRankSelf;   // per shard: (rank 0..1 bottom-up, the shard of rank i) of this model (unit 29) ...
+uniform samplerBuffer uRankOther;  // ... and of the other one (unit 30)
+uniform float uPartnerN;
+uniform vec4 uOtherFit;            // the other model's fit: centre xyz, scale (raw -> fitted)
+float MorphU( float k ) { return clamp( ( uMorphK - uMorphStagger * k ) / max( 1.0 - uMorphStagger, 1e-3 ), 0.0, 1.0 ); }
+float MorphSdf( vec3 q ) // the field inside its box, + the distance to the box outside it (as the liquid's Box)
+{
+	vec3 u = ( q - uMorphSdfMin ) / uMorphSdfSize, c = clamp( u, vec3( 0.0 ), vec3( 1.0 ) );
+	return texture( uMorphSdf, c ).r + length( ( u - c ) * uMorphSdfSize );
+}
+#endif
 
 out VData
 {
@@ -704,6 +727,94 @@ void main()
 			f += mv, f0 += mv, f1 += mv, f2 += mv;
 		}
 #endif
+#ifdef MORPH
+		{
+			const float PI_ = 3.14159265;
+			vec3 cen = ( f0 + f1 + f2 ) / 3.0;
+			vec3 rest = ( ( FetchPos( i0 ) + FetchPos( i1 ) + FetchPos( i2 ) ) / 3.0 - uFitCenter ) * uFitScale; // the triangle at rest
+			if( uMorphVS == 1 )
+			{
+				// SHRINKWRAP: every vertex slides onto the other model's surface (4 steps down its SDF), the top first
+				float u = MorphU( clamp( 0.5 - 0.5 * opos.y, 0.0, 1.0 ) );
+				u       = u * u * ( 3.0 - 2.0 * u );
+				vec3 q  = ( uMorphToOther * vec4( f, 1.0 ) ).xyz;
+				vec3 g  = vec3( 0.0, 1.0, 0.0 );
+				float h = uMorphSdfSize / 64.0;
+				for( int it = 0; it < 4; ++it )
+				{
+					float d = MorphSdf( q );
+					g = vec3( MorphSdf( q + vec3( h, 0, 0 ) ) - MorphSdf( q - vec3( h, 0, 0 ) ), MorphSdf( q + vec3( 0, h, 0 ) ) - MorphSdf( q - vec3( 0, h, 0 ) ),
+					          MorphSdf( q + vec3( 0, 0, h ) ) - MorphSdf( q - vec3( 0, 0, h ) ) );
+					g = dot( g, g ) > 1e-20 ? normalize( g ) : vec3( 0.0, 1.0, 0.0 );
+					q -= g * d;
+				}
+				vec3 fw = ( uMorphFromOther * vec4( q, 1.0 ) ).xyz;
+				vec3 gn = normalize( mat3( uMorphFromOther ) * g );
+				f       = mix( f, fw, u );
+				nOut    = normalize( mix( nOut, gn, u ) + vec3( 1e-6 ) );
+			}
+			else if( uMorphVS == 2 )
+			{
+				// PIECES: each shard flies from its home to its partner's home on the other model (partners matched by rank, bottom-up),
+				// shrinking away (outgoing) / growing in (incoming) over the far / near half of its flight, turning on the way
+				uint sh   = texelFetch( uShardOf, base / 3 ).r;
+				vec4 sd   = texelFetch( uShardData, int( sh ) );
+				float rk  = texelFetch( uRankSelf, int( sh ) ).r;
+				int pr    = int( min( floor( rk * uPartnerN ), uPartnerN - 1.0 ) );
+				int ps    = int( texelFetch( uRankOther, pr ).g + 0.5 );
+				vec3 tgt  = texelFetch( uPartnerData, ps ).xyz / uOtherFit.w + uOtherFit.xyz; // the partner's centroid, the other model's raw space
+				tgt       = ( uMorphFromOther * vec4( tgt, 1.0 ) ).xyz;
+				float u   = MorphU( rk );
+				float s2  = u * u * ( 3.0 - 2.0 * u );
+				vec3 home = sd.xyz;
+				vec3 c    = uMorphSide == 1 ? mix( home, tgt, s2 ) : mix( tgt, home, s2 );
+				c += ( vec3( 0.0, 0.5, 0.0 ) + 0.3 * normalize( home + vec3( 1e-4 ) ) ) * uMorphSpread * sin( PI_ * u );
+				float sc  = uMorphSide == 1 ? 1.0 - smoothstep( 0.45, 1.0, u ) : smoothstep( 0.0, 0.55, u );
+				vec3 hh   = Hash3v( sd.w * 17.31 );
+				mat3 R    = RotAxis( normalize( Hash3v( sd.w * 5.13 + 2.0 ) - 0.5 + 1e-4 ), uShardSpin * 0.6 * sin( PI_ * u ) * ( 0.4 + hh.y ) );
+				f         = c + R * ( f - home ) * sc;
+				nOut      = R * nOut;
+				t.xyz     = R * t.xyz;
+			}
+			else if( uMorphVS == 3 )
+			{
+				// IMPLODE: triangles fall into the centre, shrinking (the rim first), turning about the up axis; the incoming model bursts out
+				float u  = MorphU( 1.0 - clamp( length( rest ) / 1.5, 0.0, 1.0 ) );
+				float a  = u * u * ( 3.0 - 2.0 * u );
+				a        = uMorphSide == 1 ? a : 1.0 - a;
+				mat3 R   = RotAxis( vec3( 0.0, 1.0, 0.0 ), uMorphSpread * PI_ * a );
+				f        = R * ( cen * ( 1.0 - a ) + ( f - cen ) * ( 1.0 - a ) );
+				nOut     = R * nOut;
+				t.xyz    = R * t.xyz;
+			}
+			else if( uMorphVS == 4 )
+			{
+				// GLITCH: the bands in flux (near their switch between the models) jump sideways on the stepped clock
+				vec3 g     = ToAxis( rest, uDeformAxis );
+				float band = floor( clamp( ( g.z + 1.0 ) * 0.5, 0.0, 0.999 ) * uMorphFreq );
+				float h    = fract( sin( ( band + 1.37 ) * 91.7 + uMorphStep * 7.13 ) * 43758.5453 ); // (+ 1.37: band 0 at step 0 is not 0)
+				float h2   = fract( sin( band * 17.3 + uMorphStep * 3.71 + 5.0 ) * 24634.6345 );
+				float flux = 1.0 - smoothstep( 0.0, 0.2, abs( h - uMorphK ) );
+				vec3 q     = ToAxis( f, uDeformAxis );
+				q.x += ( h2 - 0.5 ) * 0.4 * uMorphSpread * flux * sin( PI_ * uMorphE );
+				f = FromAxis( q, uDeformAxis );
+			}
+			else if( uMorphVS == 5 )
+			{
+				// RIPPLE: a wave rides the front (the radius where the models swap), out along the normal
+				float x = length( opos ) - uMorphK;
+				f += nOut * ( 0.1 * uMorphSpread * sin( PI_ * uMorphE ) * exp( -x * x / 0.02 ) * sin( uMorphFreq * x ) );
+			}
+			else if( uMorphVS == 6 )
+			{
+				// SPIN SWAP: spin about the up axis while shrinking (outgoing) / growing (incoming)
+				mat3 R = RotAxis( vec3( 0.0, 1.0, 0.0 ), uMorphK );
+				f      = R * f * uMorphScale;
+				nOut   = R * nOut;
+				t.xyz  = R * t.xyz;
+			}
+		}
+#endif
 		p    = f / uFitScale + uFitCenter;
 		wn   = normalize( uNormalMat * nOut );
 		nObj = nOut;
@@ -966,6 +1077,16 @@ uniform int uPattern; // 0 off, 1 stripes, 2 cells, 3 noise
 uniform float uPatAmt, uPatScale, uPatBeat, uPatAudio;
 uniform vec3 uPatT;          // crawl (integrated Pattern Speed), the same one loop back, cross-fade weight toward it
 uniform vec3 uPatColor;
+#ifdef MORPH
+// W6 Stage 2: the transition pack's fragment side. uMorphMask 1 scan (a plane sweeps along the deform axis; a wire band where it is),
+// 2 glitch (bands across the axis take one model or the other on the stepped clock), 3 ripple (a front out from the centre), 4 burn (a
+// fire front from a point); side 1 = the outgoing model (shows ahead of the front), 2 = the incoming one (behind it)
+uniform int uMorphMask;
+uniform int uMorphSide;
+uniform float uMorphK, uMorphE, uMorphStep, uMorphFreq, uMorphBand, uMorphGlow, uMorphTemp, uMorphFlame;
+uniform vec3 uMorphColor, uMorphSeed;
+uniform int uDeformAxis;
+#endif
 #ifdef SHADOW_PASS
 uniform vec3 uShadowLightPos;
 uniform vec3 uShadowDir;   // ortho (directional) shadow: depth along the light's travel
@@ -1224,6 +1345,64 @@ void main()
 
 	if( uDustCut > 0.0 && ( ( Fbm( vi.opos * 3.0 + 17.0 ) < uDustCut * 1.08 - 0.04 ) != ( uDustInvert == 1 ) ) )
 		discard;
+#ifdef WIRE
+	// W6: a discard here (the dissolve, the pack's fronts) corrupts later values in the WIRE twins on Apple's GL (edgeGlow read 1: a
+	// white model mid-hop): they cut through the alpha at the very end instead
+	float wireCut = 1.0;
+#endif
+#ifdef MORPH
+	float morphEdge = 0.0, morphChar = 0.0, morphHeat = 0.0;
+	if( uMorphMask > 0 )
+	{
+		vec3 ax = uDeformAxis == 0 ? vi.opos.yzx : ( uDeformAxis == 1 ? vi.opos.zxy : vi.opos ); // .z runs along the axis
+		bool ahead; // the outgoing model's side of the front
+		if( uMorphMask == 1 )
+		{
+			float k  = clamp( ( ax.z + 1.15 ) / 2.3, 0.0, 1.0 );
+			ahead    = k >= uMorphK;
+			float dz = uMorphSide == 1 ? k - uMorphK : uMorphK - k; // >= 0 on this side
+			if( dz < uMorphBand )
+			{
+				// the wire band: only the lines, glowing in Wire Color; a bright ring where the plane cuts the surface
+				vec3 e     = smoothstep( vec3( 0.0 ), bw * 1.4, vi.bary );
+				float line = 1.0 - min( min( e.x, e.y ), e.z );
+				float ring = uMorphSide == 2 ? 1.0 - smoothstep( 0.0, 0.012, dz ) : 0.0;
+				if( max( line, ring ) < 0.4 && dz >= 0.0 )
+#ifdef WIRE
+					wireCut = 0.0;
+#else
+					discard;
+#endif
+				morphEdge = 1.0;
+			}
+		}
+		else if( uMorphMask == 2 )
+		{
+			float band = floor( clamp( ( ax.z + 1.0 ) * 0.5, 0.0, 0.999 ) * uMorphFreq );
+			ahead      = fract( sin( ( band + 1.37 ) * 91.7 + uMorphStep * 7.13 ) * 43758.5453 ) >= uMorphK; // the VS's band hash
+		}
+		else if( uMorphMask == 3 )
+		{
+			float r = length( vi.opos );
+			ahead   = r >= uMorphK;
+			morphEdge = 1.0 - smoothstep( 0.0, 0.035, abs( r - uMorphK ) );
+		}
+		else
+		{
+			float k   = length( vi.opos - uMorphSeed ) * 0.5 + 0.22 * ( Fbm( vi.opos * 2.5 + 3.0 ) - 0.5 );
+			ahead     = k >= uMorphK;
+			float x   = ( k - uMorphK ) / max( uMorphBand, 1e-3 ); // 0 at the front .. 1 at the far edge of the burning band
+			morphHeat = uMorphSide == 1 ? 1.0 - smoothstep( 0.0, 1.0, x ) : 0.0;
+			morphChar = uMorphSide == 1 ? 1.0 - smoothstep( 0.6, 2.0, x ) : 0.0;
+		}
+		if( ahead != ( uMorphSide == 1 ) )
+#ifdef WIRE
+			wireCut = 0.0;
+#else
+			discard;
+#endif
+	}
+#endif
 	// dissolve
 	float edgeGlow = 0.0;
 	if( uDissolve > 0.0 )
@@ -1231,7 +1410,11 @@ void main()
 		float n  = Fbm( vi.opos * 3.0 + 7.0 );
 		float th = uDissolve * 1.08 - 0.04;
 		if( ( n < th ) != ( uDissolveInvert == 1 ) )
+#ifdef WIRE
+			wireCut = 0.0;
+#else
 			discard;
+#endif
 		edgeGlow = uDissolveInvert == 1 ? smoothstep( th - 0.03, th, n ) : 1.0 - smoothstep( th, th + 0.03, n );
 	}
 #ifdef INSTANCED
@@ -1252,7 +1435,11 @@ void main()
 	if( uHas[ 0 ] == 1 )
 		base *= texture( uTex0, uv );
 	if( uCutout == 1 && base.a < 0.5 )
+#ifdef WIRE
+		wireCut = 0.0;
+#else
 		discard;
+#endif
 #ifdef SHADOW_PASS
 	fragColor = vec4( uShadowOrtho == 1 ? dot( vi.wpos - uShadowLightPos, uShadowDir ) : length( vi.wpos - uShadowLightPos ) );
 	return;
@@ -1555,6 +1742,16 @@ void main()
 	}
 
 #endif
+#ifdef MORPH
+	if( uMorphMask == 1 || uMorphMask == 3 )
+		color = mix( color, uMorphColor * ( 1.5 + uMorphGlow ), morphEdge ); // scan's wire band / ripple's front, in Wire Color
+	else if( uMorphMask == 4 )
+	{
+		// burn: the crust chars toward the front, which glows (blackbody of Flame Temp, x Flame Glow)
+		color *= 1.0 - 0.9 * morphChar;
+		color += Blackbody( uMorphTemp * ( 0.55 + 0.45 * morphHeat ) ) * morphHeat * morphHeat * uMorphFlame * 1.5;
+	}
+#endif
 #ifdef INSTANCED
 	if( uTrailPass == 1 ) // ghosts take the trail colour (keeping their shading) and glow in it
 		color = mix( color, uTrailColor * ( 0.15 + 1.2 * Luma( color ) ), uTrailMix ) + uTrailColor * uTrailGlow * 0.25;
@@ -1585,6 +1782,7 @@ void main()
 		outc = lineC * wa, alpha = vInstHA.y;
 	else if( uWirePass == 2 || uWirePass == 4 )
 		outc = lineC, alpha = wa * vInstHA.y;
+	alpha *= wireCut;
 #else
 	vec3 e      = smoothstep( vec3( 0.0 ), bw * uWireThickness, vi.bary );
 	float wire  = 1.0 - min( min( e.x, e.y ), e.z );

@@ -53,7 +53,10 @@ X( P_MAX_TEX, "Max Texture Size", OPT, 0, 2, 0, "Model", "Full|4K|2K", 0 )
 // hop (integer points = a pure model). Chain Loop: the last filled slot morphs back into the first (one more hop).
 X( P_TRANSITION, "Transition", STD, 0, 1, 0, "Model", "", 0 )
 X( P_CHAIN_LOOP, "Chain Loop", BOOL, 0, 1, 0, "Model", "", 0 )
-X( P_TRANSITION_STYLE, "Transition Style", OPT, 0, 4, 0, "Model", "Dissolve|Shatter|Dust|Slice|Liquid", 0 ) // W26: + Liquid
+// W6 Stage 2 (Amrit: "how many transitions types between models can be added?"): the pack appended (0..4 keep their numbers, so saved
+// clips keep their style). Swarm, Burn and Lava need the Wow bundles' dials: in LoadEhr / FX they dissolve.
+X( P_TRANSITION_STYLE, "Transition Style", OPT, 0, 22, 0, "Model",
+   "Dissolve|Shatter|Dust|Slice|Liquid|Points|Shrinkwrap|Wire|Voxel|Low Poly|Pieces|Implode|Twist|Melt|Scan|Glitch|Ripple|Swarm|Smoke|Burn|Lava|Spin Swap|Fold", 0 ) // W26: + Liquid
 // the style per hop: Fixed = Transition Style every hop; Cycle = Transition Style, then the next style each hop; Random = a
 // style per hop from a hash of the hop (stable while scrubbing)
 X( P_STYLE_ORDER, "Style Order", OPT, 0, 2, 0, "Model", "Fixed|Cycle|Random", 0 )

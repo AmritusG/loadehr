@@ -67,9 +67,12 @@ tools/w2_deform.py run|strips             # W2: every deform + its cost
 tools/w2_video.py make|run|modes          # W2: projector video files (test media from faces_clip.mp4; HAP via glenc-cli)
 tools/arena_w2.py <layer> [col]           # W2: dial the W2 Arena clips by param name (never triggers)
 tools/w3_dxv.py proof|alpha|cost <out>    # W3: DXV playback vs dxvtool dump-rgba, the Video Alpha strips, decode / upload cost
-tools/w4_scrub.py make|sweep|cue|reverse|latency|longshow  # W4: the scrubber on frame-coded clips (test_media/gen/w4)
+tools/w4_scrub.py make|sweep|cue|reverse|latency|longshow|refuse  # W4: the scrubber on frame-coded clips (test_media/gen/w4); W6 refuse: Scrub only on DXV / HAP
 tools/arena_w4.py <layer> [col [get]]    # W4: dial / read the W4 scrub clips by param name (never triggers)
 tools/w5_wire.py renders|checks|combos|cost <out>  # W5: the wireframe modes, fill / edge / glow / bloom checks, combinations, cost
+tools/w6_points.py renders|follow|cost|wire_same <out>  # W6: Points Only / + Wire per source, what they follow, cost, the W5 renders unchanged
+tools/w6_trans.py strips|chain|cost|waits|smoke <out>  # W6: the transition pack: scrub strips + ends, D -> A hops, cost, frame waits, Smoke
+tools/arena_w6.py points|trans <layer> [col]  # W6: dial the W6 clips by param name (never triggers)
 tools/arena_w5.py <layer> [col]          # W5: dial the W5 wire clips by param name (never triggers)
 git submodule update --init               # W3: third_party/dxvkit (DXVKit, pinned) must be checked out before cmake
 ```
@@ -92,7 +95,7 @@ MaskEhr reference builds go to a scratch folder (`cmake -S <MaskEhr> -B <scratch
 - THE CHAIN: the filled slots in order A -> B -> C -> D; H hops (n - 1, or n with Chain Loop: the last morphs back into the
   first). Transition 0..1 walks it, an equal share per hop; a whole point = a pure model (rest = that model as the next hop's
   outgoing model, never the "after the hop" state, so resting on a model looks the same whichever hop reached it).
-- Style per hop: Style Order Fixed (Transition Style every hop), Cycle (Transition Style + hop, round the five), Random (a hash
+- Style per hop: Style Order Fixed (Transition Style every hop), Cycle (Transition Style + hop, round all 23; W6: while Transition Play loops, + passes x hops, so a 4-slot loop meets every style), Random (a hash
   of the hop index: stable while scrubbing). Trans Ease / Stagger / Spread act inside each hop.
 - Transition Play (`ChainPosition`): Off / Once On Trigger / Ping-Pong / Loop; each hop = Transition Time of morph
   (smoothstepped) + Hold Time resting on the model it reached. Once: through the chain, holds the last model. Ping-Pong: to the
@@ -136,6 +139,8 @@ MaskEhr reference builds go to a scratch folder (`cmake -S <MaskEhr> -B <scratch
   emblem (`tools/w21_test_logos.py`: SVG + PDF from one geometry, PNG via sips). `tools/w21_arena.py` = set clip params by name over REST.
 - W3: `third_party/dxvkit` (submodule, MIT: DXV decoding), `tools/w3_dxv.py` (proof / alpha / cost of DXV playback).
 - W1: `tools/gen_test_models.py` (our test models), `tools/chain_test.py`, `tools/parity.py`, `tools/guards.sh`.
+- W6: `src/Points.cpp` (the Points Only / + Wire point sets), `src/Morph.cpp` (the transition pack's MORPH programs, per-pair uniforms,
+  the Points / Swarm cloud).
 - W3 chain additions: `src/ParamList.inc` (THE param list), `src/Volume.cpp` + `VolumeShaders.h` (Stage 1 shadow maps,
   raymarch, screen rays, motes), `src/Post.cpp` + `PostShaders.h` (Stage 2 key shadow, mirror, silhouette, bloom,
   flares; Stage 5 echoes; Stage 7 face readback), `src/Shape.cpp` (Stage 4 shards, dust transform feedback; per-model
@@ -524,6 +529,42 @@ d) W17: KHR_materials_pbrSpecularGlossiness -> diffuse = BaseColor, its spec/glo
   s (each point's rate rounded to whole twinkles per 1000), clock `clk.pointTwinkle` wraps at 1000 (a w14_wraps row). Points skip the
   projector picture and the lava cracks (no surface), like Wire Only. Measured (tools/w6_points.py, harness 1080p, skull 31k tris):
   solid 0.77 GPU ms; Points Only Vertices 1.68, Surface 100k 2.35, 400k 4.97; + Glow 3 + Bloom 3 3.20 (100k).
+- STAGE 2 THE TRANSITION PACK (Amrit: "how many transitions types between models can be added?"; no hard limit: one dropdown, no
+  param room; "add, then prune"): Transition Style 5..22 appended (0..4 keep their numbers: saved clips keep their style). Style Order
+  Cycle / Random go round all 23 (`kStyleCount`); Random keeps its per-hop hash. While Transition Play loops (Loop / Ping-Pong), every
+  pass round the chain moves the hop index on by H (`chainLoops`, an integer kept modulo 23, reset by a restart, 0 with Play Off): a
+  4-slot loop met only 4 styles before; now all 23 come round (Debug Log CHAIN lines). No new dial.
+  - Every new style is slider-driven (scrubbing back retraces, holding still is still; the Glitch "clock" steps with the slider: 30
+    steps per hop), per side (`TransitionPack` in Renderer.cpp: side 1 = the hop's outgoing model, 2 = the incoming one), per hop of
+    the chain (the pair's per-slot data: the other slot's liquid SDF, shards + ranks, cloud). e = the hop eased by Trans Ease; each
+    style's ramps are fixed stretches of e (`Rm`, smoothstepped `Sm`); the mid-hop swap is the W1 dissolve noise (`Swap`).
+  - MORPH programs (`src/Morph.cpp`, `#define MORPH` in kSoupVS / kMainFS): progSoupM / MI + progShadowSoupM / MI, linked inside
+    Init's twin window (so they have DEFORM, WIRE and POINTS twins); samplers 27 (the other model's liquid SDF, sampler3D), 28 (its
+    shard data), 29 / 30 (shard ranks: this model's / the other's; RG32F = rank of shard i 0..1 bottom-up, the shard of rank i; built
+    with the shards, `UpdateShards`). VS side `uMorphVS` 1 shrinkwrap, 2 pieces, 3 implode, 4 glitch, 5 ripple, 6 spin swap; FS side
+    `uMorphMask` 1 scan, 2 glitch, 3 ripple, 4 burn (a front: the outgoing model shows ahead of it, the incoming one behind). Drawn only
+    during such a hop; casters use progShadowSoupM (shadows morph too); the mirror floor draws the pair unmorphed.
+  - The cloud (styles 5 Points, 17 Swarm): per slot 65,536 area-weighted points sorted by an order key (48 height bands bottom-up,
+    round the up axis inside each), raw xyz + face normal + uv + part (worker, ~20 ms); colours baked once per slot from the part
+    base colour maps (one point per texel, a draw per part; `UpdateCloud`); point i of the outgoing cloud flies to point i of the
+    incoming one. Points: lit dots (Wire Color + Color Mix, size = Wire Thickness like the Stage 1 points, Point Twinkle) over the
+    scene, + light (Wire Glow) added at alpha 0; Swarm: light only (Firefly Color / Size / Glow / Twinkle), every 4th point.
+  - Until a style's per-slot data is on the GPU (cloud, ranks, the other SDF) its hop dissolves: never a wait (`MorphPairReady`).
+    `ChainUses` builds them ahead: Points / Swarm kUseCloud, Pieces kUseShards, Smoke kUseSim, every slot's liquid SDF as before.
+  - Classic bundles: Swarm, Burn, Lava read Wow-only dials (Firefly, Fire, Lava) and dissolve there (`StyleHere`). Smoke runs in every
+    bundle (the sim is in every bundle).
+  - SMOKE: the sim is a live simulation, so its smoke is not slider-driven: while the hop moves, the mesh dissolves (slider-driven)
+    and the plugin emits Emit Inside + half as much Emit Rim at a rate set by how fast the hop moves (`SmokeStyle`: |de| / dt x 6, max
+    10; holding still emits nothing); the sim runs (engine forced to Sim) and is lit (Smoke Ambient 1.2 when it is 0) through the hop
+    and a 4 s tail (the light fades over its last 1.5 s).
+  - WIRE TWIN DISCARD (see Hard-won rules): the dissolve, the cutout and the fronts cut through `wireCut` in the WIRE twins.
+  - Measured (tools/w6_trans.py): 18 styles x 3 pairs (skull -> SciFi helmet and text -> skull in LoadEhr, skull -> Crown 1918 in Wow),
+    9-step strips forward then backward: bit-identical at every step (Smoke: its mesh, Smoke Amount 0); t 0 / 1 vs the plain models
+    max 0; onsets t 0.01 / 0.99 mean <= 0.024 (max <= 75: the DEFORM twin's normals at the first twist / melt). Harness 1080p GPU ms
+    mid-hop (t 0.5, skull -> helmet, Wow; rest 0.82, Dissolve 1.22): Points 1.18, Shrinkwrap 0.78, Wire 2.66, Voxel 1.04, Low Poly
+    1.10, Pieces 0.89, Implode 0.34, Twist 1.75, Melt 1.59, Scan 0.79, Glitch 0.89, Ripple 0.79, Swarm 0.89, Smoke 2.07, Burn 2.42,
+    Lava 2.48, Spin Swap 0.84, Fold 3.06. Text and logos: a logo lives only in slot A (Model Source), so a text -> logo chain does not
+    exist; text -> skull stands in.
 
 ## W28: Amrit's Wow review (`tools/w28_review.py`: strip / speed / lag (HEAD vs this build) / timeline / arena; FIXES = the fresh clips, lasers gone)
 - TIME SCALES (1 = the W26 pace, 2 = crazy; Amrit: "Soooooft I want, Crazy as max MAYBE"): Fire Speed (default 0.5: sim time x it,
@@ -654,7 +695,10 @@ d) W17: KHR_materials_pbrSpecularGlossiness -> diffuse = BaseColor, its spec/glo
   Upload RGBA or R8 only — RGB costs a driver conversion.
 - Geometry shaders are emulated and ~2.5× slower than the texture-buffer soup path. Don't reintroduce them.
 - A `discard` in the middle of the fragment shader can corrupt later values (wire alpha read back 0);
-  keep the wireframe discard at the very end, and take derivatives (`fwidth`) before any discard.
+  keep the wireframe discard at the very end, and take derivatives (`fwidth`) before any discard. W6: it struck again in the
+  WIRE twins: the dissolve's mid-shader discard made the dissolve edge glow read 1 everywhere (a white incoming model in every
+  dissolve-based hop with a wire on, W5's Dissolve + wire included). In the WIRE twins the dissolve / the pack's fronts now set
+  `wireCut` and the alpha test at the very end cuts (`#ifdef WIRE`; the plain programs keep their discard).
 - Program variants compile lazily on first draw (60–250 ms). The renderer draws one scissored triangle
   through every variant at model swap. The colour write mask is part of the pipeline — don't prewarm with glColorMask.
 - The SDK clamps float defaults to 0..1 in `SetParamInfo`; ranged params reset `defaultFloatVal` afterwards
@@ -714,7 +758,7 @@ Colours: every "<X> Color" row starts a HUE / SAT / BRI / ALPHA quartet = ONE pi
 | 16 | 16 | 16 | 16 | Model | Max Texture Size | OPT | Full / 4K / 2K | 0 |
 | 17 | 17 | 17 | 17 | Model | Transition | STD | 0..1 | 0 |
 | 18 | 18 | 18 | 18 | Model | Chain Loop | BOOL | - | 0 |
-| 19 | 19 | 19 | 19 | Model | Transition Style | OPT | Dissolve / Shatter / Dust / Slice / Liquid | 0 |
+| 19 | 19 | 19 | 19 | Model | Transition Style | OPT | Dissolve / Shatter / Dust / Slice / Liquid / Points / Shrinkwrap / Wire / Voxel / Low Poly / Pieces / Implode / Twist / Melt / Scan / Glitch / Ripple / Swarm / Smoke / Burn / Lava / Spin Swap / Fold | 0 |
 | 20 | 20 | 20 | 20 | Model | Style Order | OPT | Fixed / Cycle / Random | 0 |
 | 21 | 21 | 21 | 21 | Model | Transition Play | OPT | Off / Once On Trigger / Ping-Pong / Loop | 0 |
 | 22 | 22 | 22 | 22 | Model | Transition Time | STD | 0.5..30 | 6 |

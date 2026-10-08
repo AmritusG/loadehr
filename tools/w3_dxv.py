@@ -25,6 +25,9 @@ FILES += [MOV + '/Testfiles/Metric_01.mov',                                     
           MOV + '/Testfiles/YG10-DXV3.mov',                                     # YG10
           MOV + '/S06 Lone Star Halo 5s_Custom.mov',                            # YCG6 908x2276: padding on both axes
           MOV + '/S08 Intergalactic Void 5s.mov']                               # DXT5 908x2276
+# W6: Amrit deleted ~/Movies/KLV Set ("Ran out of space, so deleted it."): files that are gone are skipped (and listed)
+MISSING = [f for f in FILES if not os.path.exists(f)]
+FILES = [f for f in FILES if os.path.exists(f)]
 ALPHA_FILES = [MOV + '/Testfiles/DXT5-DXV3.mov', MOV + '/Testfiles/YG10-DXV3.mov']  # black_snowflake (DXT5 4K) is opaque in every frame
 SCENE = [('Proj Enable', 1), ('Proj Pos X', 0.6), ('Proj Pos Y', 0.6), ('Proj Pos Z', 4), ('Proj Throw', 28), ('Proj Intensity', 40),
          ('Proj Beam', 1.2), ('Haze', 0.5), ('Key Intensity', 0.6), ('Debug Log', 1)]
@@ -114,6 +117,8 @@ def diff(pic, w, h, ref, chans=3):
 def proof(out, files):
     os.makedirs(out, exist_ok=True)
     rows = []
+    if MISSING and not files:
+        print('skipped (file gone): ' + ', '.join(os.path.basename(f) for f in MISSING))
     for path in files or FILES:
         W, H, nf, fps, var = info(path)
         dump = os.path.join(out, 'dump_' + tag(path)) + '/'

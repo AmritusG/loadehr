@@ -293,7 +293,7 @@ bool Renderer::InitPrograms( std::string& error )
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 	glBindTexture( GL_TEXTURE_2D, 0 );
-	return InitVolume( error ) && InitSim( error ) && InitPost( error ) && InitShape( error ) && InitProjector( error ) && InitLiquid( error ) && InitBolts( error ) && InitSwarm( error ) && InitCracks( error ) && InitCaustics( error );
+	return InitVolume( error ) && InitSim( error ) && InitPost( error ) && InitShape( error ) && InitProjector( error ) && InitLiquid( error ) && InitBolts( error ) && InitSwarm( error ) && InitCracks( error ) && InitCaustics( error ) && InitMorph( error );
 }
 
 void Renderer::Release()
@@ -308,6 +308,7 @@ void Renderer::Release()
 	ReleaseSwarm();
 	ReleaseCracks();
 	ReleaseCaustics();
+	ReleaseMorph();
 	for( const auto& t : deformTwins )
 		glDeleteProgram( t.second );
 	deformTwins.clear();
@@ -440,7 +441,7 @@ void Renderer::DrawCasters( const FrameState& fs, GpuModel* model, const float* 
 {
 	auto one = [ & ]( const FrameState& f, GpuModel* g ) {
 		const bool soup = f.wireMix > 0.0f || f.explode > 0.0f || f.shape.on;
-		const GLuint p  = !soup ? progShadow : f.shape.transSide > 0 && !f.shape.dustTrans ? progShadowSoupT : progShadowSoup;
+		const GLuint p  = !soup ? progShadow : f.morph.On() ? progShadowSoupM : f.shape.transSide > 0 && !f.shape.dustTrans ? progShadowSoupT : progShadowSoup;
 		EnsureVAO( g );
 		DrawModel( p, f, g, false, soup, 0, vp, lightPos, withInst && !f.inst.empty() ? &f.inst : nullptr );
 	};
@@ -477,6 +478,8 @@ void Renderer::PrepareSlot( int slot, GpuModel* model, const FrameState& fs, uns
 		EnsureSimSdf( slot, model );
 	if( uses & kUsePoints ) // W6: Points Only / Points + Wire: the slot's points are built before its hop
 		PointsFor( model, fs.wire.pointSource );
+	if( uses & kUseCloud ) // W6: the Points / Swarm styles' cloud
+		UpdateCloud( slot, model );
 	sideSlot[ 0 ] = keepSlot, activeSide = keepSide;
 }
 
@@ -566,7 +569,8 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 	if( fs.lava.split > 0.0f && !instanced ) // W26 lava split: the soup programs that move the crack cells
 		p = p == progSoup ? progSoupC : p == progShadowSoup ? progShadowSoupC : p == progCrackSoup ? progCrackSoupC : p;
 	if( instanced )
-		p = p == progMain ? progMainI : p == progSoup ? progSoupI : p == progSoupT ? progSoupTI : p == progShadow ? progShadowI : p == progShadowSoup ? progShadowSoupI : p == progShadowSoupT ? progShadowSoupTI : p;
+		p = p == progMain ? progMainI : p == progSoup ? progSoupI : p == progSoupT ? progSoupTI : p == progShadow ? progShadowI : p == progShadowSoup ? progShadowSoupI : p == progShadowSoupT ? progShadowSoupTI
+		  : p == progSoupM ? progSoupMI : p == progShadowSoupM ? progShadowSoupMI : p;
 	const LetterSlot& ls = letters[ SlotOf( model ) ];
 	if( ls.live )
 	{
@@ -663,6 +667,8 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 	glUniform1f( U( p, "uWireThickness" ), fs.wireThickness );
 	if( wired )
 		SetWireUniforms( p, fs, model );
+	if( fs.morph.On() ) // W6 Stage 2: the pack's MORPH programs (any other program has no such uniforms: harmless)
+		SetMorphUniforms( p, fs, model );
 	if( pointsNow )
 	{
 		glUniform1f( U( p, "uPointPx" ), std::max( 1.5f, 2.0f * fs.wireThickness ) ); // the dot as wide as a line (a line spans both sides of its edge)
@@ -802,7 +808,7 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 		glassParts |= gp.glass > 0.0f && gp.glass > su.glass;
 	// W2 text / logos: while pieces fly (Shatter Mode Pieces), the fractured copy draws instead of the whole mesh (at rest, and once
 	// fully reformed, the whole mesh: exactly what it drew before)
-	const bool pieces = model->hasPieces && soup && fs.shape.on && fs.shape.shatterT > 0.0f && fs.shape.shatterMode > 0;
+	const bool pieces = model->hasPieces && soup && fs.shape.on && fs.shape.shatterMode > 0 && ( fs.shape.shatterT > 0.0f || fs.morph.vs == 2 ); // W6: + the Pieces style
 	// the soup path reads vertices from texture buffers; no vertex attributes may be enabled
 	glBindVertexArray( soup ? quadVAO : vao );
 	// W19: glass parts go last, blended (premultiplied) without depth writes, so what is behind them (an iris under a
@@ -1016,9 +1022,139 @@ void TransitionPieces( FrameState& f, float t, int side )
 	s.dustInvert  = side == 2;
 	s.dustTrans   = true;
 }
+// W6 Stage 2: the pack. e = the hop eased by Trans Ease; each style's ramps are fixed stretches of it (Rm), smoothstepped (Sm), and the
+// swap in the middle is the W1 dissolve noise (Swap). Side 1 = the outgoing model (a), 2 = the incoming one (b).
+float Sm( float x )
+{
+	x = std::min( 1.0f, std::max( 0.0f, x ) );
+	return x * x * ( 3.0f - 2.0f * x );
+}
+float Rm( float e, float a, float b ) { return std::min( 1.0f, std::max( 0.0f, ( e - a ) / ( b - a ) ) ); }
+void Swap( FrameState& f, float e, int side, float a, float b )
+{
+	const float d = Sm( Rm( e, a, b ) );
+	if( side == 1 )
+		f.dissolve = std::max( f.dissolve, d );
+	else
+		f.dissolve = std::max( 1e-4f, d ), f.dissolveInvert = true; // > 0: inverted, 0 would show it all
+}
+void TransitionPack( FrameState& f, float t, int side )
+{
+	MorphState& m = f.morph;
+	ShapeState& s = f.shape;
+	const float e = t + f.transEase * ( t * t * ( 3.0f - 2.0f * t ) - t );
+	const bool out = side == 1;
+	m.side = side, m.e = e, m.stagger = std::min( 0.95f, std::max( 0.0f, f.transStagger ) ), m.spread = f.transSpread;
+	// the near half ramps up on the way out (out) or down on the way in (in)
+	auto ramp = [ & ]( float a0, float a1, float b0, float b1 ) { return out ? Sm( Rm( e, a0, a1 ) ) : 1.0f - Sm( Rm( e, b0, b1 ) ); };
+	const float PI = 3.14159265f;
+	switch( f.transitionStyle )
+	{
+	case kStylePoints:
+	case kStyleSwarm: // the mesh turns into the cloud (0 .. 0.3), the cloud flies, the other mesh condenses out of it (0.7 .. 1)
+		if( out )
+			f.dissolve = std::max( f.dissolve, Sm( Rm( e, 0.02f, 0.3f ) ) );
+		else
+			f.dissolve = std::max( 1e-4f, Sm( Rm( e, 0.7f, 0.98f ) ) ), f.dissolveInvert = true;
+		m.cloud  = std::min( Sm( Rm( e, 0.0f, 0.2f ) ), 1.0f - Sm( Rm( e, 0.8f, 1.0f ) ) );
+		m.cloudK = Rm( e, 0.15f, 0.85f );
+		m.swarm  = f.transitionStyle == kStyleSwarm;
+		break;
+	case kStyleShrinkwrap: // the outgoing model slides onto the incoming one's surface, which then appears on top of it
+		if( out )
+			m.vs = 1, m.k = Rm( e, 0.0f, 0.6f ), s.on = true;
+		Swap( f, e, side, 0.55f, 0.8f );
+		break;
+	case kStyleWire: // the fill dissolves, the lines stay; the lines swap; the incoming fill returns
+		f.wire.on = true, f.wireMix = 0.0f;
+		if( f.wire.mode < 2 )
+			f.wire.mode = 1, f.wire.mix = out ? Sm( Rm( e, 0.0f, 0.35f ) ) : 1.0f - Sm( Rm( e, 0.65f, 1.0f ) );
+		Swap( f, e, side, 0.4f, 0.6f );
+		break;
+	case kStyleVoxel: // voxelise, the cubes grow (Trans Spread), swap, shrink back as the other model
+	{
+		const float v = ramp( 0.0f, 0.4f, 0.6f, 1.0f ), g = ramp( 0.1f, 0.5f, 0.5f, 0.9f );
+		s.on = true, s.voxel = std::max( s.voxel, v ), s.voxelSize = std::max( 0.02f, s.voxelSize ) * ( 1.0f + 5.0f * f.transSpread * g );
+		Swap( f, e, side, 0.4f, 0.6f );
+		break;
+	}
+	case kStyleLowPoly: // big facets (Trans Spread = their size), tumbling, swap, back
+	{
+		const float v = ramp( 0.0f, 0.35f, 0.65f, 1.0f ), g = ramp( 0.1f, 0.5f, 0.5f, 0.9f );
+		s.on = true, s.lowPoly = std::max( s.lowPoly, v ), s.lowPolySize = 0.04f + 0.4f * f.transSpread * g;
+		s.tumble = 2, s.tumbleRandom = 1.0f, s.tumbleSway = 0.0f, s.tumbleW = 1.0f, s.flipOn = false, s.facetGap = 0.35f * g;
+		const float dir = out ? 1.0f : -1.0f;
+		s.tumbleAng[ 0 ] = 150.0f * g * dir, s.tumbleAng[ 1 ] = 110.0f * g * dir, s.tumbleAng[ 2 ] = 70.0f * g * dir;
+		s.tumblePhase[ 0 ] = s.tumblePhase[ 1 ] = s.tumblePhase[ 2 ] = 0.0f;
+		Swap( f, e, side, 0.4f, 0.6f );
+		break;
+	}
+	case kStylePieces: // solid pieces fly to the other model's pieces (ranked bottom-up) and become them
+		m.vs = 2, m.k = Rm( e, 0.05f, 0.95f ), s.on = true;
+		break;
+	case kStyleImplode: // triangles fall into the centre point; the incoming ones burst out of it
+		m.vs = 3, m.k = out ? Rm( e, 0.0f, 0.6f ) : Rm( e, 0.4f, 1.0f ), s.on = true;
+		break;
+	case kStyleTwist: // twists away round the deform axis (Trans Spread = how far), the other untwists in
+		s.on = s.deform = true;
+		s.twist += ( out ? 1.0f : -1.0f ) * ( 2.0f + 6.0f * f.transSpread ) * ramp( 0.0f, 0.55f, 0.45f, 1.0f );
+		Swap( f, e, side, 0.4f, 0.6f );
+		break;
+	case kStyleMelt: // melts into a puddle; the other rises out of it
+		s.on = s.deform = true;
+		s.melt = std::max( s.melt, ramp( 0.0f, 0.55f, 0.45f, 1.0f ) );
+		Swap( f, e, side, 0.4f, 0.6f );
+		break;
+	case kStyleScan: // a plane sweeps up the deform axis: the incoming model behind it, the outgoing ahead, a wire band at the plane
+		m.mask = 1, m.band = 0.03f + 0.1f * f.transSpread, m.k = -m.band - 0.01f + e * ( 1.0f + 2.0f * m.band + 0.02f ), s.on = true;
+		break;
+	case kStyleGlitch: // bands across the axis take one model or the other, re-rolled 30 times over the hop, until only the incoming
+		m.vs = 4, m.mask = 2, m.k = e, m.step = std::floor( e * 30.0f ), s.on = true;
+		break;
+	case kStyleRipple: // a wave front out from the centre swaps the models as it passes
+		m.vs = 5, m.mask = 3, m.k = -0.3f + 2.2f * e, s.on = true;
+		break;
+	case kStyleSmoke: // dissolves into the sim's smoke (the plugin emits it), the other condenses out of it
+		Swap( f, e, side, out ? 0.05f : 0.4f, out ? 0.6f : 0.95f );
+		break;
+	case kStyleBurn: // a fire front eats the outgoing model (blackbody edge, charred crust), the incoming one is behind it
+		m.mask = 4, m.band = 0.06f + 0.12f * f.transSpread, m.k = -0.25f + 1.6f * e, s.on = true;
+		break;
+	case kStyleLava: // cracks spread over the outgoing model, it splits, the incoming one is underneath
+		if( out )
+		{
+			LavaState& l = f.lava;
+			l.on = true, l.front = Sm( Rm( e, 0.0f, 0.5f ) ) * 3.6f, l.split = Sm( Rm( e, 0.3f, 0.8f ) ), s.on = true;
+			l.glow = std::max( l.glow, m.lavaGlow );
+		}
+		Swap( f, e, side, out ? 0.6f : 0.45f, out ? 0.95f : 0.9f );
+		break;
+	case kStyleSpinSwap: // spins up and shrinks; the other spins down and grows (Trans Spread = turns)
+	{
+		const float turns = 1.0f + 2.0f * f.transSpread;
+		const float u     = out ? Rm( e, 0.0f, 0.6f ) : 1.0f - Rm( e, 0.4f, 1.0f );
+		m.vs = 6, m.k = ( out ? 1.0f : -1.0f ) * 2.0f * PI * turns * u * u, s.on = true;
+		m.scale = out ? 1.0f - Sm( Rm( e, 0.15f, 0.6f ) ) : Sm( Rm( e, 0.4f, 0.85f ) );
+		break;
+	}
+	case kStyleFold: // folds into a kaleidoscope (Mirror Fold; Trans Spread: X / X+Y / X+Y+Z), swap, unfolds as the other
+		s.on = s.deform = true;
+		s.foldAxes[ 0 ] = 1.0f, s.foldAxes[ 1 ] = f.transSpread >= 0.5f ? 1.0f : 0.0f, s.foldAxes[ 2 ] = f.transSpread >= 1.2f ? 1.0f : 0.0f;
+		s.foldN = 1 << int( s.foldAxes[ 0 ] + s.foldAxes[ 1 ] + s.foldAxes[ 2 ] );
+		s.foldK = ramp( 0.0f, 0.45f, 0.55f, 1.0f );
+		Swap( f, e, side, 0.4f, 0.6f );
+		break;
+	default: break;
+	}
+}
 // A hop: the outgoing model (a) leaves at progress t ...
 void TransitionOut( FrameState& f, float t )
 {
+	if( f.transitionStyle >= kStylePoints )
+	{
+		TransitionPack( f, t, 1 );
+		return;
+	}
 	switch( f.transitionStyle )
 	{
 	case 0: f.dissolve = std::max( f.dissolve, t ); break;
@@ -1036,6 +1172,11 @@ void TransitionOut( FrameState& f, float t )
 // ... and the incoming one (b) arrives through the same system run backwards.
 void TransitionIn( FrameState& f, float t )
 {
+	if( f.transitionStyle >= kStylePoints )
+	{
+		TransitionPack( f, t, 2 );
+		return;
+	}
 	switch( f.transitionStyle )
 	{
 	case 0: f.dissolve = t, f.dissolveInvert = true; break;
@@ -1074,8 +1215,12 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 		both = true;
 		fsA  = fsIn;
 		fsA.liquid.ready = fsIn.transitionStyle == 4 && UpdateLiquidSdf( a, bReady );
+		// W6: a pack style whose per-slot data is not on the GPU yet dissolves this frame (never a wait)
+		if( fsA.transitionStyle >= kStylePoints && !MorphPairReady( fsA, a, bReady ) )
+			fsA.transitionStyle = kStyleDissolve;
 		TransitionOut( fsA, t );
 		fsB = AsModelB( fsIn );
+		fsB.transitionStyle = fsA.transitionStyle;
 		fsB.liquid.ready = fsA.liquid.ready;
 		TransitionIn( fsB, t );
 	}
@@ -1241,6 +1386,7 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 				pointsNow = warmingNow = false;
 				glDisable( GL_BLEND );
 			}
+			WarmMorph( fs, model ); // W6 Stage 2: the pack's MORPH programs + the cloud
 			glDisable( GL_SCISSOR_TEST );
 			WarmVolume( fs, model, w, h );
 			WarmPost( fs, model, w, h );
@@ -1282,16 +1428,20 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 				activeSide          = m;
 				if( m == 1 )
 					EnsureVAO( g );
-				const GLuint soupP = f.shape.transSide > 0 && !f.shape.dustTrans ? progSoupT : progSoup;
+				const GLuint soupP = f.morph.On() ? progSoupM : f.shape.transSide > 0 && !f.shape.dustTrans ? progSoupT : progSoup;
 				if( f.wire.on ) // W5
 					DrawWired( soupP, f, g, f.inst.empty() ? nullptr : &f.inst );
 				else
 					DrawModel( sp ? soupP : progMain, f, g, false, sp, 0, nullptr, nullptr, f.inst.empty() ? nullptr : &f.inst );
 				DrawDust( f, g, h );
+				if( m == 0 && f.lava.on && f.transitionStyle == kStyleLava )
+					DrawCracks( f, g ); // W6 Lava style: the outgoing model's cracks glow
 				if( m == 1 )
 					EnsureVAO( model );
 			}
 			activeSide = 0;
+			if( fsA.morph.cloud > 0.0f && !fsA.morph.swarm )
+				DrawCloud( fsA, fsB, w, h, false ); // W6 Points style: the cloud between the two meshes
 			if( fsA.liquid.ready )
 			{
 				if( fs.liquid.look == 1 )
@@ -1491,6 +1641,8 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 	glDrawArrays( GL_TRIANGLES, 0, 3 );
 	perf.Mark( PerfProbe::Light );
 	AddWireLight( fs, w, h ); // W5: before the post pass, so the global Bloom catches the wires too
+	if( both && fsA.morph.cloud > 0.0f && fsA.morph.cloudGlow > 0.0f )
+		DrawCloud( fsA, fsB, w, h, true ); // W6 Points / Swarm styles: the cloud's light (Wire Glow / Firefly Glow), the same way
 	if( fogOut && fs.vol.motes > 0.0f )
 		DrawMotes( fs, w, h );
 	if( depthOk && ( !fs.bolts.segs.empty() || fs.swarm.count > 0 ) )
