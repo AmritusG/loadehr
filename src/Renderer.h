@@ -357,6 +357,28 @@ struct CausticState
 	float floor = 1, smoke = 1, surface = 1, gain = 1; // gain: the cookie passes' 1 / (1 + d^2) falloff undone
 };
 
+// W9 Stage A: the line looks (Lines group). Points are captured through the soup stage every frame (CAPTURE twins), then drawn as
+// pairs (plexus), ribbons through their past positions (light paint) or edge tubes (neon); light in the main pass (rgb added, alpha
+// kept) and in the W5 HDR wire buffer for glow / bloom.
+struct LinesState
+{
+	int look = 0;            // 0 off, 1 plexus, 2 light paint, 3 neon tubes
+	int points = 0;          // plexus points / light paint heads
+	int source = 3;          // plexus: the Point Source
+	float reach = 0.15f;     // plexus: neighbour distance (fitted units); paint: trail seconds; neon: the light's reach 0..1
+	float amount = 0.35f;    // Line Amount (neon: the tubes' strength)
+	float speed = 0.5f, audio = 0;
+	float flow = 0;          // pulses along the lines, cycles (wrapped at 1000)
+	float swirl = 0;         // light paint heads' circle, turns (wrapped at 1000)
+	float time = 0;          // show seconds wrapped at 3600 (the light paint ring's stamps)
+	float flicker = 0;       // neon flicker steps (wrapped at 1000)
+	float swirlR = 0;        // light paint: the heads' circle radius, fitted units
+	float bands[ 16 ] = {};  // FFT, bass first (smoothed, x Audio Gain)
+	int axis = 1;            // the rest height axis for the bands (Deform Axis)
+	float width = 1;         // Wire Thickness, px
+	float color[ 3 ] = { 0, 1, 1 }, colorMix = 0, glow = 0, bloom = 0;
+};
+
 struct FrameState
 {
 	// target
@@ -449,6 +471,7 @@ struct FrameState
 	// W21 text / logos: per-letter transforms, 12 floats per letter (pivot + scale, quaternion, offset + unused);
 	// empty = the letters are at rest (the plain programs draw)
 	std::vector< float > letterXf;
+	LinesState lines; // W9 Stage A
 };
 
 // W6 Stage 2: a slot's point cloud for the Points / Swarm styles, built on a worker (Morph.cpp)
@@ -546,6 +569,67 @@ private:
 	bool sparkleNow     = false; // W7: this frame's wire buffer holds sparkles
 	FrameState sparkFs[ 2 ];     // W7: the pair's sparkle draws (Points Only, glow only), kept for RenderWireGlow
 	bool InitPoints( std::string& error );
+	// W9 Stage A (Lines.cpp): the CAPTURE twins, the line sets (spots + pairs per model), the capture buffers, the passes
+	std::vector< std::pair< GLuint, GLuint > > captureTwins;
+	GLuint CaptureTwin( GLuint p ) const;
+	bool captureNow = false; // DrawModel: this draw captures the spots of captureRefTex / captureRanges (transform feedback)
+	GLuint captureRefTex = 0;
+	const std::vector< std::array< uint32_t, 2 > >* captureRanges = nullptr;
+	float capTime = 0, capSwirl = 0, capPhase = 0;
+	int capAxis = 1;
+	bool InitLines( std::string& error );
+	void ReleaseLines();
+public:
+	struct LineSet
+	{
+		struct Job
+		{
+			std::atomic< bool > done{ false }, cancel{ false };
+			std::vector< float > refs;                       // 4 per spot: triangle, b1, b2, 0
+			std::vector< std::array< uint32_t, 2 > > ranges; // per GPU part: first spot, count
+			std::vector< uint32_t > pairs;                   // plexus: i, j per line (neon: none, spots 2k / 2k + 1 are an edge)
+			double ms = 0;
+		};
+		uint64_t key = 0, serial = 0;
+		int look = 0;
+		std::shared_ptr< Job > job;
+		GLuint refBuf = 0, refTex = 0, pairBuf = 0, pairTex = 0;
+		std::vector< std::array< uint32_t, 2 > > ranges;
+		size_t count = 0, lines = 0;
+		bool ready = false;
+		uint64_t used = 0; // the frame it was last asked for
+	};
+private:
+	static constexpr int kLineSets = 6;
+	LineSet lineSets[ kLineSets ];
+	const LineSet* LinesFor( GpuModel* model, const LinesState& L );
+	struct Capture // per side of the pair: this frame's spots (world position + time, normal + rest height, colour + visible)
+	{
+		GLuint buf[ 3 ] = {}, tex[ 3 ] = {};
+		size_t cap = 0;
+		// light paint: the ring of past positions (rows x heads), stamped with their time
+		GLuint ringBuf = 0, ringTex = 0;
+		size_t ringHeads = 0;
+		int ringHead = 0, ringFilled = 0;
+		int64_t lastTick = -1;
+		uint64_t ringFor = 0;
+	} capture[ 2 ];
+	static constexpr int kRingRows = 240; // 4 s at 60 samples / s
+	GLuint progLinePair = 0, progLineRibbon = 0, progLineDot = 0, progLineLight = 0, lineBlur[ 2 ] = {}, lineBlurFBO[ 2 ] = {};
+	int lineBlurW = 0, lineBlurH = 0;
+	struct LineDraw
+	{
+		const FrameState* fs;
+		const LineSet* set;
+		int side;
+		float weight;
+		float worldPerFitted;
+	};
+	std::vector< LineDraw > lineDraws; // this frame's line draws (the glow pass draws them again)
+	bool CaptureSpots( const FrameState& fs, GpuModel* model, GLuint prog, const LineSet& set, int side );
+	void RenderLines( const FrameState& fsA, GpuModel* a, GLuint progA, const FrameState* fsB, GpuModel* b, GLuint progB, float t );
+	void DrawLines( const LineDraw& d, bool glow ); // the bound target: main (light, alpha kept) or the HDR wire buffer
+	void AddLineLight( const FrameState& fs, int w, int h ); // neon: the tubes' wide light on the model
 	void ReleasePoints();
 	const PointSet* PointsFor( GpuModel* model, int source );
 	void RenderWireGlow( const FrameState& fs, int w, int h ); // the wired draws of this frame, again, into the HDR wire buffer

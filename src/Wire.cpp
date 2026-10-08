@@ -312,7 +312,9 @@ void Renderer::DrawWired( GLuint prog, const FrameState& fs, GpuModel* model, co
 void Renderer::RenderWireGlow( const FrameState& fs, int w, int h )
 {
 	wireGlowOk = false;
-	if( wireDraws.empty() )
+	// W9: the line looks glow with Wire Glow / Bloom; neon tubes always (their light on the model is read from this buffer)
+	const bool lines = !lineDraws.empty() && ( fs.wire.glow > 0.0f || fs.wire.bloom > 0.0f || fs.lines.look == 3 );
+	if( wireDraws.empty() && !lines )
 		return;
 	if( wireW != w || wireH != h || !wireFBO )
 	{
@@ -383,7 +385,27 @@ void Renderer::RenderWireGlow( const FrameState& fs, int w, int h )
 			glDepthFunc( GL_LESS );
 		}
 	activeSide = sideWas;
-	EnsureVAO( wireDraws.front().model );
+	if( !wireDraws.empty() )
+		EnsureVAO( wireDraws.front().model );
+	if( lines )
+	{
+		// the solid's depth: the wired draws wrote it; else the main pass's (one sample of it)
+		if( wireDraws.empty() )
+		{
+			glBindFramebuffer( GL_READ_FRAMEBUFFER, tSamples > 1 ? msFBO : resolveFBO );
+			glBindFramebuffer( GL_DRAW_FRAMEBUFFER, wireFBO );
+			glBlitFramebuffer( 0, 0, w, h, 0, 0, w, h, GL_DEPTH_BUFFER_BIT, GL_NEAREST );
+			glBindFramebuffer( GL_FRAMEBUFFER, wireFBO );
+		}
+		glEnable( GL_DEPTH_TEST );
+		glDepthFunc( GL_LEQUAL );
+		glDepthMask( GL_FALSE );
+		glEnable( GL_BLEND );
+		glBlendFunc( GL_ONE, GL_ONE );
+		for( const LineDraw& d : lineDraws )
+			DrawLines( d, true );
+		glDepthFunc( GL_LESS );
+	}
 	wirePassNow = 3;
 	glDepthMask( GL_TRUE );
 	glDisable( GL_DEPTH_TEST );

@@ -158,6 +158,19 @@ uniform float uTwinklePhase; // twinkles, wrapped at 1000 (each point's rate is 
 uniform vec3 uCamPos;
 flat out float vTwinkle;
 #endif
+#ifdef CAPTURE
+// W9 Stage A: the point's world position / normal / base colour into transform feedback (rasterizer off): the line looks read them.
+// The spot runs the whole soup stage above, so it follows deforms, letters, shard flight and the morph exactly as its triangle does
+uniform sampler2D uTex0;
+uniform int uHas[ 7 ];
+uniform vec4 uBaseFactor;
+uniform float uCapTime;  // show time stamped into pos.w (light paint ring), seconds wrapped at 3600
+uniform float uCapSwirl; // world radius of the light paint heads' circle in the tangent plane (0 = none)
+uniform float uCapPhase; // turns, wrapped at 1000 (each head: a whole number of turns per 1000)
+uniform int uCapHidden;  // this part is hidden: colour alpha 0 (lines touching it vanish)
+uniform int uCapAxis;    // the rest height axis (Build / Deform axis) for the audio bands
+out vec4 vCapPos, vCapNrm, vCapCol;
+#endif
 
 uniform mat4 uModel;
 uniform mat4 uViewProj;
@@ -916,6 +929,27 @@ void main()
 	vo.opos     = opos;
 #endif
 	vo.bary     = corner == 0 ? vec3( 1, 0, 0 ) : ( corner == 1 ? vec3( 0, 1, 0 ) : vec3( 0, 0, 1 ) );
+#ifdef CAPTURE
+	{
+		vec3 cw = w;
+		if( uCapSwirl > 0.0 )
+		{
+			vec3 T0 = vo.wtan.xyz - wn * dot( wn, vo.wtan.xyz );
+			T0      = dot( T0, T0 ) > 1e-12 ? normalize( T0 ) : normalize( cross( wn, abs( wn.x ) < 0.9 ? vec3( 1, 0, 0 ) : vec3( 0, 1, 0 ) ) );
+			vec3 B0 = cross( wn, T0 );
+			float h = fract( sin( float( gl_VertexID ) * 78.233 + 1.7 ) * 43758.5453 );
+			float rt = floor( ( 0.5 + h ) * 1000.0 + 0.5 ) / 1000.0 * ( h > 0.5 ? 1.0 : -1.0 ); // whole turns per 1000: seamless at the wrap
+			float a  = 6.2831853 * ( fract( uCapPhase * rt ) + h );
+			cw += ( T0 * cos( a ) + B0 * sin( a ) ) * uCapSwirl * ( 0.6 + 0.8 * fract( h * 7.31 ) );
+		}
+		vCapPos = vec4( cw, uCapTime );
+		vCapNrm = vec4( wn, ToAxis( opos, uCapAxis ).z );
+		vec4 bc = uBaseFactor;
+		if( uHas[ 0 ] == 1 )
+			bc *= textureLod( uTex0, uv, 2.0 );
+		vCapCol = vec4( bc.rgb, uCapHidden == 1 ? 0.0 : 1.0 );
+	}
+#endif
 #ifdef POINTS
 	w += normalize( uCamPos - w + vec3( 1e-6 ) ) * uPointLift;
 	float ph = fract( sin( float( gl_VertexID ) * 12.9898 + 4.1 ) * 43758.5453 );

@@ -357,6 +357,19 @@ X( P_WIRE_FADE, "Wire Fade", STD, 0, 1, 0, "Wireframe", "", 0 )         // lines
 // W6: where the points sit: every vertex (welded), the vertices on the feature edges, or evenly over the area (sparse models still read)
 X( P_POINT_SOURCE, "Point Source", OPT, 0, 4, 3, "Wireframe", "Vertices|Feature Vertices|Surface 25k|Surface 100k|Surface 400k", 0 )
 X( P_POINT_TWINKLE, "Point Twinkle", STD, 0, 1, 0, "Wireframe", "", 0 ) // each point flickers on its own (~1 twinkle / s, this deep)
+// W9 Stage A: LINES (classic). Lines drawn between / along points of the model, in the Wireframe group's look (Wire Color + Color Mix,
+// Wire Thickness = the width in px, Wire Glow / Bloom). Plexus = surface points (Point Source) joined to their neighbours closer than
+// Line Reach, fading with the distance; Light Paint = ribbons left in the air by points of the moving model (Line Reach = their
+// length, up to 4 s); Neon Tubes = the feature edges (W5) as glowing tubes that light the model nearby (Line Reach = how far).
+// Line Amount: plexus points / light paint ribbons / tube strength; Line Speed: pulses along the lines / the painting points' swirl /
+// the neon's flow and flicker; Line Audio: the FFT pulses them (bass at the base, highs at the top)
+#undef MEHR_REGION
+#define MEHR_REGION MEHR_CLASSIC
+X( P_LINE_LOOK, "Line Look", OPT, 0, 3, 0, "Lines", "Off|Plexus|Light Paint|Neon Tubes", 0 )
+X( P_LINE_AMOUNT, "Line Amount", STD, 0, 1, 0.35f, "Lines", "", 0 )
+X( P_LINE_REACH, "Line Reach", STD, 0, 1, 0.3f, "Lines", "", 0 )
+X( P_LINE_SPEED, "Line Speed", STD, 0, 4, 0.5f, "Lines", "", 0 )
+X( P_LINE_AUDIO, "Line Audio", STD, 0, 4, 0, "Lines", "", 0 )
 #undef MEHR_REGION
 #define MEHR_REGION MEHR_CLASSIC
 // COPIES: instanced clones (LODs by screen size), echo trails, ghost poses
@@ -422,6 +435,8 @@ X( P_VOL_QUALITY, "Vol Quality", OPT, 0, 3, 1, "Volume", "16|32|64|128", 0 )
 X( P_VOL_RES, "Vol Res", OPT, 0, 2, 1, "Volume", "Full|Half|Quarter", 0 )
 X( P_FOG_BLEND, "Fog Blend", OPT, 0, 1, 0, "Volume", "Add|Over", 0 )
 X( P_DRIFT_RETURN, "Drift Return", STD, 0, 3, 0.4f, "Volume", "", 0 ) // s: a light's Hue Drift at 0 glides home (A, B, C, spots)
+#undef MEHR_REGION
+#define MEHR_REGION MEHR_WOW // LoadEhr W9: Smoke Sim -> the Wow bundles only (room for the W9 looks; the classic bundles keep the Noise smoke)
 // SMOKE SIM (W20): a real 3D fluid (velocity, pressure, obstacle = the mask) in a grid around the mask. Smoke Engine Noise =
 // the W3 noise smoke, untouched. Visible, like every medium, only while a volume light is on. Rates: smoke / s, heat / s.
 X( P_SMOKE_ENGINE, "Smoke Engine", OPT, 0, 2, 0, "Smoke Sim", "Noise|Sim|Sim + Detail", 0 )
@@ -452,9 +467,7 @@ X( P_SIM_RESET, "Sim Reset", EVENT, 0, 1, 0, "Smoke Sim", "", 0 )
 MEHR_COLOR( P_SMOKE_COL, "Smoke", "Smoke Sim", 0, 0, 1, 1, "Smoke Alpha" ) // alpha = the sim smoke's density
 X( P_SMOKE_CONFINE, "Smoke Confine", STD, 0, 1, 0, "Smoke Sim", "", 0 ) // 0 = free; up: a soft wall ~1.3 mask radii out
 #if LOADEHR_FX
-#undef MEHR_REGION
-#define MEHR_REGION MEHR_CLASSIC
-X( P_SIM_PROJECT, "Project Input", STD, 0, 1, 0, "Smoke Sim", "", 0 ) // the incoming clip projected onto the smoke (W28: LoadEhr FX only, 512 cap)
+X( P_SIM_PROJECT, "Project Input", STD, 0, 1, 0, "Smoke Sim", "", 0 ) // the incoming clip projected onto the smoke (W9: Wow FX, with the sim)
 #undef MEHR_REGION
 #define MEHR_REGION 0
 #endif
@@ -738,9 +751,10 @@ X( P_INPUT_USE, "Input Use", OPT, 0, 3, 0, "Input", "Off|Background|Skin on flag
 X( P_INPUT_PROJECTION, "Input Projection", OPT, 0, 2, 0, "Input", "Front planar|Model UV|Spherical", 0 )
 X( P_INPUT_MIX, "Input Mix", STD, 0, 1, 1, "Input", "", 0 )
 #undef MEHR_REGION
-#define MEHR_REGION MEHR_WOW
+#define MEHR_REGION MEHR_CLASSIC
 // FACE (FX only, Stage 7): Apple Vision on the incoming layer places the mask on up to 4 faces. LoadEhr W1: carried by Wow FX
-// (the four model slots pushed LoadEhr FX to 521 params; Face's 10 brought it to 511, Wow FX to 507)
+// (the four model slots pushed LoadEhr FX to 521 params; Face's 10 brought it to 511, Wow FX to 507). W9: back to LoadEhr FX
+// (Smoke Sim went to the Wow side and made the room)
 X( P_FACE_TRACK, "Face Track", BOOL, 0, 1, 0, "Face", "", 0 )
 X( P_MAX_FACES, "Max Faces", STD, 1, 4, 4, "Face", "", 0 )
 X( P_FACE_SCALE, "Face Scale", STD, 0.1f, 5, 1.2f, "Face", "", 0 )

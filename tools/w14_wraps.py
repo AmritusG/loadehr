@@ -93,6 +93,12 @@ TESTS = [
     ('Glitch step', '30 steps/s', [('Glitch Shift', 0.3), ('Glitch Rate', 30)], {'after': (1000 / 30, 1, 120)}),
     # LoadEhr W6: Point Twinkle's clock runs at 1 twinkle / s and wraps at 1000 (every point's rate is a whole number of twinkles per 1000)
     ('Point Twinkle', '1 twinkle/s, depth 1', [('Wire Mode', 4), ('Point Twinkle', 1), ('Wire Glow', 1)], {'after': (1000, 1, 120)}),
+    # LoadEhr W9 Lines: the pulses' phase wraps at 1000 cycles (each line: whole cycles per 1000), the light paint heads' swirl at 1000
+    # turns (whole turns per 1000 per head), the ring's time stamps at 3600 s (ages read mod 3600), the neon flicker at 1000 steps
+    ('Line pulses (plexus)', 'speed 4', [('Line Look', 1), ('Line Speed', 4)], {'after': (1000 / 4, 1, 120)}),
+    ('Light paint swirl', 'speed 4 (2 turns/s)', [('Line Look', 2), ('Line Speed', 4), ('Line Amount', 0.6)], {'after': (1000 / 2, 1, 120)}),
+    ('Light paint stamps', 'speed 1', [('Line Look', 2), ('Line Speed', 1), ('Line Amount', 0.6), ('Spin Y', 30)], {'after': (3600, 1, 120)}),
+    ('Neon flicker + flow', 'speed 4 (48 steps/s)', [('Line Look', 3), ('Line Speed', 4)], {'after': (1000 / 48, 1, 120)}),
 ]
 # W26 / W28 features live in the Wow bundles only (Resolume's 512-param cap)
 # extra commands before the clocks are fast-forwarded (a second model)
@@ -123,6 +129,8 @@ SCENES = [
     # LoadEhr W2: the Deform clocks + the Jelly spring (a state, not a phase: it must stay bounded, not drift) over 180 min
     ('deform', [('Spin Y', 30), ('Wobble Amount', 2), ('Wobble Speed', 5), ('Jelly', 2), ('Noise Warp', 1), ('Warp Speed', 4),
                 ('Glitch Shift', 0.3), ('Glitch Rate', 6), ('Twist', 2), ('Ripple', 0.05), ('Ripple Speed', 20), ('Squash Beat', 1)]),
+    # LoadEhr W9: every Lines clock (plexus pulses + audio, the light paint ring and swirl on a spinning mask)
+    ('lines', [('Line Look', 2), ('Line Speed', 4), ('Line Amount', 0.6), ('Spin Y', 30), ('Wobble Amount', 2)]),
 ]
 MINUTES = [1, 13, 26, 60, 180]
 

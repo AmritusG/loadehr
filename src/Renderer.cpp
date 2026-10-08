@@ -48,7 +48,11 @@ std::vector< std::pair< GLuint, GLuint > >* g_deformSink = nullptr;
 std::vector< std::pair< GLuint, GLuint > >* g_wireSink = nullptr;
 // W6: and their POINTS twins (WIRE + POINTS: the soup stage at a point's spot, drawn as a sprite), each with its own DEFORM twin
 std::vector< std::pair< GLuint, GLuint > >* g_pointSink = nullptr;
-GLuint LinkPlain( const std::string& vs, const std::string& fs, std::string& error );
+// W9: and their CAPTURE twins (POINTS + CAPTURE, transform feedback of the spots' world position / normal / colour; not the instanced
+// ones), each with its own DEFORM twin
+std::vector< std::pair< GLuint, GLuint > >* g_captureSink = nullptr;
+GLuint LinkPlain( const std::string& vs, const std::string& fs, std::string& error, bool capture = false );
+const char* kCaptureFS = "out vec4 fragColor;\nvoid main() { fragColor = vec4( 0.0 ); }\n";
 }
 
 // Links a program; each stage's source is its pieces concatenated (defines, libraries, main).
@@ -79,12 +83,20 @@ GLuint Link( const std::string& vs, const std::string& fs, std::string& error )
 				if( const GLuint d = LinkPlain( "#define WIRE\n#define POINTS\n#define DEFORM\n" + vs, "#define WIRE\n#define POINTS\n" + fs, error ) )
 					g_deformSink->push_back( { q, d } );
 		}
+	if( p && g_captureSink && soup && mainFS && !pass && vs.find( "#define INSTANCED" ) == std::string::npos )
+		if( const GLuint c = LinkPlain( "#define POINTS\n#define CAPTURE\n" + vs, kCaptureFS, error, true ) )
+		{
+			g_captureSink->push_back( { p, c } );
+			if( g_deformSink )
+				if( const GLuint d = LinkPlain( "#define POINTS\n#define CAPTURE\n#define DEFORM\n" + vs, kCaptureFS, error, true ) )
+					g_deformSink->push_back( { c, d } );
+		}
 	return p;
 }
 
 namespace
 {
-GLuint LinkPlain( const std::string& vs, const std::string& fs, std::string& error )
+GLuint LinkPlain( const std::string& vs, const std::string& fs, std::string& error, bool capture )
 {
 	GLuint v = CompileStage( GL_VERTEX_SHADER, vs.c_str(), "", error );
 	GLuint f = CompileStage( GL_FRAGMENT_SHADER, fs.c_str(), "", error );
@@ -96,6 +108,11 @@ GLuint LinkPlain( const std::string& vs, const std::string& fs, std::string& err
 	GLuint p = glCreateProgram();
 	glAttachShader( p, v );
 	glAttachShader( p, f );
+	if( capture )
+	{
+		const char* vary[ 3 ] = { "vCapPos", "vCapNrm", "vCapCol" };
+		glTransformFeedbackVaryings( p, 3, vary, GL_SEPARATE_ATTRIBS );
+	}
 	glLinkProgram( p );
 	glDeleteShader( v ), glDeleteShader( f );
 	GLint ok = 0;
@@ -208,13 +225,17 @@ bool Renderer::Init( std::string& error )
 	g_deformSink = &deformTwins; // W2: every soup program linked from here on gets its DEFORM twin
 	g_wireSink   = &wireTwins;   // W5: and the main-pass ones their WIRE twin
 	g_pointSink  = &pointTwins;  // W6: and their POINTS twin
+	g_captureSink = &captureTwins; // W9: and their CAPTURE twin
 	const bool ok = InitPrograms( error );
 	g_deformSink  = nullptr;
 	g_wireSink    = nullptr;
 	g_pointSink   = nullptr;
+	g_captureSink = nullptr;
 	for( const auto& t : wireTwins ) // before the DEFORM copies: a WIRE twin hands its units on to its own DEFORM twin
 		CopySamplerUnits( t.first, t.second );
 	for( const auto& t : pointTwins )
+		CopySamplerUnits( t.first, t.second );
+	for( const auto& t : captureTwins )
 		CopySamplerUnits( t.first, t.second );
 	for( const auto& t : deformTwins )
 		CopySamplerUnits( t.first, t.second );
@@ -224,17 +245,18 @@ bool Renderer::Init( std::string& error )
 			glUseProgram( q );
 			glUniform1i( U( q, "uEdgeMask" ), 25 );
 		}
-	for( const auto& t : pointTwins )
-		for( GLuint q : { t.second, DeformTwin( t.second ) } )
-		{
-			glUseProgram( q );
-			glUniform1i( U( q, "uPointRef" ), 26 );
-		}
+	for( const auto* tw : { &pointTwins, &captureTwins } )
+		for( const auto& t : *tw )
+			for( GLuint q : { t.second, DeformTwin( t.second ) } )
+			{
+				glUseProgram( q );
+				glUniform1i( U( q, "uPointRef" ), 26 );
+			}
 	glUseProgram( 0 );
 	if( ok )
-		Log( "DEFORM %zu soup programs have their DEFORM twin, %zu their WIRE twin, %zu their POINTS twin (%.0f ms)", deformTwins.size(), wireTwins.size(),
-		     pointTwins.size(), std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - t0 ).count() );
-	return ok && InitWire( error ) && InitPoints( error );
+		Log( "DEFORM %zu soup programs have their DEFORM twin, %zu their WIRE twin, %zu their POINTS twin, %zu their CAPTURE twin (%.0f ms)", deformTwins.size(), wireTwins.size(),
+		     pointTwins.size(), captureTwins.size(), std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - t0 ).count() );
+	return ok && InitWire( error ) && InitPoints( error ) && InitLines( error );
 }
 
 GLuint Renderer::DeformTwin( GLuint p ) const
@@ -318,6 +340,10 @@ void Renderer::Release()
 	for( const auto& t : pointTwins )
 		glDeleteProgram( t.second );
 	pointTwins.clear();
+	for( const auto& t : captureTwins )
+		glDeleteProgram( t.second );
+	captureTwins.clear();
+	ReleaseLines();
 	ReleaseWire();
 	ReleasePoints();
 	ReleaseTargets();
@@ -585,8 +611,16 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 	}
 	// W5: the WIRE twin (main-pass soup programs only; any other program has none and stays itself). W6: the POINTS twin while
 	// DrawWired draws points; no twin, or the model's point set still building = no points this frame
+	// W9: a CAPTURE draw = the CAPTURE twin (no twin: nothing to capture)
+	if( captureNow )
+	{
+		const GLuint c = CaptureTwin( p );
+		if( c == p || !soup )
+			return;
+		p = c;
+	}
 	const GLuint beforeWire = p;
-	if( soup && fs.wire.on && !outline )
+	if( soup && fs.wire.on && !outline && !captureNow )
 		p = pointsNow ? PointTwin( p ) : WireTwin( p );
 	const bool wired = p != beforeWire;
 	const PointSet* pts = nullptr;
@@ -671,6 +705,19 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 		SetWireUniforms( p, fs, model );
 	if( fs.morph.On() ) // W6 Stage 2: the pack's MORPH programs (any other program has no such uniforms: harmless)
 		SetMorphUniforms( p, fs, model );
+	if( captureNow )
+	{
+		glUniform1f( U( p, "uCapTime" ), capTime );
+		glUniform1f( U( p, "uCapSwirl" ), capSwirl * fs.modelScale / std::max( model->fitScale, 1e-12f ) );
+		glUniform1f( U( p, "uCapPhase" ), capPhase );
+		glUniform1i( U( p, "uCapAxis" ), capAxis );
+		glUniform1f( U( p, "uPointLift" ), 0.0f );
+		glActiveTexture( GL_TEXTURE0 + 26 );
+		glBindTexture( GL_TEXTURE_BUFFER, captureRefTex );
+		glActiveTexture( GL_TEXTURE0 );
+		glEnable( GL_RASTERIZER_DISCARD );
+		glBeginTransformFeedback( GL_POINTS );
+	}
 	if( pointsNow )
 	{
 		glUniform1f( U( p, "uPointPx" ), std::max( 1.5f, 2.0f * fs.wireThickness ) ); // the dot as wide as a line (a line spans both sides of its edge)
@@ -817,7 +864,7 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 	// cornea, a dial under its glass) shows through. Models without glass take the single pass as before.
 	GLboolean prevBlend = GL_FALSE, prevDepthMask = GL_TRUE;
 	GLint prevSrc = GL_ONE, prevDst = GL_ZERO;
-	const int glassPasses = glassParts && !shadowLightPos ? 2 : 1;
+	const int glassPasses = glassParts && !shadowLightPos && !captureNow ? 2 : 1;
 	for( int gpass = 0; gpass < glassPasses; ++gpass )
 	{
 	if( gpass == 1 )
@@ -833,12 +880,12 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 	for( size_t i = 0; i < model->parts.size(); ++i )
 	{
 		const GpuPart& part    = model->parts[ i ];
-		if( part.fractured != pieces )
+		if( captureNow ? part.fractured : part.fractured != pieces ) // W9: a capture takes the whole mesh's spots (their run per part)
 			continue;
 		if( glassPasses == 2 && ( part.glass > 0.0f && part.glass > su.glass ) != ( gpass == 1 ) )
 			continue;
 		const PartControls& pc = fs.parts[ part.slot ];
-		if( !pc.visible || part.indexCount == 0 || ( shadowLightPos && part.glass > 0.0f ) ) // glass lets the light through
+		if( ( !pc.visible && !captureNow ) || part.indexCount == 0 || ( shadowLightPos && part.glass > 0.0f ) ) // glass lets the light through
 			continue;
 		if( glassFilter == 1 && !( part.glass > 0.0f ) ) // W26 caustics: the refractor only
 			continue;
@@ -890,6 +937,14 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 		glUniform1f( locPSurf, pc.surface );
 		// W6: this part's run of points (the prewarm: the one dummy point)
 		const std::array< uint32_t, 2 > prun = pts ? ( i < pts->ranges.size() ? pts->ranges[ i ] : std::array< uint32_t, 2 >{ 0, 0 } ) : std::array< uint32_t, 2 >{ 0, 1 };
+		if( captureNow )
+		{
+			const std::array< uint32_t, 2 > crun = i < captureRanges->size() ? ( *captureRanges )[ i ] : std::array< uint32_t, 2 >{ 0, 0 };
+			glUniform1i( U( p, "uCapHidden" ), pc.visible ? 0 : 1 );
+			if( crun[ 1 ] )
+				glDrawArrays( GL_POINTS, (GLint)crun[ 0 ], (GLsizei)crun[ 1 ] );
+			continue;
+		}
 		if( pointsNow )
 		{
 			GLsizei pc = limit ? (GLsizei)std::min( limit, prun[ 1 ] ) : (GLsizei)prun[ 1 ];
@@ -961,6 +1016,13 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 	}
 	}
 	glBindVertexArray( 0 );
+	if( captureNow )
+	{
+		glEndTransformFeedback();
+		glDisable( GL_RASTERIZER_DISCARD );
+		glActiveTexture( GL_TEXTURE0 + 26 );
+		glBindTexture( GL_TEXTURE_BUFFER, 0 );
+	}
 	if( pointsNow )
 	{
 		glDisable( GL_PROGRAM_POINT_SIZE );
@@ -1216,6 +1278,7 @@ void TransitionIn( FrameState& f, float t, const float* q )
 void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slotA, int slotB )
 {
 	wireDraws.clear(); // W5: filled by this frame's wired draws
+	lineDraws.clear(); // W9: and the line looks'
 	sparkleNow = false;
 	sideSlot[ 0 ] = slotA, sideSlot[ 1 ] = slotB, activeSide = 0;
 	GpuModel* bReady = b && b->Complete() ? b : nullptr;
@@ -1533,6 +1596,16 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 		}
 		if( !both )
 			DrawDust( fs, model, h );
+		if( fs.lines.look > 0 ) // W9 Stage A: the line looks (each side through the program it is drawn with)
+		{
+			auto soupOf = [ & ]( const FrameState& f ) { return f.morph.On() ? progSoupM : f.shape.transSide > 0 && !f.shape.dustTrans ? progSoupT : progSoup; };
+			if( both )
+				RenderLines( fsA, model, soupOf( fsA ), &fsB, bReady, soupOf( fsB ), t );
+			else
+				RenderLines( fs, model, progSoup, nullptr, nullptr, 0, 0.0f );
+		}
+		else
+			lineDraws.clear();
 		glDisable( GL_BLEND );
 		glBlendFunc( GL_ONE, GL_ZERO );
 		glDisable( GL_DEPTH_TEST );
@@ -1690,6 +1763,7 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 	glDrawArrays( GL_TRIANGLES, 0, 3 );
 	perf.Mark( PerfProbe::Light );
 	AddWireLight( fs, w, h ); // W5: before the post pass, so the global Bloom catches the wires too
+	AddLineLight( fs, w, h ); // W9 neon tubes: their light on the model
 	if( both && fsA.morph.cloud > 0.0f && fsA.morph.cloudGlow > 0.0f )
 		DrawCloud( fsA, fsB, w, h, true ); // W6 Points / Swarm styles: the cloud's light (Wire Glow / Firefly Glow), the same way
 	if( fogOut && fs.vol.motes > 0.0f )

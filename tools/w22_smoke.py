@@ -129,7 +129,7 @@ def slug(e):
 
 def script(e, out, perf=False):
     w, h = 1920, 1080
-    L = ['bundle %s/build/%s.bundle' % (ROOT, 'LoadEhrFX' if e.get('fx') else 'LoadEhr'), 'size %d %d' % (w, h)]
+    L = ['bundle %s/build/%s.bundle' % (ROOT, 'LoadEhrWowFX' if e.get('fx') else 'LoadEhrWow'), 'size %d %d' % (w, h)]  # W9: the sim is Wow-only
     if e.get('fx'):
         L.append('input ' + e.get('input', os.path.join(OUT, 'input_gen.png')))
     L.append('bpm 100')  # off the whole second: shots land at different beat phases

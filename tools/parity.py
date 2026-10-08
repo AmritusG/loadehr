@@ -100,6 +100,8 @@ def to_build(lines, d):
 _INC = open(os.path.join(ROOT, 'src', 'ParamList.inc')).read()
 TRIP = set(re.findall(r'X\( \w+, "([^"]+)", \w+, [^,]+, [^,]+, [^,]+, "Trip"', _INC)) | set(
     n for b in re.findall(r'MEHR_COLOR\( \w+, "([^"]+)", "Trip"', _INC) for n in (b + ' Color', b + ' Sat', b + ' Bri', b + ' Alpha'))
+# W9: the Smoke Sim group went to the Wow bundles too
+TRIP |= set(re.findall(r'X\( \w+, "([^"]+)", \w+, [^,]+, [^,]+, [^,]+, "Smoke Sim"', _INC)) | {'Smoke Color', 'Smoke Sat', 'Smoke Bri', 'Smoke Alpha'}
 
 
 def to_carrier(lines):
@@ -110,6 +112,8 @@ def to_carrier(lines):
 
 def harness(side, lines, path):
     if side == 'L':
+        if any('Face Track' in l for l in lines):  # W9: Face is carried by LoadEhr FX again
+            lines = [l.replace('build/LoadEhrWowFX.bundle', 'build/LoadEhrFX.bundle') for l in lines]
         lines, exe = to_build(to_carrier(lines), LBUILD), os.path.join(LBUILD, 'loadehr_harness')
     elif REF:
         lines, exe = to_build(lines, REF), os.path.join(REF, 'loadehr_harness')

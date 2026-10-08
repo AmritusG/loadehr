@@ -25,7 +25,8 @@ namespace
 {
 const char* kSourceName[ 5 ] = { "Vertices", "Feature Vertices", "Surface 25k", "Surface 100k", "Surface 400k" };
 
-// one point set: per GPU part a run of refs (the parts' order), each 4 floats: triangle, b1, b2, 0
+}
+// one point set: per GPU part a run of refs (the parts' order), each 4 floats: triangle, b1, b2, 0 (W9: the line looks use it too)
 void BuildPointRefs( const CpuGeometry& g, int source, const std::vector< PointSet::Part >& parts, PointSet::Job& job )
 {
 	const auto t0   = std::chrono::steady_clock::now();
@@ -114,7 +115,6 @@ void BuildPointRefs( const CpuGeometry& g, int source, const std::vector< PointS
 		}
 	}
 	job.ms = std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - t0 ).count();
-}
 }
 
 bool Renderer::InitPoints( std::string& )

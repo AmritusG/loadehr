@@ -1160,6 +1160,21 @@ private:
 			}
 		}
 		const float gain = values[ P_AUDIO_GAIN ];
+		// W9: 16 bands (log-spaced over the bins, bass first) for the looks that map the spectrum over the model
+		if( info && !info->elements.empty() )
+		{
+			const size_t n = info->elements.size();
+			for( int b = 0; b < 16; ++b )
+			{
+				const size_t lo = std::min( n - 1, size_t( std::floor( std::pow( double( n ), b / 16.0 ) ) ) - 1 + ( b > 0 ? 1 : 0 ) );
+				const size_t hi = std::max( lo + 1, std::min( n, size_t( std::floor( std::pow( double( n ), ( b + 1 ) / 16.0 ) ) ) ) );
+				float sum = 0;
+				for( size_t i = lo; i < hi; ++i )
+					sum += info->elements[ i ].value;
+				const float target = std::min( 4.0f, sum / float( hi - lo ) * gain * ( 2.0f + 0.5f * b ) );
+				audio16[ b ] += ( target - audio16[ b ] ) * std::min( 1.0f, ( target > audio16[ b ] ? 30.0f : 6.0f ) * dt );
+			}
+		}
 		for( int b = 0; b < 3; ++b )
 		{
 			float target = std::min( 4.0f, bands[ b ] * gain * ( b == 0 ? 2.0f : b == 1 ? 4.0f : 8.0f ) );
@@ -1365,6 +1380,7 @@ private:
 
 		clk.pointTwinkle = Wrap( clk.pointTwinkle + dt, 1000.0 ); // W6 Point Twinkle: ~1 twinkle / s (each point's rate: whole twinkles per 1000)
 		BuildWire( fs );
+		BuildLines( fs, dt );
 		fs.explode       = values[ P_EXPLODE ] + values[ P_AUDIO_EXPLODE ] * 0.5f * audio[ 2 ];
 		fs.explodeRandom = values[ P_EXPLODE_RANDOM ];
 		fs.explodeSeed   = 0.37f;
@@ -2114,7 +2130,8 @@ private:
 	// W7: a retired value (a clip saved with Shrinkwrap / Fold) dissolves
 	static int LiveStyle( int st ) { return st < 0 || st >= kStyleValues || st == kStyleRetired6 || st == kStyleRetired22 ? kStyleDissolve : st; }
 	// W6: Swarm, Burn and Lava read the Wow bundles' dials (Firefly, Fire, Lava): in LoadEhr / FX they dissolve
-	static int StyleHere( int st ) { return !LOADEHR_WOW && ( st == kStyleSwarm || st == kStyleBurn || st == kStyleLava ) ? kStyleDissolve : st; }
+	// W9: Smoke too (the sim went to the Wow bundles)
+	static int StyleHere( int st ) { return !LOADEHR_WOW && ( st == kStyleSwarm || st == kStyleBurn || st == kStyleLava || st == kStyleSmoke ) ? kStyleDissolve : st; }
 	// which per-slot caches the chain's hops need ahead of use (the styles any hop can take)
 	unsigned ChainUses() const
 	{
@@ -2128,7 +2145,7 @@ private:
 		};
 		// the liquid SDF is built for every filled slot whatever the style (CPU, off the render thread; 1 MB GPU each), so switching
 		// the style to Liquid mid-show finds every hop ready
-		return ( order == 0 ? use( style ) : ( kUseShards | kUseDust | kUseCloud | kUseSim ) ) | kUseLiquid;
+		return ( order == 0 ? use( style ) : ( kUseShards | kUseDust | kUseCloud | ( LOADEHR_WOW ? kUseSim : 0u ) ) ) | kUseLiquid;
 	}
 
 	// W28 Transition Play over the chain: restarted by a clip trigger (WatchTrigger) and by switching Play on. Each hop = Transition
@@ -3046,6 +3063,40 @@ private:
 		w.on             = w.mode >= 1 && w5;
 		fs.wireMix       = w.mode == 1 && !w5 ? w.mix : 0.0f;
 		fs.wireThickness = values[ P_WIRE_THICKNESS ];
+	}
+	// W9 Stage A: the line looks. Clocks (W14): the pulses' and the swirl's phases wrap at 1000 (whole cycles / turns per 1000 in the
+	// shaders), the ring's time stamps at 3600 s (ages are read mod 3600), the neon flicker steps at 1000.
+	void BuildLines( FrameState& fs, float dt )
+	{
+		LinesState& L = fs.lines;
+		L.look        = LOADEHR_WOW ? 0 : std::clamp( Opt( P_LINE_LOOK ), 0, 3 );
+		const float a = values[ P_LINE_AMOUNT ], r = values[ P_LINE_REACH ], sp = values[ P_LINE_SPEED ];
+		clk.lineFlow    = Wrap( clk.lineFlow + dt * sp, 1000.0 );
+		clk.lineSwirl   = Wrap( clk.lineSwirl + dt * sp * 0.5, 1000.0 );
+		clk.linePaint   = Wrap( clk.linePaint + dt, 3600.0 );
+		clk.lineFlicker = Wrap( clk.lineFlicker + dt * 12.0 * sp, 1000.0 );
+		if( L.look == 0 )
+			return;
+		L.amount = a, L.speed = sp, L.audio = values[ P_LINE_AUDIO ];
+		L.source = std::clamp( Opt( P_POINT_SOURCE ), 0, 4 );
+		if( L.look == 1 )
+			L.points = 200 + int( a * a * 20000.0f ), L.reach = 0.02f + 0.48f * r;                         // fitted units
+		else if( L.look == 2 )
+			L.points = 20 + int( a * a * 3000.0f ), L.reach = 0.1f + 3.9f * r, L.swirlR = 0.04f + 0.05f * sp; // trail seconds
+		else
+			L.reach = r;
+		L.flow    = float( clk.lineFlow );
+		L.swirl   = sp > 0.0f ? float( clk.lineSwirl ) : 0.0f;
+		if( L.look == 2 && sp <= 0.0f )
+			L.swirlR = 0.0f;
+		L.time    = float( clk.linePaint );
+		L.flicker = float( clk.lineFlicker );
+		for( int b = 0; b < 16; ++b )
+			L.bands[ b ] = audio16[ b ];
+		L.axis  = Opt( P_DEFORM_AXIS );
+		L.width = values[ P_WIRE_THICKNESS ];
+		Colour( P_WIRE_COL_H, L.color );
+		L.colorMix = Alpha( P_WIRE_COL_H );
 	}
 	// W2: the video's play position. Loop: wraps at the clip length; Ping-Pong: a clock wrapped at twice the length, mirrored back;
 	// Once: runs to the end and holds the last frame. Video Speed x real time; Video Restart / a clip trigger: back to the start.
@@ -4025,6 +4076,7 @@ private:
 		double video = 0;            // W2 projector video: seconds (Loop: wraps at the clip length, Ping-Pong at twice it; Once clamps)
 		double warp = 0, glitch = 0; // W2 Deform: Noise Warp drift (lattice cells, wraps at 256), Glitch steps (wraps at 1000)
 		double pointTwinkle = 0;     // W6 Point Twinkle: twinkles (wraps at 1000)
+		double lineFlow = 0, lineSwirl = 0, linePaint = 0, lineFlicker = 0; // W9 Lines: cycles, turns (1000), seconds (3600), steps (1000)
 	} clk;
 	// W2 Jelly: a damped spring per instance (fitted / mask space), driven by the mask's own acceleration (move, spin, bounce)
 	struct Jelly
@@ -4149,6 +4201,7 @@ private:
 	std::chrono::steady_clock::time_point lastClock;
 	Renderer renderer;
 	float audio[ 3 ]   = { 0, 0, 0 };
+	float audio16[ 16 ] = {}; // W9: 16 bands
 	double lastHostTime = 0;
 	bool hostTimeSeen = false, hostTimeValid = false;
 	std::vector< float > perfIv, perfCpu; // W29: this second's frame intervals and ProcessOpenGL wall ms
