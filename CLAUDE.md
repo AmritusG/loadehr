@@ -589,7 +589,7 @@ d) W17: KHR_materials_pbrSpecularGlossiness -> diffuse = BaseColor, its spec/glo
   through the field (the tangent squared to the normal changed normal-mapped shading at a hop's end: max 75 / 255; the same fix in the
   DEFORM twin: a deform's first step on the SciFi helmet 821 -> 545 px > 2, the rest is real sub-pixel motion). Measured: swap window
   vs the hop's own motion 0.24 .. 0.97 (6 cases, `w7_trans.py spikes`); Arena's own C8 / C9 dials played (Ping-Pong 6 s, Hold 1.5 s,
-  Spin Y 3, 60 Hz): max per-frame change W6 15.4 / 13.5 -> W7 3.25 / 4.0.
+  Spin Y 3, 60 Hz): max per-frame change W6 15.4 / 13.5 -> W7 2.72 / 2.60.
 - LAVA (style 20): only the outgoing model ever cracked, so a skull in slot B (Arena's C16: Nefertiti -> Deer Skull, Ping-Pong) never
   cracked (Lava Glow 3 vs 0: 0 px on the incoming side) and arrived as white blotches (the dissolve edge glow: 22-32 % of its pixels
   near-white at t 0.55-0.6). Now both sides carry the lava: the outgoing model cracks (front by e 0.45), splits open (0.6 x Lava Split,
