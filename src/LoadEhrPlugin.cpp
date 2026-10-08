@@ -742,7 +742,7 @@ private:
 		}
 	}
 	// the generated model's spec: every value that changes the mesh (the Letters dials animate it, they are not in here)
-	std::string TextLogoSpec()
+	std::string TextLogoSpec( bool forceText = false ) // W9: forceText = the Text group's text whatever Model Source says (Surf Source Text)
 	{
 		std::map< std::string, std::string > f;
 		auto num = [ & ]( const char* k, unsigned id ) {
@@ -750,7 +750,7 @@ private:
 			snprintf( b, sizeof( b ), "%.4g", values[ id ] );
 			f[ k ] = b;
 		};
-		const bool text = Opt( P_MODEL_SOURCE ) == 1;
+		const bool text = forceText || Opt( P_MODEL_SOURCE ) == 1;
 		f[ "source" ]   = text ? "text" : "logo";
 		if( text )
 		{
@@ -813,6 +813,12 @@ private:
 			UpdateSlot( slots[ i ], reloadRequested[ i ], i );
 			reloadRequested[ i ] = false;
 		}
+		// W9: Surf Source Text = a fifth, hidden slot holding the Text group's text (built only while a look shows it)
+		const bool wantText = !LOADEHR_WOW && Opt( P_SURF_SOURCE ) == 3 && ( Opt( P_SURF_LOOK ) == 2 || Opt( P_CUT_LOOK ) == 3 );
+		const std::string tw = wantText ? TextLogoSpec( true ) : std::string();
+		if( tw != textSlot.file && ( tw.empty() || !textSlot.ticket ) )
+			textSlot.file = tw;
+		UpdateSlot( textSlot, false, kModelSlots );
 		UpdateStatuses();
 	}
 
@@ -857,10 +863,10 @@ private:
 			}
 			if( !m.ticket->model )
 			{
-				Log( "Load failed (slot %c), keeping the previous model: %s", "ABCD"[ slot ], m.ticket->error.c_str() );
+				Log( "Load failed (slot %c), keeping the previous model: %s", "ABCDT"[ slot ], m.ticket->error.c_str() );
 				m.failed = true;
 				m.error  = m.ticket->error;
-				if( IsGenSpec( m.ticket->path ) )
+				if( IsGenSpec( m.ticket->path ) && slot < kModelSlots )
 					SetStatus( slot, m.ticket->status );
 				FFGLLog::LogToHost( ( "LoadEhr: could not load " + LogName( m.ticket->path ) + ": " + m.ticket->error ).c_str() );
 			}
@@ -874,9 +880,9 @@ private:
 				m.current = m.pending;
 				m.pending.reset();
 				m.swapMs = std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - m.switchStart ).count();
-				Log( "SWAP to %s (slot %c, %zu tris, %zu parts) %.0f ms after request", LogName( m.current->path ).c_str(), "ABCD"[ slot ], m.current->triangleCount,
+				Log( "SWAP to %s (slot %c, %zu tris, %zu parts) %.0f ms after request", LogName( m.current->path ).c_str(), "ABCDT"[ slot ], m.current->triangleCount,
 				     m.current->parts.size(), m.swapMs );
-				if( IsGenSpec( m.current->path ) )
+				if( IsGenSpec( m.current->path ) && slot < kModelSlots )
 					SetStatus( slot, m.current->status );
 			}
 		}
@@ -1381,6 +1387,7 @@ private:
 		BuildSwarm( fs, anchor, dt );
 		BuildPost( fs, anchor, scale );
 		BuildCut( fs, anchor, dt ); // W9 Stage C (after the projector: the window can show its picture)
+		BuildSurfLook( fs, dt );    // W9 Stage D
 
 		clk.pointTwinkle = Wrap( clk.pointTwinkle + dt, 1000.0 ); // W6 Point Twinkle: ~1 twinkle / s (each point's rate: whole twinkles per 1000)
 		BuildWire( fs );
@@ -3217,18 +3224,39 @@ private:
 					for( int j = 0; j < 3; ++j )
 						x.winQuad[ q ][ j ] = b[ j ] + right[ j ] * hw * ( ( q & 1 ) ? 1.0f : -1.0f ) + up[ j ] * hh * ( ( q & 2 ) ? 1.0f : -1.0f );
 			}
-			// the world's model: the first filled slot that is not on show (Stage D: Surf Source picks it)
-			const int ws = WindowSlot();
-			x.winModel   = nullptr;
-			if( ws >= 0 && slots[ ws ].current )
+			// the world's model: Surf Source (classic), else the first filled slot that is not on show
+			GpuModel* src = SourceModel();
+			const int ws  = src ? -1 : WindowSlot();
+			x.winModel    = nullptr;
+			if( src || ( ws >= 0 && slots[ ws ].current ) )
 			{
-				const Mat4 W = Mat4::Translate( b[ 0 ], b[ 1 ], b[ 2 ] ) * Mat4::RotY( float( turn ) ) * Mat4::Scale( k ) * Mat4::Translate( -c[ 0 ], -c[ 1 ], -c[ 2 ] ) * slotM[ ws ];
+				Mat4 SM;
+				float sc = 1.0f;
+				if( src )
+				{
+					// its own fit (centre, largest dimension -> 2 units) at the mask's pose
+					SM = anchor * Mat4::Scale( src->fitScale ) * Mat4::Translate( -src->fitCenter[ 0 ], -src->fitCenter[ 1 ], -src->fitCenter[ 2 ] );
+					sc = values[ P_SCALE ] * src->fitScale;
+				}
+				else
+					SM = slotM[ ws ], sc = slotScale[ ws ];
+				const Mat4 W = Mat4::Translate( b[ 0 ], b[ 1 ], b[ 2 ] ) * Mat4::RotY( float( turn ) ) * Mat4::Scale( k ) * Mat4::Translate( -c[ 0 ], -c[ 1 ], -c[ 2 ] ) * SM;
 				std::memcpy( x.winM, W.m, sizeof( x.winM ) );
-				x.winScale = slotScale[ ws ] * k;
-				x.winModel = slots[ ws ].current.get();
+				x.winScale = sc * k;
+				x.winModel = src ? src : slots[ ws ].current.get();
 			}
 		}
 		fs.shape.on = fs.shape.deform = fs.shape.deform || x.cut > 0; // the cut draws in the DEFORM twins
+	}
+	// the model Surf Source names (classic): Slot B / C / D (when filled), or the text; nullptr = none
+	GpuModel* SourceModel() const
+	{
+		if( LOADEHR_WOW )
+			return nullptr;
+		const int src = std::clamp( Opt( P_SURF_SOURCE ), 0, 3 );
+		if( src == 3 )
+			return textSlot.current.get();
+		return slots[ src + 1 ].current && SlotFilled( src + 1 ) ? slots[ src + 1 ].current.get() : nullptr;
 	}
 	int WindowSlot() const
 	{
@@ -3236,6 +3264,44 @@ private:
 			if( i != domSlot && slots[ i ].current && SlotFilled( i ) )
 				return i;
 		return -1;
+	}
+	// W9 Stage D: the Surface Look. Spikes: 200 + Scale^2 x 6000 of them, Amount x 0.25 fitted long, thinner the denser; copies: Scale =
+	// their size (0.02 + 0.28 x Scale^2 fitted), as many as cover the surface (2.5 / size^2, 40 .. 2500); Amount 1 .. 2 dissolves the model
+	// under them. The clock (spikes' dance, copies' wobble, the camera looks' motion) runs at Surf Speed cycles / s, wraps at 1000.
+	void BuildSurfLook( FrameState& fs, float dt )
+	{
+		SurfLookState& S = fs.sl;
+		S.look = LOADEHR_WOW ? 0 : std::clamp( Opt( P_SURF_LOOK ), 0, 6 );
+		clk.surfLook = Wrap( clk.surfLook + dt * values[ P_SURF_SPEED ], 1000.0 );
+		if( S.look == 0 )
+			return;
+		S.amount = values[ P_SURF_AMOUNT ], S.scale = values[ P_SURF_SCALE ], S.speed = values[ P_SURF_SPEED ];
+		S.phase  = float( clk.surfLook );
+		Colour( P_WIRE_COL_H, S.color );
+		S.colorMix = Alpha( P_WIRE_COL_H );
+		for( int b = 0; b < 16; ++b )
+			S.bands[ b ] = audio16[ b ];
+		if( S.look == 1 )
+		{
+			S.spots    = 200 + int( S.scale * S.scale * 6000.0f );
+			S.spikeLen = 0.25f * S.amount;
+			S.spikeRad = 0.4f * std::sqrt( 8.0f / float( S.spots ) );
+		}
+		else if( S.look == 2 )
+		{
+			S.copySize = 0.02f + 0.28f * S.scale * S.scale;
+			S.spots    = std::clamp( int( 2.5f / ( S.copySize * S.copySize ) ), 40, 2500 );
+			S.copy     = SourceModel();
+			if( !S.copy )
+			{
+				const int ws = WindowSlot();
+				S.copy = ws >= 0 ? slots[ ws ].current.get() : nullptr;
+			}
+			if( S.amount > 1.0f )
+				fs.dissolve = std::max( fs.dissolve, std::min( 1.0f, S.amount - 1.0f ) );
+		}
+		else
+			fs.shape.on = fs.shape.deform = true; // the camera looks shade in the DEFORM twins
 	}
 	// W9 Stage A: the line looks. Clocks (W14): the pulses' and the swirl's phases wrap at 1000 (whole cycles / turns per 1000 in the
 	// shaders), the ring's time stamps at 3600 s (ages are read mod 3600), the neon flicker steps at 1000.
@@ -4252,6 +4318,7 @@ private:
 		double lineFlow = 0, lineSwirl = 0, linePaint = 0, lineFlicker = 0; // W9 Lines: cycles, turns (1000), seconds (3600), steps (1000)
 		double build = 0, slitTime = 0; // W9 Build: Build Speed cycles (1); the slit history's ticks, seconds (3600)
 		double cut = 0, cutScan = 0;    // W9 Cut: Cut Speed cycles (1), the cap's scan lines (1)
+		double surfLook = 0;            // W9 Surface Look: Surf Speed cycles (1000)
 	} clk;
 	// W2 Jelly: a damped spring per instance (fitted / mask space), driven by the mask's own acceleration (move, spin, bounce)
 	struct Jelly
@@ -4363,6 +4430,7 @@ private:
 	float fitT[ kModelSlots ] = { 1, 1, 1, 1 };
 	uint64_t fitSerial[ kModelSlots ] = {};
 	ModelSlot slots[ kModelSlots ];
+	ModelSlot textSlot; // W9: Surf Source Text
 	std::string modelParam[ kModelSlots ];   // the Model A..D FILE params (slot A shows Model A when Model Source = Model File)
 	std::string status[ kModelSlots ];       // the Status A..D lines
 	bool reloadRequested[ kModelSlots ] = {};

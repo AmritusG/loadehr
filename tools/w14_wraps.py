@@ -109,6 +109,11 @@ TESTS = [
     ('Cut Speed (cross-section)', '30 sweeps/min', [('Cut Look', 1), ('Cut Speed', 30)], {'after': (2, 0.5, 60)}),
     ('Cut Speed (reveal box)', '30 /min', [('Cut Look', 2), ('Cut Speed', 30)], {'after': (2, 0.5, 60)}),
     ('Cut scan lines', '0.5 /s', [('Cut Look', 1)], {'after': (2, 0.5, 60)}),
+    # LoadEhr W9 Surface Look: one clock at Surf Speed cycles / s, wrapped at 1000 (spikes' dance and copies' wobble: whole cycles per 1000
+    # each; the camera looks: their motion reads it whole)
+    ('Surf Speed (spikes)', '4 /s', [('Surf Look', 1), ('Surf Speed', 4)], {'after': (250, 1, 120)}),
+    ('Surf Speed (LED roll)', '4 /s', [('Surf Look', 6), ('Surf Speed', 4)], {'after': (250, 1, 120)}),
+    ('Surf Speed (thermal)', '4 /s', [('Surf Look', 4), ('Surf Speed', 4)], {'after': (250, 1, 120)}),
 ]
 # W26 / W28 features live in the Wow bundles only (Resolume's 512-param cap)
 # extra commands before the clocks are fast-forwarded (a second model)

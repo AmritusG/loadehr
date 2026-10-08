@@ -413,6 +413,20 @@ struct XState
 	float winQuad[ 4 ][ 3 ] = {};   // the picture's quad behind the openings (world corners)
 };
 
+// W9 Stage D (Surface Look group, classic): spikes and copies on captured surface spots (the dominant model), camera looks (DEFORM twins)
+struct SurfLookState
+{
+	int look = 0;          // 1 audio spikes, 2 skin of copies, 3 x-ray, 4 thermal, 5 night vision, 6 led matrix
+	float amount = 0.5f, scale = 0.35f, speed = 0.5f;
+	float phase = 0;       // the look's clock (spikes' dance / copies' wobble: cycles wrapped at 1000; camera looks: their own)
+	int spots = 0;         // spikes / copies
+	float bands[ 16 ] = {};
+	float spikeLen = 0.3f, spikeRad = 0.02f; // fitted units
+	float copySize = 0.06f;                   // fitted units of the main model per fitted unit of the copy
+	GpuModel* copy = nullptr;                 // skin of copies: the source model (Surf Source)
+	float color[ 3 ] = { 0, 1, 1 }, colorMix = 0;
+};
+
 struct FrameState
 {
 	// target
@@ -507,6 +521,7 @@ struct FrameState
 	std::vector< float > letterXf;
 	LinesState lines; // W9 Stage A
 	XState x;         // W9 Stage B / C
+	SurfLookState sl; // W9 Stage D
 };
 
 // W6 Stage 2: a slot's point cloud for the Points / Swarm styles, built on a worker (Morph.cpp)
@@ -648,7 +663,7 @@ private:
 		int ringHead = 0, ringFilled = 0;
 		int64_t lastTick = -1;
 		uint64_t ringFor = 0;
-	} capture[ 2 ];
+	} capture[ 3 ]; // W9: [ 2 ] = the Surface Look's spots
 	static constexpr int kRingRows = 240; // 4 s at 60 samples / s
 	GLuint progLinePair = 0, progLineRibbon = 0, progLineDot = 0, progLineLight = 0, lineBlur[ 2 ] = {}, lineBlurFBO[ 2 ] = {};
 	int lineBlurW = 0, lineBlurH = 0;
@@ -679,6 +694,13 @@ private:
 	bool LensOn( const FrameState& fs ) const { return fs.x.lens && fs.x.lensAmt > 0.0f; }
 	void SetLensUniforms( GLuint prog, const FrameState& fs, int w, int h );
 	void WarmLooks( const FrameState& fs, GpuModel* model ); // at model swap, through the 1-pixel scissor
+	// W9 Stage D (Surface.cpp)
+	bool InitSurfLook( std::string& error );
+	void ReleaseSurfLook();
+	void RenderSurfLook( const FrameState& fs, GpuModel* model, GLuint prog ); // spikes / copies on the model's surface (main pass)
+	GLuint progSpike = 0, progMainIT = 0;
+	bool skinNow = false; // DrawModel: the copies (progMain -> progMainIT, one instance per captured spot)
+	int skinCount = 0, skinLod = 0;
 	struct XGroups
 	{
 		uint64_t serial = 0;

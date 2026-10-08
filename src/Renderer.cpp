@@ -256,7 +256,7 @@ bool Renderer::Init( std::string& error )
 	if( ok )
 		Log( "DEFORM %zu soup programs have their DEFORM twin, %zu their WIRE twin, %zu their POINTS twin, %zu their CAPTURE twin (%.0f ms)", deformTwins.size(), wireTwins.size(),
 		     pointTwins.size(), captureTwins.size(), std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - t0 ).count() );
-	return ok && InitWire( error ) && InitPoints( error ) && InitLines( error ) && InitBuild( error );
+	return ok && InitWire( error ) && InitPoints( error ) && InitLines( error ) && InitBuild( error ) && InitSurfLook( error );
 }
 
 GLuint Renderer::DeformTwin( GLuint p ) const
@@ -345,6 +345,7 @@ void Renderer::Release()
 	captureTwins.clear();
 	ReleaseLines();
 	ReleaseBuild();
+	ReleaseSurfLook();
 	ReleaseWire();
 	ReleasePoints();
 	ReleaseTargets();
@@ -612,6 +613,8 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 	}
 	// W5: the WIRE twin (main-pass soup programs only; any other program has none and stays itself). W6: the POINTS twin while
 	// DrawWired draws points; no twin, or the model's point set still building = no points this frame
+	if( skinNow ) // W9 Skin Of Copies: the TBO-instanced program (non-soup)
+		p = progMainIT;
 	// W9: a CAPTURE draw = the CAPTURE twin (no twin: nothing to capture)
 	if( captureNow )
 	{
@@ -1002,6 +1005,15 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 				glDrawArraysInstanced( GL_TRIANGLES, 0, count, folds );
 			else
 				glDrawArrays( GL_TRIANGLES, 0, count );
+		}
+		else if( skinNow )
+		{
+			const LodLevel& L    = model->lods[ skinLod ];
+			const uint32_t first = skinLod == 0 ? part.firstIndex : L.parts[ i ][ 0 ];
+			const GLsizei cnt    = (GLsizei)( skinLod == 0 ? part.indexCount : L.parts[ i ][ 1 ] );
+			glBindVertexArray( LodVAO( model, skinLod ) );
+			if( cnt )
+				glDrawElementsInstanced( GL_TRIANGLES, limit ? std::min( cnt, (GLsizei)limit ) : cnt, GL_UNSIGNED_INT, (void*)( size_t( first ) * sizeof( uint32_t ) ), skinCount );
 		}
 		else
 			glDrawElements( GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)( size_t( part.firstIndex ) * sizeof( uint32_t ) ) );
@@ -1623,6 +1635,16 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 		}
 		else
 			lineDraws.clear();
+		if( fs.sl.look == 1 || fs.sl.look == 2 ) // W9 Stage D: spikes / copies on the dominant model
+		{
+			const bool dB = both && t >= 0.5f;
+			const FrameState& f = dB ? fsB : both ? fsA : fs;
+			activeSide = dB ? 1 : 0;
+			EnsureVAO( dB ? bReady : model );
+			RenderSurfLook( f, dB ? bReady : model, f.morph.On() ? progSoupM : f.shape.transSide > 0 && !f.shape.dustTrans ? progSoupT : progSoup );
+			activeSide = 0;
+			EnsureVAO( model );
+		}
 		glDisable( GL_BLEND );
 		glBlendFunc( GL_ONE, GL_ZERO );
 		glDisable( GL_DEPTH_TEST );

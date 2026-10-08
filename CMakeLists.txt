@@ -48,6 +48,7 @@ add_library(loadehr_core STATIC
     src/Points.cpp
     src/Lines.cpp
     src/Build.cpp
+    src/Surface.cpp
     src/Morph.cpp
     src/Lightning.cpp
     src/Swarm.cpp

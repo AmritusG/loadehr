@@ -307,7 +307,7 @@ void BuildLineSet( const CpuGeometry& g, int look, int source, int count, float 
 	{
 		// plexus: a subset of the Point Source set; light paint: of Surface 25k. Kept with probability count / total (a hash: stable)
 		PointSet::Job all;
-		BuildPointRefs( g, look == 2 ? 2 : source, whole, all );
+		BuildPointRefs( g, look == 1 ? source : 2, whole, all ); // W9: light paint, spikes (4), copies (5): Surface 25k
 		const size_t total = all.refs.size() / 4;
 		const double keep  = total ? std::min( 1.0, double( count ) / double( total ) ) : 0.0;
 		for( size_t p = 0; p < whole.size(); ++p )
@@ -504,7 +504,7 @@ const Renderer::LineSet* Renderer::LinesFor( GpuModel* model, const LinesState& 
 		const int look = L.look;
 		std::thread( [ job, geo, look, source, count, reach, parts, name ]() {
 			BuildLineSet( *geo, look, source, count, reach, parts, *job );
-			Log( "LINES %s on %s: %zu spots, %zu pairs (reach %.3f), %.0f ms (worker)", look == 1 ? "plexus" : look == 2 ? "light paint" : "neon tubes", name.c_str(),
+			Log( "LINES %s on %s: %zu spots, %zu pairs (reach %.3f), %.0f ms (worker)", look == 1 ? "plexus" : look == 2 ? "light paint" : look == 3 ? "neon tubes" : look == 4 ? "spikes" : "copies", name.c_str(),
 			     job->refs.size() / 4, job->pairs.size() / 2, reach, job->ms );
 			job->done.store( true );
 		} ).detach();

@@ -443,6 +443,30 @@ void Renderer::SetXUniforms( GLuint p, const FrameState& fs, GpuModel* model )
 	glBindTexture( GL_TEXTURE_BUFFER, n && xHistTex ? xHistTex : xDummy );
 	glActiveTexture( GL_TEXTURE0 );
 	glUniform1i( U( p, "uXCut" ), xCutNow );
+	// W9 Stage D: the camera looks (3 .. 6 = Surf Look X-Ray .. LED Matrix)
+	const SurfLookState& S = fs.sl;
+	glUniform1i( U( p, "uXSurf" ), S.look >= 3 ? S.look : 0 );
+	if( S.look >= 3 )
+	{
+		glUniform1f( U( p, "uXSurfAmt" ), S.amount );
+		glUniform1f( U( p, "uXSurfScale" ), S.scale );
+		glUniform1f( U( p, "uXSurfPhase" ), S.phase );
+		glUniform3fv( U( p, "uXColor" ), 1, S.color );
+		glUniform1f( U( p, "uXColorMix" ), S.colorMix );
+		// the model on screen (the night vision's vignette): its centre and a fitted unit's reach, in pixels
+		Mat4 M, V, P;
+		std::memcpy( M.m, fs.model, sizeof( M.m ) );
+		std::memcpy( V.m, fs.view, sizeof( V.m ) );
+		std::memcpy( P.m, fs.proj, sizeof( P.m ) );
+		float c[ 3 ], clip[ 4 ];
+		M.Point( model ? model->fitCenter : x.box, c );
+		const Mat4 VP = P * V;
+		for( int r = 0; r < 4; ++r )
+			clip[ r ] = VP.m[ r ] * c[ 0 ] + VP.m[ 4 + r ] * c[ 1 ] + VP.m[ 8 + r ] * c[ 2 ] + VP.m[ 12 + r ];
+		const float cw = std::max( clip[ 3 ], 1e-4f );
+		const float wpf = fs.modelScale / std::max( model ? model->fitScale : 1.0f, 1e-12f );
+		glUniform3f( U( p, "uXScreen" ), ( clip[ 0 ] / cw * 0.5f + 0.5f ) * fs.width, ( clip[ 1 ] / cw * 0.5f + 0.5f ) * fs.height, wpf * P.m[ 5 ] / cw * 0.5f * fs.height * 1.3f );
+	}
 	if( xCutNow )
 	{
 		float world[ 4 ], fitted[ 4 ], wpf = 1;
@@ -465,6 +489,22 @@ void Renderer::SetXUniforms( GLuint p, const FrameState& fs, GpuModel* model )
 // one model's main draw. With a plane cut: the kept part solid, its cut face capped, the removed part in the Wire Mode's look (or nothing)
 void Renderer::DrawSide( GLuint prog, const FrameState& fs, GpuModel* model, const std::vector< Instance >* inst )
 {
+	if( fs.sl.look == 3 && !fs.wire.on )
+	{
+		// W9 X-Ray: additive (premultiplied light and a little alpha), every layer: no depth test, no depth write
+		glEnable( GL_BLEND );
+		glBlendFunc( GL_ONE, GL_ONE );
+		glDepthMask( GL_FALSE );
+		glDisable( GL_DEPTH_TEST );
+		xCutNow = fs.x.cut ? 1 : 0; // a cut still cuts (no cap: nothing is solid in an x-ray)
+		DrawModel( prog, fs, model, false, true, 0, nullptr, nullptr, inst );
+		xCutNow = 0;
+		glEnable( GL_DEPTH_TEST );
+		glDepthMask( GL_TRUE );
+		glDisable( GL_BLEND );
+		glBlendFunc( GL_ONE, GL_ZERO );
+		return;
+	}
 	if( fs.x.cut == 0 )
 	{
 		const bool soup = fs.wireMix > 0.0f || fs.explode > 0.0f || fs.shape.on;
@@ -642,6 +682,43 @@ void Renderer::WarmLooks( const FrameState& fs, GpuModel* model )
 	xCutNow = 1;
 	DrawCap( progSoup, d, model );
 	xCutNow = 0;
+	// W9 Stage D: the X-Ray draw state (additive, no depth), the spikes, the copies (the model itself as the copy, one instance)
+	d.x = XState(), d.sl = SurfLookState();
+	d.sl.look = 3, d.sl.amount = 1.0f;
+	glEnable( GL_BLEND );
+	glBlendFunc( GL_ONE, GL_ONE );
+	glDepthMask( GL_FALSE );
+	glDisable( GL_DEPTH_TEST );
+	DrawModel( progSoup, d, model, false, true, 3 );
+	glEnable( GL_DEPTH_TEST );
+	glDepthMask( GL_TRUE );
+	glDisable( GL_BLEND );
+	glBlendFunc( GL_ONE, GL_ZERO );
+	glUseProgram( progSpike );
+	for( int k = 0; k < 3; ++k )
+	{
+		glActiveTexture( GL_TEXTURE0 + k );
+		glBindTexture( GL_TEXTURE_BUFFER, c.tex[ k ] );
+	}
+	glBindVertexArray( quadVAO );
+	glDrawArraysInstanced( GL_TRIANGLES, 0, 3, 1 );
+	for( int k = 2; k >= 0; --k )
+	{
+		glActiveTexture( GL_TEXTURE0 + k );
+		glBindTexture( GL_TEXTURE_BUFFER, 0 );
+	}
+	glBindVertexArray( 0 );
+	FrameState cf = fs;
+	cf.inst.clear(), cf.ghosts.clear();
+	cf.shape = ShapeState(), cf.wire.on = false, cf.wireMix = 0.0f;
+	glActiveTexture( GL_TEXTURE0 + 33 );
+	glBindTexture( GL_TEXTURE_BUFFER, c.tex[ 0 ] );
+	glActiveTexture( GL_TEXTURE0 + 34 );
+	glBindTexture( GL_TEXTURE_BUFFER, c.tex[ 1 ] );
+	glActiveTexture( GL_TEXTURE0 );
+	skinNow = true, skinCount = 1, skinLod = 0;
+	DrawModel( progMain, cf, model, false, false, 3 );
+	skinNow = false;
 }
 
 // WINDOW: the eye openings (a disc each, from the eye finder) and the glass parts mark the stencil where they show (depth tested: a rim in

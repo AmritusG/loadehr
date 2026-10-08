@@ -399,6 +399,16 @@ X( P_CUT_SIZE, "Cut Size", STD, 0, 1, 0.4f, "Cut", "", 0 )
 X( P_CUT_SPEED, "Cut Speed", STD, 0, 30, 0, "Cut", "", 0 )
 #undef MEHR_REGION
 #define MEHR_REGION MEHR_CLASSIC
+// W9 Stage D: SURFACE LOOK (classic). Audio Spikes = ferrofluid spikes on the surface dancing with the FFT (bass at the base, highs at the
+// top; Surf Scale = how many, Surf Amount = how long, Surf Speed = the dance); Skin Of Copies = copies of Surf Source (Slot B / C / D, or
+// the Text group's text) standing all over the surface (Surf Scale = their size, Surf Amount 0..1 grows them, 1..2 dissolves the model
+// under them, Surf Speed = their wobble); X-Ray / Thermal / Night Vision / LED Matrix = the object shaded that way (Surf Amount = how
+// much; Surf Scale = edge width / contrast / grain / LED pitch; Surf Speed = their motion). Surf Source also picks the Cut Window's world.
+X( P_SURF_LOOK, "Surf Look", OPT, 0, 6, 0, "Surface Look", "Off|Audio Spikes|Skin Of Copies|X-Ray|Thermal|Night Vision|LED Matrix", 0 )
+X( P_SURF_AMOUNT, "Surf Amount", STD, 0, 2, 0.6f, "Surface Look", "", 0 )
+X( P_SURF_SCALE, "Surf Scale", STD, 0, 1, 0.35f, "Surface Look", "", 0 )
+X( P_SURF_SPEED, "Surf Speed", STD, 0, 4, 0.5f, "Surface Look", "", 0 )
+X( P_SURF_SOURCE, "Surf Source", OPT, 0, 3, 0, "Surface Look", "Slot B|Slot C|Slot D|Text", 0 )
 #undef MEHR_REGION
 #define MEHR_REGION MEHR_CLASSIC
 // COPIES: instanced clones (LODs by screen size), echo trails, ghost poses

@@ -52,6 +52,32 @@ vec3 Glitch( vec3 w )
 		w.x += ( r - 0.86 ) * uGlitchAmt * 0.8;
 	return w;
 }
+#ifdef INSTTBO
+// W9 Skin Of Copies: one copy per captured surface spot (units 33 / 34: world position, normal + rest height): standing on the surface
+// (its up = the normal), turned round it by a hash, wobbling (Surf Speed), sized by uSkinSize (world per fitted unit of the copy)
+uniform samplerBuffer uSkinPos, uSkinNrm;
+uniform vec4 uSkinFit;     // the copy's fit: centre xyz (raw), scale (raw -> fitted)
+uniform float uSkinSize;   // world size of a fitted unit of the copy
+uniform float uSkinPhase;  // wobble cycles, wrapped at 1000 (each copy: whole cycles per 1000)
+uniform float uSkinWobble; // radians
+mat4 SkinMatrix( int i )
+{
+	vec3 P  = texelFetch( uSkinPos, i ).xyz;
+	vec3 n  = normalize( texelFetch( uSkinNrm, i ).xyz + vec3( 1e-6 ) );
+	float h = fract( sin( float( i ) * 12.9898 + 4.1 ) * 43758.5453 );
+	vec3 t  = normalize( cross( n, abs( n.y ) < 0.9 ? vec3( 0.0, 1.0, 0.0 ) : vec3( 1.0, 0.0, 0.0 ) ) );
+	vec3 b  = cross( t, n );
+	float a = 6.2831853 * h, c = cos( a ), s = sin( a );
+	vec3 t2 = t * c + b * s, b2 = cross( t2, n );
+	float rt = floor( ( 0.7 + 0.6 * fract( h * 7.31 ) ) * 1000.0 + 0.5 ) / 1000.0;
+	float w  = uSkinWobble * sin( 6.2831853 * ( fract( uSkinPhase * rt ) + h ) );
+	vec3 n2  = normalize( n * cos( w ) + t2 * sin( w ) ), t3 = normalize( cross( n2, b2 ) );
+	float k  = uSkinSize * uSkinFit.w;
+	mat3 R   = mat3( t3 * k, n2 * k, b2 * k );
+	vec3 o   = P + n2 * uSkinSize - R * uSkinFit.xyz; // standing on the spot (the copy's fitted half height up the normal)
+	return mat4( vec4( R[ 0 ], 0.0 ), vec4( R[ 1 ], 0.0 ), vec4( R[ 2 ], 0.0 ), vec4( o, 1.0 ) );
+}
+#endif
 
 out VData
 {
@@ -75,12 +101,21 @@ void main()
 	}
 #ifdef INSTANCED
 	// clone / ghost: rigid transform + uniform scale, so mat3(M) is a valid normal matrix up to length
+#ifdef INSTTBO
+	mat4 M   = SkinMatrix( gl_InstanceID );
+#else
 	mat4 M   = uInst[ uInstBase + gl_InstanceID ];
+#endif
 	vec4 w   = M * vec4( p, 1.0 );
 	vo.wnrm  = normalize( mat3( M ) * n );
 	vo.wtan  = vec4( normalize( mat3( M ) * aTangent.xyz ), aTangent.w < 0.0 ? -1.0 : 1.0 );
+#ifdef INSTTBO
+	vInstHA  = vec2( 0.0, 1.0 );
+	vInstX   = vec4( 1.0, 1.0, 0.0, 0.0 );
+#else
 	vInstHA  = uInstHA[ uInstBase + gl_InstanceID ];
 	vInstX   = uInstX[ uInstBase + gl_InstanceID ];
+#endif
 	if( uTrailSmear > 0.0 )
 		w.xyz += TrailSmear( w.xyz, p, vo.wnrm );
 	w.xyz += TrailDrift( vInstX.z );
@@ -1270,6 +1305,10 @@ uniform int uXRegion;    // the cut's region: 0 the plane (+ a slab under it: Cr
 uniform vec2 uXSlab;     // cross-section slab thickness: world, fitted (0 = no lower plane)
 uniform vec4 uXBox;      // reveal box (fitted rest space): centre, half size
 uniform float uXRound;   // its corner radius share (0 box .. 1 sphere)
+// W9 Stage D: the camera looks (shading modes of the object, display space): 3 X-Ray, 4 Thermal, 5 Night Vision, 6 LED Matrix
+uniform int uXSurf;
+uniform float uXSurfAmt, uXSurfScale, uXSurfPhase, uXColorMix;
+uniform vec3 uXScreen;   // the model's centre on screen (px) + its radius (px): the night vision's vignette
 in float vXFall;
 #endif
 #ifdef SHADOW_PASS
@@ -1434,6 +1473,17 @@ vec3 Tonemap( vec3 c )
 	return clamp( c, 0.0, 1.0 );
 }
 vec3 Encode( vec3 c ) { return pow( max( c, 0.0 ), vec3( 1.0 / 2.2 ) ); }
+#ifdef DEFORM
+// W9 Thermal: black - indigo - purple - red - orange - yellow - white (an iron-bow style ramp)
+vec3 Thermal( float h )
+{
+	const vec3 c0 = vec3( 0.0, 0.0, 0.02 ), c1 = vec3( 0.12, 0.0, 0.45 ), c2 = vec3( 0.55, 0.0, 0.6 ), c3 = vec3( 0.95, 0.12, 0.1 );
+	const vec3 c4 = vec3( 1.0, 0.55, 0.0 ), c5 = vec3( 1.0, 0.92, 0.2 ), c6 = vec3( 1.0, 1.0, 1.0 );
+	float x = clamp( h, 0.0, 1.0 ) * 6.0;
+	return x < 1.0 ? mix( c0, c1, x ) : x < 2.0 ? mix( c1, c2, x - 1.0 ) : x < 3.0 ? mix( c2, c3, x - 2.0 ) : x < 4.0 ? mix( c3, c4, x - 3.0 )
+	     : x < 5.0 ? mix( c4, c5, x - 4.0 ) : mix( c5, c6, x - 5.0 );
+}
+#endif
 
 // Kelvin -> linear rgb, max component 1 (Helland's fit)
 vec3 Blackbody( float k )
@@ -1987,6 +2037,53 @@ void main()
 #endif
 	color *= exp2( uExposure );
 	vec3 outc   = Encode( Tonemap( color ) );
+#if defined( DEFORM ) && !defined( SHADOW_PASS ) && !defined( PHOTON_PASS ) && !defined( CRACK_PASS ) && !defined( PROJ_PASS )
+	if( uXSurf >= 3 )
+	{
+		// W9 Stage D: the camera looks, as shading modes of the object (they combine with the rest; Surf Amount = how much)
+		float k  = clamp( uXSurfAmt, 0.0, 1.0 );
+		vec3 lk  = outc;
+		float gz = 1.0 - nov;
+		if( uXSurf == 3 )
+		{
+			// X-RAY: see-through by the viewing angle (drawn additively, both faces, no depth): the edges (grazing = thick) glow
+			float edge = pow( gz, 1.0 + 3.0 * ( 1.0 - clamp( uXSurfScale, 0.0, 1.0 ) ) );
+			lk = mix( vec3( 0.55, 0.75, 1.0 ), uXColor, uXColorMix ) * ( 0.06 + 1.4 * edge ) * ( 0.85 + 0.15 * sin( 6.2831853 * uXSurfPhase + vi.opos.y * 8.0 ) );
+			surfAlpha = mix( surfAlpha, 0.08 + 0.5 * edge, k );
+		}
+		else if( uXSurf == 4 )
+		{
+			// THERMAL: heat from the shaded brightness, the facing side warmer, a slow shimmer; Surf Scale = contrast
+			float h = clamp( 0.05 + 0.6 * Luma( outc ) + 0.22 * ( 1.0 - gz * gz ) + 0.15 * ( Noise3P( vi.opos * 3.0 + vec3( 0.0, uXSurfPhase * 3.2, 0.0 ) ) - 0.5 ), 0.0, 1.0 ); // 64-periodic: 1000 x 3.2 = 50 tiles, seamless at the wrap
+			lk = Thermal( pow( h, 0.4 + 1.6 * clamp( uXSurfScale, 0.0, 1.0 ) ) );
+		}
+		else if( uXSurf == 5 )
+		{
+			// NIGHT VISION: green phosphor, gain, grain (Surf Scale = its size; a new grain 30 times a second), scan lines, a vignette
+			// round the object, highlights blooming
+			float L  = Luma( outc ) * 1.8 + 0.04;
+			vec2 px  = floor( gl_FragCoord.xy / ( 1.0 + 3.0 * clamp( uXSurfScale, 0.0, 1.0 ) ) );
+			float g  = fract( sin( dot( px + floor( uXSurfPhase * 30.0 ) * vec2( 17.3, 31.1 ), vec2( 12.9898, 78.233 ) ) ) * 43758.5453 );
+			L       *= ( 0.75 + 0.5 * g ) * ( 0.85 + 0.15 * sin( gl_FragCoord.y * 1.6 ) );
+			float v  = length( ( gl_FragCoord.xy - uXScreen.xy ) / max( uXScreen.z, 1.0 ) );
+			L       *= 1.0 - 0.8 * smoothstep( 0.5, 1.3, v );
+			lk = vec3( 0.25, 1.0, 0.35 ) * L + vec3( 0.6, 1.0, 0.6 ) * max( L - 0.8, 0.0 ) * 2.5;
+		}
+		else
+		{
+			// LED MATRIX: round LEDs on a screen grid (Surf Scale = the pitch, 4 .. 32 px), each lit by the shaded colour (quantised),
+			// dark gaps (transparent), a slow brightness roll down the rows
+			float pitch = 4.0 + 28.0 * clamp( uXSurfScale, 0.0, 1.0 );
+			vec2 cell   = gl_FragCoord.xy / pitch;
+			float r     = length( fract( cell ) - 0.5 ), aa = 1.2 / pitch;
+			float dotm  = 1.0 - smoothstep( 0.36 - aa, 0.36 + aa, r );
+			float roll  = 0.85 + 0.15 * ( 0.5 + 0.5 * cos( 6.2831853 * ( floor( cell.y ) / 24.0 - uXSurfPhase ) ) );
+			lk = min( floor( outc * 7.0 + 0.5 ) / 7.0 * 1.25 * roll, 1.0 ) * dotm;
+			surfAlpha *= mix( 1.0, dotm, k );
+		}
+		outc = mix( outc, lk, k );
+	}
+#endif
 	// Branch-free on purpose: a discard inside this block miscompiles on Apple's GL-over-Metal.
 #ifdef WIRE
 #ifdef POINTS

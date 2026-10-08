@@ -73,3 +73,11 @@ the depth there, draw the other scene only where the stencil is set (the standar
 - Reveal Box: an FS region (rounded box, fitted rest space) drifting on a closed path; inside solid + seam, outside wire / points.
 - Window: eye-opening discs (eye finder) + glass parts (or the silhouette) in the stencil; another model slot, or the projector's
   picture, behind them.
+
+## Stage D: Surface Look (group "Surface Look", classic: Surf Look Off / Audio Spikes / Skin Of Copies / X-Ray / Thermal / Night Vision /
+## LED Matrix, Surf Amount, Surf Scale, Surf Speed, Surf Source Slot B / C / D / Text)
+Reading: ferrofluid spikes (Rosensweig instability: spikes in a hexagonal-ish packing, black glossy); X-ray shading = fresnel / grazing-angle
+emission, additive, every layer; thermal = a false-colour (iron-bow) ramp of a heat value; night vision = a green phosphor tube (gain,
+grain, scan lines, vignette); LED dot matrix = the picture sampled on a grid of round emitters with dark gaps.
+- Spikes / copies: instanced on captured surface spots of the dominant model (they ride every deform); copies via a TBO-instanced
+  variant of the main program. Camera looks: fragment shading in the DEFORM twins, after the tonemap, so they combine with every other look.
