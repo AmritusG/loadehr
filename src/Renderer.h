@@ -360,7 +360,15 @@ struct FrameState
 	float exposure       = 0;
 	int tonemap          = 0;
 	// fx
-	float wireMix = 0, wireThickness = 1, explode = 0, explodeRandom = 0, explodeSeed = 0;
+	float wireMix = 0, wireThickness = 1, explode = 0, explodeRandom = 0, explodeSeed = 0; // wireMix: the W1 wire (plain programs) only
+	// W5 wireframe through the WIRE program twins (on = anything past the W1 look). mode 1 over surface, 2 wire only, 3 + dark fill
+	struct WireState
+	{
+		bool on = false;
+		int mode = 1, back = 0, edges = 0; // back 0 hidden, 1 x-ray; edges 0 all triangles, 1 feature edges
+		float mix = 0, color[ 3 ] = { 0, 1, 1 }, colorMix = 0, glow = 0, bloom = 0, bloomSize = 0.5f, fade = 0;
+		float fadeNear = 0, fadeFar = 1; // camera distances the fade runs across (the model's near / far side)
+	} wire;
 	float dissolve = 0, dissolveEdge = 0, toonSteps = 0, outline = 0, fogDensity = 0, fogStart = 0;
 	// output
 	bool dissolveInvert = false; // transition: the incoming model shows where the outgoing one dissolved
@@ -427,6 +435,40 @@ private:
 	// W2 Deform: every triangle-soup program has a DEFORM twin (linked by Init), drawn whenever a deform is on
 	std::vector< std::pair< GLuint, GLuint > > deformTwins;
 	GLuint DeformTwin( GLuint p ) const;
+	// W5 wireframe (Wire.cpp): WIRE twins of the main-pass soup programs, per-model edge flags, the HDR wire glow buffer
+	std::vector< std::pair< GLuint, GLuint > > wireTwins;
+	GLuint WireTwin( GLuint p ) const;
+	struct WireEdges
+	{
+		uint64_t serial = 0;
+		std::shared_ptr< std::vector< uint8_t > > job; // filled by the worker (flags per triangle, GPU index order)
+		std::shared_ptr< std::atomic< bool > > done;
+		GLuint buf = 0, tex = 0;
+		bool ready = false;
+	};
+	WireEdges wireEdges[ 4 ];
+	GLuint wireDummyEdge = 0, wireDummyEdgeBuf = 0, wireTex = 0, wireFBO = 0, wireDepth = 0, wireBlur[ 2 ] = {}, wireBlurFBO[ 2 ] = {};
+	GLuint progWireAdd = 0;
+	int wireW = 0, wireH = 0;
+	bool wireGlowOk = false;
+	bool InitWire( std::string& error );
+	void ReleaseWire();
+	GLuint WireEdgeTex( GpuModel* model, bool want ); // the model's edge flags (R8UI buffer) or the all-edges dummy
+	void DrawWired( GLuint prog, const FrameState& fs, GpuModel* model, const std::vector< Instance >* inst ); // the main pass, wired
+	void SetWireUniforms( GLuint prog, const FrameState& fs, GpuModel* model ); // + binds the edge flags (unit 25)
+	int wirePassNow = 3; // the WIRE pass a wired DrawModel draws (DrawWired sets it per draw)
+	void RenderWireGlow( const FrameState& fs, int w, int h ); // the wired draws of this frame, again, into the HDR wire buffer
+	struct WireDraw
+	{
+		GLuint prog;
+		const FrameState* fs;
+		GpuModel* model;
+		const std::vector< Instance >* inst;
+		int side;
+	};
+	std::vector< WireDraw > wireDraws; // this frame's wired draws that glow (DrawWired adds them)
+	float wireMixNow = -1.0f;          // a wired draw's Wireframe Mix override (-1 = the dial)
+	void AddWireLight( const FrameState& fs, int w, int h ); // after the composite: glow + halo, light at alpha 0
 	bool EnsureTargets( int w, int h, int samples );
 	void ReleaseTargets();
 	void EnsureVAO( GpuModel* model );

@@ -142,6 +142,11 @@ static const char* kSoupVS = R"GLSL(
 uniform usamplerBuffer uIdxBuf; // R32UI view of the index buffer
 uniform usamplerBuffer uVtxBuf; // R32UI view of the vertex buffer, 7 words per vertex
 uniform int uFirstIndex;
+#ifdef WIRE
+uniform usamplerBuffer uEdgeMask; // W5 Feature Edges: per triangle, bit k = draw the edge opposite corner k
+uniform int uWireEdges;
+flat out vec3 vEdge;
+#endif
 
 uniform mat4 uModel;
 uniform mat4 uViewProj;
@@ -503,6 +508,10 @@ void main()
 	int corner = gl_VertexID - tri * 3;
 	int base   = uFirstIndex + tri * 3;
 	int i0 = int( texelFetch( uIdxBuf, base ).r ), i1 = int( texelFetch( uIdxBuf, base + 1 ).r ), i2 = int( texelFetch( uIdxBuf, base + 2 ).r );
+#ifdef WIRE
+	uint em = uWireEdges == 1 ? texelFetch( uEdgeMask, base / 3 ).r : 7u;
+	vEdge   = vec3( float( em & 1u ), float( ( em >> 1u ) & 1u ), float( ( em >> 2u ) & 1u ) );
+#endif
 #ifdef DEFORM
 	if( uFoldN > 1 )
 	{
@@ -794,6 +803,15 @@ in VData
 
 out vec4 fragColor;
 flat in vec2 vInstHA; // clone hue offset, ghost alpha
+#ifdef WIRE
+// W5: the WIRE twins. uWirePass 0 depth only, 1 dark fill (+ lines), 2 lines only, 3 over the surface (the W1 formula), 4 the lines'
+// glow into the HDR wire buffer (light at alpha 0)
+flat in vec3 vEdge;
+uniform int uWirePass;
+uniform vec3 uWireColor;
+uniform float uWireColorMix;
+uniform float uWireFade, uWireFadeNear, uWireFadeFar;
+#endif
 #ifdef INSTANCED
 flat in vec4 vInstX;   // keep, fog keep, trail age
 uniform int uTrailPass; // 1 = the ghosts (trail copies)
@@ -1503,10 +1521,29 @@ void main()
 	color *= exp2( uExposure );
 	vec3 outc   = Encode( Tonemap( color ) );
 	// Branch-free on purpose: a discard inside this block miscompiles on Apple's GL-over-Metal.
+#ifdef WIRE
+	// an edge the flags leave out (Feature Edges) never draws: its barycentric distance counts as far
+	vec3 e      = max( smoothstep( vec3( 0.0 ), bw * uWireThickness, vi.bary ), vec3( 1.0 ) - vEdge );
+	float wire  = 1.0 - min( min( e.x, e.y ), e.z );
+	wire       *= 1.0 - uWireFade * clamp( ( length( uCamPos - vi.wpos ) - uWireFadeNear ) / max( uWireFadeFar - uWireFadeNear, 1e-4 ), 0.0, 1.0 );
+	vec3 lineC  = mix( min( outc * 1.6 + 0.08, 1.0 ), uWireColor, uWireColorMix );
+	float wa    = wire * uWireMix;
+	float alpha = 1.0;
+	if( uWirePass == 3 )
+	{
+		outc  = mix( outc, lineC, wa );
+		alpha = mix( 1.0, wire, uWireMix ) * surfAlpha * vInstHA.y;
+	}
+	else if( uWirePass == 1 )
+		outc = lineC * wa, alpha = vInstHA.y;
+	else if( uWirePass == 2 || uWirePass == 4 )
+		outc = lineC, alpha = wa * vInstHA.y;
+#else
 	vec3 e      = smoothstep( vec3( 0.0 ), bw * uWireThickness, vi.bary );
 	float wire  = 1.0 - min( min( e.x, e.y ), e.z );
 	outc        = mix( outc, min( outc * 1.6 + 0.08, 1.0 ), wire * uWireMix );
 	float alpha = mix( 1.0, wire, uWireMix ) * surfAlpha * vInstHA.y;
+#endif
 
 	vec4 result = vec4( outc * alpha, alpha );
 	if( uFogDensity > 0.0 )
@@ -1521,6 +1558,12 @@ void main()
 	fragColor = result;
 #if defined( PROJ_PASS ) || defined( CRACK_PASS )
 	fragColor = vec4( result.rgb, 0.0 ); // added light: the mask's coverage is already there
+#endif
+#ifdef WIRE
+	if( uWirePass == 0 )
+		fragColor = vec4( 0.0 ); // depth only (alpha stays 1 for the discard test: the depth is written)
+	else if( uWirePass == 4 )
+		fragColor = vec4( lineC * alpha, 0.0 ); // light, added into the wire buffer
 #endif
 	if( alpha < 0.004 )
 		discard;

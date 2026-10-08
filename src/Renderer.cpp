@@ -42,16 +42,32 @@ namespace
 // W2: while a Renderer initialises, every program linked from the triangle-soup vertex stage gets its DEFORM twin (the same
 // sources with #define DEFORM): plain program -> twin
 std::vector< std::pair< GLuint, GLuint > >* g_deformSink = nullptr;
+// W5: the same for WIRE twins, of the soup programs that link the MAIN fragment stage (not the shadow / crack / projector / photon
+// passes); a WIRE twin gets its own DEFORM twin
+std::vector< std::pair< GLuint, GLuint > >* g_wireSink = nullptr;
 GLuint LinkPlain( const std::string& vs, const std::string& fs, std::string& error );
 }
 
 // Links a program; each stage's source is its pieces concatenated (defines, libraries, main).
 GLuint Link( const std::string& vs, const std::string& fs, std::string& error )
 {
-	const GLuint p = LinkPlain( vs, fs, error );
-	if( p && g_deformSink && vs.find( "uniform usamplerBuffer uIdxBuf; // R32UI view of the index buffer" ) != std::string::npos )
+	const GLuint p   = LinkPlain( vs, fs, error );
+	const bool soup  = vs.find( "uniform usamplerBuffer uIdxBuf; // R32UI view of the index buffer" ) != std::string::npos;
+	if( p && g_deformSink && soup )
 		if( const GLuint d = LinkPlain( "#define DEFORM\n" + vs, fs, error ) )
 			g_deformSink->push_back( { p, d } );
+	const bool mainFS = fs.find( "uniform float uWireMix;" ) != std::string::npos;
+	bool pass         = false;
+	for( const char* d : { "#define SHADOW_PASS", "#define CRACK_PASS", "#define PROJ_PASS", "#define PHOTON_PASS" } )
+		pass = pass || fs.find( d ) != std::string::npos;
+	if( p && g_wireSink && soup && mainFS && !pass )
+		if( const GLuint w = LinkPlain( "#define WIRE\n" + vs, "#define WIRE\n" + fs, error ) )
+		{
+			g_wireSink->push_back( { p, w } );
+			if( g_deformSink )
+				if( const GLuint d = LinkPlain( "#define WIRE\n#define DEFORM\n" + vs, "#define WIRE\n" + fs, error ) )
+					g_deformSink->push_back( { w, d } );
+		}
 	return p;
 }
 
@@ -178,13 +194,24 @@ void BindSamplers( GLuint prog )
 bool Renderer::Init( std::string& error )
 {
 	g_deformSink = &deformTwins; // W2: every soup program linked from here on gets its DEFORM twin
+	g_wireSink   = &wireTwins;   // W5: and the main-pass ones their WIRE twin
 	const bool ok = InitPrograms( error );
 	g_deformSink  = nullptr;
+	g_wireSink    = nullptr;
+	for( const auto& t : wireTwins ) // before the DEFORM copies: a WIRE twin hands its units on to its own DEFORM twin
+		CopySamplerUnits( t.first, t.second );
 	for( const auto& t : deformTwins )
 		CopySamplerUnits( t.first, t.second );
+	for( const auto& t : wireTwins )
+		for( GLuint q : { t.second, DeformTwin( t.second ) } )
+		{
+			glUseProgram( q );
+			glUniform1i( U( q, "uEdgeMask" ), 25 );
+		}
+	glUseProgram( 0 );
 	if( ok )
-		Log( "DEFORM %zu soup programs have their DEFORM twin", deformTwins.size() );
-	return ok;
+		Log( "DEFORM %zu soup programs have their DEFORM twin, %zu their WIRE twin", deformTwins.size(), wireTwins.size() );
+	return ok && InitWire( error );
 }
 
 GLuint Renderer::DeformTwin( GLuint p ) const
@@ -261,6 +288,10 @@ void Renderer::Release()
 	for( const auto& t : deformTwins )
 		glDeleteProgram( t.second );
 	deformTwins.clear();
+	for( const auto& t : wireTwins )
+		glDeleteProgram( t.second );
+	wireTwins.clear();
+	ReleaseWire();
 	ReleaseTargets();
 	for( GLuint* p : { &progMain, &progSoup, &progMainI, &progSoupI, &progSoupT, &progSoupTI, &progSoupL, &progSoupLI, &progComposite, &progCopy, &progCompositeHaze } )
 		if( *p )
@@ -517,6 +548,11 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 		glBindTexture( GL_TEXTURE_BUFFER, ls.xfTex );
 		glActiveTexture( GL_TEXTURE0 );
 	}
+	// W5: the WIRE twin (main-pass soup programs only; any other program has none and stays itself)
+	const GLuint beforeWire = p;
+	if( soup && fs.wire.on && !outline )
+		p = WireTwin( p );
+	const bool wired = p != beforeWire;
 	// W2 Deform: any deform on = the DEFORM twin of whatever soup program this draw ended up with (plain programs untouched)
 	const bool deform = soup && fs.shape.on && fs.shape.deform;
 	if( deform )
@@ -586,6 +622,8 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 	// fx
 	glUniform1f( U( p, "uWireMix" ), fs.wireMix );
 	glUniform1f( U( p, "uWireThickness" ), fs.wireThickness );
+	if( wired )
+		SetWireUniforms( p, fs, model );
 	glUniform1f( U( p, "uDissolve" ), fs.dissolve );
 	glUniform1f( U( p, "uDissolveEdge" ), fs.dissolveEdge );
 	glUniform1f( U( p, "uToonSteps" ), fs.toonSteps );
@@ -807,6 +845,8 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 					glActiveTexture( GL_TEXTURE0 + 9 );
 					glBindTexture( GL_TEXTURE_BUFFER, g.lod == 0 ? model->idxTBO : L.tbo );
 					glUniform1i( locFirst, (GLint)first );
+					if( wired ) // W5: the edge flags follow the full mesh's triangles; a simplified LOD draws every edge
+						glUniform1i( U( p, "uWireEdges" ), g.lod == 0 && fs.wire.edges == 1 ? 1 : 0 );
 					glDrawArraysInstanced( GL_TRIANGLES, 0, cnt, g.n * folds );
 				}
 				else
@@ -937,6 +977,7 @@ void TransitionIn( FrameState& f, float t )
 
 void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slotA, int slotB )
 {
+	wireDraws.clear(); // W5: filled by this frame's wired draws
 	sideSlot[ 0 ] = slotA, sideSlot[ 1 ] = slotB, activeSide = 0;
 	GpuModel* bReady = b && b->Complete() ? b : nullptr;
 	const float t    = bReady ? std::min( 1.0f, std::max( 0.0f, fsIn.transition ) ) : 0.0f;
@@ -1102,6 +1143,18 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 					ls.live = was && UpdateLetters( model, fs.letterXf );
 				}
 			}
+			// W5: the WIRE twins of the main draws (wired draws are always blended): plain, instanced, deformed, the transition
+			{
+				FrameState d = fs;
+				d.wire.on    = true;
+				glEnable( GL_BLEND );
+				DrawModel( progSoup, d, model, false, true, 3 );
+				DrawModel( progSoup, d, model, false, true, 0, nullptr, nullptr, &one );
+				DrawModel( progSoupT, d, model, false, true, 3 );
+				d.shape.on = d.shape.deform = true;
+				DrawModel( progSoup, d, model, false, true, 3 );
+				glDisable( GL_BLEND );
+			}
 			glDisable( GL_SCISSOR_TEST );
 			WarmVolume( fs, model, w, h );
 			WarmPost( fs, model, w, h );
@@ -1144,7 +1197,10 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 				if( m == 1 )
 					EnsureVAO( g );
 				const GLuint soupP = f.shape.transSide > 0 && !f.shape.dustTrans ? progSoupT : progSoup;
-				DrawModel( sp ? soupP : progMain, f, g, false, sp, 0, nullptr, nullptr, f.inst.empty() ? nullptr : &f.inst );
+				if( f.wire.on ) // W5
+					DrawWired( soupP, f, g, f.inst.empty() ? nullptr : &f.inst );
+				else
+					DrawModel( sp ? soupP : progMain, f, g, false, sp, 0, nullptr, nullptr, f.inst.empty() ? nullptr : &f.inst );
 				DrawDust( f, g, h );
 				if( m == 1 )
 					EnsureVAO( model );
@@ -1162,9 +1218,15 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 		}
 		else
 		{
-			DrawModel( soup ? progSoup : progMain, fs, model, false, soup, 0, nullptr, nullptr, fs.inst.empty() ? nullptr : &fs.inst );
-			DrawProjSurface( fs, model ); // W26: the projected picture on the mask
-			DrawCracks( fs, model );      // W26: lava cracks
+			if( fs.wire.on ) // W5
+				DrawWired( progSoup, fs, model, fs.inst.empty() ? nullptr : &fs.inst );
+			else
+				DrawModel( soup ? progSoup : progMain, fs, model, false, soup, 0, nullptr, nullptr, fs.inst.empty() ? nullptr : &fs.inst );
+			if( !fs.wire.on || fs.wire.mode != 2 ) // Wire Only has no surface for the picture / the cracks to land on
+			{
+				DrawProjSurface( fs, model ); // W26: the projected picture on the mask
+				DrawCracks( fs, model );      // W26: lava cracks
+			}
 		}
 		if( !fs.ghosts.empty() )
 		{
@@ -1175,7 +1237,10 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 			// a hair behind in depth: where a ghost (or its Smear stretch) meets the live surface, the live mask wins
 			glEnable( GL_POLYGON_OFFSET_FILL );
 			glPolygonOffset( 1.0f, 64.0f );
-			DrawModel( soup ? progSoup : progMain, fs, model, false, soup, 0, nullptr, nullptr, &fs.ghosts );
+			if( fs.wire.on )
+				DrawWired( progSoup, fs, model, &fs.ghosts );
+			else
+				DrawModel( soup ? progSoup : progMain, fs, model, false, soup, 0, nullptr, nullptr, &fs.ghosts );
 			glDisable( GL_POLYGON_OFFSET_FILL );
 			glPolygonOffset( 0.0f, 0.0f );
 			if( fs.wireMix <= 0.0f )
@@ -1196,6 +1261,7 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 		glBlitFramebuffer( 0, 0, w, h, 0, 0, w, h, GL_COLOR_BUFFER_BIT, GL_NEAREST );
 	}
 
+	RenderWireGlow( fs, w, h ); // W5: the lines' light (only while Wire Glow / Wire Bloom are on)
 	perf.Mark( PerfProbe::Floor );
 	RenderMirror( fs, ready, w, h ); // mid-hop: the whole pair (pairOn)
 	RenderSilhouetteBlur( fs, w, h );
@@ -1338,6 +1404,7 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 	glBindVertexArray( quadVAO );
 	glDrawArrays( GL_TRIANGLES, 0, 3 );
 	perf.Mark( PerfProbe::Light );
+	AddWireLight( fs, w, h ); // W5: before the post pass, so the global Bloom catches the wires too
 	if( fogOut && fs.vol.motes > 0.0f )
 		DrawMotes( fs, w, h );
 	if( depthOk && ( !fs.bolts.segs.empty() || fs.swarm.count > 0 ) )

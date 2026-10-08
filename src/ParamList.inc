@@ -330,6 +330,19 @@ X( P_GLITCH_RATE, "Glitch Rate", STD, 0, 30, 6, "Deform", "", 0 )        // jump
 X( P_MIRROR_FOLD, "Mirror Fold", OPT, 0, 3, 0, "Deform", "Off|X|X+Y|X+Y+Z", 0 ) // kaleidoscope object: folded across the centre planes
 X( P_JELLY, "Jelly", STD, 0, 2, 0, "Deform", "", 0 )                     // lags behind its own spin / move / bounce, springs back
 X( P_AUDIO_DEFORM, "Audio > Deform", STD, 0, 4, 0, "Deform", "", 0 )     // the audio level adds to Deform Amount
+// WIREFRAME (W5, every bundle; Wireframe Mix / Wire Thickness moved here from the classic FX group, names kept). Over Surface with
+// Color Mix / Glow / Bloom / Fade 0, Back Hidden, Edges All = the W1 look on the plain programs; anything else draws through the WIRE
+// program twins (lines from the triangle-soup barycentrics; Feature Edges from per-triangle edge flags built off-thread).
+X( P_WIRE_MODE, "Wire Mode", OPT, 0, 3, 1, "Wireframe", "Off|Over Surface|Wire Only|Wire + Dark Fill", 0 )
+X( P_WIRE_MIX, "Wireframe Mix", STD, 0, 1, 0, "Wireframe", "", 0 )      // the wire's strength (W1: also fades the fill)
+X( P_WIRE_THICKNESS, "Wire Thickness", STD, 0.2f, 8, 1, "Wireframe", "", 0 ) // px, constant on screen
+X( P_WIRE_BACK, "Wire Back", OPT, 0, 1, 0, "Wireframe", "Hidden|X-Ray", 0 ) // Hidden: the solid's own back lines are hidden
+X( P_WIRE_EDGES, "Wire Edges", OPT, 0, 1, 0, "Wireframe", "All Triangles|Feature Edges", 0 ) // Feature: creases > 20 deg + open edges
+MEHR_COLOR( P_WIRE_COL, "Wire", "Wireframe", 0.5f, 1, 1, 0, "Wire Color Mix" ) // alpha: the picked colour vs the surface colour
+X( P_WIRE_GLOW, "Wire Glow", STD, 0, 10, 0, "Wireframe", "", 0 )        // the lines' own light (added at alpha 0, past white)
+X( P_WIRE_BLOOM, "Wire Bloom", STD, 0, 10, 0, "Wireframe", "", 0 )      // a halo round the lines only
+X( P_WIRE_BLOOM_SIZE, "Wire Bloom Size", STD, 0, 1, 0.5f, "Wireframe", "", 0 )
+X( P_WIRE_FADE, "Wire Fade", STD, 0, 1, 0, "Wireframe", "", 0 )         // lines fade with distance from the camera (across the model)
 #undef MEHR_REGION
 #define MEHR_REGION MEHR_CLASSIC
 // COPIES: instanced clones (LODs by screen size), echo trails, ghost poses
@@ -683,7 +696,7 @@ X( P_MIRROR_FADE, "Mirror Fade", STD, 0, 1, 0.2f, "Floor", "", 0 )
 X( P_FLOOR_LIGHT, "Floor Light", STD, 0, 1, 0.5f, "Floor", "", 0 )   // key-lit pool on the catcher, so the shadow reads over black
 X( P_FLOOR_CAMERA, "Floor Camera", STD, 0, 1, 1, "Floor", "", 0 )  // tilts the camera down onto the floor while the floor is on
 #undef MEHR_REGION
-#define MEHR_REGION MEHR_WOW
+#define MEHR_REGION MEHR_CLASSIC // W5: moved Wow -> classic (room for Wireframe in Wow FX)
 // SILHOUETTE: black fill with a glowing outline; Sil Fill reveals the lit mask
 X( P_SILHOUETTE, "Silhouette", STD, 0, 1, 0, "Silhouette", "", 0 )
 X( P_SIL_FILL, "Sil Fill", STD, 0, 1, 0, "Silhouette", "", 0 )
@@ -693,8 +706,6 @@ MEHR_COLOR( P_SIL_COL, "Sil", "Silhouette", 0.5238095f, 0.7f, 1, 1, "Sil Alpha" 
 #undef MEHR_REGION
 #define MEHR_REGION MEHR_CLASSIC
 // FX
-X( P_WIRE_MIX, "Wireframe Mix", STD, 0, 1, 0, "FX", "", 0 )
-X( P_WIRE_THICKNESS, "Wire Thickness", STD, 0.2f, 8, 1, "FX", "", 0 )
 X( P_EXPLODE, "Explode", STD, 0, 3, 0, "FX", "", 0 )
 X( P_EXPLODE_RANDOM, "Explode Random", STD, 0, 1, 0.5f, "FX", "", 0 )
 X( P_DISSOLVE, "Dissolve", STD, 0, 1, 0, "FX", "", 0 )

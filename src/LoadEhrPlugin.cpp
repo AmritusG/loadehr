@@ -1355,8 +1355,7 @@ private:
 		BuildSwarm( fs, anchor, dt );
 		BuildPost( fs, anchor, scale );
 
-		fs.wireMix       = values[ P_WIRE_MIX ];
-		fs.wireThickness = values[ P_WIRE_THICKNESS ];
+		BuildWire( fs );
 		fs.explode       = values[ P_EXPLODE ] + values[ P_AUDIO_EXPLODE ] * 0.5f * audio[ 2 ];
 		fs.explodeRandom = values[ P_EXPLODE_RANDOM ];
 		fs.explodeSeed   = 0.37f;
@@ -2937,6 +2936,26 @@ private:
 			p.color[ k ] = std::max( 0.0f, c[ k ] ) * gain;
 		if( p.beam > 0.0f && !fs.vol.active )
 			fs.vol.active = fs.vol.projOnly = true; // the beam lives in the fog's march target
+	}
+	// W5: the wireframe. Over Surface with every W5 dial at rest = the W1 wire on the plain programs (fs.wireMix); anything else
+	// draws through the WIRE twins (fs.wire.on). Wireframe Mix = the lines' strength in every mode (0 = no lines).
+	void BuildWire( FrameState& fs ) const
+	{
+		FrameState::WireState& w = fs.wire;
+		w.mode      = Opt( P_WIRE_MODE );
+		w.back      = Opt( P_WIRE_BACK );
+		w.edges     = Opt( P_WIRE_EDGES );
+		w.mix       = values[ P_WIRE_MIX ];
+		Colour( P_WIRE_COL_H, w.color );
+		w.colorMix  = Alpha( P_WIRE_COL_H );
+		w.glow      = values[ P_WIRE_GLOW ];
+		w.bloom     = values[ P_WIRE_BLOOM ];
+		w.bloomSize = values[ P_WIRE_BLOOM_SIZE ];
+		w.fade      = values[ P_WIRE_FADE ];
+		const bool w5 = w.mode >= 2 || w.colorMix > 0.0f || w.glow > 0.0f || w.bloom > 0.0f || w.fade > 0.0f || w.back == 1 || w.edges == 1;
+		w.on             = w.mode >= 1 && w5;
+		fs.wireMix       = w.mode == 1 && !w5 ? w.mix : 0.0f;
+		fs.wireThickness = values[ P_WIRE_THICKNESS ];
 	}
 	// W2: the video's play position. Loop: wraps at the clip length; Ping-Pong: a clock wrapped at twice the length, mirrored back;
 	// Once: runs to the end and holds the last frame. Video Speed x real time; Video Restart / a clip trigger: back to the start.

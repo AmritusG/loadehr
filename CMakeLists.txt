@@ -44,6 +44,7 @@ add_library(loadehr_core STATIC
     src/Wow.cpp
     src/Projector.cpp
     src/Liquid.cpp
+    src/Wire.cpp
     src/Lightning.cpp
     src/Swarm.cpp
     src/Crack.cpp
