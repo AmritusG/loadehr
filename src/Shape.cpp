@@ -965,6 +965,7 @@ void Renderer::SetShapeUniforms( GLuint p, const FrameState& fs, GpuModel* model
 		glUniform1f( U( p, "uShear" ), s.shear );
 		glUniform1f( U( p, "uBulge" ), s.bulge );
 		glUniform1f( U( p, "uSpherize" ), s.spherize );
+		glUniform1i( U( p, "uShapeTarget" ), s.shapeTarget );
 		glUniform1f( U( p, "uWarp" ), s.warp );
 		glUniform1f( U( p, "uWarpScale" ), s.warpScale );
 		glUniform1f( U( p, "uWarpPhase" ), s.warpPhase );

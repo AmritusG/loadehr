@@ -3878,6 +3878,7 @@ private:
 		s.shear       = values[ P_SHEAR ] * k;
 		s.bulge       = values[ P_BULGE ] * k;
 		s.spherize    = std::min( 1.0f, values[ P_SPHERIZE ] * k );
+		s.shapeTarget = std::clamp( Opt( P_SHAPE_TARGET ), 0, 3 ); // W9 Stage E
 		s.warp        = values[ P_NOISE_WARP ] * k;
 		s.warpScale   = values[ P_WARP_SCALE ];
 		clk.warp      = Wrap( clk.warp + dt * values[ P_WARP_SPEED ], 256.0 );

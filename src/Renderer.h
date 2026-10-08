@@ -194,6 +194,7 @@ struct ShapeState
 	// W2 Deform group (values already x Deform Amount): deform = any of them on (the DEFORM program twins draw)
 	bool deform = false;
 	float taper = 0, squash = 0, shear = 0, bulge = 0, spherize = 0;
+	int shapeTarget = 0; // W9: Spherize's target: 0 sphere, 1 cube, 2 torus, 3 crystal
 	float warp = 0, warpScale = 2, warpPhase = 0; // warpPhase: lattice cells, wrapped at 256
 	float glitchShift = 0, glitchBands = 12, glitchStep = 0; // glitchStep: the step index, wrapped at 1000
 	float foldAxes[ 3 ] = { 0, 0, 0 }, foldK = 0;

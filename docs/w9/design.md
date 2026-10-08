@@ -81,3 +81,8 @@ emission, additive, every layer; thermal = a false-colour (iron-bow) ramp of a h
 grain, scan lines, vignette); LED dot matrix = the picture sampled on a grid of round emitters with dark gaps.
 - Spikes / copies: instanced on captured surface spots of the dominant model (they ride every deform); copies via a TBO-instanced
   variant of the main program. Camera looks: fragment shading in the DEFORM twins, after the tonemap, so they combine with every other look.
+
+## Stage E: Shape (Deform group: Shape Target Sphere / Cube / Torus / Crystal, every bundle; Spherize = the blend)
+- The target point along the direction from the centre: cube = onto its faces (L-infinity), torus = the nearest point of the tube round
+  the Deform Axis ring, crystal = a bipyramid (L1, stretched along the axis). Sphere keeps the W2 expression exactly (saved Spherize
+  values look as before). Black Hole (item 14) is Stage B's 4th Build Look (the brief allowed either).

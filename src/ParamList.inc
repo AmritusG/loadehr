@@ -322,6 +322,8 @@ X( P_SQUASH_BEAT, "Squash Beat", STD, 0, 2, 0, "Deform", "", 0 )         // a sq
 X( P_SHEAR, "Shear", STD, -2, 2, 0, "Deform", "", 0 )                    // slides along the axis' first perpendicular
 X( P_BULGE, "Bulge", STD, -1, 2, 0, "Deform", "", 0 )                    // rounds the middle out (negative: pinches it in)
 X( P_SPHERIZE, "Spherize", STD, 0, 1, 0, "Deform", "", 0 )               // toward a sphere of the fitted radius
+// W9 Stage E: what Spherize morphs toward (Sphere = as before: saved Spherize values keep their look); Torus / Crystal round the Deform Axis
+X( P_SHAPE_TARGET, "Shape Target", OPT, 0, 3, 0, "Deform", "Sphere|Cube|Torus|Crystal", 0 )
 X( P_NOISE_WARP, "Noise Warp", STD, 0, 2, 0, "Deform", "", 0 )           // smooth 3D noise displacement
 X( P_WARP_SCALE, "Warp Scale", STD, 0.2f, 10, 2, "Deform", "", 0 )       // noise cells per fitted unit
 X( P_WARP_SPEED, "Warp Speed", STD, 0, 4, 0.3f, "Deform", "", 0 )        // noise cells per second
