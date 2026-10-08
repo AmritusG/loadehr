@@ -76,7 +76,9 @@ tools/arena_w6.py points|trans <layer> [col]  # W6: dial the W6 clips by param n
 tools/arena_w5.py <layer> [col]          # W5: dial the W5 wire clips by param name (never triggers)
 tools/w7_trans.py scrub|spikes|realtime|strip|cost ...  # W7: per-step change along a hop (the swap vs the hop's own motion), Arena's dials played, strips, cost
 tools/arena_w7.py <layer> [col]          # W7: dial the W7 clips (Twist / Melt / Lava / Sparkle / Cycle 21) by param name (never triggers)
-git submodule update --init               # W3: third_party/dxvkit (DXVKit, pinned) must be checked out before cmake
+git submodule update --init               # W3: third_party/dxvkit (DXVKit, pinned: W8 tag v1.0.0) must be checked out before cmake
+tools/w8_dxv.py same|forms <out> ...      # W8: pictures byte-identical vs a reference build; the 33 DXVKit Arena forms play / refuse as Arena
+tools/arena_w8.py <layer> [col]          # W8: dial the HQ comparison clips (DXVKit vs Arena's own DXV decode) by param name (never triggers)
 ```
 Log: `~/Library/Logs/LoadEhr/LoadEhr.log` (per-material texture resolution, load/upload/swap times per slot, shader compile
 logs; with Debug Log: PERF + MEM (GPU MB per slot) lines every second, CHAIN hops). `LOADEHR_LOG_STDERR=1` mirrors it to stderr.
@@ -429,14 +431,21 @@ d) W17: KHR_materials_pbrSpecularGlossiness -> diffuse = BaseColor, its spec/glo
   Once / Scrub), Video Position, Video Time, Video Restart; clock `clk.video` (Loop wraps at the clip length, Ping-Pong at twice it,
   Once clamps); a clip trigger restarts it. W4: see VIDEO SCRUBBER below. Debug Log: one VIDEO line per second (decoded, ms each, late, upload ms, cache MB). Measured: tools/w2_video.py
   (13 files, harness) and Arena (MBP M3 Max): see the W2 results handoff.
-- DXV (W3, `RunDxv` in Video.mm): DXVKit (`third_party/dxvkit`, a git submodule pinned at cdbb4bc, our clean-room MIT decoder, built
+- DXV (W3, `RunDxv` in Video.mm): DXVKit (`third_party/dxvkit`, a git submodule pinned at tag v1.0.0 = 2f5256a since W8, our clean-room MIT decoder, built
   by our CMake as a static universal C lib, no tools / Swift) opens EVERY Proj File video first (`dxvk_mov_open_file`); a DXV track
   plays here, anything else falls back to AVFoundation. Every packet is a whole frame: the worker reads + decodes the wanted frame
   directly (no reader state) into DXVKit's block planes over the 16-PADDED coded texture; the decode window / late frames / Loop /
   Ping-Pong / Once / Speed / Restart / `clk.video` are the shared code (`Window()`). Uploads (each texture defined once per size +
   format, then glCompressedTexSubImage2D): DXT1 / legacy DXT1 -> 0x83F0 (opaque BC1), DXT5 / legacy DXT5 -> 0x83F3, YCG6 -> RGTC1 Y +
   RGTC2 Co, Cg at half size, YG10 -> RGTC2 Y, A + RGTC2 Co, Cg; on the copy pass's existing uDxt / uDxtA samplers (no new sampler);
-  uDxtFit = display / coded crops the padding. YCoCg = Hap Q's formula with scale 1 (Co, Cg - 128/255). Chroma is sampled NEAREST
+  uDxtFit = display / coded crops the padding. W8 (DXVKit 1.0.0, Arena 7.28's convention, spec 8.4): plain YCoCg with chroma midpoint
+  0.5 (127.5 / 255, not 128 / 255) and R / B overflow folded into the other channel before the clamp (kProjVideoFS modes 5 / 6; Hap Q's
+  branch untouched, byte-identical). W8 acceptance: DXVK_GEN_AUTO (the packet decides legacy vs DXV3); frame 0 is decoded at open and a
+  file whose frame 0 fails (DXVK_ERR_BAD_HEADER: DXV3 version < 4, stored flag > 1; Arena plays those black) is REFUSED; a later frame
+  that fails is skipped (marked, never fetched again; the last frame stays; one VIDEO line with Debug Log). A refused video file keeps
+  the projector's last picture (`ProjState::videoKeep`). An AVFoundation track that is not `decodable` (FourCC DXV3 / DXT1 / YCG6 / DXD1
+  / DXDA: Arena "not a clip") is refused at open (it used to read nothing forever, LOADEHR-017). Proof (tools/w3_dxv.py proof vs
+  dxvtool 1.0.0): HQ max 1-3 (was 14-84 with midpoint 128), DXT max 0 vs W7; the 33 Arena forms 33 / 33 (tools/w8_dxv.py forms). Chroma is sampled NEAREST
   (the DXV spec's chroma): linear smeared colour edges (testsrc2 max 107 of 255) and pulled the padding's chroma into the last row
   (97). GL (M3 Max): GL_COMPRESSED_TEXTURE_FORMATS lists only the three S3TC formats, but RGTC1 / RGTC2 upload without error (core
   3.0); BPTC: INVALID_ENUM. Proof (`tools/w3_dxv.py proof`, LOADEHR_VIDEO_DUMP=<folder/> = each new picture as raw RGBA, debug):

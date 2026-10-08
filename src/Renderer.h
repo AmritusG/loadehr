@@ -286,6 +286,7 @@ struct ProjState
 	std::shared_ptr< const ProjImage > image;
 	std::shared_ptr< const VideoFrame > video; // W2: the video file's frame for this frame (instead of image)
 	bool videoStraight = false;                // W3 Video Alpha: straight alpha = premultiply the frame in the copy pass
+	bool videoKeep     = false;                // W8: the video file was refused: the last picture stays
 };
 
 // W6 Stage 2: the transition pack's per-side state. The MORPH program variants (`#define MORPH`, Morph.cpp) carry its vertex side

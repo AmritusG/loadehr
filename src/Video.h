@@ -49,6 +49,8 @@ public:
 	double FrameDuration() const { return frameDur; }
 	int Frames() const { return frames; }
 	std::string Codec() const; // short: "DXV YCG6", "avc1", "Hap1", ...
+	// W8: DXV frames that did not decode (skipped: the last frame stays) and the first one's error; 0 = none
+	std::string BadInfo( uint64_t* n ) const;
 	// render thread: the frame to show at `pos` seconds while playing forward (or backward); never blocks. `pos` is the play
 	// position already wrapped / mirrored into 0..Duration by the caller; `loop` = the frames after the end are the first ones.
 	// W4 hold 1 (Scrub) / 2 (a cue waiting): the frame at `pos` exactly; until it is decoded the last frame shown stays (Scrub: from
@@ -93,6 +95,9 @@ private:
 	std::chrono::steady_clock::time_point scrubT0;
 	std::vector< ScrubStat > scrubStats;
 	uint64_t scrubSuperseded = 0;
+	std::vector< char > bad; // W8 DXV: frames that did not decode (never fetched again)
+	uint64_t badFrames = 0;
+	std::string badInfo;
 	std::map< int, std::shared_ptr< const VideoFrame > > cache;
 	std::shared_ptr< const VideoFrame > last;
 };

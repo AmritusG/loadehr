@@ -29,7 +29,7 @@ void main()
 // W3 Video Alpha Straight multiplies the colour by the frame's alpha here, Premultiplied (uStraight 0) takes it as it is.
 // mode 0 = a BGRA frame (IOSurface rectangle texture, rows top-first), 1 = DXT1 / DXT5 RGB(A), 2 = Hap Q (scaled YCoCg DXT5),
 // 3 = Hap Q Alpha (+ the BC4 alpha plane), 4 = a BC4 alpha-only frame (white light through it: the alpha is the picture),
-// W3 DXV HQ: 5 = YCG6 (uDxt BC4 Y, uDxtA BC5 Co, Cg at half size: the same picture coordinates), 6 = YG10 (uDxt BC5 Y, alpha)
+// W3 DXV HQ (W8: Arena's convention, see below): 5 = YCG6 (uDxt BC4 Y, uDxtA BC5 Co, Cg at half size: the same picture coordinates), 6 = YG10 (uDxt BC5 Y, alpha)
 static const char* kProjVideoFS = R"GLSL(
 in vec2 vUV;
 out vec4 fragColor;
@@ -62,10 +62,16 @@ void main()
 			c = vec4( c.rrr, 1.0 );
 		else if( uMode >= 5 )
 		{
-			// plain YCoCg, chroma biased by 128 (DXVKit's README): Hap Q's conversion with scale 1
-			vec2 cc  = texture( uDxtA, st * uDxtFit ).rg - 128.0 / 255.0;
-			float y  = c.r;
-			c = vec4( y + cc.x - cc.y, y + cc.y, y - cc.x - cc.y, uMode == 6 ? c.g : 1.0 );
+			// W8: DXV HQ as Arena 7.28 shows it (DXVKit 1.0.0, spec 8.4): plain YCoCg, chroma (sampled nearest) with midpoint 127.5 / 255 =
+			// 0.5, and the overflow of R or B carried into the other one (in this order) before the clamp; G as it is
+			vec2 cc = texture( uDxtA, st * uDxtFit ).rg - 0.5;
+			float y = c.r, t = y - cc.y;
+			float r = t + cc.x, b = t - cc.x;
+			if( r < 0.0 ) { b += r; r = 0.0; }
+			if( b < 0.0 ) { r += b; b = 0.0; }
+			if( r > 1.0 ) { b += r - 1.0; r = 1.0; }
+			if( b > 1.0 ) { r += b - 1.0; b = 1.0; }
+			c = vec4( r, y + cc.y, b, uMode == 6 ? c.g : 1.0 );
 		}
 	}
 	fragColor = vec4( clamp( c.rgb, 0.0, 1.0 ) * ( uStraight == 1 ? c.a : 1.0 ), 1.0 );

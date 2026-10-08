@@ -272,6 +272,8 @@ void Renderer::RenderProjector( const FrameState& fs, GpuModel* model )
 		if( projVideoHeld )
 			img = projImageTex, iw = projVideoHeld->w, ih = projVideoHeld->h, levels = mips ? projImageLevels : 1;
 	}
+	else if( pr.source == 1 && pr.videoKeep && projVideoHeld )
+		img = projImageTex, iw = projVideoHeld->w, ih = projVideoHeld->h, levels = projMipsValid && pr.focus > 0.0f ? projImageLevels : 1;
 	else if( pr.source == 1 && pr.image && !pr.image->mips.empty() )
 	{
 		if( projImageSerial != pr.image->serial )

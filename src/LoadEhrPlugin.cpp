@@ -2968,13 +2968,14 @@ private:
 			std::string ext = file.substr( file.find_last_of( '.' ) + 1 );
 			std::transform( ext.begin(), ext.end(), ext.begin(), ::tolower );
 			if( ext == "mov" || ext == "mp4" || ext == "m4v" )
-				video = std::make_shared< VideoPlayer >( file ), videoLogged = false, videoRestart = true; // W2: decoded on its own thread
+				video = std::make_shared< VideoPlayer >( file ), videoLogged = videoBadLogged = false, videoRestart = true; // W2: decoded on its own thread
 			else if( !file.empty() )
 				projImageJob = DecodeProjImage( file, ++projImageSerial );
 		}
 		p.video.reset();
 		if( video && p.on && p.source == 1 )
 			p.video = VideoClock( dt );
+		p.videoKeep = video && video->Failed(); // W8: a refused file keeps the last picture
 		p.videoStraight = Opt( P_VIDEO_ALPHA ) == 1;
 		if( projImageJob && projImageJob->done.load() )
 		{
@@ -3149,6 +3150,14 @@ private:
 				return Fmt( "%02ld:%02ld.%ld", t / 600, t / 10 % 60, t % 10 );
 			};
 			SetVideoTime( ( videoScrubRefused ? "Scrub: DXV / HAP only  " : "" ) + mmss( i * fd ) + " / " + mmss( n * fd ) + Fmt( "  frame %d / %d  ", i + 1, n ) + video->Codec() );
+		}
+		// W8 Debug Log: a DXV frame that did not decode (skipped, the last frame stays), once per file
+		if( LogVerbose() && !videoBadLogged )
+		{
+			uint64_t bad = 0;
+			const std::string e = video->BadInfo( &bad );
+			if( bad )
+				Log( "VIDEO %s: %s (skipped: the last frame stays)", FileName( projImageFile ).c_str(), e.c_str() ), videoBadLogged = true;
 		}
 		// Debug Log: one VIDEO line per second (frames shown late = the last decoded frame stood in; the drops are only logged here)
 		videoStatT += dt;
@@ -4050,7 +4059,7 @@ private:
 	float burstT = 10.0f;
 	std::string projImageFile;
 	std::shared_ptr< VideoPlayer > video; // W2: Proj File is a video
-	bool videoRestart = true, videoLogged = false;
+	bool videoRestart = true, videoLogged = false, videoBadLogged = false;
 	float videoCue = -1.0f;        // W4: a user's Video Position change waiting to cue (-1 = none)
 	int videoCueHold = -1;         // the cued frame the clock waits on until it is shown (-1 = none)
 	float videoCueWait = 0.0f;

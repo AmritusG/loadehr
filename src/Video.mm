@@ -259,6 +259,13 @@ std::string VideoPlayer::Info() const
 	return info;
 }
 
+std::string VideoPlayer::BadInfo( uint64_t* n ) const
+{
+	std::lock_guard< std::mutex > lock( mtx );
+	*n = badFrames;
+	return badInfo;
+}
+
 std::string VideoPlayer::Codec() const
 {
 	std::lock_guard< std::mutex > lock( mtx );
@@ -356,7 +363,7 @@ int VideoPlayer::Window( std::vector< int >& need )
 		if( std::find( need.begin(), need.end(), i ) == need.end() )
 			need.push_back( i );
 		// the one just behind the play position is kept, never fetched (a frame the wrap also puts ahead, e.g. a 1-frame clip, is)
-		if( first < 0 && k >= 0 && k <= kAhead && !cache.count( i ) )
+		if( first < 0 && k >= 0 && k <= kAhead && !cache.count( i ) && !( size_t( i ) < bad.size() && bad[ size_t( i ) ] ) )
 			first = i;
 	}
 	for( auto it = cache.begin(); it != cache.end(); )
@@ -369,6 +376,9 @@ int VideoPlayer::Window( std::vector< int >& need )
 
 // W3: a DXV file through DXVKit. Every packet is a whole frame, so the wanted frame is read and decoded directly: its block planes
 // (plane 0 over the 16-padded picture, HQ chroma at half size) go to the renderer as they are. Alpha is left as stored (Video Alpha).
+// W8 (DXVKit 1.0.0): the packet decides legacy vs DXV3 (DXVK_GEN_AUTO). A file whose first frame does not decode is refused (Arena 7.28
+// plays such files black: a DXV3 version byte below 4, a stored flag above 1); a later frame that does not decode is skipped (the last
+// frame stays, the error is kept for the Debug Log).
 bool VideoPlayer::RunDxv()
 {
 	dxvk_mov* mov = nullptr;
@@ -376,27 +386,52 @@ bool VideoPlayer::RunDxv()
 		return false;
 	const dxvk_mov_info in = *dxvk_mov_get_info( mov );
 	std::vector< uint8_t > packet( in.max_packet_size );
+	const double fd      = in.frame_rate > 0 ? 1.0 / in.frame_rate : 1.0 / 30.0;
 	dxvk_variant variant = DXVK_VARIANT_DXT1;
-	int stored           = 0;
-	size_t n             = 0;
-	if( in.frame_count == 0 || dxvk_mov_read_packet( mov, 0, packet.data(), packet.size(), &n ) != DXVK_OK ||
-	    dxvk_packet_variant( in.generation, packet.data(), n, &variant, &stored ) != DXVK_OK )
+	auto decode          = [ & ]( int i, VideoFrame& f ) {
+		size_t n = 0;
+		int stored;
+		dxvk_frame_layout lay{};
+		dxvk_status st = dxvk_mov_read_packet( mov, uint32_t( i ), packet.data(), packet.size(), &n );
+		if( st == DXVK_OK )
+			st = dxvk_packet_variant( DXVK_GEN_AUTO, packet.data(), n, &variant, &stored );
+		if( st == DXVK_OK )
+			st = dxvk_layout( variant, in.width, in.height, &lay );
+		if( st == DXVK_OK )
+		{
+			f.blocks.resize( lay.bytes[ 0 ] ), f.blocks2.resize( lay.plane_count > 1 ? lay.bytes[ 1 ] : 0 );
+			void* const planes[ 2 ] = { f.blocks.data(), f.blocks2.data() };
+			const size_t caps[ 2 ]  = { f.blocks.size(), f.blocks2.size() };
+			st = dxvk_decode_blocks( DXVK_GEN_AUTO, packet.data(), n, in.width, in.height, nullptr, planes, caps, &lay, nullptr );
+		}
+		f.pts = i * fd, f.index = i, f.w = int( in.width ), f.h = int( in.height ), f.serial = ( 1ull << 62 ) + ++g_frameSerial;
+		f.tw = int( lay.coded_width ), f.th = int( lay.coded_height );
+		f.format = lay.variant == DXVK_VARIANT_YCG6 ? 7 : lay.variant == DXVK_VARIANT_YG10 ? 8 : lay.format[ 0 ] == DXVK_BLOCKS_BC3 ? 5 : 1;
+		return st;
+	};
+	auto f0               = std::make_shared< VideoFrame >();
+	const dxvk_status st0 = in.frame_count ? decode( 0, *f0 ) : DXVK_ERR_RANGE;
 	{
 		std::lock_guard< std::mutex > lock( mtx );
-		info = "DXV: cannot read the first frame of " + path.substr( path.find_last_of( '/' ) + 1 ), failed.store( true );
-		dxvk_mov_close( mov );
-		return true;
-	}
-	{
-		std::lock_guard< std::mutex > lock( mtx );
-		frameDur = in.frame_rate > 0 ? 1.0 / in.frame_rate : 1.0 / 30.0;
+		const std::string name = path.substr( path.find_last_of( '/' ) + 1 );
+		if( st0 != DXVK_OK )
+		{
+			info = "DXV frame 0 of " + name + ": " + dxvk_status_string( st0 ), failed.store( true );
+			dxvk_mov_close( mov );
+			return true;
+		}
+		const char* var = dxvk_variant_name( variant );
+		frameDur = fd;
 		frames   = int( in.frame_count );
 		duration = in.timescale && in.duration ? double( in.duration ) / in.timescale : frames * frameDur;
 		char b[ 200 ];
-		snprintf( b, sizeof( b ), "DXV %s %ux%u, %.4g fps, %.2f s (%d frames), DXVKit: block upload", dxvk_variant_name( variant ), in.width, in.height,
-		          1.0 / frameDur, duration, frames );
+		snprintf( b, sizeof( b ), "DXV %s %ux%u, %.4g fps, %.2f s (%d frames), DXVKit %s: block upload", var, in.width, in.height, 1.0 / frameDur, duration, frames,
+		          dxvk_version_string() );
 		info  = b;
-		codec = std::string( "DXV " ) + dxvk_variant_name( variant );
+		codec = std::string( "DXV " ) + var;
+		bad.assign( size_t( frames ), 0 );
+		cache[ 0 ] = f0;
+		++decoded;
 	}
 	intra.store( true ); // every DXV packet is a whole frame
 	ready.store( true );
@@ -413,31 +448,17 @@ bool VideoPlayer::RunDxv()
 				continue;
 			}
 		}
-		const auto c0 = std::chrono::steady_clock::now();
-		auto f        = std::make_shared< VideoFrame >();
-		f->pts = first * frameDur, f->index = first, f->w = int( in.width ), f->h = int( in.height ), f->serial = ( 1ull << 62 ) + ++g_frameSerial;
-		dxvk_frame_layout lay;
-		dxvk_status st = dxvk_mov_read_packet( mov, uint32_t( first ), packet.data(), packet.size(), &n );
-		if( st == DXVK_OK )
-			st = dxvk_packet_variant( in.generation, packet.data(), n, &variant, &stored );
-		if( st == DXVK_OK )
-			st = dxvk_layout( variant, in.width, in.height, &lay );
-		if( st == DXVK_OK )
-		{
-			f->blocks.resize( lay.bytes[ 0 ] ), f->blocks2.resize( lay.plane_count > 1 ? lay.bytes[ 1 ] : 0 );
-			void* const planes[ 2 ] = { f->blocks.data(), f->blocks2.data() };
-			const size_t caps[ 2 ]  = { f->blocks.size(), f->blocks2.size() };
-			st = dxvk_decode_blocks( in.generation, packet.data(), n, in.width, in.height, nullptr, planes, caps, &lay, nullptr );
-		}
+		const auto c0         = std::chrono::steady_clock::now();
+		auto f                = std::make_shared< VideoFrame >();
+		const dxvk_status st  = decode( first, *f );
+		std::lock_guard< std::mutex > lock( mtx );
 		if( st != DXVK_OK )
 		{
-			std::lock_guard< std::mutex > lock( mtx );
-			info = "DXV frame " + std::to_string( first ) + ": " + dxvk_status_string( st ), failed.store( true );
-			break;
+			bad[ size_t( first ) ] = 1;
+			if( !badFrames++ )
+				badInfo = "DXV frame " + std::to_string( first ) + ": " + dxvk_status_string( st );
+			continue;
 		}
-		f->tw = int( lay.coded_width ), f->th = int( lay.coded_height );
-		f->format = lay.variant == DXVK_VARIANT_YCG6 ? 7 : lay.variant == DXVK_VARIANT_YG10 ? 8 : lay.format[ 0 ] == DXVK_BLOCKS_BC3 ? 5 : 1;
-		std::lock_guard< std::mutex > lock( mtx );
 		cache[ first ] = f;
 		++decoded;
 		decodeMs += std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - c0 ).count();
@@ -487,6 +508,10 @@ void VideoPlayer::Run()
 			behind = hap ? 24 : std::clamp( int( ( 256ull << 20 ) / ( size_t( std::max( 1, W ) ) * std::max( 1, H ) * 4 ) ) - kAhead, kAhead, 30 );
 			if( cc == "Hap7" || cc == "HapH" )
 				info = cc + ": BC7 / BC6 HAP is not supported (GL 4.1 on this Mac has no BPTC)", failed.store( true );
+			// W8: a codec macOS cannot decode (a DXV sample entry DXVKit does not open: FourCC DXV3 / DXT1 / YCG6 / DXD1 / DXDA, which
+			// Arena 7.28 does not take as a clip either) is refused; the reader used to reopen on it forever without a frame
+			else if( !hap && !track.decodable )
+				info = cc + ": no decoder for this codec on this Mac", failed.store( true );
 			intra.store( hap ); // HAP: every frame is a key frame of raw blocks
 		}
 		if( failed.load() )

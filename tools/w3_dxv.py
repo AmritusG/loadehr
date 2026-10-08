@@ -9,10 +9,12 @@ usage: tools/w3_dxv.py proof <out> [file ...]   every DXV variant: the projector
                                                  (Video Speed set to 0 at that instant, the picture dumped) vs the exact frame -> <out>/longshow.md
        tools/w3_dxv.py cost <out> [file ...]    real-time play (60 fps pacing), Debug Log VIDEO lines: decode / upload ms, late
                                                  frames per variant -> <out>/cost.md
-dxvtool: built from the submodule into a scratch folder (DXVTOOL env, default $TMPDIR/dxvkit_tools/dxvtool)."""
+dxvtool: built from the submodule into a scratch folder (DXVTOOL env, default $TMPDIR/dxvkit_tools_<submodule commit>/dxvtool: W8, a
+DXVKit bump builds its own). LOADEHR_BUILD=<build dir> (W8): render with that build's bundles + harness (default build/)."""
 import math, os, re, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BUILD = os.environ.get('LOADEHR_BUILD', os.path.join(ROOT, 'build'))
 MASK = '/Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Skulls/Human Skull/scene.gltf'
 LOG = os.path.expanduser('~/Library/Logs/LoadEhr/LoadEhr.log')
 MOV = os.path.expanduser('~/Movies')
@@ -34,7 +36,8 @@ SCENE = [('Proj Enable', 1), ('Proj Pos X', 0.6), ('Proj Pos Y', 0.6), ('Proj Po
 
 
 def dxvtool():
-    t = os.environ.get('DXVTOOL', os.path.join(os.environ.get('TMPDIR', '/tmp'), 'dxvkit_tools', 'dxvtool'))
+    sha = subprocess.run(['git', '-C', os.path.join(ROOT, 'third_party', 'dxvkit'), 'rev-parse', '--short', 'HEAD'], capture_output=True, text=True).stdout.strip()
+    t = os.environ.get('DXVTOOL', os.path.join(os.environ.get('TMPDIR', '/tmp'), 'dxvkit_tools_' + sha, 'dxvtool'))
     if not os.path.exists(t):
         b = os.path.dirname(t)
         subprocess.run(['cmake', '-S', os.path.join(ROOT, 'third_party', 'dxvkit'), '-B', b], check=True, capture_output=True)
@@ -49,12 +52,12 @@ def tag(path):
 def harness(lines, out, name, env=None):
     sp = os.path.join(out, name + '.txt')
     open(sp, 'w').write('\n'.join(lines) + '\n')
-    return subprocess.run([os.path.join(ROOT, 'build', 'loadehr_harness'), sp], capture_output=True, text=True, cwd=ROOT,
+    return subprocess.run([os.path.join(BUILD, 'loadehr_harness'), sp], capture_output=True, text=True, cwd=ROOT,
                           env=dict(os.environ, **(env or {})))
 
 
 def scene(path, extra=(), bundle='LoadEhrWow', size=(960, 540)):
-    L = ['bundle %s/build/%s.bundle' % (ROOT, bundle), 'size %d %d' % size, 'instance', 'text Model_A ' + MASK, 'wait_loaded 60']
+    L = ['bundle %s/%s.bundle' % (BUILD, bundle), 'size %d %d' % size, 'instance', 'text Model_A ' + MASK, 'wait_loaded 60']
     L += ['set %s %g' % (k, v) for k, v in SCENE + list(extra)]
     return L + ['text Proj_File ' + path]
 
