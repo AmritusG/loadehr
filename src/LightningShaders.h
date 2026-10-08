@@ -18,9 +18,6 @@ out float vBright, vW;
 void main()
 {
 	vec4 ca = uViewProj * vec4( aA.xyz, 1.0 ), cb = uViewProj * vec4( aB.xyz, 1.0 );
-#ifdef MIRROR
-	ca = MirrorClip( uViewProj, aA.xyz ), cb = MirrorClip( uViewProj, aB.xyz ); // W27: the bolt's image in one mirror cell
-#endif
 	vBright = aA.w;
 	vW      = uWidth * aB.w;
 	if( ca.w < 0.05 || cb.w < 0.05 )

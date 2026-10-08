@@ -72,6 +72,8 @@ GpuModel::GpuModel( std::shared_ptr< const ModelData > d ) :
 		GpuPart g;
 		g.slot  = p.slot;
 		g.glass = p.glass;
+		g.fractured = p.fractured;
+		hasPieces |= p.fractured;
 		for( int k = 0; k < 3; ++k )
 			g.glassTint[ k ] = p.glassTint[ k ], g.boxMin[ k ] = p.boxMin[ k ], g.boxMax[ k ] = p.boxMax[ k ];
 		g.name       = p.name;

@@ -37,8 +37,27 @@ GLuint CompileStage( GLenum type, const char* src, const char* defines, std::str
 
 }
 
+namespace
+{
+// W2: while a Renderer initialises, every program linked from the triangle-soup vertex stage gets its DEFORM twin (the same
+// sources with #define DEFORM): plain program -> twin
+std::vector< std::pair< GLuint, GLuint > >* g_deformSink = nullptr;
+GLuint LinkPlain( const std::string& vs, const std::string& fs, std::string& error );
+}
+
 // Links a program; each stage's source is its pieces concatenated (defines, libraries, main).
 GLuint Link( const std::string& vs, const std::string& fs, std::string& error )
+{
+	const GLuint p = LinkPlain( vs, fs, error );
+	if( p && g_deformSink && vs.find( "uniform usamplerBuffer uIdxBuf; // R32UI view of the index buffer" ) != std::string::npos )
+		if( const GLuint d = LinkPlain( "#define DEFORM\n" + vs, fs, error ) )
+			g_deformSink->push_back( { p, d } );
+	return p;
+}
+
+namespace
+{
+GLuint LinkPlain( const std::string& vs, const std::string& fs, std::string& error )
 {
 	GLuint v = CompileStage( GL_VERTEX_SHADER, vs.c_str(), "", error );
 	GLuint f = CompileStage( GL_FRAGMENT_SHADER, fs.c_str(), "", error );
@@ -67,10 +86,40 @@ GLuint Link( const std::string& vs, const std::string& fs, std::string& error )
 	}
 	return p;
 }
+}
 
 namespace
 {
 inline GLint U( GLuint p, const char* n ) { return glGetUniformLocation( p, n ); }
+// a DEFORM twin gets the plain program's sampler units (each Init* pinned them on the plain one)
+void CopySamplerUnits( GLuint from, GLuint to )
+{
+	GLint n = 0;
+	glGetProgramiv( from, GL_ACTIVE_UNIFORMS, &n );
+	glUseProgram( to );
+	for( GLint i = 0; i < n; ++i )
+	{
+		char name[ 128 ];
+		GLsizei len = 0;
+		GLint size  = 0;
+		GLenum type = 0;
+		glGetActiveUniform( from, (GLuint)i, sizeof( name ), &len, &size, &type, name );
+		const bool sampler = type == GL_SAMPLER_2D || type == GL_SAMPLER_CUBE || type == GL_SAMPLER_BUFFER || type == GL_UNSIGNED_INT_SAMPLER_BUFFER ||
+		                     type == GL_INT_SAMPLER_BUFFER || type == GL_SAMPLER_3D || type == GL_SAMPLER_2D_RECT;
+		if( !sampler )
+			continue;
+		for( GLint k = 0; k < size; ++k )
+		{
+			std::string nm = name;
+			if( size > 1 )
+				nm = nm.substr( 0, nm.find( '[' ) ) + "[" + std::to_string( k ) + "]";
+			GLint unit = 0;
+			glGetUniformiv( from, glGetUniformLocation( from, nm.c_str() ), &unit );
+			glUniform1i( glGetUniformLocation( to, nm.c_str() ), unit );
+		}
+	}
+	glUseProgram( 0 );
+}
 }
 
 // Shadow maps live on units 11-14, 17, 18 in every program that includes kLightLib (program must be bound).
@@ -128,6 +177,26 @@ void BindSamplers( GLuint prog )
 
 bool Renderer::Init( std::string& error )
 {
+	g_deformSink = &deformTwins; // W2: every soup program linked from here on gets its DEFORM twin
+	const bool ok = InitPrograms( error );
+	g_deformSink  = nullptr;
+	for( const auto& t : deformTwins )
+		CopySamplerUnits( t.first, t.second );
+	if( ok )
+		Log( "DEFORM %zu soup programs have their DEFORM twin", deformTwins.size() );
+	return ok;
+}
+
+GLuint Renderer::DeformTwin( GLuint p ) const
+{
+	for( const auto& t : deformTwins )
+		if( t.first == p )
+			return t.second;
+	return p;
+}
+
+bool Renderer::InitPrograms( std::string& error )
+{
 	const std::string mainFS = std::string( kLightLib ) + kMainFS;
 	progMain      = Link( kMainVS, mainFS, error );
 	progSoup      = Link( kSoupVS, mainFS, error );
@@ -174,7 +243,7 @@ bool Renderer::Init( std::string& error )
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 	glBindTexture( GL_TEXTURE_2D, 0 );
-	return InitVolume( error ) && InitSim( error ) && InitPost( error ) && InitShape( error ) && InitProjector( error ) && InitLiquid( error ) && InitBolts( error ) && InitSwarm( error ) && InitCracks( error ) && InitCaustics( error ) && InitMirror( error );
+	return InitVolume( error ) && InitSim( error ) && InitPost( error ) && InitShape( error ) && InitProjector( error ) && InitLiquid( error ) && InitBolts( error ) && InitSwarm( error ) && InitCracks( error ) && InitCaustics( error );
 }
 
 void Renderer::Release()
@@ -189,7 +258,9 @@ void Renderer::Release()
 	ReleaseSwarm();
 	ReleaseCracks();
 	ReleaseCaustics();
-	ReleaseMirror();
+	for( const auto& t : deformTwins )
+		glDeleteProgram( t.second );
+	deformTwins.clear();
 	ReleaseTargets();
 	for( GLuint* p : { &progMain, &progSoup, &progMainI, &progSoupI, &progSoupT, &progSoupTI, &progSoupL, &progSoupLI, &progComposite, &progCopy, &progCompositeHaze } )
 		if( *p )
@@ -339,7 +410,7 @@ void Renderer::PrepareSlot( int slot, GpuModel* model, const FrameState& fs, uns
 	sideSlot[ 0 ] = slot, activeSide = 0;
 	model->UpdateLods();
 	if( uses & kUseShards )
-		UpdateShards( model, fs.shape.shardCount );
+		UpdateShards( model, fs.shape.shardCount, fs.shape.shatterMode );
 	if( uses & kUseDust )
 		UpdateDust( fs, model, true );
 	if( uses & kUseLiquid )
@@ -446,6 +517,11 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 		glBindTexture( GL_TEXTURE_BUFFER, ls.xfTex );
 		glActiveTexture( GL_TEXTURE0 );
 	}
+	// W2 Deform: any deform on = the DEFORM twin of whatever soup program this draw ended up with (plain programs untouched)
+	const bool deform = soup && fs.shape.on && fs.shape.deform;
+	if( deform )
+		p = DeformTwin( p );
+	const GLsizei folds = deform ? std::max( 1, fs.shape.foldN ) : 1; // Mirror Fold: every draw is this many copies
 	glUseProgram( p );
 	Mat4 M;
 	std::memcpy( M.m, fs.model, sizeof( M.m ) );
@@ -607,7 +683,7 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 				std::memcpy( &mats[ k * 16 ], in.m, sizeof( in.m ) );
 				std::memcpy( &nexts[ k * 16 ], in.next, sizeof( in.next ) );
 				ha[ k * 2 ] = in.hue, ha[ k * 2 + 1 ] = in.alpha;
-				xa[ k * 4 ] = in.keep, xa[ k * 4 + 1 ] = in.fogKeep, xa[ k * 4 + 2 ] = in.age, xa[ k * 4 + 3 ] = in.bounces;
+				xa[ k * 4 ] = in.keep, xa[ k * 4 + 1 ] = in.fogKeep, xa[ k * 4 + 2 ] = in.age, xa[ k * 4 + 3 ] = 0.0f;
 				++k, ++g.n;
 			}
 			if( g.n )
@@ -621,7 +697,7 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 		const bool trail    = inst == &fs.ghosts;
 		glUniform1i( U( p, "uTrailPass" ), trail ? 1 : 0 );
 		glUniform1f( U( p, "uTrailSmear" ), trail ? t.ghostSmear : 0.0f );
-		if( ( trail && t.ghostSmear > 0.0f ) || fs.mirror.shape > 0 ) // W27: the mirror copies' folds ride in the same array
+		if( trail && t.ghostSmear > 0.0f )
 			glUniformMatrix4fv( U( p, "uInstNext" ), k, GL_FALSE, nexts );
 		glUniform1f( U( p, "uTrailDust" ), trail ? t.dust : 0.0f );
 		glUniform1f( U( p, "uTrailDustV" ), trail ? t.dust : 0.0f );
@@ -636,6 +712,9 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 	bool glassParts = false; // a part drawn as glass changes the surface uniforms: every part then sets its own
 	for( const GpuPart& gp : model->parts )
 		glassParts |= gp.glass > 0.0f && gp.glass > su.glass;
+	// W2 text / logos: while pieces fly (Shatter Mode Pieces), the fractured copy draws instead of the whole mesh (at rest, and once
+	// fully reformed, the whole mesh: exactly what it drew before)
+	const bool pieces = model->hasPieces && soup && fs.shape.on && fs.shape.shatterT > 0.0f && fs.shape.shatterMode > 0;
 	// the soup path reads vertices from texture buffers; no vertex attributes may be enabled
 	glBindVertexArray( soup ? quadVAO : vao );
 	// W19: glass parts go last, blended (premultiplied) without depth writes, so what is behind them (an iris under a
@@ -658,6 +737,8 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 	for( size_t i = 0; i < model->parts.size(); ++i )
 	{
 		const GpuPart& part    = model->parts[ i ];
+		if( part.fractured != pieces )
+			continue;
 		if( glassPasses == 2 && ( part.glass > 0.0f && part.glass > su.glass ) != ( gpass == 1 ) )
 			continue;
 		const PartControls& pc = fs.parts[ part.slot ];
@@ -726,7 +807,7 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 					glActiveTexture( GL_TEXTURE0 + 9 );
 					glBindTexture( GL_TEXTURE_BUFFER, g.lod == 0 ? model->idxTBO : L.tbo );
 					glUniform1i( locFirst, (GLint)first );
-					glDrawArraysInstanced( GL_TRIANGLES, 0, cnt, g.n );
+					glDrawArraysInstanced( GL_TRIANGLES, 0, cnt, g.n * folds );
 				}
 				else
 				{
@@ -740,7 +821,10 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 		if( soup )
 		{
 			glUniform1i( locFirst, (GLint)part.firstIndex );
-			glDrawArrays( GL_TRIANGLES, 0, count );
+			if( folds > 1 )
+				glDrawArraysInstanced( GL_TRIANGLES, 0, count, folds );
+			else
+				glDrawArrays( GL_TRIANGLES, 0, count );
 		}
 		else
 			glDrawElements( GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)( size_t( part.firstIndex ) * sizeof( uint32_t ) ) );
@@ -902,7 +986,7 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 	if( ready )
 	{
 		ready->UpdateLods();
-		UpdateShards( ready, fs.shape.shardCount );
+		UpdateShards( ready, fs.shape.shardCount, fs.shape.shatterMode );
 		UpdateBounce( fs, ready ); // W26
 		letters[ SlotOf( ready ) ].live = UpdateLetters( ready, fs.letterXf ); // empty unless this is slot A's text / logo
 		UpdateDust( both ? fsA : fs, ready );
@@ -911,7 +995,7 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 	{
 		activeSide = 1;
 		bReady->UpdateLods();
-		UpdateShards( bReady, fs.shape.shardCount );
+		UpdateShards( bReady, fs.shape.shardCount, fs.shape.shatterMode );
 		letters[ SlotOf( bReady ) ].live = sideSlot[ 1 ] == 0 && UpdateLetters( bReady, fs.letterXf ); // only slot A has letters
 		UpdateDust( fsB, bReady );
 		activeSide = 0;
@@ -997,6 +1081,27 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 				glDisable( GL_BLEND );
 				ls.live = was && UpdateLetters( model, fs.letterXf );
 			}
+			// W2: the DEFORM twins of the main draws (plain, blended, instanced, the Shatter transition, letters)
+			{
+				FrameState d  = fs;
+				d.shape.on    = d.shape.deform = true;
+				d.shape.foldN = 2, d.shape.foldK = 1.0f, d.shape.foldAxes[ 0 ] = 1.0f;
+				glEnable( GL_BLEND );
+				DrawModel( progSoup, d, model, false, true, 3 );
+				glDisable( GL_BLEND );
+				DrawModel( progSoup, d, model, false, true, 3 );
+				DrawModel( progSoup, d, model, false, true, 0, nullptr, nullptr, &one );
+				DrawModel( progSoupT, d, model, false, true, 3 );
+				if( model->geometry && !model->geometry->triGroup.empty() )
+				{
+					LetterSlot& ls = letters[ SlotOf( model ) ];
+					const bool was = ls.live;
+					std::vector< float > rest( size_t( model->geometry->groupCount ) * 12, 0.0f );
+					ls.live = UpdateLetters( model, rest );
+					DrawModel( progSoup, d, model, false, true, 3 );
+					ls.live = was && UpdateLetters( model, fs.letterXf );
+				}
+			}
 			glDisable( GL_SCISSOR_TEST );
 			WarmVolume( fs, model, w, h );
 			WarmPost( fs, model, w, h );
@@ -1060,7 +1165,6 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 			DrawModel( soup ? progSoup : progMain, fs, model, false, soup, 0, nullptr, nullptr, fs.inst.empty() ? nullptr : &fs.inst );
 			DrawProjSurface( fs, model ); // W26: the projected picture on the mask
 			DrawCracks( fs, model );      // W26: lava cracks
-			DrawMirrorCopies( fs, model ); // W26: the mirror room's reflections
 		}
 		if( !fs.ghosts.empty() )
 		{
@@ -1097,7 +1201,7 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 	RenderSilhouetteBlur( fs, w, h );
 	UpdateEchoes( fs, w, h );
 	fogOut = 0;
-	const bool depthNeeded = fs.vol.active || !fs.bolts.segs.empty() || fs.swarm.count > 0 || fs.mirror.shape > 0;
+	const bool depthNeeded = fs.vol.active || !fs.bolts.segs.empty() || fs.swarm.count > 0;
 	bool depthOk           = false;
 	if( depthNeeded && EnsureSceneDepth( w, h ) )
 	{
@@ -1236,8 +1340,6 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 	perf.Mark( PerfProbe::Light );
 	if( fogOut && fs.vol.motes > 0.0f )
 		DrawMotes( fs, w, h );
-	if( depthOk && fs.mirror.shape > 0 )
-		DrawMirrorLeds( fs, w, h ); // W26: the LED edges of the mirror room
 	if( depthOk && ( !fs.bolts.segs.empty() || fs.swarm.count > 0 ) )
 		RenderGlow( fs, w, h ); // W26 fireflies + lightning, the same way
 	perf.Mark( PerfProbe::Post );

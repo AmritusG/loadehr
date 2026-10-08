@@ -5,7 +5,6 @@
 #include "Log.h"
 #include "MathUtil.h"
 #include "ProjectorShaders.h"
-#include "MirrorShaders.h"
 #include "Renderer.h"
 #include "Shaders.h"
 #include "SimShaders.h"
@@ -14,7 +13,11 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstring>
+#include <chrono>
 #include <vector>
+#include <OpenGL/OpenGL.h>
+#include <OpenGL/CGLIOSurface.h>
+#include <CoreVideo/CoreVideo.h>
 
 namespace mehr
 {
@@ -33,21 +36,12 @@ bool Renderer::InitProjector( std::string& error )
 	progProjSoup     = Link( kSoupVS, fs, error );
 	progProjSoupL    = Link( std::string( "#define LETTERS\n" ) + kSoupVS, fs, error );
 	progProjCookie   = Link( kQuadVS, kProjCookieFS, error );
+	progProjVideo    = Link( kQuadVS, kProjVideoFS, error ); // W2
 	progProjMarch    = Link( kQuadVS, std::string( kMediumLib ) + kProjMarchFS, error );
 	progProjMarchSim = Link( kQuadVS, std::string( kSimLib ) + kMediumSimLib + kProjMarchFS, error );
 	if( !progProjMain || !progProjSoup || !progProjSoupL || !progProjCookie || !progProjMarch || !progProjMarchSim )
 		return false;
-	// W27 mirror room: the picture on the mask's copies (instanced MIRROR programs), the beam through the unfolded lattice
-	const std::string fsM    = std::string( "#define PROJ_PASS\n#define INSTANCED\n#define MIRROR\n" ) + kLightLib + kMainFS;
-	const std::string vsM    = "#define INSTANCED\n#define MIRROR\n";
-	const std::string mirror = std::string( "#define MIRROR\n" ) + kMirrorLib + kMirrorMarchLib;
-	progProjMainM     = Link( vsM + kMainVS, fsM, error );
-	progProjSoupM     = Link( vsM + kSoupVS, fsM, error );
-	progProjMarchM    = Link( kQuadVS, mirror + kMediumLib + kProjMarchFS, error );
-	progProjMarchSimM = Link( kQuadVS, mirror + kSimLib + kMediumSimLib + kProjMarchFS, error );
-	if( !progProjMainM || !progProjSoupM || !progProjMarchM || !progProjMarchSimM )
-		return false;
-	for( GLuint p : { progProjMain, progProjSoup, progProjSoupL, progProjMainM, progProjSoupM } )
+	for( GLuint p : { progProjMain, progProjSoup, progProjSoupL } )
 	{
 		glUseProgram( p );
 		char name[ 16 ];
@@ -65,7 +59,18 @@ bool Renderer::InitProjector( std::string& error )
 	}
 	glUseProgram( progProjCookie );
 	glUniform1i( U( progProjCookie, "uImage" ), 0 );
-	for( GLuint p : { progProjMarch, progProjMarchSim, progProjMarchM, progProjMarchSimM } )
+	if( !progProjVideo )
+		return false;
+	glUseProgram( progProjVideo );
+	glUniform1i( U( progProjVideo, "uRect" ), 0 );
+	glUniform1i( U( progProjVideo, "uDxt" ), 1 );
+	glUniform1i( U( progProjVideo, "uDxtA" ), 2 );
+	glGenTextures( 1, &dummyRect ); // every declared sampler needs a texture of its type (Apple GL)
+	glBindTexture( GL_TEXTURE_RECTANGLE, dummyRect );
+	const uint8_t px[ 4 ] = { 255, 255, 255, 255 };
+	glTexImage2D( GL_TEXTURE_RECTANGLE, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, px );
+	glBindTexture( GL_TEXTURE_RECTANGLE, 0 );
+	for( GLuint p : { progProjMarch, progProjMarchSim } )
 	{
 		glUseProgram( p );
 		glUniform1i( U( p, "uDepth" ), 0 );
@@ -80,19 +85,138 @@ bool Renderer::InitProjector( std::string& error )
 
 void Renderer::ReleaseProjector()
 {
-	for( GLuint* p : { &progProjMain, &progProjSoup, &progProjSoupL, &progProjCookie, &progProjMarch, &progProjMarchSim, &progProjMainM, &progProjSoupM, &progProjMarchM,
-	                   &progProjMarchSimM } )
+	for( GLuint* p : { &progProjMain, &progProjSoup, &progProjSoupL, &progProjCookie, &progProjMarch, &progProjMarchSim, &progProjVideo } )
 		if( *p )
 			glDeleteProgram( *p ), *p = 0;
-	for( GLuint* t : { &projTex, &projImageTex } )
+	for( GLuint* t : { &projTex, &projImageTex, &projVideoRect, &projVideoDxt, &projVideoAlpha, &dummyRect } )
 		if( *t )
 			glDeleteTextures( 1, t ), *t = 0;
+	if( projVideoFBO )
+		glDeleteFramebuffers( 1, &projVideoFBO ), projVideoFBO = 0;
+	projVideoHeld.reset();
+	projImageW = projImageH = 0;
 	if( projFBO )
 		glDeleteFramebuffers( 1, &projFBO ), projFBO = 0;
 	if( projDepth )
 		glDeleteRenderbuffers( 1, &projDepth ), projDepth = 0;
 	projImageSerial = 0;
 	projOk          = false;
+}
+
+// W2: a video frame -> projImageTex (<= 2048 px, all levels allocated; the mips are built on the GPU only when Focus needs them)
+bool Renderer::UploadVideoFrame( const VideoFrame& f, bool mips )
+{
+	const auto t0 = std::chrono::steady_clock::now();
+	int w = f.w, h = f.h;
+	while( std::max( w, h ) > 2048 )
+		w = std::max( 1, w / 2 ), h = std::max( 1, h / 2 );
+	if( !projImageTex || w != projImageW || h != projImageH )
+	{
+		if( !projImageTex )
+			glGenTextures( 1, &projImageTex );
+		glBindTexture( GL_TEXTURE_2D, projImageTex );
+		const int n = 1 + (int)std::floor( std::log2( float( std::max( w, h ) ) ) );
+		for( int l = 0; l < n; ++l )
+			glTexImage2D( GL_TEXTURE_2D, l, GL_RGBA8, std::max( 1, w >> l ), std::max( 1, h >> l ), 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, n - 1 );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+		projImageW = w, projImageH = h, projImageLevels = n;
+		if( !projVideoFBO )
+			glGenFramebuffers( 1, &projVideoFBO );
+		glBindFramebuffer( GL_FRAMEBUFFER, projVideoFBO );
+		glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, projImageTex, 0 );
+	}
+	int mode = 0;
+	glActiveTexture( GL_TEXTURE0 );
+	if( f.pixelBuffer )
+	{
+		// zero-copy: the decoder's IOSurface becomes the rectangle texture's storage
+		IOSurfaceRef surf = CVPixelBufferGetIOSurface( (CVPixelBufferRef)f.pixelBuffer );
+		if( !surf )
+			return false;
+		if( !projVideoRect )
+			glGenTextures( 1, &projVideoRect );
+		glBindTexture( GL_TEXTURE_RECTANGLE, projVideoRect );
+		if( CGLTexImageIOSurface2D( CGLGetCurrentContext(), GL_TEXTURE_RECTANGLE, GL_RGBA, (GLsizei)IOSurfaceGetWidth( surf ), (GLsizei)IOSurfaceGetHeight( surf ), GL_BGRA,
+		                            GL_UNSIGNED_INT_8_8_8_8_REV, surf, 0 ) != kCGLNoError )
+			return false;
+		glTexParameteri( GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		glTexParameteri( GL_TEXTURE_RECTANGLE, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		glTexParameteri( GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+		glTexParameteri( GL_TEXTURE_RECTANGLE, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+	}
+	else
+	{
+		// HAP: the block planes straight into compressed textures (no CPU pixel decode)
+		const int bw = ( f.w + 3 ) / 4 * 4, bh = ( f.h + 3 ) / 4 * 4;
+		const GLenum fmt = f.format == 1 ? 0x83F0 /* RGB S3TC DXT1 */ : f.format == 4 ? 0x8DBB /* RED RGTC1 */ : 0x83F3 /* RGBA S3TC DXT5 */;
+		auto put = [ & ]( GLuint& tex, const std::vector< uint8_t >& data, GLenum format ) {
+			const GLsizei bytes = GLsizei( ( bw / 4 ) * ( bh / 4 ) * ( format == 0x83F0 || format == 0x8DBB ? 8 : 16 ) );
+			const bool fresh    = !tex || projVideoFmt != f.format || projDxtW != bw || projDxtH != bh;
+			if( !tex )
+				glGenTextures( 1, &tex );
+			glBindTexture( GL_TEXTURE_2D, tex );
+			if( fresh )
+			{
+				glCompressedTexImage2D( GL_TEXTURE_2D, 0, format, bw, bh, 0, bytes, data.data() );
+				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0 );
+				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+			}
+			else
+				glCompressedTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, bw, bh, format, bytes, data.data() );
+		};
+		glActiveTexture( GL_TEXTURE1 );
+		put( projVideoDxt, f.blocks, fmt );
+		if( !f.alpha.empty() )
+		{
+			glActiveTexture( GL_TEXTURE2 );
+			put( projVideoAlpha, f.alpha, 0x8DBB );
+		}
+		projVideoFmt = f.format, projDxtW = bw, projDxtH = bh;
+		mode         = f.format == 6 ? ( f.alpha.empty() ? 2 : 3 ) : f.format == 4 ? 4 : 1;
+		glActiveTexture( GL_TEXTURE0 );
+	}
+	// bind every sampler with a texture of its type, draw the frame into the picture
+	glActiveTexture( GL_TEXTURE0 );
+	glBindTexture( GL_TEXTURE_RECTANGLE, mode == 0 ? projVideoRect : dummyRect );
+	glActiveTexture( GL_TEXTURE1 );
+	glBindTexture( GL_TEXTURE_2D, mode != 0 && projVideoDxt ? projVideoDxt : whiteTex );
+	glActiveTexture( GL_TEXTURE2 );
+	glBindTexture( GL_TEXTURE_2D, mode == 3 && projVideoAlpha ? projVideoAlpha : whiteTex );
+	glBindFramebuffer( GL_FRAMEBUFFER, projVideoFBO );
+	glViewport( 0, 0, w, h );
+	glDisable( GL_BLEND );
+	glDisable( GL_DEPTH_TEST );
+	glUseProgram( progProjVideo );
+	glUniform1i( U( progProjVideo, "uMode" ), mode );
+	glUniform2f( U( progProjVideo, "uSize" ), float( f.w ), float( f.h ) );
+	glUniform2f( U( progProjVideo, "uDxtFit" ), mode ? float( f.w ) / float( std::max( 1, projDxtW ) ) : 1.0f, mode ? float( f.h ) / float( std::max( 1, projDxtH ) ) : 1.0f );
+	glBindVertexArray( quadVAO );
+	glDrawArrays( GL_TRIANGLES, 0, 3 );
+	glBindVertexArray( 0 );
+	for( int u = 2; u >= 0; --u )
+	{
+		glActiveTexture( GL_TEXTURE0 + u );
+		glBindTexture( GL_TEXTURE_2D, 0 );
+		glBindTexture( GL_TEXTURE_RECTANGLE, 0 );
+	}
+	projMipsValid = false;
+	if( mips )
+	{
+		glBindTexture( GL_TEXTURE_2D, projImageTex );
+		glGenerateMipmap( GL_TEXTURE_2D ); // only while Focus > 0 (the blur reads the upper levels)
+		glBindTexture( GL_TEXTURE_2D, 0 );
+		projMipsValid = true;
+	}
+	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+	videoUploadMs = std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - t0 ).count();
+	return true;
 }
 
 // the projector's frustum (its aspect = the picture's), shadow distance, then the picture
@@ -106,7 +230,20 @@ void Renderer::RenderProjector( const FrameState& fs, GpuModel* model )
 	GLuint img  = 0;
 	int iw = 0, ih = 0, levels = 1;
 	float scale[ 2 ] = { 1, 1 };
-	if( pr.source == 1 && pr.image && !pr.image->mips.empty() )
+	if( pr.source == 1 && pr.video )
+	{
+		// W2: a video file. A new frame is drawn into the picture; the mips only while Focus blurs it
+		const bool mips = pr.focus > 0.0f;
+		if( projImageSerial != pr.video->serial || ( mips && !projMipsValid ) )
+		{
+			if( UploadVideoFrame( *pr.video, mips ) )
+				projVideoHeld = pr.video;
+			projImageSerial = pr.video->serial;
+		}
+		if( projVideoHeld )
+			img = projImageTex, iw = projVideoHeld->w, ih = projVideoHeld->h, levels = mips ? projImageLevels : 1;
+	}
+	else if( pr.source == 1 && pr.image && !pr.image->mips.empty() )
 	{
 		if( projImageSerial != pr.image->serial )
 		{
@@ -126,6 +263,8 @@ void Renderer::RenderProjector( const FrameState& fs, GpuModel* model )
 			glBindTexture( GL_TEXTURE_2D, 0 );
 			projImageSerial = pr.image->serial;
 			projImageLevels = n;
+			projImageW = projImageH = 0; // the next video frame re-allocates its picture
+			projVideoHeld.reset();
 		}
 		img = projImageTex, iw = pr.image->w, ih = pr.image->h, levels = projImageLevels;
 	}
@@ -254,13 +393,6 @@ void Renderer::DrawProjSurface( const FrameState& fs, GpuModel* model )
 	FrameState f  = fs;
 	f.fogDensity = 0.0f; // light only: Depth Fog would mix the background in
 	DrawModel( p, f, model, false, soup, 0, nullptr, nullptr, nullptr );
-	if( fs.mirror.shape > 0 && !fs.mirror.copies.empty() ) // W27: the picture on the mask's mirror images too
-	{
-		const GLuint pm = soup ? progProjSoupM : progProjMainM;
-		glUseProgram( pm );
-		BindCookieLights( pm, fs );
-		DrawMirrorPass( pm, f, model, soup );
-	}
 	glDisable( GL_POLYGON_OFFSET_FILL );
 	glPolygonOffset( 0.0f, 0.0f );
 	glDepthMask( GL_TRUE );
@@ -301,11 +433,9 @@ void Renderer::DrawCookieMarch( const FrameState& fs, bool sim, GLuint tex, cons
 	std::memcpy( V.m, fs.view, sizeof( V.m ) );
 	std::memcpy( P.m, fs.proj, sizeof( P.m ) );
 	const Mat4 VP = P * V, inv = VP.Inverse();
-	const GLuint p = MirrorVariant( sim ? progProjMarchSim : progProjMarch, fs ); // W27: + through the mirror room
+	const GLuint p = sim ? progProjMarchSim : progProjMarch;
 	glUseProgram( p );
 	SetMediumUniforms( p, fs );
-	if( p == progProjMarchM || p == progProjMarchSimM )
-		SetMirrorUniforms( p, fs );
 	if( sim )
 		SetSimMediumUniforms( p, fs, VP );
 	else

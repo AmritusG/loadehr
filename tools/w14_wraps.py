@@ -79,7 +79,6 @@ TESTS = [
     ('Lava flow', '0.12 /s (W28)', [('Lava Cracks', 1), ('Crack Spread', 1), ('Lava Glow', 6)], {'after': (64 / 0.12, 1, 120)}),
     ('Lava heat haze', '0.5 cycles/s', [('Lava Cracks', 1), ('Crack Spread', 1), ('Heat Haze', 2)], {'after': (2, 0.5, 60)}),
     ('Caustic ripple', '0.5 /s', [('Glass', 1), ('Caustics', 2), ('Caustic Source', 1), ('Caustic Ripple', 1), ('Caustic Floor', 2), ('Shadow Catcher', 0.5)], {'after': (128, 1, 120)}),
-    ('Mirror LED chase', '4 cycles/s', [('Mirror Room', 1), ('LED Speed', 4), ('LED Colors', 1)], {'after': (0.25, 0.1, 30)}),
     # W28
     ('Liquid wobble', 'speed 2 (1.2 c/s)', [('Liquid Wobble', 1), ('Liquid Speed', 2)], {'after': (1 / 1.2, 0.2, 40)}),
     ('Transition Ping-Pong', 'time 0.5 s', [('Transition Play', 2), ('Transition Time', 0.5)], {'after': (1.0, 0.2, 40)}),
@@ -88,6 +87,10 @@ TESTS = [
     ('Chain Loop (4 slots)', 'time 0.5 s / hop', [('Transition Play', 3), ('Chain Loop', 1), ('Transition Time', 0.5), ('Style Order', 1)], {'after': (2.0, 0.2, 40)}),
     ('Chain Loop + Hold', 'time 0.5 s, hold 0.5 s', [('Transition Play', 3), ('Chain Loop', 1), ('Transition Time', 0.5), ('Hold Time', 0.5)], {'after': (4.0, 0.7, 60)}),
     ('Chain Ping-Pong (4 slots)', 'time 0.5 s / hop', [('Transition Play', 2), ('Transition Time', 0.5), ('Style Order', 2)], {'after': (3.0, 0.2, 40)}),
+    # LoadEhr W2 Deform: the Noise Warp drift wraps at 256 lattice cells (x 1 : y 0.5 : z 0.25 = whole 64-periods), the Glitch step
+    # at 1000 steps (a wrap is one more random step); Ripple's phase is in the row above (2 pi)
+    ('Noise Warp drift', '4 cells/s', [('Noise Warp', 1), ('Warp Scale', 2), ('Warp Speed', 4)], {'after': (256 / 4, 1, 120)}),
+    ('Glitch step', '30 steps/s', [('Glitch Shift', 0.3), ('Glitch Rate', 30)], {'after': (1000 / 30, 1, 120)}),
 ]
 # W26 / W28 features live in the Wow bundles only (Resolume's 512-param cap)
 # extra commands before the clocks are fast-forwarded (a second model)
@@ -96,7 +99,7 @@ SETUP = {'Liquid wobble': ['text Model_B ' + MODEL, 'wait_loaded 60', 'set Trans
          'Chain Loop (4 slots)': ['mark'] + SLOTS + ['wait_slots 3 60', 'frames 1'],
          'Chain Loop + Hold': ['mark'] + SLOTS + ['wait_slots 3 60', 'frames 1'],
          'Chain Ping-Pong (4 slots)': ['mark'] + SLOTS + ['wait_slots 3 60', 'frames 1']}
-WOW = ('Fire', 'Swarm', 'Lava', 'Caustic', 'Mirror', 'Liquid', 'Transition')
+WOW = ('Fire', 'Swarm', 'Lava', 'Caustic', 'Liquid', 'Transition')
 
 
 # `times`: every clock at max speed at once (two scenes), rendered after 1, 13, 26, 60 and 180 minutes of show time:
@@ -111,6 +114,9 @@ SCENES = [
     ('surface', [('Pattern', 3), ('Pattern Speed', 4), ('Glitter', 10), ('Glitter Twinkle', 1), ('Liquid Chrome', 0.6), ('Chrome Ripple', 3),
                  ('Oil Film', 2), ('Film Swirl', 2), ('Contours', 5), ('Contour Speed', 4), ('Ripple', 0.1), ('Ripple Speed', 20),
                  ('Slice Wave', 4), ('Dust Wind', 6)]),
+    # LoadEhr W2: the Deform clocks + the Jelly spring (a state, not a phase: it must stay bounded, not drift) over 180 min
+    ('deform', [('Spin Y', 30), ('Wobble Amount', 2), ('Wobble Speed', 5), ('Jelly', 2), ('Noise Warp', 1), ('Warp Speed', 4),
+                ('Glitch Shift', 0.3), ('Glitch Rate', 6), ('Twist', 2), ('Ripple', 0.05), ('Ripple Speed', 20), ('Squash Beat', 1)]),
 ]
 MINUTES = [1, 13, 26, 60, 180]
 

@@ -1,7 +1,8 @@
 #include "Generate.h"
 #include "Log.h"
 #include "ModelLoader.h"
-#include "tesselator.h"
+#include "clipper2/clipper.h"
+#include "earcut.hpp"
 #include <ApplicationServices/ApplicationServices.h>
 #include <CoreText/CoreText.h>
 #include <algorithm>
@@ -11,6 +12,7 @@
 #include <chrono>
 #include <cmath>
 #include <cstring>
+#include <random>
 #include <sys/stat.h>
 #define NANOSVG_IMPLEMENTATION
 #include "nanosvg.h"
@@ -30,7 +32,7 @@ struct Contour
 struct Shape
 {
 	std::vector< Contour > contours;
-	int winding       = TESS_WINDING_NONZERO;
+	Clipper2Lib::FillRule fill = Clipper2Lib::FillRule::NonZero; // the source's fill rule
 	float color[ 4 ]  = { 1, 1, 1, 1 };
 };
 struct Outline
@@ -257,7 +259,7 @@ bool SvgOutline( const std::string& path, const GenParams& g, Outline& o, std::s
 			continue;
 		}
 		Shape sh;
-		sh.winding = s->fillRule == NSVG_FILLRULE_EVENODD ? TESS_WINDING_ODD : TESS_WINDING_NONZERO;
+		sh.fill = s->fillRule == NSVG_FILLRULE_EVENODD ? Clipper2Lib::FillRule::EvenOdd : Clipper2Lib::FillRule::NonZero;
 		unsigned int c = s->fill.color;
 		if( s->fill.type == NSVG_PAINT_LINEAR_GRADIENT || s->fill.type == NSVG_PAINT_RADIAL_GRADIENT )
 			c = s->fill.gradient && s->fill.gradient->nstops > 0 ? s->fill.gradient->stops[ 0 ].color : 0xff808080u, ++gradients;
@@ -377,22 +379,22 @@ void OpRe( CGPDFScannerRef s, void* i )
 		Ctx( i )->fl.Line( p[ k * 2 ], p[ k * 2 + 1 ] );
 	Ctx( i )->fl.Close();
 }
-void Fill( void* i, int winding )
+void Fill( void* i, Clipper2Lib::FillRule fill )
 {
 	PdfCtx* c = Ctx( i );
 	c->fl.Close();
 	if( !c->path.empty() )
 	{
 		Shape sh;
-		sh.winding  = winding;
+		sh.fill     = fill;
 		sh.contours = std::move( c->path );
 		std::memcpy( sh.color, c->S().fill, sizeof( c->S().fill ) );
 		c->o->shapes.push_back( std::move( sh ) );
 	}
 	c->path.clear();
 }
-void OpFill( CGPDFScannerRef, void* i ) { Fill( i, TESS_WINDING_NONZERO ); }
-void OpFillEO( CGPDFScannerRef, void* i ) { Fill( i, TESS_WINDING_ODD ); }
+void OpFill( CGPDFScannerRef, void* i ) { Fill( i, Clipper2Lib::FillRule::NonZero ); }
+void OpFillEO( CGPDFScannerRef, void* i ) { Fill( i, Clipper2Lib::FillRule::EvenOdd ); }
 void OpNoFill( CGPDFScannerRef, void* i )
 {
 	Ctx( i )->fl.Close();
@@ -736,7 +738,7 @@ bool RasterOutline( const std::string& path, const GenParams& g, Outline& o, std
 				}
 			}
 		Shape sh;
-		sh.winding = TESS_WINDING_ODD;
+		sh.fill = Clipper2Lib::FillRule::EvenOdd;
 		while( !next.empty() )
 		{
 			const int start = next.begin()->first;
@@ -780,43 +782,95 @@ struct V2
 {
 	float x, y;
 };
-std::vector< Contour > Tess( const std::vector< Contour >& in, int winding, int type, std::vector< float >* triVerts )
+// W2: Clipper2 (Boost) resolves a fill rule into clean contours (a PolyTree: outers and their holes), earcut (ISC) triangulates
+// each outer with its holes (licences on the list: Boost, ISC).
+using Clipper2Lib::FillRule;
+// decimal places Clipper2 keeps (it works on int64): ~9 significant digits of the largest coordinate
+int ClipPrecision( const std::vector< Contour >& in )
 {
-	std::vector< Contour > out;
-	TESStesselator* t = tessNewTess( nullptr );
-	if( !t )
-		return out;
+	double m = 1;
+	for( const Contour& c : in )
+		for( float v : c.xy )
+			m = std::max( m, double( std::fabs( v ) ) );
+	return std::clamp( 9 - int( std::ceil( std::log10( m ) ) ), 2, 8 );
+}
+Clipper2Lib::PathsD ToPaths( const std::vector< Contour >& in )
+{
+	Clipper2Lib::PathsD paths;
 	for( const Contour& c : in )
 		if( c.xy.size() >= 6 )
-			tessAddContour( t, 2, c.xy.data(), sizeof( float ) * 2, int( c.xy.size() / 2 ) );
-	const TESSreal normal[ 3 ] = { 0, 0, 1 };
-	if( tessTesselate( t, winding, type, 3, 2, normal ) )
+		{
+			Clipper2Lib::PathD p;
+			for( size_t i = 0; i + 1 < c.xy.size(); i += 2 )
+				p.push_back( Clipper2Lib::PointD( c.xy[ i ], c.xy[ i + 1 ] ) );
+			paths.push_back( std::move( p ) );
+		}
+	return paths;
+}
+void Resolve( const std::vector< Contour >& in, FillRule fill, Clipper2Lib::PolyTreeD& tree )
+{
+	Clipper2Lib::BooleanOp( Clipper2Lib::ClipType::Union, fill, ToPaths( in ), Clipper2Lib::PathsD(), tree, ClipPrecision( in ) );
+}
+// region on the left: outers counter-clockwise, holes clockwise (y up)
+Contour ToContour( const Clipper2Lib::PathD& p, bool hole )
+{
+	Contour c;
+	for( const Clipper2Lib::PointD& q : p )
+		c.xy.push_back( float( q.x ) ), c.xy.push_back( float( q.y ) );
+	if( ( Clipper2Lib::Area( p ) < 0 ) != hole )
+		for( size_t i = 0, n = c.xy.size() / 2; i < n / 2; ++i )
+			std::swap( c.xy[ i * 2 ], c.xy[ ( n - 1 - i ) * 2 ] ), std::swap( c.xy[ i * 2 + 1 ], c.xy[ ( n - 1 - i ) * 2 + 1 ] );
+	return c;
+}
+void Collect( const Clipper2Lib::PolyPathD& node, std::vector< Contour >& out )
+{
+	for( size_t i = 0; i < node.Count(); ++i )
 	{
-		const TESSreal* v = tessGetVertices( t );
-		const TESSindex* e = tessGetElements( t );
-		const int ne       = tessGetElementCount( t );
-		if( type == TESS_BOUNDARY_CONTOURS )
-			for( int i = 0; i < ne; ++i )
-			{
-				Contour c;
-				for( int k = 0; k < e[ i * 2 + 1 ]; ++k )
-					c.xy.push_back( v[ ( e[ i * 2 ] + k ) * 2 ] ), c.xy.push_back( v[ ( e[ i * 2 ] + k ) * 2 + 1 ] );
-				if( c.xy.size() >= 6 )
-					out.push_back( c );
-			}
-		else if( triVerts )
-			for( int i = 0; i < ne; ++i )
-			{
-				bool ok = true;
-				for( int k = 0; k < 3; ++k )
-					ok = ok && e[ i * 3 + k ] != TESS_UNDEF;
-				if( ok )
-					for( int k = 0; k < 3; ++k )
-						triVerts->push_back( v[ e[ i * 3 + k ] * 2 ] ), triVerts->push_back( v[ e[ i * 3 + k ] * 2 + 1 ] );
-			}
+		const Clipper2Lib::PolyPathD& ch = *node.Child( i );
+		Contour c = ToContour( ch.Polygon(), ch.IsHole() );
+		if( c.xy.size() >= 6 )
+			out.push_back( std::move( c ) );
+		Collect( ch, out );
 	}
-	tessDeleteTess( t );
+}
+// the clean boundary of a shape under its fill rule
+std::vector< Contour > Boundary( const std::vector< Contour >& in, FillRule fill )
+{
+	Clipper2Lib::PolyTreeD tree;
+	Resolve( in, fill, tree );
+	std::vector< Contour > out;
+	Collect( tree, out );
 	return out;
+}
+// triangles (x, y per corner, counter-clockwise) filling a shape under its fill rule: each outer with its holes
+void EarcutNode( const Clipper2Lib::PolyPathD& node, std::vector< float >& tris )
+{
+	for( size_t i = 0; i < node.Count(); ++i )
+	{
+		const Clipper2Lib::PolyPathD& outer = *node.Child( i );
+		std::vector< std::vector< std::array< double, 2 > > > poly( 1 );
+		for( const Clipper2Lib::PointD& q : outer.Polygon() )
+			poly[ 0 ].push_back( { q.x, q.y } );
+		for( size_t h = 0; h < outer.Count(); ++h )
+		{
+			poly.emplace_back();
+			for( const Clipper2Lib::PointD& q : outer.Child( h )->Polygon() )
+				poly.back().push_back( { q.x, q.y } );
+		}
+		std::vector< std::array< double, 2 > > flat;
+		for( const auto& r : poly )
+			flat.insert( flat.end(), r.begin(), r.end() );
+		for( uint32_t k : mapbox::earcut< uint32_t >( poly ) )
+			tris.push_back( float( flat[ k ][ 0 ] ) ), tris.push_back( float( flat[ k ][ 1 ] ) );
+		for( size_t h = 0; h < outer.Count(); ++h ) // islands inside the holes
+			EarcutNode( *outer.Child( h ), tris );
+	}
+}
+void Triangulate( const std::vector< Contour >& in, FillRule fill, std::vector< float >& tris )
+{
+	Clipper2Lib::PolyTreeD tree;
+	Resolve( in, fill, tree );
+	EarcutNode( tree, tris );
 }
 
 // points in a straight run (curve flattening of a line, nanosvg's line-as-cubic) fold the bevel's inset at sharp tips
@@ -904,7 +958,323 @@ struct Builder
 	}
 };
 
-void Extrude( const Outline& o, const GenParams& g, GenMesh& m, std::string& status )
+// ---------------------------------------------------------------- W2: text / logos shatter into solid pieces
+// Each letter (logo shape) is cut by a 2D Voronoi diagram of seeds inside its outline (Shard Count shared over the letters by
+// front area, at least one per letter). Every triangle of the FINISHED letter (caps, bevel, side wall) is clipped by each convex
+// cell (Sutherland-Hodgman in the triangle's barycentric space, attributes interpolated), so a piece's outer faces ARE the letter's
+// surface: the pieces at home are the whole letter exactly (no pop when the fractured copy takes over). Each cell edge that runs
+// through the solid becomes a flat cut face ("Core"): the section between the top surface (front cap / bevel) and the bottom one
+// (back cap / bevel, or the back plane without a back cap), read off the clipped triangles' edges on that line, so every piece is
+// a closed solid. Parts out: Front, Back, Side, Bevel (as clipped), Core.
+struct FracSeg
+{
+	float s0, z0, s1, z1;
+};
+struct FracEdge
+{
+	float n[ 2 ], d; // the cell is n.p <= d
+	std::vector< FracSeg > top, bot;
+};
+struct FracCell
+{
+	std::vector< FracEdge > edges; // the bisectors that bound it (not the letter's box)
+	float lo[ 2 ], hi[ 2 ];        // its box (inside the letter's box)
+};
+
+std::vector< FracCell > VoronoiCells( const std::vector< std::array< float, 2 > >& seeds, const float* lo, const float* hi )
+{
+	std::vector< FracCell > cells( seeds.size() );
+	for( size_t i = 0; i < seeds.size(); ++i )
+	{
+		// the box, then every bisector half-plane: closer to seed i than seed j
+		std::vector< std::array< float, 2 > > poly = { { lo[ 0 ], lo[ 1 ] }, { hi[ 0 ], lo[ 1 ] }, { hi[ 0 ], hi[ 1 ] }, { lo[ 0 ], hi[ 1 ] } };
+		std::vector< int > from( 4, -1 ); // which half-plane made the edge starting at each vertex (-1 = the box)
+		std::vector< FracEdge > planes;
+		for( size_t j = 0; j < seeds.size() && poly.size() >= 3; ++j )
+		{
+			if( j == i )
+				continue;
+			const float nx = seeds[ j ][ 0 ] - seeds[ i ][ 0 ], ny = seeds[ j ][ 1 ] - seeds[ i ][ 1 ];
+			const float l  = std::hypot( nx, ny );
+			if( l < 1e-9f )
+				continue;
+			FracEdge e;
+			e.n[ 0 ] = nx / l, e.n[ 1 ] = ny / l;
+			e.d      = ( e.n[ 0 ] * ( seeds[ i ][ 0 ] + seeds[ j ][ 0 ] ) + e.n[ 1 ] * ( seeds[ i ][ 1 ] + seeds[ j ][ 1 ] ) ) * 0.5f;
+			std::vector< std::array< float, 2 > > out;
+			std::vector< int > of;
+			const size_t n = poly.size();
+			bool cut       = false;
+			for( size_t k = 0; k < n; ++k )
+			{
+				const auto& a = poly[ k ];
+				const auto& b = poly[ ( k + 1 ) % n ];
+				const float da = e.n[ 0 ] * a[ 0 ] + e.n[ 1 ] * a[ 1 ] - e.d, db = e.n[ 0 ] * b[ 0 ] + e.n[ 1 ] * b[ 1 ] - e.d;
+				if( da <= 0 )
+					out.push_back( a ), of.push_back( from[ k ] );
+				if( ( da <= 0 ) != ( db <= 0 ) )
+				{
+					const float t = da / ( da - db );
+					out.push_back( { a[ 0 ] + t * ( b[ 0 ] - a[ 0 ] ), a[ 1 ] + t * ( b[ 1 ] - a[ 1 ] ) } );
+					of.push_back( da <= 0 ? int( planes.size() ) : from[ k ] ); // leaving: the new edge lies on this plane
+					cut = true;
+				}
+			}
+			poly.swap( out ), from.swap( of );
+			if( cut )
+				planes.push_back( e );
+		}
+		FracCell& c = cells[ i ];
+		c.lo[ 0 ] = c.lo[ 1 ] = 1e30f, c.hi[ 0 ] = c.hi[ 1 ] = -1e30f;
+		for( const auto& p : poly )
+			for( int k = 0; k < 2; ++k )
+				c.lo[ k ] = std::min( c.lo[ k ], p[ k ] ), c.hi[ k ] = std::max( c.hi[ k ], p[ k ] );
+		// only the planes that still bound the final cell
+		std::vector< char > used( planes.size(), 0 );
+		for( int f : from )
+			if( f >= 0 )
+				used[ f ] = 1;
+		for( size_t p = 0; p < planes.size(); ++p )
+			if( used[ p ] )
+				c.edges.push_back( planes[ p ] );
+	}
+	return cells;
+}
+
+void Fracture( const GenMesh& whole, int count, float zBack, bool backCap, const std::vector< std::array< float, 2 > >& groupUV, const Builder& B, float sc,
+               GenMesh& out, std::vector< uint32_t >& triPiece, int& pieceCount )
+{
+	const size_t tris = whole.corners.size() / 3;
+	const int G       = whole.groupCount;
+	std::vector< std::vector< uint32_t > > byGroup( size_t( std::max( G, 0 ) ) );
+	std::vector< double > area( size_t( std::max( G, 0 ) ), 0.0 );
+	double total = 0;
+	auto xyArea = [ & ]( size_t t ) {
+		const GenCorner* c = &whole.corners[ t * 3 ];
+		return 0.5 * ( double( c[ 1 ].p[ 0 ] - c[ 0 ].p[ 0 ] ) * ( c[ 2 ].p[ 1 ] - c[ 0 ].p[ 1 ] ) - double( c[ 2 ].p[ 0 ] - c[ 0 ].p[ 0 ] ) * ( c[ 1 ].p[ 1 ] - c[ 0 ].p[ 1 ] ) );
+	};
+	for( size_t t = 0; t < tris; ++t )
+	{
+		const uint32_t g = whole.triGroup[ t ];
+		byGroup[ g ].push_back( uint32_t( t ) );
+		if( whole.triPart[ t ] == 0 ) // front cap: the letter's face
+			area[ g ] += std::max( 0.0, xyArea( t ) ), total += std::max( 0.0, xyArea( t ) );
+	}
+	out.parts.clear();
+	pieceCount = 0;
+	std::mt19937 rng( 20261008u + uint32_t( count ) );
+	std::uniform_real_distribution< double > U01( 0.0, 1.0 );
+	for( int g = 0; g < G; ++g )
+	{
+		const std::vector< uint32_t >& T = byGroup[ g ];
+		if( T.empty() )
+			continue;
+		float lo[ 2 ] = { 1e30f, 1e30f }, hi[ 2 ] = { -1e30f, -1e30f };
+		for( uint32_t t : T )
+			for( int k = 0; k < 3; ++k )
+				for( int a = 0; a < 2; ++a )
+					lo[ a ] = std::min( lo[ a ], whole.corners[ t * 3 + k ].p[ a ] ), hi[ a ] = std::max( hi[ a ], whole.corners[ t * 3 + k ].p[ a ] );
+		const float size = std::max( hi[ 0 ] - lo[ 0 ], hi[ 1 ] - lo[ 1 ] );
+		for( int a = 0; a < 2; ++a )
+			lo[ a ] -= 0.01f * size + 1e-4f, hi[ a ] += 0.01f * size + 1e-4f;
+		// seeds: area-weighted points on the front cap, spread out (best of 12 candidates: the farthest from the seeds so far)
+		const int k = total > 0 ? std::max( 1, int( std::lround( count * area[ g ] / total ) ) ) : 1;
+		std::vector< double > cum;
+		std::vector< uint32_t > front;
+		double acc = 0;
+		for( uint32_t t : T )
+			if( whole.triPart[ t ] == 0 && xyArea( t ) > 0 )
+				front.push_back( t ), cum.push_back( acc += xyArea( t ) );
+		std::vector< std::array< float, 2 > > seeds;
+		for( int s = 0; s < k && !front.empty(); ++s )
+		{
+			std::array< float, 2 > best{};
+			float bestD = -1;
+			for( int c = 0; c < ( s == 0 ? 1 : 12 ); ++c )
+			{
+				const size_t i = std::min( front.size() - 1, size_t( std::lower_bound( cum.begin(), cum.end(), U01( rng ) * acc ) - cum.begin() ) );
+				const GenCorner* q = &whole.corners[ front[ i ] * 3 ];
+				double r1 = std::sqrt( U01( rng ) ), r2 = U01( rng );
+				const float wa = float( 1 - r1 ), wb = float( r1 * ( 1 - r2 ) ), wc = float( r1 * r2 );
+				const std::array< float, 2 > p = { wa * q[ 0 ].p[ 0 ] + wb * q[ 1 ].p[ 0 ] + wc * q[ 2 ].p[ 0 ], wa * q[ 0 ].p[ 1 ] + wb * q[ 1 ].p[ 1 ] + wc * q[ 2 ].p[ 1 ] };
+				float dmin = 1e30f;
+				for( const auto& o : seeds )
+					dmin = std::min( dmin, std::hypot( p[ 0 ] - o[ 0 ], p[ 1 ] - o[ 1 ] ) );
+				if( dmin > bestD )
+					bestD = dmin, best = p;
+			}
+			seeds.push_back( best );
+		}
+		if( seeds.empty() )
+			seeds.push_back( { 0.5f * ( lo[ 0 ] + hi[ 0 ] ), 0.5f * ( lo[ 1 ] + hi[ 1 ] ) } );
+		std::vector< FracCell > cells = VoronoiCells( seeds, lo, hi );
+		const float tol = 1e-5f * std::max( size, 1e-3f );
+		for( size_t ci = 0; ci < cells.size(); ++ci )
+		{
+			FracCell& cell = cells[ ci ];
+			const uint32_t piece = uint32_t( pieceCount++ );
+			for( uint32_t t : T )
+			{
+				const GenCorner* q = &whole.corners[ t * 3 ];
+				float tlo[ 2 ] = { 1e30f, 1e30f }, thi[ 2 ] = { -1e30f, -1e30f };
+				for( int c = 0; c < 3; ++c )
+					for( int a = 0; a < 2; ++a )
+						tlo[ a ] = std::min( tlo[ a ], q[ c ].p[ a ] ), thi[ a ] = std::max( thi[ a ], q[ c ].p[ a ] );
+				if( tlo[ 0 ] > cell.hi[ 0 ] + tol || thi[ 0 ] < cell.lo[ 0 ] - tol || tlo[ 1 ] > cell.hi[ 1 ] + tol || thi[ 1 ] < cell.lo[ 1 ] - tol )
+					continue;
+				// the polygon in barycentric coordinates of the triangle
+				std::vector< std::array< double, 3 > > poly = { { 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 } };
+				auto XY = [ & ]( const std::array< double, 3 >& b, int a ) { return b[ 0 ] * q[ 0 ].p[ a ] + b[ 1 ] * q[ 1 ].p[ a ] + b[ 2 ] * q[ 2 ].p[ a ]; };
+				for( const FracEdge& e : cell.edges )
+				{
+					std::vector< std::array< double, 3 > > o;
+					const size_t n = poly.size();
+					for( size_t v = 0; v < n && n >= 3; ++v )
+					{
+						const auto& a = poly[ v ];
+						const auto& b = poly[ ( v + 1 ) % n ];
+						const double da = e.n[ 0 ] * XY( a, 0 ) + e.n[ 1 ] * XY( a, 1 ) - e.d, db = e.n[ 0 ] * XY( b, 0 ) + e.n[ 1 ] * XY( b, 1 ) - e.d;
+						if( da <= 0 )
+							o.push_back( a );
+						if( ( da <= 0 ) != ( db <= 0 ) )
+						{
+							const double u = da / ( da - db );
+							o.push_back( { a[ 0 ] + u * ( b[ 0 ] - a[ 0 ] ), a[ 1 ] + u * ( b[ 1 ] - a[ 1 ] ), a[ 2 ] + u * ( b[ 2 ] - a[ 2 ] ) } );
+						}
+					}
+					poly.swap( o );
+					if( poly.size() < 3 )
+						break;
+				}
+				if( poly.size() < 3 )
+					continue;
+				auto corner = [ & ]( const std::array< double, 3 >& b ) {
+					GenCorner c;
+					float nl = 0;
+					for( int a = 0; a < 3; ++a )
+					{
+						c.p[ a ] = float( b[ 0 ] * q[ 0 ].p[ a ] + b[ 1 ] * q[ 1 ].p[ a ] + b[ 2 ] * q[ 2 ].p[ a ] );
+						c.n[ a ] = float( b[ 0 ] * q[ 0 ].n[ a ] + b[ 1 ] * q[ 1 ].n[ a ] + b[ 2 ] * q[ 2 ].n[ a ] );
+						nl += c.n[ a ] * c.n[ a ];
+					}
+					nl = 1.0f / std::max( std::sqrt( nl ), 1e-12f );
+					for( float& v : c.n )
+						v *= nl;
+					for( int a = 0; a < 2; ++a )
+						c.uv[ a ] = float( b[ 0 ] * q[ 0 ].uv[ a ] + b[ 1 ] * q[ 1 ].uv[ a ] + b[ 2 ] * q[ 2 ].uv[ a ] );
+					return c;
+				};
+				std::vector< GenCorner > pc;
+				for( const auto& b : poly )
+					pc.push_back( corner( b ) );
+				// the piece's share of this triangle: a fan (the clipped polygon is convex)
+				for( size_t v = 1; v + 1 < pc.size(); ++v )
+				{
+					const float* a = pc[ 0 ].p;
+					const float* b = pc[ v ].p;
+					const float* c = pc[ v + 1 ].p;
+					const float e1[ 3 ] = { b[ 0 ] - a[ 0 ], b[ 1 ] - a[ 1 ], b[ 2 ] - a[ 2 ] }, e2[ 3 ] = { c[ 0 ] - a[ 0 ], c[ 1 ] - a[ 1 ], c[ 2 ] - a[ 2 ] };
+					const float cx = e1[ 1 ] * e2[ 2 ] - e1[ 2 ] * e2[ 1 ], cy = e1[ 2 ] * e2[ 0 ] - e1[ 0 ] * e2[ 2 ], cz = e1[ 0 ] * e2[ 1 ] - e1[ 1 ] * e2[ 0 ];
+					if( cx * cx + cy * cy + cz * cz < 1e-24f * size * size * size * size )
+						continue;
+					out.corners.push_back( pc[ 0 ] ), out.corners.push_back( pc[ v ] ), out.corners.push_back( pc[ v + 1 ] );
+					out.triPart.push_back( whole.triPart[ t ] ), out.triGroup.push_back( uint32_t( g ) ), triPiece.push_back( piece );
+				}
+				// the clipped edges that lie on a cell edge: the cut section's top (front-facing) or bottom (back-facing) outline
+				const float* a = q[ 0 ].p;
+				const float fz = ( q[ 1 ].p[ 0 ] - a[ 0 ] ) * ( q[ 2 ].p[ 1 ] - a[ 1 ] ) - ( q[ 2 ].p[ 0 ] - a[ 0 ] ) * ( q[ 1 ].p[ 1 ] - a[ 1 ] ); // 2 x xy area
+				const float e1[ 3 ] = { q[ 1 ].p[ 0 ] - a[ 0 ], q[ 1 ].p[ 1 ] - a[ 1 ], q[ 1 ].p[ 2 ] - a[ 2 ] }, e2[ 3 ] = { q[ 2 ].p[ 0 ] - a[ 0 ], q[ 2 ].p[ 1 ] - a[ 1 ], q[ 2 ].p[ 2 ] - a[ 2 ] };
+				const float fl = std::sqrt( ( e1[ 1 ] * e2[ 2 ] - e1[ 2 ] * e2[ 1 ] ) * ( e1[ 1 ] * e2[ 2 ] - e1[ 2 ] * e2[ 1 ] ) + ( e1[ 2 ] * e2[ 0 ] - e1[ 0 ] * e2[ 2 ] ) * ( e1[ 2 ] * e2[ 0 ] - e1[ 0 ] * e2[ 2 ] ) + fz * fz );
+				if( std::fabs( fz ) < 0.02f * fl ) // a side-wall triangle: its edges on the cut are vertical
+					continue;
+				for( FracEdge& e : cell.edges )
+				{
+					const float tx = -e.n[ 1 ], ty = e.n[ 0 ];
+					for( size_t v = 0; v < pc.size(); ++v )
+					{
+						const GenCorner& u = pc[ v ];
+						const GenCorner& w = pc[ ( v + 1 ) % pc.size() ];
+						if( std::fabs( e.n[ 0 ] * u.p[ 0 ] + e.n[ 1 ] * u.p[ 1 ] - e.d ) > tol || std::fabs( e.n[ 0 ] * w.p[ 0 ] + e.n[ 1 ] * w.p[ 1 ] - e.d ) > tol )
+							continue;
+						FracSeg sg{ tx * u.p[ 0 ] + ty * u.p[ 1 ], u.p[ 2 ], tx * w.p[ 0 ] + ty * w.p[ 1 ], w.p[ 2 ] };
+						if( sg.s1 < sg.s0 )
+							std::swap( sg.s0, sg.s1 ), std::swap( sg.z0, sg.z1 );
+						if( sg.s1 - sg.s0 > tol * 0.1f )
+							( fz > 0 ? e.top : e.bot ).push_back( sg );
+					}
+				}
+			}
+			// the cut faces: between the top and bottom outlines of the section along each cell edge (outward = the edge's normal)
+			for( const FracEdge& e : cell.edges )
+			{
+				if( e.top.empty() )
+					continue;
+				std::vector< float > S;
+				for( const auto* L : { &e.top, &e.bot } )
+					for( const FracSeg& s : *L )
+						S.push_back( s.s0 ), S.push_back( s.s1 );
+				std::sort( S.begin(), S.end() );
+				auto at = [ & ]( const std::vector< FracSeg >& L, float m, float s, float& z ) {
+					for( const FracSeg& g2 : L )
+						if( m >= g2.s0 - tol && m <= g2.s1 + tol )
+						{
+							const float u = std::clamp( ( s - g2.s0 ) / std::max( g2.s1 - g2.s0, 1e-12f ), 0.0f, 1.0f );
+							z = g2.z0 + u * ( g2.z1 - g2.z0 );
+							return true;
+						}
+					return false;
+				};
+				const float tx = -e.n[ 1 ], ty = e.n[ 0 ];
+				for( size_t i = 0; i + 1 < S.size(); ++i )
+				{
+					const float sa = S[ i ], sb = S[ i + 1 ];
+					if( sb - sa < tol * 0.5f )
+						continue;
+					const float m = 0.5f * ( sa + sb );
+					float ta, tb, ba, bb;
+					if( !at( e.top, m, sa, ta ) || !at( e.top, m, sb, tb ) )
+						continue;
+					if( !at( e.bot, m, sa, ba ) || !at( e.bot, m, sb, bb ) )
+					{
+						if( backCap )
+							continue;
+						ba = bb = zBack; // no back cap: the section runs down to the back plane
+					}
+					auto C = [ & ]( float s, float z ) {
+						GenCorner c;
+						c.p[ 0 ] = e.n[ 0 ] * e.d + tx * s, c.p[ 1 ] = e.n[ 1 ] * e.d + ty * s, c.p[ 2 ] = z;
+						c.n[ 0 ] = e.n[ 0 ], c.n[ 1 ] = e.n[ 1 ], c.n[ 2 ] = 0;
+						if( groupUV[ g ][ 0 ] >= 0 )
+							c.uv[ 0 ] = groupUV[ g ][ 0 ], c.uv[ 1 ] = groupUV[ g ][ 1 ];
+						else
+							B.Planar( c.p[ 0 ] / sc, c.p[ 1 ] / sc, c.uv[ 0 ], c.uv[ 1 ] );
+						return c;
+					};
+					const GenCorner A = C( sa, ta ), Bt = C( sb, tb ), Cb = C( sb, bb ), D = C( sa, ba );
+					// the quad A (sa, top) Bt (sb, top) Cb (sb, bottom) D (sa, bottom), each triangle turned to face +n
+					const GenCorner* t1[ 3 ] = { &A, &D, &Cb };
+					const GenCorner* t2[ 3 ] = { &A, &Cb, &Bt };
+					for( const GenCorner* const* tt : { t1, t2 } )
+					{
+						const float* p0 = tt[ 0 ]->p;
+						const float* p1 = tt[ 1 ]->p;
+						const float* p2 = tt[ 2 ]->p;
+						const float u1[ 3 ] = { p1[ 0 ] - p0[ 0 ], p1[ 1 ] - p0[ 1 ], p1[ 2 ] - p0[ 2 ] }, u2[ 3 ] = { p2[ 0 ] - p0[ 0 ], p2[ 1 ] - p0[ 1 ], p2[ 2 ] - p0[ 2 ] };
+						const float nx = u1[ 1 ] * u2[ 2 ] - u1[ 2 ] * u2[ 1 ], ny = u1[ 2 ] * u2[ 0 ] - u1[ 0 ] * u2[ 2 ], nz = u1[ 0 ] * u2[ 1 ] - u1[ 1 ] * u2[ 0 ];
+						if( nx * nx + ny * ny + nz * nz < 1e-24f * size * size * size * size )
+							continue;
+						const bool flip = nx * e.n[ 0 ] + ny * e.n[ 1 ] < 0;
+						out.corners.push_back( *tt[ 0 ] ), out.corners.push_back( flip ? *tt[ 2 ] : *tt[ 1 ] ), out.corners.push_back( flip ? *tt[ 1 ] : *tt[ 2 ] );
+						out.triPart.push_back( 4 ), out.triGroup.push_back( uint32_t( g ) ), triPiece.push_back( piece );
+					}
+				}
+			}
+		}
+	}
+	out.groupCount = whole.groupCount;
+}
+
+void Extrude( const Outline& o, const GenParams& g, GenMesh& m, std::string& status, GenMesh* frac, std::vector< uint32_t >* triPiece, int* pieceCount )
 {
 	// outline space -> model units: 1 = Outline::unit
 	const float sc     = 1.0f / std::max( o.unit, 1e-6f );
@@ -962,11 +1332,12 @@ void Extrude( const Outline& o, const GenParams& g, GenMesh& m, std::string& sta
 		BuildImageMips( *pal );
 	}
 	int groups = 0, tris0 = 0;
+	std::vector< std::array< float, 2 > > groupUV; // W2: per group, its palette texel (or -1: planar), for the cut faces
 	for( int si = 0; si < nShapes; ++si )
 	{
 		const Shape& sh = o.shapes[ si ];
 		// clean boundary (the source's fill rule), region on the left; Outline Only: the ring inside it
-		std::vector< Contour > bound = Tess( sh.contours, sh.winding, TESS_BOUNDARY_CONTOURS, nullptr );
+		std::vector< Contour > bound = Boundary( sh.contours, sh.fill );
 		for( Contour& c : bound )
 		{
 			for( float& v : c.xy )
@@ -983,7 +1354,7 @@ void Extrude( const Outline& o, const GenParams& g, GenMesh& m, std::string& sta
 					std::swap( in.xy[ i * 2 ], in.xy[ ( n - 1 - i ) * 2 ] ), std::swap( in.xy[ i * 2 + 1 ], in.xy[ ( n - 1 - i ) * 2 + 1 ] );
 				ring.push_back( in );
 			}
-			bound = Tess( ring, TESS_WINDING_POSITIVE, TESS_BOUNDARY_CONTOURS, nullptr );
+			bound = Boundary( ring, FillRule::Positive );
 		}
 		if( bound.empty() )
 			continue;
@@ -1008,12 +1379,13 @@ void Extrude( const Outline& o, const GenParams& g, GenMesh& m, std::string& sta
 			B.uvFixed[ 0 ] = ( ( si % cols ) * 4 + 2.0f ) / pal->width, B.uvFixed[ 1 ] = ( ( si / cols ) * 4 + 2.0f ) / pal->height;
 		else
 			B.uvFixed[ 0 ] = B.uvFixed[ 1 ] = -1;
+		groupUV.push_back( { B.uvFixed[ 0 ], B.uvFixed[ 1 ] } );
 		// caps: the boundary inset by the profile's first offset, tessellated
 		std::vector< Contour > capC;
 		for( const Contour& c : bound )
 			capC.push_back( P[ 0 ].x > 0 ? Inset( c, P[ 0 ].x ) : c );
 		std::vector< float > tv;
-		Tess( capC, TESS_WINDING_POSITIVE, TESS_POLYGONS, &tv );
+		Triangulate( capC, FillRule::Positive, tv );
 		const float zc = zf - P[ 0 ].y, zcb = zb + P[ 0 ].y;
 		for( size_t i = 0; i + 5 < tv.size(); i += 6 )
 		{
@@ -1117,9 +1489,10 @@ void Extrude( const Outline& o, const GenParams& g, GenMesh& m, std::string& sta
 		tris0 = int( m.triPart.size() );
 	}
 	m.groupCount = groups;
-	// parts: Front, Back, Side, Bevel (texture: the palette, the image on every part (raster), or plain)
-	const char* names[ 4 ] = { "Front", "Back", "Side", "Bevel" };
-	for( int p = 0; p < 4; ++p )
+	// parts: Front, Back, Side, Bevel (texture: the palette, the image on every part (raster), or plain); W2: + Core = the cut
+	// faces of the fractured copy (empty on the whole mesh, so the Parts group shows it at rest too)
+	const char* names[ 5 ] = { "Front", "Back", "Side", "Bevel", "Core" };
+	for( int p = 0; p < ( frac ? 5 : 4 ); ++p )
 	{
 		Part part;
 		part.name = names[ p ];
@@ -1131,6 +1504,12 @@ void Extrude( const Outline& o, const GenParams& g, GenMesh& m, std::string& sta
 		else if( o.image && g.F( "colours", 0 ) < 0.5f )
 			part.tex[ CH_BASECOLOR ].image = o.image, part.tex[ CH_BASECOLOR ].source = "logo image";
 		m.parts.push_back( part );
+	}
+	if( frac )
+	{
+		const int count = std::clamp( (int)std::lround( g.F( "frac", 64 ) ), 1, 4096 );
+		Fracture( m, count, zb, backCap, groupUV, B, sc, *frac, *triPiece, *pieceCount );
+		frac->parts = m.parts;
 	}
 	(void)tris0;
 	(void)status;
@@ -1245,20 +1624,23 @@ std::unique_ptr< ModelData > GenerateModel( const std::string& spec, const std::
 	if( !ok || cancel.load() )
 		return nullptr;
 	const double msOutline = std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - t0 ).count();
-	GenMesh m;
-	Extrude( o, g, m, status );
+	GenMesh m, frac;
+	std::vector< uint32_t > triPiece;
+	int pieces      = 0;
+	const bool cut  = g.F( "frac", 0 ) > 0.5f; // W2 Shatter Mode Pieces: the fractured copy too
+	Extrude( o, g, m, status, cut ? &frac : nullptr, &triPiece, &pieces );
 	if( m.corners.empty() )
 	{
 		error = status = "Nothing to extrude (every shape collapsed)";
 		return nullptr;
 	}
-	auto model       = ModelFromMesh( m, spec );
+	auto model       = ModelFromMesh( m, spec, cut ? &frac : nullptr, &triPiece, pieces );
 	model->status    = status;
 	const double ms  = std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - t0 ).count();
 	model->msParse    = msOutline;
 	model->msGeometry = ms - msOutline;
-	Log( "GEN %s: %s | %zu tris, %d letters/shapes | outline %.1f ms, mesh %.1f ms", ShortSpecName( spec ).c_str(), status.c_str(), model->triangleCount, model->groupCount,
-	     msOutline, ms - msOutline );
+	Log( "GEN %s: %s | %zu tris, %d letters/shapes%s | outline %.1f ms, mesh %.1f ms", ShortSpecName( spec ).c_str(), status.c_str(), model->wholeIndexCount ? model->wholeIndexCount / 3 : model->triangleCount,
+	     model->groupCount, cut ? ( " + " + std::to_string( pieces ) + " solid pieces (" + std::to_string( model->triangleCount - model->wholeIndexCount / 3 ) + " tris)" ).c_str() : "", msOutline, ms - msOutline );
 	return model;
 }
 

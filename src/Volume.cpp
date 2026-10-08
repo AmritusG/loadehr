@@ -3,7 +3,6 @@
 // and the motes. Everything here is skipped while no volume light is on.
 #include "Log.h"
 #include "MathUtil.h"
-#include "MirrorShaders.h"
 #include "Renderer.h"
 #include "Shaders.h"
 #include "VolumeShaders.h"
@@ -117,13 +116,6 @@ bool Renderer::InitVolume( std::string& error )
 	const std::string from = "S += uXLColor[ i ] *", to = "S += gTint * uXLColor[ i ] *";
 	marchT.replace( marchT.find( from ), from.size(), to );
 	progFogMarchT = Link( kQuadVS, std::string( "#define TRIP\n" ) + kLightLib + kFrontLib + kTripLib + kMediumLib + marchT, error );
-	// W27 mirror room: the marches through the unfolded lattice, the motes per mirror cell
-	const std::string mirror = std::string( kMirrorLib ) + kMirrorMarchLib;
-	progFogMarchM  = Link( kQuadVS, std::string( "#define MIRROR\n" ) + kLightLib + kFrontLib + kMediumLib + mirror + kFogMarchFS, error );
-	progFogMarchTM = Link( kQuadVS, std::string( "#define TRIP\n#define MIRROR\n" ) + kLightLib + kFrontLib + kTripLib + kMediumLib + mirror + marchT, error );
-	progMotesM     = Link( std::string( "#define MIRROR\n" ) + kLightLib + kFrontLib + kMirrorLib + kMirrorPointLib + kMotesVS, std::string( kToneLib ) + kMotesFS, error );
-	if( !progFogMarchM || !progFogMarchTM || !progMotesM )
-		return false;
 	progTripPost  = Link( kQuadVS, std::string( kTripLib ) + kTripPostFS, error ); // W25: + Palette for contour lines
 	if( !progFogMarchT || !progTripPost )
 		return false;
@@ -143,7 +135,7 @@ bool Renderer::InitVolume( std::string& error )
 		glUniform1i( U( p, "uVtxBuf" ), 10 );
 		BindShadowSamplers( p );
 	}
-	for( GLuint p : { progFogMarch, progRaySrc, progFogMarchT, progFogMarchM, progFogMarchTM } )
+	for( GLuint p : { progFogMarch, progRaySrc, progFogMarchT } )
 	{
 		glUseProgram( p );
 		glUniform1i( U( p, "uDepth" ), 0 );
@@ -160,12 +152,9 @@ bool Renderer::InitVolume( std::string& error )
 	glUseProgram( progTripPost );
 	glUniform1i( U( progTripPost, "uFogIn" ), 0 );
 	glUniform1i( U( progTripPost, "uHist" ), 1 );
-	for( GLuint p : { progMotes, progMotesM } )
-	{
-		glUseProgram( p );
-		glUniform1i( U( p, "uDepth" ), 0 );
-		BindShadowSamplers( p );
-	}
+	glUseProgram( progMotes );
+	glUniform1i( U( progMotes, "uDepth" ), 0 );
+	BindShadowSamplers( progMotes );
 	glUseProgram( 0 );
 
 	// 1x1 cube bound to the cube shadow units whenever no point-light shadow exists
@@ -183,7 +172,7 @@ bool Renderer::InitVolume( std::string& error )
 void Renderer::ReleaseVolume()
 {
 	for( GLuint* p : { &progShadow, &progShadowSoup, &progShadowI, &progShadowSoupI, &progShadowSoupT, &progShadowSoupTI, &progShadowSoupL, &progShadowSoupLI, &progFogMarch, &progFogTemporal, &progRaySrc, &progRayBlur, &progMotes,
-	                   &progFogMarchT, &progTripPost, &progFogMarchM, &progFogMarchTM, &progMotesM } )
+	                   &progFogMarchT, &progTripPost } )
 		if( *p )
 			glDeleteProgram( *p ), *p = 0;
 	for( int i = 0; i < kMaxVolLights; ++i )
@@ -621,19 +610,16 @@ void Renderer::RenderVolume( const FrameState& fs, int w, int h )
 		const GLenum bufs[ 2 ] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 		glDrawBuffers( 2, bufs );
 		const bool trip = fs.trip.medium; // W24: the TRIP variants (the plain ones run untouched otherwise)
-		// plain = the variant's plain program (TRIP / FIRE uniforms), march = it or its W27 MIRROR one (through the room's lattice)
-		auto drawMarch  = [ & ]( GLuint plain, GLuint march ) {
+		auto drawMarch  = [ & ]( GLuint march ) {
 			glUseProgram( march );
 			SetLightUniforms( march, fs, true );
 			SetMediumUniforms( march, fs );
 			if( sim )
 				SetSimMediumUniforms( march, fs, VP );
-			if( plain == progFogMarchT || plain == progFogMarchSimT || plain == progFogMarchSimF )
+			if( march == progFogMarchT || march == progFogMarchSimT || march == progFogMarchSimF )
 				SetTripUniforms( march, fs );
-			if( plain == progFogMarchSimF )
+			if( march == progFogMarchSimF )
 				SetFireUniforms( march, fs );
-			if( march != plain )
-				SetMirrorUniforms( march, fs );
 			glUniformMatrix4fv( U( march, "uInvViewProj" ), 1, GL_FALSE, inv.m );
 			glUniform3fv( U( march, "uCamPos" ), 1, fs.camPos );
 			glUniform1i( U( march, "uSteps" ), v.steps );
@@ -672,11 +658,8 @@ void Renderer::RenderVolume( const FrameState& fs, int w, int h )
 			const GLboolean scissor = glIsEnabled( GL_SCISSOR_TEST ); // WarmVolume draws scissored already
 			glEnable( GL_SCISSOR_TEST );
 			glScissor( 0, 0, 1, 1 );
-			drawMarch( progFogMarchSimT, progFogMarchSimT );
-			drawMarch( progFogMarchSimF, progFogMarchSimF ); // W26 fire
-			drawMarch( progFogMarchSim, progFogMarchSimM );  // W27 mirror room
-			drawMarch( progFogMarchSimT, progFogMarchSimTM );
-			drawMarch( progFogMarchSimF, progFogMarchSimFM );
+			drawMarch( progFogMarchSimT );
+			drawMarch( progFogMarchSimF ); // W26 fire
 			if( !scissor )
 				glDisable( GL_SCISSOR_TEST );
 		}
@@ -690,8 +673,7 @@ void Renderer::RenderVolume( const FrameState& fs, int w, int h )
 		}
 		else
 		{
-			const GLuint plain = sim ? ( fs.sim.fire ? progFogMarchSimF : trip ? progFogMarchSimT : progFogMarchSim ) : ( trip ? progFogMarchT : progFogMarch );
-			drawMarch( plain, MirrorVariant( plain, fs ) );
+			drawMarch( sim ? ( fs.sim.fire ? progFogMarchSimF : trip ? progFogMarchSimT : progFogMarchSim ) : ( trip ? progFogMarchT : progFogMarch ) );
 		}
 		const GLenum one = GL_COLOR_ATTACHMENT0;
 		glDrawBuffers( 1, &one );
@@ -807,34 +789,23 @@ void Renderer::DrawMotes( const FrameState& fs, int w, int h )
 	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, sceneDepthTex );
 	glBindVertexArray( quadVAO );
-	const int images = MirrorImages( fs ); // W27: the motes again in each of the nearest mirror cells, lit where they really are
-	for( int c = -1; c < images; ++c )
-	{
-		const GLuint p = c < 0 ? progMotes : progMotesM;
-		if( c <= 0 )
-		{
-			glUseProgram( p );
-			SetLightUniforms( p, fs, true );
-			glUniformMatrix4fv( U( p, "uViewProj" ), 1, GL_FALSE, VP.m );
-			glUniform3fv( U( p, "uCamPos" ), 1, fs.camPos );
-			glUniform3fv( U( p, "uVolCenter" ), 1, v.center );
-			glUniform1f( U( p, "uVolRadius" ), v.radius );
-			const float md[ 3 ] = { v.drift[ 0 ] / 100.0f, v.drift[ 1 ] / 100.0f, v.drift[ 2 ] / 100.0f }; // the drift loops at 100
-			glUniform3fv( U( p, "uMoteDrift" ), 1, md );
-			glUniform1f( U( p, "uTime" ), v.time );
-			glUniform1f( U( p, "uPointScale" ), 16.0f * float( h ) / 1080.0f );
-			glUniform1i( U( p, "uVolLights" ), std::min( v.fogLights, fs.xlCount ) );
-			glUniform1f( U( p, "uG" ), v.g );
-			glUniform2f( U( p, "uScreen" ), float( w ), float( h ) );
-			glUniform1f( U( p, "uExposure" ), fs.exposure );
-			glUniform1i( U( p, "uTonemap" ), fs.tonemap );
-			if( c == 0 )
-				SetMirrorUniforms( p, fs );
-		}
-		if( c >= 0 )
-			SetMirrorCell( p, fs, c, fs.camPos );
-		glDrawArrays( GL_POINTS, 0, (GLsizei)std::lround( v.motes * 1500.0f ) );
-	}
+	const GLuint p = progMotes;
+	glUseProgram( p );
+	SetLightUniforms( p, fs, true );
+	glUniformMatrix4fv( U( p, "uViewProj" ), 1, GL_FALSE, VP.m );
+	glUniform3fv( U( p, "uCamPos" ), 1, fs.camPos );
+	glUniform3fv( U( p, "uVolCenter" ), 1, v.center );
+	glUniform1f( U( p, "uVolRadius" ), v.radius );
+	const float md[ 3 ] = { v.drift[ 0 ] / 100.0f, v.drift[ 1 ] / 100.0f, v.drift[ 2 ] / 100.0f }; // the drift loops at 100
+	glUniform3fv( U( p, "uMoteDrift" ), 1, md );
+	glUniform1f( U( p, "uTime" ), v.time );
+	glUniform1f( U( p, "uPointScale" ), 16.0f * float( h ) / 1080.0f );
+	glUniform1i( U( p, "uVolLights" ), std::min( v.fogLights, fs.xlCount ) );
+	glUniform1f( U( p, "uG" ), v.g );
+	glUniform2f( U( p, "uScreen" ), float( w ), float( h ) );
+	glUniform1f( U( p, "uExposure" ), fs.exposure );
+	glUniform1i( U( p, "uTonemap" ), fs.tonemap );
+	glDrawArrays( GL_POINTS, 0, (GLsizei)std::lround( v.motes * 1500.0f ) );
 	glDisable( GL_PROGRAM_POINT_SIZE );
 	glDisable( GL_BLEND );
 	glBlendFunc( GL_ONE, GL_ZERO );
@@ -862,6 +833,12 @@ void Renderer::WarmVolume( const FrameState& fs, GpuModel* model, int w, int h )
 	glScissor( 0, 0, 1, 1 );
 	ComputeLightMatrices( t );
 	RenderShadows( t, model );
+	{
+		// W2: the shadow passes' DEFORM twins (a deformed shape casts a deformed shadow)
+		FrameState d = t;
+		d.shape.on   = d.shape.deform = true;
+		RenderShadows( d, model );
+	}
 	if( EnsureSceneDepth( w, h ) )
 	{
 		CopySceneDepth( w, h );
@@ -880,22 +857,6 @@ void Renderer::WarmVolume( const FrameState& fs, GpuModel* model, int w, int h )
 		RenderVolume( t, w, h );
 		RenderTripPost( t, w, h );
 		tripHist = false;
-		glBindFramebuffer( GL_FRAMEBUFFER, resolveFBO );
-		glViewport( 0, 0, w, h );
-		DrawMotes( t, w, h );
-		// W27: the same through the mirror room (the MIRROR marches, the motes' images); the jitter frame and the history
-		// slot are put back, so a show without the room renders exactly as before
-		const unsigned keepFrame = frameCounter;
-		const int keepHist       = histIdx;
-		t.mirror.shape   = 1;
-		t.mirror.volumes = t.mirror.particles = true;
-		t.mirror.images  = 1;
-		t.mirror.cells.assign( 1, MirrorCell() );
-		t.mirror.cells[ 0 ].index[ 0 ] = t.mirror.cells[ 0 ].bounces = 1.0f;
-		RenderVolume( t, w, h );
-		t.trip.medium = t.trip.post = false;
-		RenderVolume( t, w, h );
-		frameCounter = keepFrame, histIdx = keepHist;
 		glBindFramebuffer( GL_FRAMEBUFFER, resolveFBO );
 		glViewport( 0, 0, w, h );
 		DrawMotes( t, w, h );

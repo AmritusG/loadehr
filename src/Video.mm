@@ -1,0 +1,452 @@
+// W2 Stage 5: video files for the projector (see Video.h). AVFoundation reads; HAP is parsed + Snappy-decompressed here.
+#include "Video.h"
+#include "Log.h"
+#import <AVFoundation/AVFoundation.h>
+#import <CoreMedia/CoreMedia.h>
+#import <CoreVideo/CoreVideo.h>
+#include <algorithm>
+#include <chrono>
+#include <cmath>
+#include <cstring>
+
+namespace mehr
+{
+namespace
+{
+std::atomic< uint64_t > g_frameSerial{ 0 };
+constexpr int kAhead = 6; // frames decoded ahead of the play position (in its direction)
+
+uint32_t Rd( const uint8_t* p, int n )
+{
+	uint32_t v = 0;
+	for( int i = 0; i < n; ++i )
+		v |= uint32_t( p[ i ] ) << ( 8 * i );
+	return v;
+}
+// a HAP section header: payload size, type, header length; false if it does not fit
+bool Section( const uint8_t* p, size_t n, size_t& size, int& type, size_t& hdr )
+{
+	if( n < 4 )
+		return false;
+	size = Rd( p, 3 ), type = p[ 3 ], hdr = 4;
+	if( size == 0 )
+	{
+		if( n < 8 )
+			return false;
+		size = Rd( p + 4, 4 ), hdr = 8;
+	}
+	return hdr + size <= n;
+}
+// one texture section (top-level type: compressor nibble + format nibble) -> its block data
+bool TextureSection( int type, const uint8_t* p, size_t n, std::vector< uint8_t >& out, int& format, std::string& error )
+{
+	switch( type & 0x0F )
+	{
+	case 0xB: format = 1; break; // RGB DXT1
+	case 0xE: format = 5; break; // RGBA DXT5
+	case 0xF: format = 6; break; // scaled YCoCg DXT5 (Hap Q)
+	case 0x1: format = 4; break; // alpha BC4
+	default: error = "HAP texture format 0x" + std::to_string( type & 0x0F ) + " (BC6 / BC7) not supported"; return false;
+	}
+	const int comp = ( type >> 4 ) & 0x0F;
+	out.clear();
+	if( comp == 0xA )
+	{
+		out.assign( p, p + n );
+		return true;
+	}
+	if( comp == 0xB )
+	{
+		if( SnappyDecompress( p, n, out ) )
+			return true;
+		error = "HAP: bad Snappy data";
+		return false;
+	}
+	if( comp != 0xC )
+	{
+		error = "HAP: unknown compressor";
+		return false;
+	}
+	// decode instructions: a container (0x01) of the chunk tables, then the chunks
+	size_t csize, chdr;
+	int ctype;
+	if( !Section( p, n, csize, ctype, chdr ) || ctype != 0x01 )
+	{
+		error = "HAP: no decode instructions";
+		return false;
+	}
+	std::vector< uint8_t > comps;
+	std::vector< uint32_t > sizes, offsets;
+	for( size_t q = chdr; q < chdr + csize; )
+	{
+		size_t s, h;
+		int t;
+		if( !Section( p + q, chdr + csize - q, s, t, h ) )
+			break;
+		const uint8_t* d = p + q + h;
+		if( t == 0x02 )
+			comps.assign( d, d + s );
+		else if( t == 0x03 )
+			for( size_t i = 0; i + 4 <= s; i += 4 )
+				sizes.push_back( Rd( d + i, 4 ) );
+		else if( t == 0x04 )
+			for( size_t i = 0; i + 4 <= s; i += 4 )
+				offsets.push_back( Rd( d + i, 4 ) );
+		q += h + s;
+	}
+	if( comps.empty() || comps.size() != sizes.size() || ( !offsets.empty() && offsets.size() != sizes.size() ) )
+	{
+		error = "HAP: inconsistent chunk tables";
+		return false;
+	}
+	const uint8_t* frame = p + chdr + csize;
+	const size_t left    = n - chdr - csize;
+	size_t at            = 0;
+	std::vector< uint8_t > tmp;
+	for( size_t c = 0; c < comps.size(); ++c )
+	{
+		const size_t off = offsets.empty() ? at : offsets[ c ];
+		at               = off + sizes[ c ];
+		if( at > left )
+		{
+			error = "HAP: chunk past the frame";
+			return false;
+		}
+		if( comps[ c ] == 0x0A )
+			out.insert( out.end(), frame + off, frame + off + sizes[ c ] );
+		else if( comps[ c ] == 0x0B && SnappyDecompress( frame + off, sizes[ c ], tmp ) )
+			out.insert( out.end(), tmp.begin(), tmp.end() );
+		else
+		{
+			error = "HAP: bad chunk";
+			return false;
+		}
+	}
+	return true;
+}
+std::string FourCC( uint32_t f )
+{
+	char s[ 5 ] = { char( f >> 24 ), char( f >> 16 ), char( f >> 8 ), char( f ), 0 };
+	return s;
+}
+}
+
+size_t VideoFrame::Bytes() const { return blocks.size() + alpha.size() + ( pixelBuffer ? size_t( w ) * h * 4 : 0 ); }
+
+VideoFrame::~VideoFrame()
+{
+	if( pixelBuffer )
+		CVPixelBufferRelease( (CVPixelBufferRef)pixelBuffer );
+}
+
+// Snappy: a varint length, then literals (tag 00) and copies with 1 / 2 / 4-byte offsets (tags 01 / 10 / 11)
+bool SnappyDecompress( const uint8_t* in, size_t n, std::vector< uint8_t >& out )
+{
+	size_t i = 0, len = 0;
+	for( int shift = 0; i < n && shift < 35; shift += 7 )
+	{
+		const uint8_t b = in[ i++ ];
+		len |= size_t( b & 0x7F ) << shift;
+		if( !( b & 0x80 ) )
+			break;
+	}
+	out.resize( len );
+	size_t o = 0;
+	while( i < n )
+	{
+		const uint8_t tag = in[ i++ ];
+		if( ( tag & 3 ) == 0 )
+		{
+			size_t l = tag >> 2;
+			if( l >= 60 )
+			{
+				const int b = int( l - 59 );
+				if( i + b > n )
+					return false;
+				l = Rd( in + i, b ), i += b;
+			}
+			++l;
+			if( i + l > n || o + l > len )
+				return false;
+			std::memcpy( &out[ o ], in + i, l ), i += l, o += l;
+			continue;
+		}
+		size_t l, off;
+		if( ( tag & 3 ) == 1 )
+		{
+			if( i + 1 > n )
+				return false;
+			l = 4 + ( ( tag >> 2 ) & 7 ), off = ( size_t( tag >> 5 ) << 8 ) | in[ i ], i += 1;
+		}
+		else
+		{
+			const int b = ( tag & 3 ) == 2 ? 2 : 4;
+			if( i + b > n )
+				return false;
+			l = ( tag >> 2 ) + 1, off = Rd( in + i, b ), i += b;
+		}
+		if( off == 0 || off > o || o + l > len )
+			return false;
+		for( size_t k = 0; k < l; ++k, ++o ) // may overlap: byte by byte
+			out[ o ] = out[ o - off ];
+	}
+	return o == len;
+}
+
+bool DecodeHapFrame( const uint8_t* data, size_t n, int w, int h, VideoFrame& out, std::string& error )
+{
+	size_t size, hdr;
+	int type;
+	if( !Section( data, n, size, type, hdr ) )
+	{
+		error = "HAP: truncated frame";
+		return false;
+	}
+	const size_t blocks = size_t( ( w + 3 ) / 4 ) * size_t( ( h + 3 ) / 4 );
+	auto check = [ & ]( const std::vector< uint8_t >& v, int f ) { return v.size() >= blocks * ( f == 1 || f == 4 ? 8 : 16 ); };
+	if( type == 0x0D ) // multiple images: Hap Q Alpha = scaled YCoCg DXT5 + BC4 alpha
+	{
+		out.format = 0;
+		for( size_t q = hdr; q < hdr + size; )
+		{
+			size_t s, hh;
+			int t;
+			if( !Section( data + q, hdr + size - q, s, t, hh ) )
+				break;
+			std::vector< uint8_t > v;
+			int f = 0;
+			if( !TextureSection( t, data + q + hh, s, v, f, error ) || !check( v, f ) )
+				return error.empty() ? ( error = "HAP: short plane", false ) : false;
+			if( f == 4 )
+				out.alpha.swap( v );
+			else
+				out.blocks.swap( v ), out.format = f;
+			q += hh + s;
+		}
+		if( !out.format && !out.alpha.empty() )
+			out.blocks.swap( out.alpha ), out.format = 4;
+		return out.format != 0;
+	}
+	if( !TextureSection( type, data + hdr, size, out.blocks, out.format, error ) )
+		return false;
+	if( !check( out.blocks, out.format ) )
+	{
+		error = "HAP: short plane";
+		return false;
+	}
+	return true;
+}
+
+VideoPlayer::VideoPlayer( const std::string& p ) :
+	path( p )
+{
+	worker = std::thread( [ this ]() { Run(); } );
+}
+
+VideoPlayer::~VideoPlayer()
+{
+	stop.store( true );
+	cv.notify_all();
+	if( worker.joinable() )
+		worker.join();
+}
+
+std::string VideoPlayer::Info() const
+{
+	std::lock_guard< std::mutex > lock( mtx );
+	return info;
+}
+
+std::shared_ptr< const VideoFrame > VideoPlayer::Frame( double pos, bool forward, bool loop )
+{
+	std::lock_guard< std::mutex > lock( mtx );
+	wantPos = pos, wantForward = forward, wantLoop = loop, ++wantSerial;
+	cv.notify_one();
+	if( frames <= 0 )
+		return last;
+	const int target = std::clamp( int( std::floor( pos / frameDur + 1e-4 ) ), 0, frames - 1 );
+	auto it = cache.find( target );
+	std::shared_ptr< const VideoFrame > pick;
+	if( it != cache.end() )
+		pick = it->second;
+	else
+	{
+		// not decoded yet: the nearest frame behind the play position, else the last one shown
+		for( const auto& kv : cache )
+			if( forward ? kv.first <= target && ( !pick || kv.first > pick->index ) : kv.first >= target && ( !pick || kv.first < pick->index ) )
+				pick = kv.second;
+		if( !pick )
+			pick = last;
+		if( !last || !pick || pick->index != last->index )
+			++late;
+	}
+	if( pick )
+		last = pick;
+	return last;
+}
+
+void VideoPlayer::Run()
+{
+	@autoreleasepool
+	{
+		NSURL* url         = [NSURL fileURLWithPath:[NSString stringWithUTF8String:path.c_str()]];
+		AVURLAsset* asset  = [AVURLAsset URLAssetWithURL:url options:@{ AVURLAssetPreferPreciseDurationAndTimingKey : @YES }];
+		AVAssetTrack* track = [[asset tracksWithMediaType:AVMediaTypeVideo] firstObject];
+		if( !track )
+		{
+			std::lock_guard< std::mutex > lock( mtx );
+			info = "no video track in " + path.substr( path.find_last_of( '/' ) + 1 );
+			failed.store( true );
+			return;
+		}
+		CMFormatDescriptionRef fd = track.formatDescriptions.count ? (__bridge CMFormatDescriptionRef)track.formatDescriptions[ 0 ] : nullptr;
+		const uint32_t codec      = fd ? CMFormatDescriptionGetMediaSubType( fd ) : 0;
+		const std::string cc      = FourCC( codec );
+		const bool hap            = cc == "Hap1" || cc == "Hap5" || cc == "HapY" || cc == "HapM" || cc == "HapA";
+		const CGSize sz           = track.naturalSize;
+		const int W = int( std::lround( sz.width ) ), H = int( std::lround( sz.height ) );
+		float fps = track.nominalFrameRate;
+		if( fps <= 0 && CMTIME_IS_VALID( track.minFrameDuration ) && CMTimeGetSeconds( track.minFrameDuration ) > 0 )
+			fps = float( 1.0 / CMTimeGetSeconds( track.minFrameDuration ) );
+		if( fps <= 0 )
+			fps = 30;
+		{
+			std::lock_guard< std::mutex > lock( mtx );
+			duration = CMTimeGetSeconds( asset.duration );
+			frameDur = 1.0 / fps;
+			frames   = std::max( 1, int( std::lround( duration * fps ) ) );
+			char b[ 160 ];
+			snprintf( b, sizeof( b ), "%s %dx%d, %.3g fps, %.2f s (%d frames)%s", cc.c_str(), W, H, fps, duration, frames, hap ? ", HAP: block upload" : ", decoded to BGRA IOSurface" );
+			info = b;
+			if( cc == "Hap7" || cc == "HapH" )
+				info = cc + ": BC7 / BC6 HAP is not supported (GL 4.1 on this Mac has no BPTC)", failed.store( true );
+		}
+		if( failed.load() )
+			return;
+		ready.store( true );
+		NSDictionary* settings = hap ? nil : @{ (id)kCVPixelBufferPixelFormatTypeKey : @( kCVPixelFormatType_32BGRA ), (id)kCVPixelBufferIOSurfacePropertiesKey : @{},
+		                                         (id)kCVPixelBufferOpenGLCompatibilityKey : @YES };
+		AVAssetReader* reader             = nil;
+		AVAssetReaderTrackOutput* output  = nil;
+		int readerNext                    = -1; // the frame the open reader delivers next (-1 = none)
+		while( !stop.load() )
+		{
+			// what is needed: the play position and kAhead frames on in the play direction (wrapped when looping)
+			std::vector< int > need;
+			int first = -1;
+			{
+				std::unique_lock< std::mutex > lock( mtx );
+				const int t = std::clamp( int( std::floor( wantPos / frameDur + 1e-4 ) ), 0, frames - 1 );
+				for( int k = -1; k <= kAhead; ++k )
+				{
+					int i = wantForward ? t + k : t - k;
+					if( wantLoop )
+						i = ( i % frames + frames ) % frames;
+					else if( i < 0 || i >= frames )
+						continue;
+					if( std::find( need.begin(), need.end(), i ) == need.end() )
+						need.push_back( i );
+				}
+				for( auto it = cache.begin(); it != cache.end(); )
+					it = std::find( need.begin(), need.end(), it->first ) == need.end() ? cache.erase( it ) : std::next( it );
+				for( int i : need )
+					if( !cache.count( i ) && first < 0 && i != ( wantForward ? t - 1 : t + 1 ) )
+						first = i;
+				cacheBytes = 0;
+				for( const auto& kv : cache )
+					cacheBytes += kv.second->Bytes();
+				if( first < 0 )
+				{
+					const uint64_t s = wantSerial;
+					cv.wait_for( lock, std::chrono::milliseconds( 4 ), [ & ] { return stop.load() || wantSerial != s; } );
+					continue;
+				}
+			}
+			const bool fwd = wantForward;
+			// keep reading the open reader if it is about to reach the frame; else open one there (backward: a few frames before it)
+			if( !reader || readerNext < 0 || readerNext > first || first - readerNext > 12 )
+			{
+				[reader cancelReading];
+				reader          = nil;
+				const int start = fwd ? first : std::max( 0, first - kAhead );
+				NSError* err    = nil;
+				reader          = [AVAssetReader assetReaderWithAsset:asset error:&err];
+				output          = [AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:track outputSettings:settings];
+				output.alwaysCopiesSampleData = NO;
+				if( !reader || ![reader canAddOutput:output] )
+				{
+					std::lock_guard< std::mutex > lock( mtx );
+					info = "cannot read " + cc + ( err ? std::string( ": " ) + err.localizedDescription.UTF8String : std::string() );
+					failed.store( true );
+					return;
+				}
+				[reader addOutput:output];
+				const CMTime t0 = CMTimeMakeWithSeconds( std::max( 0.0, ( start - 0.5 ) * frameDur ), 600000 );
+				reader.timeRange = CMTimeRangeFromTimeToTime( t0, asset.duration );
+				[reader startReading];
+				readerNext = start;
+			}
+			const auto c0 = std::chrono::steady_clock::now();
+			CMSampleBufferRef sb = [output copyNextSampleBuffer];
+			if( !sb )
+			{
+				readerNext = -1; // the end (or an error): the next request opens a new reader
+				reader     = nil;
+				continue;
+			}
+			if( CMSampleBufferGetNumSamples( sb ) == 0 ) // a marker buffer (no frame in it)
+			{
+				CFRelease( sb );
+				continue;
+			}
+			const double pts = CMTimeGetSeconds( CMSampleBufferGetPresentationTimeStamp( sb ) );
+			const int idx    = std::clamp( int( std::lround( pts / frameDur ) ), 0, frames - 1 );
+			readerNext       = idx + 1;
+			bool wanted;
+			{
+				std::lock_guard< std::mutex > lock( mtx );
+				wanted = std::find( need.begin(), need.end(), idx ) != need.end() && !cache.count( idx );
+			}
+			if( wanted )
+			{
+				auto f = std::make_shared< VideoFrame >();
+				f->pts = idx * frameDur, f->index = idx, f->w = W, f->h = H, f->serial = ( 1ull << 62 ) + ++g_frameSerial; // never equal to a still image's serial
+				bool ok = true;
+				if( hap )
+				{
+					CMBlockBufferRef bb = CMSampleBufferGetDataBuffer( sb );
+					const size_t n      = bb ? CMBlockBufferGetDataLength( bb ) : 0;
+					std::vector< uint8_t > bytes( n );
+					std::string error;
+					ok = n > 0 && CMBlockBufferCopyDataBytes( bb, 0, n, bytes.data() ) == kCMBlockBufferNoErr && DecodeHapFrame( bytes.data(), n, W, H, *f, error );
+					if( !ok && error.empty() )
+						error = "HAP: empty sample (" + std::to_string( n ) + " bytes, " + std::to_string( CMSampleBufferGetNumSamples( sb ) ) + " samples)";
+					if( !ok )
+					{
+						std::lock_guard< std::mutex > lock( mtx );
+						info = error, failed.store( true );
+					}
+				}
+				else if( CVImageBufferRef ib = CMSampleBufferGetImageBuffer( sb ) )
+				{
+					f->pixelBuffer = (void*)CVPixelBufferRetain( (CVPixelBufferRef)ib );
+					f->w = (int)CVPixelBufferGetWidth( (CVPixelBufferRef)ib ), f->h = (int)CVPixelBufferGetHeight( (CVPixelBufferRef)ib );
+				}
+				else
+					ok = false;
+				if( ok )
+				{
+					std::lock_guard< std::mutex > lock( mtx );
+					cache[ idx ] = f;
+					++decoded;
+					decodeMs += std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - c0 ).count();
+				}
+			}
+			CFRelease( sb );
+			if( failed.load() )
+				return;
+		}
+		[reader cancelReading];
+	}
+}
+}

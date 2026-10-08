@@ -1,7 +1,6 @@
 // W26 Stage 7: lava cracks. The glow = the CRACK_PASS variants of the main programs drawn additively over the mask (as the
 // projector's light); the split = the CRACKS soup variants (render + shadow), which DrawModel substitutes while Lava Split > 0.
 #include "Log.h"
-#include "MirrorShaders.h"
 #include "Renderer.h"
 #include "Shaders.h"
 #include <algorithm>
@@ -39,13 +38,9 @@ bool Renderer::InitCracks( std::string& error )
 	progCrackMain   = Link( kMainVS, crackFS, error );
 	progCrackSoup   = Link( kSoupVS, crackFS, error );
 	progCrackSoupC  = Link( soupC, crackFS, error );
-	// W27 mirror room: the glow on the mask's copies
-	const std::string crackFSM = std::string( "#define CRACK_PASS\n#define INSTANCED\n#define MIRROR\n" ) + kCrackLib + mainFS;
-	progCrackMainM  = Link( std::string( "#define INSTANCED\n#define MIRROR\n" ) + kMainVS, crackFSM, error );
-	progCrackSoupM  = Link( std::string( "#define INSTANCED\n#define MIRROR\n" ) + kSoupVS, crackFSM, error );
-	if( !progSoupC || !progShadowSoupC || !progCrackMain || !progCrackSoup || !progCrackSoupC || !progCrackMainM || !progCrackSoupM )
+	if( !progSoupC || !progShadowSoupC || !progCrackMain || !progCrackSoup || !progCrackSoupC )
 		return false;
-	for( GLuint p : { progSoupC, progShadowSoupC, progCrackMain, progCrackSoup, progCrackSoupC, progCrackMainM, progCrackSoupM } )
+	for( GLuint p : { progSoupC, progShadowSoupC, progCrackMain, progCrackSoup, progCrackSoupC } )
 		BindMain( p );
 	glUseProgram( 0 );
 	return true;
@@ -99,7 +94,7 @@ bool Renderer::DrawHazeMask( const FrameState& fs, GpuModel* model, int w, int h
 
 void Renderer::ReleaseCracks()
 {
-	for( GLuint* p : { &progSoupC, &progShadowSoupC, &progCrackMain, &progCrackSoup, &progCrackSoupC, &progCrackMainM, &progCrackSoupM } )
+	for( GLuint* p : { &progSoupC, &progShadowSoupC, &progCrackMain, &progCrackSoup, &progCrackSoupC } )
 		if( *p )
 			glDeleteProgram( *p ), *p = 0;
 	if( hazeTex )
@@ -119,7 +114,7 @@ void Renderer::DrawCracks( const FrameState& fs, GpuModel* model )
 	const bool soup = fs.wireMix > 0.0f || fs.explode > 0.0f || fs.shape.on;
 	const GLuint p  = soup ? progCrackSoup : progCrackMain; // DrawModel swaps in progCrackSoupC while split
 	glUseProgram( soup && lv.split > 0.0f ? progCrackSoupC : p );
-	for( GLuint q : { progCrackMain, progCrackSoup, progCrackSoupC, progCrackMainM, progCrackSoupM } )
+	for( GLuint q : { progCrackMain, progCrackSoup, progCrackSoupC } )
 	{
 		glUseProgram( q );
 		glUniform1f( U( q, "uLavaGlow" ), lv.glow );
@@ -139,12 +134,6 @@ void Renderer::DrawCracks( const FrameState& fs, GpuModel* model )
 	FrameState f  = fs;
 	f.fogDensity = 0.0f;
 	DrawModel( p, f, model, false, soup, 0, nullptr, nullptr, nullptr );
-	if( fs.mirror.shape > 0 && !fs.mirror.copies.empty() ) // W27: the glow on the mask's mirror images too (unsplit: Lava Split stays real)
-	{
-		const GLuint pm = soup ? progCrackSoupM : progCrackMainM;
-		glUseProgram( pm );
-		DrawMirrorPass( pm, f, model, soup );
-	}
 	glDisable( GL_POLYGON_OFFSET_FILL );
 	glPolygonOffset( 0.0f, 0.0f );
 	glDepthMask( GL_TRUE );

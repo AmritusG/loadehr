@@ -27,6 +27,10 @@ struct GenMesh
 	std::vector< Part > parts;
 	int groupCount = 0;
 };
-std::unique_ptr< ModelData > ModelFromMesh( GenMesh& mesh, const std::string& path );
+// W2: `frac` = the fractured copy (text / logo pieces): drawn instead of the whole mesh while pieces fly. Its triangles follow the
+// whole mesh's in the buffers (parts flagged `fractured`, control slots shared); the fit, CpuGeometry::idx and parts stay the whole
+// mesh's. triPiece / pieceCount: the piece of each fractured triangle (in `frac` order).
+std::unique_ptr< ModelData > ModelFromMesh( GenMesh& mesh, const std::string& path, GenMesh* frac = nullptr, const std::vector< uint32_t >* triPiece = nullptr,
+                                            int pieceCount = 0 );
 void BuildImageMips( Image& img ); // the loader's CPU mip chain (sRGB-aware)
 }

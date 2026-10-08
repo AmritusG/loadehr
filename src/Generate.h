@@ -5,7 +5,7 @@
 //   Logo: SVG (nanosvg: paths + fill colours; no <text>, gradients take their first stop), PDF and PDF-compatible
 //         .ai (CGPDFScanner path + fill operators, CTM, form XObjects), PNG / JPG (traced: threshold, marching squares,
 //         simplify, smooth; the image maps onto the front). EPS: not readable on this macOS (answered in Status).
-//   Extrusion: caps tessellated with libtess2 (the source's fill rule), bevel profiles, side walls, optional back cap,
+//   Extrusion: the source's fill rule resolved by Clipper2 (outers + holes), caps triangulated by earcut, bevel profiles, side walls, optional back cap,
 //         Outline Only. Parts: Front, Back, Side, Bevel. Every glyph / logo shape is one group (a letter).
 #include "ModelData.h"
 #include <atomic>

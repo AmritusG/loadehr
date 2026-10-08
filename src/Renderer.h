@@ -4,6 +4,7 @@
 #include "Perf.h"
 #include "MathUtil.h"
 #include "SdfBuilder.h"
+#include "Video.h"
 #include <OpenGL/gl3.h>
 #include <array>
 #include <atomic>
@@ -161,6 +162,7 @@ struct ShapeState
 	bool on = false; // any soup-stage deform active
 	float slicePhase = 0, curlY = 0, dt = 0; // Slice Wave (radians); dust wind drift (64-periodic noise)
 	int shardCount = 64;
+	int shatterMode = 1; // W2 (text / logos): 0 Letters (whole letters fly), 1 Pieces (solid chunks), 2 Pieces + Letters (a letter's pieces share its kick)
 	float shatterT = 0, shatterForce = 2, shatterGravity = 4, shardSpin = 2;
 	float melt = 0, drip = 1;
 	int sliceAxis = 1, sliceCount = 12;
@@ -175,6 +177,14 @@ struct ShapeState
 	float flipBase = 0, flipT = 0, flipDur = 0.3f, flipDeg = 90;
 	int deformAxis = 1;
 	float twist = 0, bend = 0, ripple = 0, rippleFreq = 12, ripplePhase = 0;
+	// W2 Deform group (values already x Deform Amount): deform = any of them on (the DEFORM program twins draw)
+	bool deform = false;
+	float taper = 0, squash = 0, shear = 0, bulge = 0, spherize = 0;
+	float warp = 0, warpScale = 2, warpPhase = 0; // warpPhase: lattice cells, wrapped at 256
+	float glitchShift = 0, glitchBands = 12, glitchStep = 0; // glitchStep: the step index, wrapped at 1000
+	float foldAxes[ 3 ] = { 0, 0, 0 }, foldK = 0;
+	int foldN = 1; // fold copies per draw (2 per folded axis)
+	float jellyLin[ 3 ] = { 0, 0, 0 }, jellyAng[ 3 ] = { 0, 0, 0 }, jellyScale = 0;
 	float dustCut = 0, dustWind = 1, dustSize = 1.5f, reformTime = 1.5f;
 	bool dustInvert = false; // transition: the incoming model shows where the outgoing one has dissolved
 	float slide = 0;         // transition Slice: slabs slide out sideways (+) / in (-)
@@ -225,8 +235,7 @@ struct Instance
 	float hue = 0, alpha = 1;
 	int lod   = 0;
 	float keep = 1, fogKeep = 1, age = 0;
-	float bounces = 0; // W26 mirror room copies: reflections it took (the MIRROR programs tint by it)
-	float next[ 16 ] = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 }; // ghosts: the next newer pose (Trail Smear); W27 mirror copies: the fold
+	float next[ 16 ] = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 }; // ghosts: the next newer pose (Trail Smear)
 };
 
 // Stage 5 trails (W15): Trail Echoes = a screen-space feedback buffer of the rendered mask (stamped every Delay
@@ -259,8 +268,9 @@ struct ProjState
 	float fovX = 30;           // throw, degrees across the picture
 	float color[ 3 ] = {};     // colour x intensity
 	float beam = 1, surface = 1, focus = 0;
-	int source = 0;            // 0 the FX input, 1 the image file
+	int source = 0;            // 0 the FX input, 1 the image / video file
 	std::shared_ptr< const ProjImage > image;
+	std::shared_ptr< const VideoFrame > video; // W2: the video file's frame for this frame (instead of image)
 };
 
 // W26 Stage 4: the Liquid transition style (4). ready: both models' SDFs are on the GPU (otherwise it dissolves like style 0)
@@ -303,27 +313,6 @@ struct CausticState
 	float pos[ 3 ] = {}, dir[ 3 ] = { 0, -1, 0 }, fov = 40, color[ 3 ] = { 1, 1, 1 };
 	float ior = 1.5f, rainbow = 0.5f, sharp = 0.6f, ripple = 0.3f, phase = 0;
 	float floor = 1, smoke = 1, surface = 1, gain = 1; // gain: the cookie passes' 1 / (1 + d^2) falloff undone
-};
-
-// W26 Stage 10: the infinity mirror room (world-aligned box round the mask). shape 0 off, 1 box, 2 corridor (the upright walls),
-// 3 two mirrors (front + back). copies = the mask's mirror images (unfolded lattice cells), drawn instanced.
-// W27: a cell = one mirror image of the box (index i j k: odd = mirrored on that axis), nearest bounces first.
-struct MirrorCell
-{
-	float index[ 3 ] = {};
-	float bounces    = 0;
-};
-struct MirrorState
-{
-	int shape = 0, bounces = 3, ledColors = 0;
-	float center[ 3 ] = {}, half[ 3 ] = { 1.5f, 1.5f, 1.5f }, tint[ 3 ] = { 0.8f, 0.8f, 0.8f };
-	float axes[ 3 ] = { 1, 1, 1 }; // W27: 1 = a mirrored axis (box: all three, corridor: x z, two mirrors: z)
-	float led[ 3 ] = { 1, 1, 1 }, ledGlow = 1, ledWidth = 0.012f, phase = 0;
-	std::vector< Instance > copies;
-	// W27: the volumes march through the lattice (volSteps per bounce); particles / beams are drawn in the first `images` cells
-	bool volumes = false, particles = false;
-	int volSteps = 8, images = 24;
-	std::vector< MirrorCell > cells;
 };
 
 struct FrameState
@@ -396,7 +385,6 @@ struct FrameState
 	SwarmState swarm;
 	LavaState lava;
 	CausticState caustic;
-	MirrorState mirror;
 	PostState post;
 	SurfaceState surf;
 	ShapeState shape;
@@ -421,7 +409,7 @@ static constexpr int kShadowCubeUnit[ 2 ]           = { 13, 14 };
 class Renderer
 {
 public:
-	bool Init( std::string& error ); // compiles shaders; logs the compile log on failure
+	bool Init( std::string& error ); // compiles shaders; logs the compile log on failure (+ W2: the DEFORM twins)
 	void Release();
 	// a = the hop's outgoing model (slot slotA), b = the incoming one (slot slotB); fs.transition = the hop's progress
 	void Render( const FrameState& fs, GpuModel* a, GpuModel* b, int slotA = 0, int slotB = 1 );
@@ -434,6 +422,10 @@ public:
 	PerfProbe perf; // W29: the PERF line's per-pass timing (Debug Log on only)
 
 private:
+	bool InitPrograms( std::string& error );
+	// W2 Deform: every triangle-soup program has a DEFORM twin (linked by Init), drawn whenever a deform is on
+	std::vector< std::pair< GLuint, GLuint > > deformTwins;
+	GLuint DeformTwin( GLuint p ) const;
 	bool EnsureTargets( int w, int h, int samples );
 	void ReleaseTargets();
 	void EnsureVAO( GpuModel* model );
@@ -469,7 +461,8 @@ private:
 	// Shape.cpp
 	bool InitShape( std::string& error );
 	void ReleaseShape();
-	void UpdateShards( GpuModel* model, int count );
+	void UpdateShards( GpuModel* model, int count, int mode );
+	static uint64_t ShardKey( const GpuModel* model, const ShapeState& s );
 	bool UpdateLetters( GpuModel* model, const std::vector< float >& xf ); // true = the LETTERS programs can draw it
 	GLuint LettersProgram( GLuint p ) const;
 	void SetShapeUniforms( GLuint prog, const FrameState& fs, GpuModel* model );
@@ -497,23 +490,6 @@ private:
 	float causticVP[ 16 ];
 	bool causticOk = false;
 	int glassFilter = 0; // DrawModel: 0 every part, 1 glass parts only (the photon pass)
-	// Mirror.cpp (W26)
-	bool InitMirror( std::string& error );
-	void ReleaseMirror();
-	void DrawMirrorCopies( const FrameState& fs, GpuModel* model ); // the mask's reflections, into the scene (depth tested)
-	void DrawMirrorLeds( const FrameState& fs, int w, int h );      // the LED edges through the lattice, additive
-	// W27: the copies with a light pass on top (projector / caustic cookies, lava glow): p = that pass's MIRROR program, bound
-	void DrawMirrorPass( GLuint p, const FrameState& fs, GpuModel* model, bool soup );
-	GLuint MirrorVariant( GLuint p, const FrameState& fs ) const; // a volume / beam / particle program -> its MIRROR one (or p)
-	void SetMirrorUniforms( GLuint p, const FrameState& fs );      // the box, the camera, the lattice (bound program)
-	int MirrorImages( const FrameState& fs ) const;                // particle / beam images to draw: 0 = none
-	void SetMirrorCell( GLuint p, const FrameState& fs, int i, const float* eye = nullptr ); // cell i: uMCell + uMTint (+ folded camera)
-	void WarmMirror( const FrameState& fs, GpuModel* model, int w, int h );
-	GLuint progMainM = 0, progSoupM = 0, progMirrorLed = 0;
-	GLuint progSoupBM = 0, progProjMainM = 0, progProjSoupM = 0, progCrackMainM = 0, progCrackSoupM = 0;                    // W27 mesh
-	GLuint progFogMarchM = 0, progFogMarchTM = 0, progFogMarchSimM = 0, progFogMarchSimTM = 0, progFogMarchSimFM = 0;       // W27 volumes
-	GLuint progProjMarchM = 0, progProjMarchSimM = 0;                                                                       // W27 beams
-	GLuint progSwarmDrawM = 0, progBoltM = 0, progMotesM = 0;                                           // W27 particles
 	// Swarm.cpp (W26)
 	bool InitSwarm( std::string& error );
 	void ReleaseSwarm();
@@ -562,6 +538,15 @@ private:
 	void BindCookieLights( GLuint prog, const FrameState& fs );
 	GLuint progProjMain = 0, progProjSoup = 0, progProjSoupL = 0, progProjCookie = 0, progProjMarch = 0, progProjMarchSim = 0;
 	GLuint projTex = 0, projFBO = 0, projDepth = 0, projImageTex = 0;
+	// W2 video: the frame -> projImageTex (a draw: BGRA IOSurface bound zero-copy as a rectangle texture, or HAP blocks as DXT / BC)
+	GLuint progProjVideo = 0, projVideoRect = 0, projVideoDxt = 0, projVideoAlpha = 0, projVideoFBO = 0, dummyRect = 0;
+	int projImageW = 0, projImageH = 0, projVideoFmt = 0, projDxtW = 0, projDxtH = 0;
+	bool projMipsValid = false;
+	std::shared_ptr< const VideoFrame > projVideoHeld; // the frame bound to the rectangle texture (its IOSurface stays alive)
+	bool UploadVideoFrame( const VideoFrame& f, bool mips );
+public:
+	double videoUploadMs = 0; // W2: the last frame's upload (+ mips) ms on the render thread (PERF / harness)
+private:
 	uint64_t projImageSerial = 0;
 	int projImageLevels = 1;
 	float projVP[ 16 ];

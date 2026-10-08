@@ -4,7 +4,6 @@
 #include "Generate.h"
 #include "Log.h"
 #include "MathUtil.h"
-#include "MirrorShaders.h"
 #include "Renderer.h"
 #include "Shaders.h"
 #include "VolumeShaders.h"
@@ -36,24 +35,29 @@ void ShardRadii( const std::vector< float >& cen, int count, ShardJob& job )
 }
 
 // ---- shards: object-space Voronoi of triangle centroids around area-weighted random seeds
-void BuildShards( const CpuGeometry& g, int count, ShardJob& job )
+// W2 text / logos: shard ids 0..L-1 = the letters (the whole mesh, Shatter Mode Letters), L..L+P-1 = the solid pieces of the
+// fractured copy (Pieces; Pieces + Letters: a piece takes its letter's seed, so a letter's pieces share one kick and spin)
+void BuildShards( const CpuGeometry& g, int count, int mode, ShardJob& job )
 {
 	auto t0          = std::chrono::steady_clock::now();
 	const size_t tri = g.idx.size() / 3;
-	std::vector< float > cen( tri * 3 ), area( tri );
+	const size_t all = tri + ( g.triGroup.empty() ? 0 : g.fracIdx.size() / 3 );
+	std::vector< float > cen( all * 3 ), area( all );
 	float mn[ 3 ] = { 1e30f, 1e30f, 1e30f }, mx[ 3 ] = { -1e30f, -1e30f, -1e30f };
-	for( size_t t = 0; t < tri && !job.cancel.load(); ++t )
+	for( size_t t = 0; t < all && !job.cancel.load(); ++t )
 	{
-		const float* a = &g.pos[ g.idx[ t * 3 ] * 3 ];
-		const float* b = &g.pos[ g.idx[ t * 3 + 1 ] * 3 ];
-		const float* c = &g.pos[ g.idx[ t * 3 + 2 ] * 3 ];
+		const uint32_t* I = t < tri ? &g.idx[ t * 3 ] : &g.fracIdx[ ( t - tri ) * 3 ];
+		const float* a = &g.pos[ I[ 0 ] * 3 ];
+		const float* b = &g.pos[ I[ 1 ] * 3 ];
+		const float* c = &g.pos[ I[ 2 ] * 3 ];
 		float e1[ 3 ], e2[ 3 ], cr[ 3 ];
 		for( int k = 0; k < 3; ++k )
 		{
 			// fitted space: the model spans -1..1
 			cen[ t * 3 + k ] = ( ( a[ k ] + b[ k ] + c[ k ] ) / 3.0f - g.fitCenter[ k ] ) * g.fitScale;
 			e1[ k ] = b[ k ] - a[ k ], e2[ k ] = c[ k ] - a[ k ];
-			mn[ k ] = std::min( mn[ k ], cen[ t * 3 + k ] ), mx[ k ] = std::max( mx[ k ], cen[ t * 3 + k ] );
+			if( t < tri )
+				mn[ k ] = std::min( mn[ k ], cen[ t * 3 + k ] ), mx[ k ] = std::max( mx[ k ], cen[ t * 3 + k ] );
 		}
 		Mat4::Cross( e1, e2, cr );
 		area[ t ] = std::sqrt( cr[ 0 ] * cr[ 0 ] + cr[ 1 ] * cr[ 1 ] + cr[ 2 ] * cr[ 2 ] ) + 1e-30f;
@@ -62,23 +66,28 @@ void BuildShards( const CpuGeometry& g, int count, ShardJob& job )
 		return;
 	if( !g.triGroup.empty() )
 	{
-		// W21 text / logos: every letter (logo shape) is one shard
-		count = std::max( g.groupCount, 1 );
-		job.triShard.assign( g.triGroup.begin(), g.triGroup.end() );
+		// W21 text / logos: every letter (logo shape) is one shard; W2: + every solid piece of the fractured copy
+		const int L = std::max( g.groupCount, 1 ), P = g.fracIdx.empty() ? 0 : g.pieceCount;
+		count = L + P;
+		job.triShard.resize( all );
+		for( size_t t = 0; t < all; ++t )
+			job.triShard[ t ] = t < tri ? g.triGroup[ t ] : uint16_t( L + g.fracPiece[ t - tri ] );
 		std::vector< double > sum( size_t( count ) * 4, 0.0 );
-		for( size_t t = 0; t < tri; ++t )
+		std::vector< int > letterOf( size_t( count ), 0 );
+		for( size_t t = 0; t < all; ++t )
 		{
 			const int s = job.triShard[ t ];
 			for( int k = 0; k < 3; ++k )
 				sum[ s * 4 + k ] += cen[ t * 3 + k ] * area[ t ];
 			sum[ s * 4 + 3 ] += area[ t ];
+			letterOf[ s ] = g.triGroup[ t ];
 		}
 		job.shardData.resize( size_t( count ) * 4 );
 		for( int s = 0; s < count; ++s )
 		{
 			for( int k = 0; k < 3; ++k )
 				job.shardData[ s * 4 + k ] = sum[ s * 4 + 3 ] > 0 ? float( sum[ s * 4 + k ] / sum[ s * 4 + 3 ] ) : 0.0f;
-			job.shardData[ s * 4 + 3 ] = float( s ) + 0.5f;
+			job.shardData[ s * 4 + 3 ] = float( s >= L && mode == 2 ? letterOf[ s ] : s ) + 0.5f;
 		}
 		ShardRadii( cen, count, job );
 		job.ms = std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - t0 ).count();
@@ -510,11 +519,9 @@ bool Renderer::InitShape( std::string& error )
 		const std::string mainFS = std::string( kLightLib ) + kMainFS;
 		progSoupB       = Link( std::string( "#define BOUNCE\n" ) + kSoupVS, mainFS, error );
 		progShadowSoupB = Link( std::string( "#define BOUNCE\n" ) + kSoupVS, "#define SHADOW_PASS\n" + mainFS, error );
-		// W27: the mirror room's copies follow the recorded flights too
-		progSoupBM = Link( std::string( "#define BOUNCE\n#define INSTANCED\n#define MIRROR\n" ) + kSoupVS, "#define INSTANCED\n#define MIRROR\n" + mainFS, error );
-		if( !progSoupB || !progShadowSoupB || !progSoupBM )
+		if( !progSoupB || !progShadowSoupB )
 			return false;
-		for( GLuint p : { progSoupB, progShadowSoupB, progSoupBM } )
+		for( GLuint p : { progSoupB, progShadowSoupB } )
 		{
 			glUseProgram( p );
 			char name[ 16 ];
@@ -554,7 +561,7 @@ void Renderer::ReleaseShape()
 			glDeleteTextures( 1, &sl.pathTex ), sl.pathTex = 0;
 		sl.pathKey = 0;
 	}
-	for( GLuint* p : { &progDustSim, &progDustDraw, &progDustTrans, &progSoupB, &progShadowSoupB, &progSoupBM } )
+	for( GLuint* p : { &progDustSim, &progDustDraw, &progDustTrans, &progSoupB, &progShadowSoupB } )
 		if( *p )
 			glDeleteProgram( *p ), *p = 0;
 	for( LetterSlot& L : letters )
@@ -636,13 +643,22 @@ GLuint Renderer::LettersProgram( GLuint p ) const
 	return p == progProjSoup ? progProjSoupL : p == progSoup ? progSoupL : p == progSoupI ? progSoupLI : p == progShadowSoup ? progShadowSoupL : p == progShadowSoupI ? progShadowSoupLI : p;
 }
 
+uint64_t Renderer::ShardKey( const GpuModel* model, const ShapeState& s )
+{
+	// W2: the mode only matters for a fractured text / logo (Pieces + Letters gives the pieces their letter's seed)
+	const uint64_t mode = model && model->hasPieces && s.shatterMode == 2 ? 1 : 0;
+	return model ? ( model->serial * 4096 + (uint64_t)s.shardCount ) * 2 + mode : 0;
+}
+
 // Starts / collects the shard clustering for (model, count); uploads the result as texture buffers.
-void Renderer::UpdateShards( GpuModel* model, int count )
+void Renderer::UpdateShards( GpuModel* model, int count, int mode )
 {
 	if( !model || !model->geometry )
 		return;
 	ShardSlot& sh      = shards[ SlotOf( model ) ];
-	const uint64_t key = model->serial * 4096 + (uint64_t)count;
+	ShapeState ks;
+	ks.shardCount = count, ks.shatterMode = mode;
+	const uint64_t key = ShardKey( model, ks );
 	if( key != sh.key && ( !sh.job || sh.job->key != key ) )
 	{
 		if( sh.job )
@@ -651,8 +667,8 @@ void Renderer::UpdateShards( GpuModel* model, int count )
 		job->key = key;
 		auto geo = model->geometry;
 		sh.job   = job;
-		std::thread( [ job, geo, count ]() {
-			BuildShards( *geo, count, *job );
+		std::thread( [ job, geo, count, mode ]() {
+			BuildShards( *geo, count, mode, *job );
 			job->done.store( true );
 		} ).detach();
 	}
@@ -714,7 +730,7 @@ void Renderer::UpdateBounce( const FrameState& fs, GpuModel* model )
 	if( !sh.bounce || sh.shatterT <= 0.0f || !model )
 		return;
 	ShardSlot& sl = shards[ SlotOf( model ) ];
-	if( sl.data.empty() || sl.key != model->serial * 4096 + (uint64_t)sh.shardCount )
+	if( sl.data.empty() || sl.key != ShardKey( model, sh ) )
 		return;
 	uint64_t key = sh.shatterGen;
 	for( float v : { sh.bounciness, sh.friction, sh.shatterForce, sh.shatterGravity, sh.shardSpin } )
@@ -884,7 +900,7 @@ void Renderer::SetShapeUniforms( GLuint p, const FrameState& fs, GpuModel* model
 	glUniform1i( U( p, "uDustInvert" ), s.dustInvert ? 1 : 0 );
 	glUniform1i( U( p, "uDissolveInvert" ), fs.dissolveInvert ? 1 : 0 );
 	const ShardSlot& sh    = shards[ SlotOf( model ) ];
-	const bool shardsReady = model && sh.key == model->serial * 4096 + (uint64_t)s.shardCount;
+	const bool shardsReady = model && sh.key == ShardKey( model, s );
 	glActiveTexture( GL_TEXTURE0 + 15 );
 	glBindTexture( GL_TEXTURE_BUFFER, shardsReady ? sh.ofTex : dummyShardOf );
 	glActiveTexture( GL_TEXTURE0 + 16 );
@@ -898,10 +914,11 @@ void Renderer::SetShapeUniforms( GLuint p, const FrameState& fs, GpuModel* model
 		glUniform1f( U( p, "uContourScroll" ), s.contourScroll );
 		glUniform3fv( U( p, "uContourColor" ), 1, s.contourColor );
 	}
+	glUniform1i( U( p, "uFoldN" ), s.deform ? std::max( 1, s.foldN ) : 1 ); // W2: the DEFORM programs divide by it
 	if( !s.on )
 		return;
 	glUniform1i( U( p, "uShardsReady" ), shardsReady ? 1 : 0 );
-	if( p == progSoupB || p == progShadowSoupB || p == progSoupBM ) // W26: the recorded flights (unit 24)
+	if( p == progSoupB || p == progShadowSoupB ) // W26: the recorded flights (unit 24)
 	{
 		glActiveTexture( GL_TEXTURE0 + 24 );
 		glBindTexture( GL_TEXTURE_BUFFER, sh.pathTex ? sh.pathTex : dummyShardData );
@@ -949,6 +966,25 @@ void Renderer::SetShapeUniforms( GLuint p, const FrameState& fs, GpuModel* model
 	glUniform1f( U( p, "uRippleFreq" ), s.rippleFreq );
 	glUniform1f( U( p, "uRipplePhase" ), s.ripplePhase );
 	glUniform1f( U( p, "uSlicePhase" ), s.slicePhase );
+	if( s.deform ) // W2 Deform group (the DEFORM twins only)
+	{
+		glUniform1f( U( p, "uTaper" ), s.taper );
+		glUniform1f( U( p, "uSquash" ), s.squash );
+		glUniform1f( U( p, "uShear" ), s.shear );
+		glUniform1f( U( p, "uBulge" ), s.bulge );
+		glUniform1f( U( p, "uSpherize" ), s.spherize );
+		glUniform1f( U( p, "uWarp" ), s.warp );
+		glUniform1f( U( p, "uWarpScale" ), s.warpScale );
+		glUniform1f( U( p, "uWarpPhase" ), s.warpPhase );
+		glUniform1f( U( p, "uGlitchShift" ), s.glitchShift );
+		glUniform1f( U( p, "uGlitchBands" ), s.glitchBands );
+		glUniform1f( U( p, "uGlitchStep" ), s.glitchStep );
+		glUniform3fv( U( p, "uFoldAxes" ), 1, s.foldAxes );
+		glUniform1f( U( p, "uFoldK" ), s.foldK );
+		glUniform3fv( U( p, "uJellyLin" ), 1, s.jellyLin );
+		glUniform3fv( U( p, "uJellyAng" ), 1, s.jellyAng );
+		glUniform1f( U( p, "uJellyScale" ), s.jellyScale );
+	}
 }
 
 // Starts / collects the dust point sampling; steps the transform-feedback simulation.

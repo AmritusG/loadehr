@@ -1621,10 +1621,11 @@ void BuildImageMips( Image& img )
 	BuildMips( img );
 }
 
-std::unique_ptr< ModelData > ModelFromMesh( GenMesh& g, const std::string& path )
+namespace
 {
-	auto model  = std::make_unique< ModelData >();
-	model->path = path;
+// a generated mesh through FinalizeGeometry; per-triangle values (`per`, in mesh order) follow the part sort
+void FinalizeGen( GenMesh& g, ModelData& out, const std::vector< std::vector< uint32_t > >& per, std::vector< std::vector< uint16_t > >& sorted )
+{
 	MeshBuilder mb;
 	mb.allHaveTangents = false;
 	const size_t tris  = g.corners.size() / 3;
@@ -1640,23 +1641,60 @@ std::unique_ptr< ModelData > ModelFromMesh( GenMesh& g, const std::string& path 
 	mb.triSlot = g.triPart;
 	mb.triNode.assign( tris, 0 );
 	for( size_t p = 0; p < g.parts.size(); ++p )
-	{
 		g.parts[ p ].slot = int( p );
-		model->slotNames.push_back( g.parts[ p ].name );
-	}
-	FinalizeGeometry( mb, g.parts, *model );
-	// FinalizeGeometry sorts the triangles by part (stable): the groups follow the same order
+	FinalizeGeometry( mb, g.parts, out );
+	// FinalizeGeometry sorts the triangles by part (stable): the per-triangle values follow the same order
 	std::vector< uint32_t > cursor( g.parts.size(), 0 ), start( g.parts.size(), 0 );
 	for( uint32_t t : g.triPart )
 		cursor[ t ]++;
 	for( size_t p = 1; p < g.parts.size(); ++p )
 		start[ p ] = start[ p - 1 ] + cursor[ p - 1 ];
-	model->triGroup.resize( tris );
+	sorted.assign( per.size(), std::vector< uint16_t >( tris ) );
 	for( size_t t = 0; t < tris; ++t )
-		model->triGroup[ start[ g.triPart[ t ] ]++ ] = (uint16_t)std::min( g.triGroup[ t ], 65535u );
+	{
+		const uint32_t d = start[ g.triPart[ t ] ]++;
+		for( size_t k = 0; k < per.size(); ++k )
+			sorted[ k ][ d ] = (uint16_t)std::min( per[ k ][ t ], 65535u );
+	}
+}
+}
+
+std::unique_ptr< ModelData > ModelFromMesh( GenMesh& g, const std::string& path, GenMesh* frac, const std::vector< uint32_t >* triPiece, int pieceCount )
+{
+	auto model  = std::make_unique< ModelData >();
+	model->path = path;
+	for( const Part& p : g.parts )
+		model->slotNames.push_back( p.name );
+	std::vector< std::vector< uint16_t > > sorted;
+	FinalizeGen( g, *model, { g.triGroup }, sorted );
+	model->triGroup   = sorted[ 0 ];
 	model->groupCount = g.groupCount;
 	for( Part& p : g.parts )
 		model->parts.push_back( std::move( p ) );
+	if( !frac || frac->corners.empty() || !triPiece )
+		return model;
+	// W2: the fractured copy, finished on its own (its corners never merge into the whole mesh's vertices, so the whole mesh's
+	// vertices, tangents and fit are exactly what they are without it) and appended: vertices, indices, parts (same control slots)
+	ModelData f;
+	FinalizeGen( *frac, f, { frac->triGroup, *triPiece }, sorted );
+	const uint32_t v0    = (uint32_t)model->vertices.size();
+	const uint32_t i0    = (uint32_t)model->indices.size();
+	model->wholeIndexCount = i0;
+	model->vertices.insert( model->vertices.end(), f.vertices.begin(), f.vertices.end() );
+	for( uint32_t i : f.indices )
+		model->indices.push_back( i + v0 );
+	for( size_t p = 0; p < frac->parts.size(); ++p )
+	{
+		Part q       = std::move( frac->parts[ p ] );
+		q.slot       = int( p );
+		q.fractured  = true;
+		q.firstIndex += i0;
+		model->parts.push_back( std::move( q ) );
+	}
+	model->triGroup.insert( model->triGroup.end(), sorted[ 0 ].begin(), sorted[ 0 ].end() );
+	model->triPiece      = sorted[ 1 ];
+	model->pieceCount    = pieceCount;
+	model->triangleCount = model->indices.size() / 3;
 	return model;
 }
 }

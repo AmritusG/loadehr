@@ -24,6 +24,7 @@ struct GpuPart
 	float glass = 0, glassTint[ 3 ] = { 1, 1, 1 };
 	int slot = 0;
 	float boxMin[ 3 ] = { 0, 0, 0 }, boxMax[ 3 ] = { 0, 0, 0 };
+	bool fractured = false; // W2: the fractured copy (text / logo pieces): drawn instead of the whole mesh while pieces fly
 };
 
 // Simplified index buffers (meshoptimizer) for clones / ghosts: level 0 is the model's own ibo.
@@ -53,6 +54,7 @@ public:
 	float fitCenter[ 3 ] = { 0, 0, 0 };
 	float fitScale       = 1;
 	size_t triangleCount = 0;
+	bool hasPieces       = false; // W2: carries a fractured copy (parts flagged `fractured`)
 	std::string path;
 	std::string status; // W21: generated models: the Status line
 	double msUpload = 0, msWorstStep = 0;

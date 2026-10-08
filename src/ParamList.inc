@@ -234,28 +234,28 @@ MEHR_PART( 6 )
 MEHR_PART( 7 )
 MEHR_PART( 8 )
 #undef MEHR_PART
-// SHAPE: deforms in the triangle-soup vertex stage (fitted object space). Shatter moves whole shards.
-#undef MEHR_REGION
-#define MEHR_REGION MEHR_CLASSIC
-X( P_MELT, "Melt", STD, 0, 1, 0, "Shape", "", 0 )
-X( P_DRIP, "Drip", STD, 0, 3, 1, "Shape", "", 0 )
+// SHAPE: the triangle-soup vertex stage (fitted object space). Shatter moves whole shards.
 #undef MEHR_REGION
 #define MEHR_REGION 0
 X( P_SHATTER, "Shatter", EVENT, 0, 1, 0, "Shape", "", 0 )
 X( P_REFORM, "Reform", EVENT, 0, 1, 0, "Shape", "", 0 )
 X( P_SHATTER_BEAT, "Shatter On Beat", OPT, 0, 4, 0, "Shape", "Off|Every Beat|Every 2|Every 4|Every 8", 0 )
 X( P_SHARD_COUNT, "Shard Count", STD, 8, 512, 64, "Shape", "", 0 )
+// W2 text / logos: Letters = whole letters fly (W21); Pieces = each letter breaks into solid chunks (Shard Count shared over the
+// letters by area, cut faces = the Core part); Pieces + Letters = the chunks fly, each letter's chunks with one common kick.
+// Loaded models: shards as before (any mode).
+X( P_SHATTER_MODE, "Shatter Mode", OPT, 0, 2, 1, "Shape", "Letters|Pieces|Pieces + Letters", 0 )
 X( P_SHATTER_FORCE, "Shatter Force", STD, 0, 10, 1.5f, "Shape", "", 0 )
 X( P_SHATTER_GRAVITY, "Shatter Gravity", STD, 0, 20, 2, "Shape", "", 0 )
 X( P_SHARD_SPIN, "Shard Spin", STD, 0, 20, 3, "Shape", "", 0 )
 X( P_REFORM_TIME, "Reform Time", STD, 0.05f, 10, 1.2f, "Shape", "", 0 )
-#undef MEHR_REGION
-#define MEHR_REGION MEHR_WOW
 // W26 Stage 9: Bounce = the shards fall, bounce on the floor (and the wall when the catcher is a wall), slide and tumble; Reform
-// flies them back along the same path
+// flies them back along the same path. LoadEhr W2: every bundle (a logo's pieces bounce in LoadEhr too); Physics Speed stays Wow
 X( P_SHATTER_PHYSICS, "Shatter Physics", OPT, 0, 1, 0, "Shape", "Analytic|Bounce", 0 )
 X( P_BOUNCINESS, "Bounciness", STD, 0, 1, 0.5f, "Shape", "", 0 )
 X( P_FLOOR_FRICTION, "Floor Friction", STD, 0, 1, 0.3f, "Shape", "", 0 )
+#undef MEHR_REGION
+#define MEHR_REGION MEHR_WOW
 X( P_PHYSICS_SPEED, "Physics Speed", STD, 0, 2, 0.35f, "Shape", "", 0 ) // W28: shard flight / bounce / reform pace (1 = W26)
 #undef MEHR_REGION
 #define MEHR_REGION MEHR_CLASSIC
@@ -285,13 +285,6 @@ X( P_TUMBLE_BEAT, "Tumble On Beat", OPT, 0, 4, 0, "Shape", "Off|Every Beat|Every
 X( P_TUMBLE_FLIP, "Tumble Beat Flip", OPT, 0, 1, 0, "Shape", "90|180", 0 )
 X( P_FACET_GAP, "Facet Gap", STD, 0, 1, 0, "Shape", "", 0 )
 X( P_TUMBLE_RESET, "Tumble Reset", EVENT, 0, 1, 0, "Shape", "", 0 )
-X( P_DEFORM_AXIS, "Deform Axis", OPT, 0, 2, 1, "Shape", "X|Y|Z", 0 )
-X( P_TWIST, "Twist", STD, -8, 8, 0, "Shape", "", 0 )
-X( P_BEND, "Bend", STD, -4, 4, 0, "Shape", "", 0 )
-X( P_RIPPLE, "Ripple", STD, 0, 0.5f, 0, "Shape", "", 0 )
-X( P_RIPPLE_FREQ, "Ripple Freq", STD, 1, 80, 14, "Shape", "", 0 )
-X( P_RIPPLE_SPEED, "Ripple Speed", STD, -20, 20, 4, "Shape", "", 0 )
-X( P_RIPPLE_BEAT, "Ripple Beat", STD, 0, 4, 0, "Shape", "", 0 )
 X( P_BLOW_DUST, "Blow To Dust", EVENT, 0, 1, 0, "Shape", "", 0 )
 X( P_DUST_REFORM, "Dust Reform", EVENT, 0, 1, 0, "Shape", "", 0 )
 X( P_DUST_BEAT, "Dust On Beat", OPT, 0, 4, 0, "Shape", "Off|Every Beat|Every 2|Every 4|Every 8", 0 )
@@ -306,6 +299,37 @@ X( P_CONTOUR_SPACING, "Contour Spacing", STD, 0.005f, 0.5f, 0.06f, "Shape", "", 
 X( P_CONTOUR_WIDTH, "Contour Width", STD, 0.01f, 1, 0.15f, "Shape", "", 0 )
 X( P_CONTOUR_SPEED, "Contour Speed", STD, -4, 4, 0.3f, "Shape", "", 0 )
 MEHR_COLOR( P_CONTOUR_COL, "Contour", "Shape", 0.07843137f, 0.85f, 1, 1, "Contour Alpha" ) // alpha x Contours
+// DEFORM (W2, every bundle): bends the model, text and logos (any slot) in a fixed order: Taper, Twist, Bend, Squash, Shear,
+// Bulge, Spherize, Noise Warp, Ripple, Melt / Drip, Glitch, Mirror Fold, Jelly; shards / pieces fly from the deformed shape.
+// Drawn by the DEFORM program twins (every deform at 0 = the plain programs). Not deformed: the sim obstacle, the eye finder, the
+// liquid SDF, the dust points (they stay the rigid model). Deform Axis .. Drip moved here from Shape (names and meaning as before).
+#undef MEHR_REGION
+#define MEHR_REGION 0
+X( P_DEFORM_AMOUNT, "Deform Amount", STD, 0, 2, 1, "Deform", "", 0 )     // master on every deform (> 1 is too much on purpose)
+X( P_DEFORM_AXIS, "Deform Axis", OPT, 0, 2, 1, "Deform", "X|Y|Z", 0 )
+X( P_TAPER, "Taper", STD, -2, 2, 0, "Deform", "", 0 )                    // across the axis: grows (+) / shrinks (-) along it
+X( P_TWIST, "Twist", STD, -8, 8, 0, "Deform", "", 0 )
+X( P_BEND, "Bend", STD, -4, 4, 0, "Deform", "", 0 )
+X( P_SQUASH, "Squash", STD, -1, 1, 0, "Deform", "", 0 )                  // + shorter along the axis and wider (volume kept), - stretched
+X( P_SQUASH_BEAT, "Squash Beat", STD, 0, 2, 0, "Deform", "", 0 )         // a squash kick on each beat (the Beat Bounce envelope)
+X( P_SHEAR, "Shear", STD, -2, 2, 0, "Deform", "", 0 )                    // slides along the axis' first perpendicular
+X( P_BULGE, "Bulge", STD, -1, 2, 0, "Deform", "", 0 )                    // rounds the middle out (negative: pinches it in)
+X( P_SPHERIZE, "Spherize", STD, 0, 1, 0, "Deform", "", 0 )               // toward a sphere of the fitted radius
+X( P_NOISE_WARP, "Noise Warp", STD, 0, 2, 0, "Deform", "", 0 )           // smooth 3D noise displacement
+X( P_WARP_SCALE, "Warp Scale", STD, 0.2f, 10, 2, "Deform", "", 0 )       // noise cells per fitted unit
+X( P_WARP_SPEED, "Warp Speed", STD, 0, 4, 0.3f, "Deform", "", 0 )        // noise cells per second
+X( P_RIPPLE, "Ripple", STD, 0, 0.5f, 0, "Deform", "", 0 )
+X( P_RIPPLE_FREQ, "Ripple Freq", STD, 1, 80, 14, "Deform", "", 0 )
+X( P_RIPPLE_SPEED, "Ripple Speed", STD, -20, 20, 4, "Deform", "", 0 )
+X( P_RIPPLE_BEAT, "Ripple Beat", STD, 0, 4, 0, "Deform", "", 0 )
+X( P_MELT, "Melt", STD, 0, 1, 0, "Deform", "", 0 )
+X( P_DRIP, "Drip", STD, 0, 3, 1, "Deform", "", 0 )
+X( P_GLITCH_SHIFT, "Glitch Shift", STD, 0, 1, 0, "Deform", "", 0 )       // bands across the axis jump sideways
+X( P_GLITCH_BANDS, "Glitch Bands", STD, 2, 64, 12, "Deform", "", 0 )
+X( P_GLITCH_RATE, "Glitch Rate", STD, 0, 30, 6, "Deform", "", 0 )        // jumps (steps) per second
+X( P_MIRROR_FOLD, "Mirror Fold", OPT, 0, 3, 0, "Deform", "Off|X|X+Y|X+Y+Z", 0 ) // kaleidoscope object: folded across the centre planes
+X( P_JELLY, "Jelly", STD, 0, 2, 0, "Deform", "", 0 )                     // lags behind its own spin / move / bounce, springs back
+X( P_AUDIO_DEFORM, "Audio > Deform", STD, 0, 4, 0, "Deform", "", 0 )     // the audio level adds to Deform Amount
 #undef MEHR_REGION
 #define MEHR_REGION MEHR_CLASSIC
 // COPIES: instanced clones (LODs by screen size), echo trails, ghost poses
@@ -407,6 +431,10 @@ X( P_SIM_PROJECT, "Project Input", STD, 0, 1, 0, "Smoke Sim", "", 0 ) // the inc
 #undef MEHR_REGION
 #define MEHR_REGION 0
 #endif
+// LoadEhr W2: Trip moved to the Wow bundles (W2's Deform group went into every bundle; both FX carriers can only fit it if one
+// shared group goes to one side: 2 x shared + extras <= 2 x 512)
+#undef MEHR_REGION
+#define MEHR_REGION MEHR_WOW
 // TRIP (W24): psychedelic looks on top of the smoke (Sim, and the Noise engine where it makes sense). Everything defaults
 // off. Trip Master scales every look (0 = all off; the top end is too much on purpose). Medium looks = Raymarch only.
 X( P_TRIP_MASTER, "Trip Master", STD, 0, 2, 1, "Trip", "", 0 )
@@ -534,25 +562,6 @@ X( P_CAUSTIC_FLOOR, "Caustic Floor", STD, 0, 2, 1, "Caustics", "", 0 )        //
 X( P_CAUSTIC_SMOKE, "Caustic Smoke", STD, 0, 2, 0.5f, "Caustics", "", 0 )
 X( P_CAUSTIC_SURFACE, "Caustic Surface", STD, 0, 2, 1, "Caustics", "", 0 )    // on the mask behind the glass
 MEHR_COLOR( P_CAUSTIC_COL, "Caustic", "Caustics", 0.12f, 0.15f, 1, 1, "Caustic Alpha" ) // alpha x Caustics
-// MIRROR ROOM (W26 Stage 10): a mirror box round the mask (front = a two-way mirror, as an infinity mirror), its reflections
-// unfolded into a lattice of mirrored copies (Mirror Count bounces, each tinted x Mirror Reflect), LED strips on its edges
-// (Mirror Gap); every volume and particle reflects (W27).
-X( P_MIRROR_ROOM, "Mirror Room", OPT, 0, 3, 0, "Mirror Room", "Off|Box|Corridor|Two Mirrors", 0 )
-X( P_MIRROR_COUNT, "Mirror Count", STD, 1, 8, 3, "Mirror Room", "", 0 )      // bounces
-X( P_BOX_SIZE, "Box Size", STD, 0.8f, 6, 1.6f, "Mirror Room", "", 0 )        // half width / height, mask units
-X( P_BOX_DEPTH, "Box Depth", STD, 0.5f, 6, 1.6f, "Mirror Room", "", 0 )      // half depth
-MEHR_COLOR( P_MIRROR_COL, "Mirror", "Mirror Room", 0.55f, 0.12f, 1, 0.8f, "Mirror Reflect" ) // alpha = reflectance per bounce
-X( P_MIRROR_GAP, "Mirror Gap", STD, 0, 4, 1, "Mirror Room", "", 0 )          // the LED strips' glow on the edges
-X( P_LED_WIDTH, "LED Width", STD, 0.2f, 4, 1, "Mirror Room", "", 0 )
-X( P_LED_COLORS, "LED Colors", OPT, 0, 1, 0, "Mirror Room", "Picker|Rainbow", 0 )
-MEHR_COLOR( P_LED_COL, "LED", "Mirror Room", 0.58f, 0.3f, 1, 1, "LED Alpha" )
-X( P_LED_SPEED, "LED Speed", STD, -4, 4, 0.3f, "Mirror Room", "", 0 )       // the chase along the strips, cycles / s
-// W27: the volumes (smoke, fire, haze, glow cloud, light shafts, projector beam) march on through the unfolded lattice, and
-// the particles (fireflies, bolts, motes) are drawn again in the nearest mirror cells
-X( P_MIRROR_VOLUMES, "Mirror Volumes", BOOL, 0, 1, 1, "Mirror Room", "", 0 )
-X( P_MIRROR_VOL_STEPS, "Mirror Vol Steps", OPT, 0, 3, 1, "Mirror Room", "4|8|16|32", 0 ) // march steps per bounce
-X( P_MIRROR_PARTICLES, "Mirror Particles", BOOL, 0, 1, 1, "Mirror Room", "", 0 )
-X( P_PARTICLE_IMAGES, "Particle Images", STD, 1, 64, 24, "Mirror Room", "", 0 ) // mirror cells the particles are drawn in
 #undef MEHR_REGION
 #define MEHR_REGION 0
 #define MEHR_VLIGHT( L, S, px, py, pz, anchor, aim, h, s, v )                                          \
@@ -606,8 +615,8 @@ X( P_LC_BEAT, "C Beat Pulse", STD, 0, 4, 0, "Light C", "", 0 )
 X( P_LC_AUDIO, "C Audio > Light", STD, 0, 4, 0, "Light C", "", 0 )
 X( P_LC_PLACED, "C Placed For", TEXT, 0, 0, 0, "Light C", "", HIDDEN )
 #undef MEHR_REGION
-#define MEHR_REGION MEHR_WOW
-// SPOTS: club-style moving spotlights across the mask (their beams show in the Volume medium)
+#define MEHR_REGION MEHR_CLASSIC
+// SPOTS: club-style moving spotlights (LoadEhr W2: moved to LoadEhr / FX, making room in Wow FX) across the mask (their beams show in the Volume medium)
 X( P_SPOT_COUNT, "Spot Count", OPT, 0, 4, 0, "Spots", "Off|1|2|3|4", 0 )
 X( P_SPOT_INTENSITY, "Spot Intensity", STD, 0, 100, 25, "Spots", "", 0 )
 X( P_SPOT_CONE, "Spot Cone", STD, 2, 90, 14, "Spots", "", 0 )
@@ -620,13 +629,19 @@ MEHR_COLOR( P_SPOT_COL, "Spot", "Spots", 0, 0, 1, 1, "Spot Alpha" ) // alpha x S
 X( P_SPOT_COLOR_MODE, "Spot Color Mode", OPT, 0, 2, 0, "Spots", "Single|Rainbow|Pairs", 0 )
 X( P_SPOT_STROBE, "Spot Beat Strobe", STD, 0, 1, 0, "Spots", "", 0 )
 X( P_SPOT_BEAMS, "Spot Beams", STD, 0, 4, 1, "Spots", "", 0 )
-// PROJECTOR (W26 Stage 2): a spot whose light is a picture (FX: the incoming clip or an image file; source: an image file). It
-// lights the medium (the picture shows as a beam in the haze / smoke) and lands on the mask, shadowed by it. Placed like Light A.
+#undef MEHR_REGION
+#define MEHR_REGION MEHR_WOW
+// PROJECTOR (W26 Stage 2): a spot whose light is a picture (FX: the incoming clip or a file; source: a file). It lights the medium
+// (the picture shows as a beam in the haze / smoke) and lands on the mask, shadowed by it. Placed like Light A.
+// W2: Proj File = an image (png / jpg) or a VIDEO (mov / mp4 / m4v: H.264, HEVC, ProRes incl. 4444 alpha, HAP / HAP Alpha / HAP Q)
 X( P_PROJ_ENABLE, "Proj Enable", BOOL, 0, 1, 0, "Projector", "", 0 )
 #if LOADEHR_FX
-X( P_PROJ_SOURCE, "Proj Source", OPT, 0, 1, 0, "Projector", "Input|Image File", 0 )
+X( P_PROJ_SOURCE, "Proj Source", OPT, 0, 1, 0, "Projector", "Input|File", 0 )
 #endif
-X( P_PROJ_IMAGE, "Proj Image", FILE, 0, 0, 0, "Projector", "", 0 )
+X( P_PROJ_FILE, "Proj File", FILE, 0, 0, 0, "Projector", "", 0 )
+X( P_VIDEO_SPEED, "Video Speed", STD, 0, 4, 1, "Projector", "", 0 )        // x real time
+X( P_VIDEO_LOOP, "Video Loop", OPT, 0, 2, 0, "Projector", "Loop|Ping-Pong|Once", 0 )
+X( P_VIDEO_RESTART, "Video Restart", EVENT, 0, 1, 0, "Projector", "", 0 )  // back to the first frame (a clip trigger does it too)
 X( P_PROJ_ANCHOR, "Proj Anchor", BOOL, 0, 1, 0, "Projector", "", 0 )
 X( P_PROJ_POS_X, "Proj Pos X", STD, -6, 6, 0.8f, "Projector", "", 0 )
 X( P_PROJ_POS_Y, "Proj Pos Y", STD, -6, 6, 1.2f, "Projector", "", 0 )

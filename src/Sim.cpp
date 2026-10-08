@@ -6,7 +6,6 @@
 #include "Generate.h"
 #include "Log.h"
 #include "MathUtil.h"
-#include "MirrorShaders.h"
 #include "Renderer.h"
 #include "Shaders.h"
 #include "SimShaders.h"
@@ -80,13 +79,6 @@ bool Renderer::InitSim( std::string& error )
 	progRaySrcSim   = Link( kQuadVS, std::string( kLightLib ) + kFrontLib + kSimLib + kMediumSimLib + kRaySourceFS, error );
 	progFogMarchSimT = Link( kQuadVS, std::string( "#define TRIP\n" ) + kLightLib + kFrontLib + kSimLib + kTripLib + kMediumSimLib + march, error ); // W24
 	progFogMarchSimF = Link( kQuadVS, std::string( "#define TRIP\n#define FIRE\n" ) + kLightLib + kFrontLib + kSimLib + kTripLib + kMediumSimLib + march, error ); // W26
-	// W27 mirror room: the same three marches through the unfolded lattice
-	const std::string mirror = std::string( kMirrorLib ) + kMirrorMarchLib;
-	progFogMarchSimM  = Link( kQuadVS, std::string( "#define MIRROR\n" ) + kLightLib + kFrontLib + kSimLib + kMediumSimLib + mirror + march, error );
-	progFogMarchSimTM = Link( kQuadVS, std::string( "#define TRIP\n#define MIRROR\n" ) + kLightLib + kFrontLib + kSimLib + kTripLib + kMediumSimLib + mirror + march, error );
-	progFogMarchSimFM = Link( kQuadVS, std::string( "#define TRIP\n#define FIRE\n#define MIRROR\n" ) + kLightLib + kFrontLib + kSimLib + kTripLib + kMediumSimLib + mirror + march, error );
-	if( !progFogMarchSimM || !progFogMarchSimTM || !progFogMarchSimFM )
-		return false;
 	if( !progFogMarchSimT || !progFogMarchSimF )
 		return false;
 	if( !progSimObs || !progSimAdvect || !progSimCorrect || !progSimCurl || !progSimForce || !progSimDiv || !progSimJacobi || !progSimProject || !progFogMarchSim ||
@@ -100,7 +92,7 @@ bool Renderer::InitSim( std::string& error )
 		for( int i = 0; i < 10; ++i )
 			glUniform1i( U( p, names[ i ] ), i );
 	}
-	for( GLuint p : { progFogMarchSim, progRaySrcSim, progFogMarchSimT, progFogMarchSimF, progFogMarchSimM, progFogMarchSimTM, progFogMarchSimFM } )
+	for( GLuint p : { progFogMarchSim, progRaySrcSim, progFogMarchSimT, progFogMarchSimF } )
 	{
 		glUseProgram( p );
 		glUniform1i( U( p, "uDepth" ), 0 );
@@ -119,8 +111,7 @@ bool Renderer::InitSim( std::string& error )
 void Renderer::ReleaseSim()
 {
 	for( GLuint* p : { &progSimObs, &progSimAdvect, &progSimCorrect, &progSimCurl, &progSimForce, &progSimDiv, &progSimJacobi, &progSimProject, &progFogMarchSim,
-	                   &progRaySrcSim, &progFogMarchSimT, &progSimCorrectT, &progSimForceT, &progSimProjectT, &progSimCorrectF, &progSimForceF, &progFogMarchSimF,
-	                   &progFogMarchSimM, &progFogMarchSimTM, &progFogMarchSimFM } )
+	                   &progRaySrcSim, &progFogMarchSimT, &progSimCorrectT, &progSimForceT, &progSimProjectT, &progSimCorrectF, &progSimForceF, &progFogMarchSimF } )
 		if( *p )
 			glDeleteProgram( *p ), *p = 0;
 	for( GLuint* t : { &simVel[ 0 ], &simVel[ 1 ], &simSca[ 0 ], &simSca[ 1 ], &simTmpV, &simTmpS, &simObs, &simDiv, &simP[ 0 ], &simP[ 1 ] } )

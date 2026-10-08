@@ -42,21 +42,6 @@ vec3 TrailSmear( vec3 w, vec3 p, vec3 wn )
 	return dot( wn, mv ) > 0.0 ? mv * uTrailSmear : vec3( 0.0 );
 }
 #endif
-#ifdef MIRROR
-// W27 mirror room copies: uInstNext holds the fold (the cell -> real space): the copy is shaded where the mask really is
-uniform vec3 uMirrorEye; // the camera
-out vec3 vMUnf;          // the unfolded position (seen through the box?)
-flat out vec3 vMCam;     // the camera folded into the real box
-void MirrorFoldOut( inout vec3 wpos, inout vec3 wnrm, inout vec3 wtan )
-{
-	mat4 F = uInstNext[ uInstBase + gl_InstanceID ];
-	vMUnf  = wpos;
-	vMCam  = ( F * vec4( uMirrorEye, 1.0 ) ).xyz;
-	wpos   = ( F * vec4( wpos, 1.0 ) ).xyz;
-	wnrm   = mat3( F ) * wnrm;
-	wtan   = mat3( F ) * wtan;
-}
-#endif
 uniform float uGlitchAmt; // hologram glitch on the beat: horizontal slices jump sideways
 uniform float uTime;
 vec3 Glitch( vec3 w )
@@ -113,9 +98,6 @@ void main()
 	vo.uv       = aUV;
 	vo.opos     = ( p - uFitCenter ) * uFitScale;
 	vo.bary     = vec3( 1.0 );
-#ifdef MIRROR
-	MirrorFoldOut( vo.wpos, vo.wnrm, vo.wtan.xyz );
-#endif
 	gl_Position = uViewProj * w;
 }
 )GLSL";
@@ -176,6 +158,12 @@ uniform float uExplodeRandom;
 uniform float uSeed;
 uniform float uWorldScale;
 // instances (clones / ghosts, program variants built with INSTANCED): matrix, hue offset, alpha
+#ifdef DEFORM
+uniform int uFoldN; // W2 Mirror Fold: every draw is uFoldN copies, the fold copy = gl_InstanceID % uFoldN
+#define INST_ID ( gl_InstanceID / uFoldN )
+#else
+#define INST_ID gl_InstanceID
+#endif
 uniform int uInstBase;
 uniform mat4 uInst[ 64 ];
 uniform vec2 uInstHA[ 64 ]; // hue offset, alpha
@@ -192,23 +180,8 @@ uniform mat4 uInstNext[ 64 ];
 uniform float uTrailSmear;
 vec3 TrailSmear( vec3 w, vec3 p, vec3 wn )
 {
-	vec3 mv = ( uInstNext[ uInstBase + gl_InstanceID ] * vec4( p, 1.0 ) ).xyz - w;
+	vec3 mv = ( uInstNext[ uInstBase + INST_ID ] * vec4( p, 1.0 ) ).xyz - w;
 	return dot( wn, mv ) > 0.0 ? mv * uTrailSmear : vec3( 0.0 );
-}
-#endif
-#ifdef MIRROR
-// W27 mirror room copies: uInstNext holds the fold (the cell -> real space): the copy is shaded where the mask really is
-uniform vec3 uMirrorEye; // the camera
-out vec3 vMUnf;          // the unfolded position (seen through the box?)
-flat out vec3 vMCam;     // the camera folded into the real box
-void MirrorFoldOut( inout vec3 wpos, inout vec3 wnrm, inout vec3 wtan )
-{
-	mat4 F = uInstNext[ uInstBase + gl_InstanceID ];
-	vMUnf  = wpos;
-	vMCam  = ( F * vec4( uMirrorEye, 1.0 ) ).xyz;
-	wpos   = ( F * vec4( wpos, 1.0 ) ).xyz;
-	wnrm   = mat3( F ) * wnrm;
-	wtan   = mat3( F ) * wtan;
 }
 #endif
 uniform float uGlitchAmt; // hologram glitch on the beat: horizontal slices jump sideways
@@ -324,9 +297,103 @@ float VNoise( vec2 p )
 	return mix( mix( a, b, f.x ), mix( c, d, f.x ), f.y );
 }
 
+#ifdef DEFORM
+// W2 Deform group (this program variant only: with every deform at 0 the plain programs draw). Fitted space; the fixed order:
+// Taper, Twist, Bend, Squash, Shear, Bulge, Spherize, Noise Warp, Ripple, Melt / Drip, Glitch, Mirror Fold, Jelly. The values
+// arrive already scaled by Deform Amount (+ Audio > Deform).
+uniform float uTaper, uSquash, uShear, uBulge, uSpherize;
+uniform float uWarp, uWarpScale, uWarpPhase;       // the noise drifts at Warp Speed lattice cells / s (phase wraps at 256)
+uniform float uGlitchShift, uGlitchBands, uGlitchStep; // the step index wraps at 1000 (a wrap = one more random step)
+uniform vec3 uFoldAxes;                           // 1 = folded across that fitted centre plane
+uniform float uFoldK;                             // 0..1: how far folded (Deform Amount)
+uniform vec3 uJellyLin, uJellyAng;                // the jelly's lag: offset and rotation (axis x angle) at a fitted radius of 1
+uniform float uJellyScale;
+vec3 gFoldS = vec3( 1.0 );                        // this copy's side per folded axis (+1 / -1)
+bool gFoldFlip = false;                           // this triangle is reflected an odd number of times (winding reversed)
+bool gNormalPass = false;                         // the normal's finite differences: no Glitch (a band's jump is a translation)
+float DHash( vec3 c )
+{
+	c = mod( c, 64.0 ); // 64-periodic lattice: the drift wraps seamlessly
+	return fract( sin( dot( c, vec3( 127.1, 311.7, 74.7 ) ) ) * 43758.5453 );
+}
+float DNoise( vec3 p )
+{
+	vec3 i = floor( p ), f = fract( p );
+	f      = f * f * ( 3.0 - 2.0 * f );
+	return mix( mix( mix( DHash( i ), DHash( i + vec3( 1, 0, 0 ) ), f.x ), mix( DHash( i + vec3( 0, 1, 0 ) ), DHash( i + vec3( 1, 1, 0 ) ), f.x ), f.y ),
+	            mix( mix( DHash( i + vec3( 0, 0, 1 ) ), DHash( i + vec3( 1, 0, 1 ) ), f.x ), mix( DHash( i + vec3( 0, 1, 1 ) ), DHash( i + vec3( 1, 1, 1 ) ), f.x ), f.y ), f.z );
+}
+vec3 DeformPre( vec3 f, vec3 n )
+{
+	vec3 q = ToAxis( f, uDeformAxis ); // q.z runs along the axis
+	q.xy *= max( 1.0 + uTaper * q.z * 0.5, 0.0 );
+	if( uTwist != 0.0 )
+	{
+		float a = uTwist * q.z, c = cos( a ), s = sin( a );
+		q.xy    = vec2( c * q.x - s * q.y, s * q.x + c * q.y );
+	}
+	if( abs( uBend ) > 1e-4 )
+	{
+		float R  = 1.0 / uBend;
+		float th = uBend * q.z;
+		q        = vec3( R - ( R - q.x ) * cos( th ), q.y, ( R - q.x ) * sin( th ) );
+	}
+	float sa = exp( -uSquash ); // squash: shorter along the axis, wider across it (volume kept)
+	q.z *= sa;
+	q.xy *= inversesqrt( sa );
+	q.x += uShear * q.z * 0.5;
+	q.xy *= 1.0 + uBulge * 0.6 * max( 1.0 - q.z * q.z, 0.0 ); // round the middle of the axis out (negative: pinch)
+	f = FromAxis( q, uDeformAxis );
+	if( uSpherize > 0.0 )
+		f = mix( f, normalize( f + vec3( 1e-6 ) ) * 0.8, uSpherize );
+	if( uWarp > 0.0 )
+	{
+		vec3 p = f * uWarpScale + uWarpPhase * vec3( 1.0, 0.5, 0.25 );
+		f += uWarp * 0.5 * ( vec3( DNoise( p ), DNoise( p + vec3( 17.3, 9.1, 31.7 ) ), DNoise( p + vec3( 41.9, 23.3, 7.7 ) ) ) - 0.5 );
+	}
+	if( uRipple > 0.0 )
+		f += n * uRipple * sin( uRippleFreq * length( f ) - uRipplePhase );
+	if( uMelt > 0.0 )
+	{
+		float h    = f.y + 1.0;
+		float drip = pow( VNoise( f.xz * 7.0 + 3.1 ), 3.0 ) * uDrip * 2.5;
+		float sag  = uMelt * h * ( 0.45 + drip ) * ( 0.6 + 0.4 * VNoise( f.xz * 2.3 ) );
+		f.y -= sag;
+		float floorY = -1.0 - uMelt * 0.15;
+		float under  = max( floorY - f.y, 0.0 );
+		f.y          = max( f.y, floorY - under * 0.08 );
+		f.xz *= 1.0 + uMelt * 0.35 * smoothstep( 0.4, 0.0, f.y - floorY );
+	}
+	if( uGlitchShift > 0.0 && !gNormalPass )
+	{
+		// bands across the axis jump sideways on a stepped clock (a hash per band and step: still while the clock is paused)
+		vec3 g     = ToAxis( f, uDeformAxis );
+		float band = floor( ( g.z + 1.0 ) * 0.5 * uGlitchBands );
+		float h    = fract( sin( band * 91.7 + uGlitchStep * 7.13 ) * 43758.5453 );
+		float h2   = fract( sin( band * 17.3 + uGlitchStep * 3.71 + 5.0 ) * 24634.6345 );
+		if( h > 0.55 )
+			g.x += ( h2 - 0.5 ) * uGlitchShift;
+		f = FromAxis( g, uDeformAxis );
+	}
+	return f;
+}
+vec3 DeformPost( vec3 f )
+{
+	if( uFoldK > 0.0 ) // kaleidoscope: this copy keeps its own side of each folded centre plane
+		f = mix( f, mix( f, gFoldS * abs( f ), uFoldAxes ), uFoldK );
+	float w = min( length( f ), 1.5 ); // the jelly: the far parts lag the most
+	float a = length( uJellyAng );
+	if( a > 1e-6 )
+		f = RotAxis( uJellyAng / a, a * w ) * f;
+	return f * ( 1.0 + uJellyScale * w ) + uJellyLin * w;
+}
+#endif
 // smooth deforms of one corner (fitted space)
 vec3 Continuous( vec3 f, vec3 n )
 {
+#ifdef DEFORM
+	f = DeformPost( DeformPre( f, n ) );
+#else
 	if( uTwist != 0.0 || uBend != 0.0 )
 	{
 		vec3 q = ToAxis( f, uDeformAxis ); // q.z runs along the axis
@@ -357,6 +424,7 @@ vec3 Continuous( vec3 f, vec3 n )
 		f.y          = max( f.y, floorY - under * 0.08 );
 		f.xz *= 1.0 + uMelt * 0.35 * smoothstep( 0.4, 0.0, f.y - floorY ); // puddle spreading on the floor
 	}
+#endif
 	if( uVoxel > 0.0 )
 		f = mix( f, ( floor( f / uVoxelSize ) + 0.5 ) * uVoxelSize, uVoxel );
 	return f;
@@ -435,6 +503,29 @@ void main()
 	int corner = gl_VertexID - tri * 3;
 	int base   = uFirstIndex + tri * 3;
 	int i0 = int( texelFetch( uIdxBuf, base ).r ), i1 = int( texelFetch( uIdxBuf, base + 1 ).r ), i2 = int( texelFetch( uIdxBuf, base + 2 ).r );
+#ifdef DEFORM
+	if( uFoldN > 1 )
+	{
+		// Mirror Fold: copy c keeps the side bit k of c says on its k-th folded axis
+		int c = gl_InstanceID % uFoldN, k = 0;
+		for( int a = 0; a < 3; ++a )
+			if( uFoldAxes[ a ] > 0.5 )
+				gFoldS[ a ] = ( ( c >> k++ ) & 1 ) == 1 ? -1.0 : 1.0;
+		if( uFoldK > 0.5 )
+		{
+			// a triangle reflected an odd number of times turns its winding: swap two corners so it stays front-facing
+			vec3 c3 = ( DeformPre( ( FetchPos( i0 ) - uFitCenter ) * uFitScale, FetchNrm( i0 ) ) + DeformPre( ( FetchPos( i1 ) - uFitCenter ) * uFitScale, FetchNrm( i1 ) ) +
+			            DeformPre( ( FetchPos( i2 ) - uFitCenter ) * uFitScale, FetchNrm( i2 ) ) ) / 3.0;
+			vec3 r     = step( 0.5, uFoldAxes ) * step( 0.0, -gFoldS * c3 );
+			gFoldFlip  = mod( r.x + r.y + r.z, 2.0 ) > 0.5;
+			if( gFoldFlip )
+			{
+				int sw = i1;
+				i1 = i2, i2 = sw;
+			}
+		}
+	}
+#endif
 	int me = corner == 0 ? i0 : ( corner == 1 ? i1 : i2 );
 
 	int b   = me * 7;
@@ -476,6 +567,24 @@ void main()
 		vec3 f0 = Continuous( ( o0 - uFitCenter ) * uFitScale, FetchNrm( i0 ) );
 		vec3 f1 = Continuous( ( o1 - uFitCenter ) * uFitScale, FetchNrm( i1 ) );
 		vec3 f2 = Continuous( ( o2 - uFitCenter ) * uFitScale, FetchNrm( i2 ) );
+#ifdef DEFORM
+		{
+			// the normal (and tangent) follow the deform: finite differences along the tangent / bitangent (a reflected copy's
+			// differences turn inward: flipped back)
+			vec3 Tn = t.xyz - n * dot( n, t.xyz );
+			Tn      = dot( Tn, Tn ) > 1e-12 ? normalize( Tn ) : normalize( cross( n, abs( n.x ) < 0.9 ? vec3( 1, 0, 0 ) : vec3( 0, 1, 0 ) ) );
+			vec3 Bn = cross( n, Tn );
+			gNormalPass = true;
+			vec3 f0n    = Continuous( opos, n );
+			vec3 dT     = Continuous( opos + Tn * 0.01, n ) - f0n, dB = Continuous( opos + Bn * 0.01, n ) - f0n;
+			gNormalPass = false;
+			vec3 dn = cross( dT, dB );
+			if( dot( dn, dn ) > 1e-16 )
+				n = normalize( dn ) * ( gFoldFlip ? -1.0 : 1.0 );
+			if( dot( dT, dT ) > 1e-16 )
+				t.xyz = normalize( dT );
+		}
+#endif
 		if( uLowPoly > 0.0 )
 		{
 			// the facet is the grid cell of the triangle's centroid: all three corners agree on it
@@ -487,7 +596,11 @@ void main()
 		}
 		vec3 fc = ( f0 + f1 + f2 ) / 3.0;
 		vec3 fn = cross( f1 - f0, f2 - f0 );
+#ifdef DEFORM
+		float flatK = max( uVoxel, uLowPoly ); // the continuous deforms carry their own normals (above)
+#else
 		float flatK = max( max( uVoxel, uLowPoly ), ( uMelt > 0.0 || uTwist != 0.0 || uBend != 0.0 || uRipple > 0.0 ) ? 1.0 : 0.0 );
+#endif
 		vec3 nOut = n;
 		if( dot( fn, fn ) > 1e-24 && flatK > 0.0 )
 			nOut = normalize( mix( n, normalize( fn ), clamp( flatK, 0.0, 1.0 ) ) );
@@ -560,10 +673,10 @@ void main()
 
 #ifdef INSTANCED
 	// clone / ghost: its own model matrix (rigid + uniform scale, so mat3(M) is a normal matrix up to length)
-	mat4 M  = uInst[ uInstBase + gl_InstanceID ];
+	mat4 M  = uInst[ uInstBase + INST_ID ];
 	wn      = normalize( mat3( M ) * nObj );
-	vInstHA = uInstHA[ uInstBase + gl_InstanceID ];
-	vInstX  = uInstX[ uInstBase + gl_InstanceID ];
+	vInstHA = uInstHA[ uInstBase + INST_ID ];
+	vInstX  = uInstX[ uInstBase + INST_ID ];
 #else
 #define M uModel
 	vInstHA = vec2( 0.0, 1.0 );
@@ -604,9 +717,6 @@ void main()
 	vo.opos     = opos;
 #endif
 	vo.bary     = corner == 0 ? vec3( 1, 0, 0 ) : ( corner == 1 ? vec3( 0, 1, 0 ) : vec3( 0, 0, 1 ) );
-#ifdef MIRROR
-	MirrorFoldOut( vo.wpos, vo.wnrm, vo.wtan.xyz );
-#endif
 	gl_Position = uViewProj * vec4( w, 1.0 );
 }
 )GLSL";
@@ -804,13 +914,6 @@ uniform int uShadowOrtho;
 #endif
 #ifdef PHOTON_PASS
 uniform int uPhotonOut;
-#endif
-#ifdef MIRROR
-uniform vec3 uMirrorTint, uMirrorBoxC, uMirrorBoxH;
-uniform vec3 uMirrorEye; // W27: the camera; the copy is shaded in real space (the VS folds it), seen from the folded camera
-in vec3 vMUnf;
-flat in vec3 vMCam;
-#define uCamPos vMCam
 #endif
 #ifdef CRACK_PASS
 uniform float uLavaGlow, uLavaTemp, uCrackWidth, uLavaTintMix, uCrackFlow;
@@ -1126,14 +1229,6 @@ void main()
 		T  = -T;
 	}
 	vec3 B = cross( Ng, T ) * w * ( gl_FrontFacing ? 1.0 : -1.0 );
-#ifdef MIRROR
-	if( mod( vInstX.w, 2.0 ) > 0.5 ) // W27: an odd number of reflections turns the winding: gl_FrontFacing reads the other side
-	{
-		Ng = -Ng;
-		T  = -T;
-		B  = -B;
-	}
-#endif
 	vec3 N = Ng;
 	if( uHas[ 1 ] == 1 )
 	{
@@ -1400,18 +1495,6 @@ void main()
 		}
 	}
 
-#endif
-#ifdef MIRROR
-	color *= pow( uMirrorTint, vec3( vInstX.w ) ); // W26 mirror room: tint x reflectance per bounce (w = the bounces)
-	{
-		// a reflection is only seen THROUGH the box: the ray from the camera to this point must pass through it
-		vec3 rd  = vMUnf - uMirrorEye;
-		vec3 inv = 1.0 / ( rd + vec3( 1e-7 ) );
-		vec3 t0  = ( uMirrorBoxC - uMirrorBoxH - uMirrorEye ) * inv, t1 = ( uMirrorBoxC + uMirrorBoxH - uMirrorEye ) * inv;
-		vec3 tn  = min( t0, t1 ), tx = max( t0, t1 );
-		if( min( min( tx.x, tx.y ), tx.z ) <= max( max( tn.x, tn.y ), max( tn.z, 0.0 ) ) )
-			discard;
-	}
 #endif
 #ifdef INSTANCED
 	if( uTrailPass == 1 ) // ghosts take the trail colour (keeping their shading) and glow in it

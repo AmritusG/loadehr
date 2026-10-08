@@ -9,7 +9,7 @@ usage: tools/parity.py list
        tools/parity.py report <out>                 compare L vs M1 and M2 vs M1 per shot -> <out>/parity.tsv + summary
        tools/parity.py strips <out> <dst>           side-by-side strips (MaskEhr top, LoadEhr bottom, diff x8) -> <dst>/<slug>.jpg
                                                     (a model / script naming a forbidden file stops the run: FORBIDDEN)
-Looks = tools/w22_smoke.py (12), w24_trip.py (14), w25_looks.py (3), w26_wow.py (18), w27_mirror.py (14), w28_review.py (6),
+Looks = tools/w22_smoke.py (12), w24_trip.py (14), w25_looks.py (3), w26_wow.py (18), w28_review.py (6),
         + the name-based harness scripts in tools/scripts/ (each shot of each script)."""
 import os, re, subprocess, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -18,7 +18,6 @@ import w22_smoke as W
 import w24_trip as T
 import w25_looks as T25
 import w26_wow as V
-import w27_mirror as R
 import w28_review as F
 
 ROOT = W.ROOT
@@ -50,8 +49,6 @@ def looks():
         out.append(('w25_' + T.slug(t), T.preamble(T.recipe(t)), {}, T.recipe(t).get('model')))
     for e in V.LOOKS:
         out.append(('w26_' + V.slug(e), V.preamble(e) + e.get('start', []), e.get('at', {}), e.get('model')))
-    for e in R.ALL:
-        out.append(('w27_' + R.slug(e), V.preamble(e) + e.get('start', []), e.get('at', {}), e.get('model')))
     for f in F.FIXES:
         e = F.look(f['name'])
         out.append(('w28_' + V.slug(e), V.preamble(e) + e.get('start', []), e.get('at', {}), e.get('model')))
@@ -84,13 +81,43 @@ def to_maskehr(lines):
     return out
 
 
+# W2: the reference can be an earlier LoadEhr build instead of MaskEhr (PARITY_REF=<build dir>: its LoadEhr*.bundle +
+# loadehr_harness, the same param names), and the L side a frozen copy of this build (PARITY_L=<build dir>)
+REF = os.environ.get('PARITY_REF', '')
+LBUILD = os.environ.get('PARITY_L', os.path.join(ROOT, 'build'))
+
+
+def to_build(lines, d):
+    out = []
+    for l in lines:
+        l = re.sub(r'%s/build/LoadEhr(\w*)\.bundle' % re.escape(ROOT), lambda m: '%s/LoadEhr%s.bundle' % (d, m.group(1)), l)
+        l = re.sub(r'^bundle build/LoadEhr(\w*)\.bundle', lambda m: 'bundle %s/LoadEhr%s.bundle' % (d, m.group(1)), l)
+        out.append(l)
+    return out
+
+
+# W2: Trip lives in the Wow bundles only (Spots in the classic ones): a look that dials them runs on that carrier on the L side
+_INC = open(os.path.join(ROOT, 'src', 'ParamList.inc')).read()
+TRIP = set(re.findall(r'X\( \w+, "([^"]+)", \w+, [^,]+, [^,]+, [^,]+, "Trip"', _INC)) | set(
+    n for b in re.findall(r'MEHR_COLOR\( \w+, "([^"]+)", "Trip"', _INC) for n in (b + ' Color', b + ' Sat', b + ' Bri', b + ' Alpha'))
+
+
+def to_carrier(lines):
+    if not any(re.match(r'^set (.+?) -?[\d.]+$', l) and re.match(r'^set (.+?) -?[\d.]+$', l).group(1) in TRIP for l in lines):
+        return lines
+    return [re.sub(r'LoadEhr(FX)?\.bundle', lambda m: 'LoadEhrWow%s.bundle' % (m.group(1) or ''), l) if l.startswith('bundle') else l for l in lines]
+
+
 def harness(side, lines, path):
-    if side != 'L':
+    if side == 'L':
+        lines, exe = to_build(to_carrier(lines), LBUILD), os.path.join(LBUILD, 'loadehr_harness')
+    elif REF:
+        lines, exe = to_build(lines, REF), os.path.join(REF, 'loadehr_harness')
+    else:
         if any('Face Track' in l for l in lines):  # Face: LoadEhr Wow FX carries it, MaskEhr FX did
             lines = [l.replace('build/LoadEhrWowFX.bundle', 'build/LoadEhrFX.bundle') for l in lines]
-        lines = to_maskehr(lines)
+        lines, exe = to_maskehr(lines), os.path.join(MEHR, 'maskehr_harness')
     open(path, 'w').write('\n'.join(lines) + '\n')
-    exe = os.path.join(ROOT, 'build', 'loadehr_harness') if side == 'L' else os.path.join(MEHR, 'maskehr_harness')
     r = subprocess.run([exe, path], capture_output=True, text=True, cwd=ROOT)
     return r.stdout + r.stderr
 

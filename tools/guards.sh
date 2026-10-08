@@ -6,6 +6,9 @@
 #  G3 no model file inside any built bundle
 #  G4 nothing loaded = transparent: a fresh instance of each bundle covers 0 pixels; every Model slot is empty; Status A says so
 #  G5 no laser / library source files, no library tools
+#  G6 (W2) the mirror room is gone: no param named Mirror Room / Mirror Count / Box Size / LED*, no Mirror* source, no MIRROR program
+#     variant (Mirror Floor in the Floor group is not the mirror room and stays)
+#  G7 (W2) libtess2 is gone (SGI Free Software License B: not on the licence list): no libtess2 / tesselator / SGI-B in the tree
 cd "$(dirname "$0")/.."
 fail=0
 say() { printf '%s\n' "$*"; }
@@ -16,6 +19,9 @@ for b in LoadEhr LoadEhrFX LoadEhrWow LoadEhrWowFX; do
 	n=$(grep -c -E '^\s+[0-9]+ \|' "$T/g_$b.out")
 	bad=$(grep -E '^\s+[0-9]+ \|' "$T/g_$b.out" | awk -F'|' '{print $3}' | grep -i -E '^\s*(library|laser)' | tr '\n' ',')
 	if [ -n "$bad" ]; then say "G1 FAIL $b: $bad"; fail=1; else say "G1 ok   $b: $n params, none named Library* / Laser*"; fi
+	room=$(grep -E '^\s+[0-9]+ \|' "$T/g_$b.out" | awk -F'|' '{print $3}' | grep -E '^\s*(Mirror Room|Mirror Count|Box Size|Box Depth|LED )' | tr '\n' ',')
+	if [ -n "$room" ]; then say "G6 FAIL $b: $room"; fail=1; else say "G6 ok   $b: no Mirror Room / Mirror Count / Box Size / LED* param"; fi
+	[ "$n" -le 512 ] || { say "COUNT FAIL $b: $n params > 512 (Arena drops every param past index 511)"; fail=1; }
 	px=$(grep '^means frame' "$T/g_$b.out" | sed -E 's/.*\| ([0-9]+) px$/\1/' | sort -u | tr '\n' ' ')
 	empty=$(grep -c -E "^get Model [A-D] = ''$" "$T/g_$b.out")
 	st=$(grep '^get Status A' "$T/g_$b.out")
@@ -31,5 +37,9 @@ if [ -z "$models" ]; then say "G3 ok   no model / texture file inside build/Load
 else say "G3 FAIL: $models"; fail=1; fi
 gone=$(ls src/Laser* src/Library* tools/w19_* tools/prune.sh tools/w17_library.py 2>/dev/null)
 if [ -z "$gone" ]; then say "G5 ok   no Laser* / Library* sources, no library tools"; else say "G5 FAIL: $gone"; fail=1; fi
+mir=$(ls src/Mirror* tools/w27_mirror* 2>/dev/null; grep -l -E 'define MIRROR|ifdef MIRROR|MirrorShaders|kMirror(Lib|MarchLib|PointLib)|MirrorClip|MirrorCell|MirrorFold\(' src/* CMakeLists.txt 2>/dev/null)
+if [ -z "$mir" ]; then say "G6 ok   no Mirror* source, no MIRROR program variant"; else say "G6 FAIL: $mir"; fail=1; fi
+tess=$(ls -d third_party/libtess2 2>/dev/null; grep -rl -i -E 'libtess|tesselator\.h|tessNewTess|SGI FREE SOFTWARE|Free Software License B' src third_party CMakeLists.txt 2>/dev/null)
+if [ -z "$tess" ]; then say "G7 ok   no libtess2 / tesselator / SGI-B in src, third_party, CMakeLists.txt"; else say "G7 FAIL: $tess"; fail=1; fi
 rm -rf "$T"
 exit $fail

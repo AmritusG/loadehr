@@ -25,6 +25,43 @@ void main()
 }
 )GLSL";
 
+// W2: a video frame into the projector's picture texture (rows flipped bottom-up, light premultiplied by the frame's alpha).
+// mode 0 = a BGRA frame (IOSurface rectangle texture, rows top-first), 1 = DXT1 / DXT5 RGB(A), 2 = Hap Q (scaled YCoCg DXT5),
+// 3 = Hap Q Alpha (+ the BC4 alpha plane), 4 = a BC4 alpha-only frame (white light through it)
+static const char* kProjVideoFS = R"GLSL(
+in vec2 vUV;
+out vec4 fragColor;
+uniform sampler2DRect uRect;
+uniform sampler2D uDxt;
+uniform sampler2D uDxtA;
+uniform int uMode;
+uniform vec2 uSize;    // the rectangle texture's size (mode 0)
+uniform vec2 uDxtFit;  // the picture's share of the block-padded DXT texture
+void main()
+{
+	vec2 st = vec2( vUV.x, 1.0 - vUV.y ); // the frame's rows are top-first
+	vec4 c;
+	if( uMode == 0 )
+		c = texture( uRect, st * uSize );
+	else
+	{
+		c = texture( uDxt, st * uDxtFit );
+		if( uMode == 2 || uMode == 3 )
+		{
+			// scaled YCoCg (van Waveren and Castano 2007, as Hap Q stores it): Co, Cg in r, g, the scale in b, Y in a
+			float sc = c.b * ( 255.0 / 8.0 ) + 1.0;
+			float co = ( c.r - 0.5 * 256.0 / 255.0 ) / sc, cg = ( c.g - 0.5 * 256.0 / 255.0 ) / sc, y = c.a;
+			c = vec4( y + co - cg, y + cg, y - co - cg, 1.0 );
+			if( uMode == 3 )
+				c.a = texture( uDxtA, st * uDxtFit ).r;
+		}
+		else if( uMode == 4 )
+			c = vec4( vec3( 1.0 ), c.r );
+	}
+	fragColor = vec4( clamp( c.rgb, 0.0, 1.0 ) * c.a, 1.0 );
+}
+)GLSL";
+
 static const char* kProjMarchFS = R"GLSL(
 in vec2 vUV;
 layout( location = 0 ) out vec4 outFog;
@@ -71,16 +108,7 @@ void main()
 		else
 			t1 = min( t1, tk );
 	}
-#ifdef MIRROR
-	// W27 mirror room: the real ray ends where it leaves the box through a mirror; its reflections run on (folded samples)
-	vec2 mr  = MirrorRange( rd, tEnd );
-	bool mOn = mr.x < mr.y;
-	if( mOn )
-		t1 = min( t1, mr.x );
-	if( t1 <= t0 && !mOn )
-#else
 	if( t1 <= t0 )
-#endif
 	{
 		outFog = vec4( 0.0 );
 		return;
@@ -89,29 +117,9 @@ void main()
 	float t  = t0 + dt * IGN( gl_FragCoord.xy + uFrame * vec2( 5.588238, 3.1459 ) );
 	vec3 L   = vec3( 0.0 );
 	float T  = 1.0;
-#ifdef MIRROR
-	int nReal = t1 > t0 ? uSteps : 0;
-	for( int s = 0; s < nReal + ( mOn ? uMSteps : 0 ); ++s, t += dt )
-	{
-		if( s == nReal )
-		{
-			dt = ( mr.y - mr.x ) / float( uMSteps );
-			t  = mr.x + dt * IGN( gl_FragCoord.yx + uFrame * vec2( 3.1459, 5.588238 ) );
-		}
-		vec3 p  = uCamPos + rd * t;
-		vec3 wb = vec3( 1.0 ), rdF = rd;
-		if( s >= nReal )
-		{
-			float nb;
-			p  = MirrorFold( p, rd, rdF, nb );
-			wb = pow( uMTint, vec3( nb ) );
-		}
-		vec3 rd = rdF;
-#else
 	for( int s = 0; s < uSteps; ++s, t += dt )
 	{
 		vec3 p  = uCamPos + rd * t;
-#endif
 		vec4 c  = uPLVP * vec4( p, 1.0 );
 		if( c.w <= 1e-5 )
 			continue;
@@ -128,13 +136,8 @@ void main()
 		if( d > ck.a + 0.02 + 0.01 * d )
 			continue; // behind the mask, seen from the projector
 		float ext = exp( -sig * dt );
-#ifdef MIRROR
-		L += T * wb * uPLColor * ck.rgb * ( HG( dot( lv / max( d, 1e-5 ), -rd ), 0.5 ) / ( 1.0 + d * d ) ) * ( 1.0 - ext );
-		T *= 1.0 - dot( wb, vec3( 1.0 / 3.0 ) ) * ( 1.0 - ext );
-#else
 		L += T * uPLColor * ck.rgb * ( HG( dot( lv / max( d, 1e-5 ), -rd ), 0.5 ) / ( 1.0 + d * d ) ) * ( 1.0 - ext );
 		T *= ext;
-#endif
 	}
 	outFog = vec4( L, 0.0 );
 }

@@ -209,8 +209,8 @@ public:
 			case FF_TYPE_FILE:
 				if( p.id == P_FONT_FILE )
 					SetFileParamInfo( p.id, p.name, { "ttf", "otf", "ttc" }, "" );
-				else if( p.id == P_PROJ_IMAGE )
-					SetFileParamInfo( p.id, p.name, { "png", "jpg", "jpeg" }, "" );
+				else if( p.id == P_PROJ_FILE )
+					SetFileParamInfo( p.id, p.name, { "png", "jpg", "jpeg", "mov", "mp4", "m4v" }, "" );
 				else if( p.id == P_LOGO_FILE )
 					SetFileParamInfo( p.id, p.name, { "svg", "pdf", "ai", "png", "jpg", "jpeg", "eps" }, "" );
 				else
@@ -364,6 +364,8 @@ public:
 			crackPress = 2;
 		if( index == P_CRACK_SPREAD && value != values[ index ] )
 			crackManual = true;
+		if( index == P_VIDEO_RESTART && press )
+			videoRestart = true; // W2
 		if( index == P_SWARM_RELEASE && press )
 			swarmRelease = true; // W26
 		if( index == P_STRIKE && press )
@@ -439,7 +441,7 @@ public:
 
 	char* GetDisplayId( unsigned int index )
 	{
-		if( SlotOfParam( index, SF_FILE ) >= 0 || index == P_FONT_FILE || index == P_LOGO_FILE || index == P_PROJ_IMAGE )
+		if( SlotOfParam( index, SF_FILE ) >= 0 || index == P_FONT_FILE || index == P_LOGO_FILE || index == P_PROJ_FILE )
 		{
 			const std::string& f = SlotOfParam( index, SF_FILE ) >= 0 ? modelParam[ SlotOfParam( index, SF_FILE ) ] : texts[ index ];
 			size_t s             = f.find_last_of( '/' );
@@ -631,6 +633,7 @@ public:
 	void OnTrigger()
 	{
 		transRestart = true;
+		videoRestart = true; // W2: the projector's video starts from its first frame
 		crackAuto    = true; // the lava spreads from nothing, then stays (W28)
 	}
 
@@ -753,6 +756,9 @@ private:
 		}
 		num( "detail", P_CURVE_DETAIL ), num( "depth", P_EXTRUDE_DEPTH ), num( "bevel", P_BEVEL_SIZE ), num( "segments", P_BEVEL_SEGMENTS );
 		num( "bevelshape", P_BEVEL_SHAPE ), num( "backcap", P_BACK_CAP ), num( "outlineonly", P_OUTLINE_ONLY ), num( "wall", P_WALL );
+		// W2 Shatter Mode Pieces: the fractured copy is built with the model (cached by the spec: a new Shard Count rebuilds it)
+		if( Opt( P_SHATTER_MODE ) > 0 )
+			f[ "frac" ] = std::to_string( std::clamp( (int)std::lround( values[ P_SHARD_COUNT ] ), 8, 512 ) );
 		return MakeSpec( f );
 	}
 
@@ -1336,12 +1342,12 @@ private:
 		fs.tonemap   = Opt( P_TONEMAP );
 
 		BuildSurface( fs, pulse, dt );
+		StepJelly( anchor, dt ); // W2: before BuildShape reads it
 		BuildShape( fs, pulse, dt );
 		BuildLetters( fs, dt );
 		BuildLava( fs, anchor, dt );
-		BuildMirror( fs, anchor, dt );
 		BuildVolume( fs, anchor, eye, pulse, dt );
-		BuildProjector( fs, anchor, eye );
+		BuildProjector( fs, anchor, eye, dt );
 		BuildCaustics( fs, anchor, dt );
 		BuildLightning( fs, anchor, dt );
 		BuildSwarm( fs, anchor, dt );
@@ -2703,83 +2709,6 @@ private:
 		}
 	}
 
-	// ---- W26 Stage 10: the mirror room. A world-aligned box round the mask's centre. Its reflections are the cells of the
-	// unfolded lattice (bounces = |i| + |j| + |k|; the front is a two-way mirror: only k <= 0 can be seen through it), each a
-	// copy of the mask mirrored on the odd axes. The chase phase wraps at 1.
-	void BuildMirror( FrameState& fs, const Mat4& anchor, float dt )
-	{
-		MirrorState& r = fs.mirror;
-		r.shape        = Opt( P_MIRROR_ROOM );
-		r.copies.clear();
-		clk.mirror = Wrap( clk.mirror + dt * values[ P_LED_SPEED ], 1.0 );
-		if( r.shape == 0 )
-			return;
-		float ux[ 3 ] = { 1, 0, 0 }, uw[ 3 ];
-		const float o[ 3 ] = { 0, 0, 0 };
-		anchor.Point( o, r.center );
-		anchor.Dir( ux, uw );
-		const float unit = std::max( 1e-3f, std::sqrt( uw[ 0 ] * uw[ 0 ] + uw[ 1 ] * uw[ 1 ] + uw[ 2 ] * uw[ 2 ] ) );
-		r.half[ 0 ] = r.half[ 1 ] = values[ P_BOX_SIZE ] * unit;
-		r.half[ 2 ] = values[ P_BOX_DEPTH ] * unit;
-		r.bounces   = std::clamp( (int)std::lround( values[ P_MIRROR_COUNT ] ), 1, 8 );
-		Colour( P_MIRROR_COL_H, r.tint );
-		for( float& c : r.tint )
-			c *= Alpha( P_MIRROR_COL_H );
-		Colour( P_LED_COL_H, r.led );
-		for( float& c : r.led )
-			c *= Alpha( P_LED_COL_H );
-		r.ledGlow   = values[ P_MIRROR_GAP ];
-		r.ledWidth  = 0.012f * values[ P_LED_WIDTH ] * unit;
-		r.ledColors = Opt( P_LED_COLORS );
-		r.phase     = float( clk.mirror );
-		r.axes[ 0 ] = r.shape == 3 ? 0.0f : 1.0f;
-		r.axes[ 1 ] = r.shape == 1 ? 1.0f : 0.0f;
-		r.axes[ 2 ] = 1.0f;
-		r.volumes   = On( P_MIRROR_VOLUMES );
-		r.volSteps  = 4 << std::clamp( Opt( P_MIRROR_VOL_STEPS ), 0, 3 );
-		r.particles = On( P_MIRROR_PARTICLES );
-		r.images    = std::clamp( (int)std::lround( values[ P_PARTICLE_IMAGES ] ), 1, 64 );
-		// the cells, nearest bounces first (at most 192: the copies' three instanced batches); the mask's copies with LOD by distance
-		r.cells.clear();
-		Mat4 M;
-		std::memcpy( M.m, fs.model, sizeof( M.m ) );
-		const int N = r.bounces;
-		for( int b = 1; b <= N && r.cells.size() < 192; ++b )
-			for( int k = 0; k >= -N; --k )
-				for( int j = -N; j <= N; ++j )
-					for( int i = -N; i <= N; ++i )
-					{
-						if( std::abs( i ) + std::abs( j ) + std::abs( k ) != b || r.cells.size() >= 192 )
-							continue;
-						if( ( r.shape == 2 && j != 0 ) || ( r.shape == 3 && ( i != 0 || j != 0 ) ) )
-							continue;
-						const float off[ 3 ] = { 2.0f * r.half[ 0 ] * i, 2.0f * r.half[ 1 ] * j, 2.0f * r.half[ 2 ] * k };
-						const Mat4 A = Mat4::Translate( r.center[ 0 ] + off[ 0 ], r.center[ 1 ] + off[ 1 ], r.center[ 2 ] + off[ 2 ] ) * MirrorScale( i & 1, j & 1, k & 1 ) *
-						               Mat4::Translate( -r.center[ 0 ], -r.center[ 1 ], -r.center[ 2 ] );
-						MirrorCell cell;
-						cell.index[ 0 ] = float( i ), cell.index[ 1 ] = float( j ), cell.index[ 2 ] = float( k );
-						cell.bounces    = float( b );
-						r.cells.push_back( cell );
-						const Mat4 C = A * M;
-						Instance in;
-						std::memcpy( in.m, C.m, sizeof( in.m ) );
-						std::memcpy( in.next, A.Inverse().m, sizeof( in.next ) ); // W27: the fold: the MIRROR programs shade the copy where it really is
-						in.bounces = float( b );
-						float d = 0;
-						for( int q = 0; q < 3; ++q )
-							d += ( r.center[ q ] + off[ q ] - fs.camPos[ q ] ) * ( r.center[ q ] + off[ q ] - fs.camPos[ q ] );
-						const float px = 1.2f * unit / std::max( std::sqrt( d ), 0.05f ) / std::tan( values[ P_FOV ] * 0.5f * kDeg ) * float( fs.height ) * 0.5f;
-						in.lod = px > 350.0f ? 0 : px > 140.0f ? 1 : px > 50.0f ? 2 : 3;
-						r.copies.push_back( in );
-					}
-	}
-	static Mat4 MirrorScale( int fx, int fy, int fz )
-	{
-		Mat4 s = Mat4::Identity();
-		s.m[ 0 ] = fx ? -1.0f : 1.0f, s.m[ 5 ] = fy ? -1.0f : 1.0f, s.m[ 10 ] = fz ? -1.0f : 1.0f;
-		return s;
-	}
-
 	// ---- W26 Stage 8: caustics. The caustic light sits 5 mask units out along the key's direction, aimed at the mask, its
 	// frustum wide enough for the mask and the floor under it. The ripple drifts in 64-periodic noise (wraps at 64).
 	void BuildCaustics( FrameState& fs, const Mat4& anchor, float dt )
@@ -2930,7 +2859,7 @@ private:
 
 	// ---- W26 Stage 2: the projector. Placed and aimed like Light A; the picture = the FX input or Proj Image (decoded on a
 	// worker thread, <= 2048 px, bottom-up rows, CPU mips: glGenerateMipmap blocks the render thread)
-	void BuildProjector( FrameState& fs, const Mat4& anchor, const float* eye )
+	void BuildProjector( FrameState& fs, const Mat4& anchor, const float* eye, float dt )
 	{
 		(void)eye;
 		ProjState& p = fs.projector;
@@ -2941,15 +2870,23 @@ private:
 #else
 		p.source = 1;
 #endif
-		const std::string& file = texts[ P_PROJ_IMAGE ];
+		const std::string& file = texts[ P_PROJ_FILE ];
 		if( p.source == 1 && file != projImageFile )
 		{
 			projImageFile = file;
 			projImageJob.reset();
 			projImage.reset();
-			if( !file.empty() )
+			video.reset();
+			std::string ext = file.substr( file.find_last_of( '.' ) + 1 );
+			std::transform( ext.begin(), ext.end(), ext.begin(), ::tolower );
+			if( ext == "mov" || ext == "mp4" || ext == "m4v" )
+				video = std::make_shared< VideoPlayer >( file ), videoLogged = false, videoRestart = true; // W2: decoded on its own thread
+			else if( !file.empty() )
 				projImageJob = DecodeProjImage( file, ++projImageSerial );
 		}
+		p.video.reset();
+		if( video && p.on && p.source == 1 )
+			p.video = VideoClock( dt );
 		if( projImageJob && projImageJob->done.load() )
 		{
 			if( projImageJob->image.w > 0 )
@@ -2996,6 +2933,40 @@ private:
 			p.color[ k ] = std::max( 0.0f, c[ k ] ) * gain;
 		if( p.beam > 0.0f && !fs.vol.active )
 			fs.vol.active = fs.vol.projOnly = true; // the beam lives in the fog's march target
+	}
+	// W2: the video's play position. Loop: wraps at the clip length; Ping-Pong: a clock wrapped at twice the length, mirrored back;
+	// Once: runs to the end and holds the last frame. Video Speed x real time; Video Restart / a clip trigger: back to the start.
+	std::shared_ptr< const VideoFrame > VideoClock( float dt )
+	{
+		if( video->Failed() )
+		{
+			if( !videoLogged )
+				Log( "PROJ video %s: %s", projImageFile.c_str(), video->Info().c_str() ), videoLogged = true;
+			return nullptr;
+		}
+		if( !video->Ready() )
+			return nullptr;
+		if( !videoLogged )
+			Log( "PROJ video %s: %s", projImageFile.c_str(), video->Info().c_str() ), videoLogged = true;
+		const double len = std::max( video->Duration(), video->FrameDuration() );
+		const int mode   = std::clamp( Opt( P_VIDEO_LOOP ), 0, 2 );
+		if( videoRestart )
+			clk.video = 0.0, videoRestart = false;
+		const double adv = double( dt ) * values[ P_VIDEO_SPEED ];
+		clk.video        = mode == 0 ? Wrap( clk.video + adv, len ) : mode == 1 ? Wrap( clk.video + adv, 2.0 * len ) : std::min( clk.video + adv, len );
+		const bool back  = mode == 1 && clk.video >= len;
+		const double pos = back ? 2.0 * len - clk.video : std::min( clk.video, len - 0.5 * video->FrameDuration() );
+		auto f           = video->Frame( pos, !back, mode == 0 );
+		// Debug Log: one VIDEO line per second (frames shown late = the last decoded frame stood in; the drops are only logged here)
+		videoStatT += dt;
+		if( LogVerbose() && videoStatT >= 1.0f )
+		{
+			Log( "VIDEO %s | decoded %llu (%.2f ms each, worker), late %llu (+%llu), upload %.2f ms (render thread%s), cache %.0f MB", FileName( projImageFile ).c_str(),
+			     (unsigned long long)video->decoded, video->decoded ? video->decodeMs / video->decoded : 0.0, (unsigned long long)video->late,
+			     (unsigned long long)( video->late - videoLateLogged ), renderer.videoUploadMs, values[ P_PROJ_FOCUS ] > 0.0f ? ", + mips" : "", video->cacheBytes / 1048576.0 );
+			videoLateLogged = video->late, videoStatT = 0.0f;
+		}
+		return f;
 	}
 	struct ProjDecode
 	{
@@ -3319,6 +3290,7 @@ private:
 		s.dt            = dt;
 		s.reformTime    = values[ P_REFORM_TIME ];
 		s.shardCount    = std::max( 8, std::min( 512, (int)std::lround( values[ P_SHARD_COUNT ] ) ) );
+		s.shatterMode   = std::clamp( Opt( P_SHATTER_MODE ), 0, 2 );
 		const int every = Opt( P_SHATTER_BEAT ) == 0 ? 0 : 1 << ( Opt( P_SHATTER_BEAT ) - 1 );
 		if( every > 0 && beatCount != lastShatterBeat && beatCount % every == 0 )
 		{
@@ -3362,15 +3334,10 @@ private:
 		s.bounciness     = values[ P_BOUNCINESS ];
 		s.friction       = values[ P_FLOOR_FRICTION ];
 		s.shatterGen     = shatterGen;
-		s.melt = values[ P_MELT ], s.drip = values[ P_DRIP ];
 		s.sliceCount = std::max( 2, (int)std::lround( values[ P_SLICE_COUNT ] ) ), s.sliceGap = values[ P_SLICE_GAP ];
 		s.sliceAxis = Opt( P_SLICE_AXIS ), s.sliceWave = values[ P_SLICE_WAVE ];
 		s.voxel = values[ P_VOXEL ], s.voxelSize = values[ P_VOXEL_SIZE ], s.lowPoly = values[ P_LOW_POLY ], s.lowPolySize = values[ P_LOW_POLY_SIZE ];
-		s.deformAxis = Opt( P_DEFORM_AXIS ), s.twist = values[ P_TWIST ], s.bend = values[ P_BEND ];
-		s.ripple      = values[ P_RIPPLE ] * ( 1.0f + values[ P_RIPPLE_BEAT ] * pulse * 2.0f );
-		s.rippleFreq  = values[ P_RIPPLE_FREQ ];
-		clk.ripple    = Wrap( clk.ripple + dt * values[ P_RIPPLE_SPEED ], kTwoPi );
-		s.ripplePhase = float( clk.ripple );
+		BuildDeform( s, pulse, dt );
 		BuildDust( s, dt );
 		BuildLowPoly( s, dt );
 		static const int kDust[ 5 ] = { 25000, 50000, 100000, 200000, 400000 };
@@ -3386,7 +3353,116 @@ private:
 		s.contour *= Alpha( P_CONTOUR_COL_H );
 		Colour( P_CONTOUR_COL_H, s.contourColor );
 		s.on = s.shatterT > 0.0f || s.melt > 0.0f || s.sliceGap > 0.0f || s.sliceWave > 0.0f || s.voxel > 0.0f || s.lowPoly > 0.0f || s.twist != 0.0f
-		    || s.bend != 0.0f || s.ripple > 0.0f;
+		    || s.bend != 0.0f || s.ripple > 0.0f || s.deform;
+	}
+
+	// ---- W2 Deform group: every deform x Deform Amount (+ Audio > Deform), in the DEFORM program twins. deform = any on (else the
+	// plain programs draw, byte for byte as before). Clocks (W14): Ripple wraps at 2 pi, Noise Warp's drift at 256 lattice cells
+	// (the x / y / z drift 1 : 0.5 : 0.25 = whole 64-periods), the Glitch step at 1000 steps; Jelly is a spring, not a phase.
+	void BuildDeform( ShapeState& s, float pulse, float dt )
+	{
+		const float k = std::max( 0.0f, values[ P_DEFORM_AMOUNT ] + values[ P_AUDIO_DEFORM ] * 0.5f * audio[ 0 ] );
+		s.deformAxis  = Opt( P_DEFORM_AXIS );
+		s.twist = values[ P_TWIST ] * k, s.bend = values[ P_BEND ] * k;
+		s.melt        = values[ P_MELT ] * k, s.drip = values[ P_DRIP ];
+		s.ripple      = values[ P_RIPPLE ] * k * ( 1.0f + values[ P_RIPPLE_BEAT ] * pulse * 2.0f );
+		s.rippleFreq  = values[ P_RIPPLE_FREQ ];
+		clk.ripple    = Wrap( clk.ripple + dt * values[ P_RIPPLE_SPEED ], kTwoPi );
+		s.ripplePhase = float( clk.ripple );
+		s.taper       = values[ P_TAPER ] * k;
+		s.squash      = ( values[ P_SQUASH ] + values[ P_SQUASH_BEAT ] * 0.5f * pulse ) * k;
+		s.shear       = values[ P_SHEAR ] * k;
+		s.bulge       = values[ P_BULGE ] * k;
+		s.spherize    = std::min( 1.0f, values[ P_SPHERIZE ] * k );
+		s.warp        = values[ P_NOISE_WARP ] * k;
+		s.warpScale   = values[ P_WARP_SCALE ];
+		clk.warp      = Wrap( clk.warp + dt * values[ P_WARP_SPEED ], 256.0 );
+		s.warpPhase   = float( clk.warp );
+		s.glitchShift = values[ P_GLITCH_SHIFT ] * k;
+		s.glitchBands = std::max( 2.0f, std::floor( values[ P_GLITCH_BANDS ] + 0.5f ) );
+		clk.glitch    = Wrap( clk.glitch + dt * values[ P_GLITCH_RATE ], 1000.0 );
+		s.glitchStep  = std::floor( float( clk.glitch ) );
+		const int fold = std::clamp( Opt( P_MIRROR_FOLD ), 0, 3 );
+		for( int a = 0; a < 3; ++a )
+			s.foldAxes[ a ] = a < fold ? 1.0f : 0.0f;
+		s.foldK = fold > 0 ? std::min( 1.0f, k ) : 0.0f;
+		s.foldN = fold > 0 && s.foldK > 0.0f ? 1 << fold : 1;
+		const float j = values[ P_JELLY ] * k;
+		for( int a = 0; a < 3; ++a )
+			s.jellyLin[ a ] = jelly.lin[ a ] * j, s.jellyAng[ a ] = jelly.ang[ a ] * j;
+		s.jellyScale = jelly.scale * j;
+		s.deform = s.twist != 0.0f || s.bend != 0.0f || s.melt > 0.0f || s.ripple > 0.0f || s.taper != 0.0f || s.squash != 0.0f || s.shear != 0.0f ||
+		           s.bulge != 0.0f || s.spherize > 0.0f || s.warp > 0.0f || s.glitchShift > 0.0f || s.foldK > 0.0f || j > 0.0f;
+		(void)dt;
+	}
+
+	// the Jelly spring: the mask's pose this frame (anchor = mask space) -> its acceleration in mask space drives a damped spring
+	// (1.6 Hz, damping 0.22: it wobbles a few times on a stop), integrated at 240 Hz. Always integrated (the dial only scales the
+	// result), so turning Jelly up mid-move never jumps.
+	void StepJelly( const Mat4& anchor, float dt )
+	{
+		Jelly& J = jelly;
+		float pos[ 3 ], R[ 9 ], sc = 0;
+		const float o[ 3 ] = { 0, 0, 0 };
+		anchor.Point( o, pos );
+		for( int c = 0; c < 3; ++c )
+		{
+			float l = 0;
+			for( int r = 0; r < 3; ++r )
+				l += anchor.m[ c * 4 + r ] * anchor.m[ c * 4 + r ];
+			l = std::sqrt( l );
+			sc += l / 3.0f;
+			for( int r = 0; r < 3; ++r )
+				R[ c * 3 + r ] = anchor.m[ c * 4 + r ] / std::max( l, 1e-9f );
+		}
+		if( dt <= 1e-5f )
+			return;
+		float vel[ 3 ], acc[ 3 ], w[ 3 ] = {}, alpha[ 3 ];
+		for( int k = 0; k < 3; ++k )
+			vel[ k ] = ( pos[ k ] - J.prevPos[ k ] ) / dt, acc[ k ] = ( vel[ k ] - J.prevVel[ k ] ) / dt;
+		// angular velocity: the rotation from last frame to this one, R * prevR^T, as axis x angle / dt (world)
+		float D[ 9 ];
+		for( int c = 0; c < 3; ++c )
+			for( int r = 0; r < 3; ++r )
+			{
+				float v = 0;
+				for( int k = 0; k < 3; ++k )
+					v += R[ k * 3 + r ] * J.prevR[ k * 3 + c ];
+				D[ c * 3 + r ] = v;
+			}
+		const float tr = std::clamp( ( D[ 0 ] + D[ 4 ] + D[ 8 ] - 1.0f ) * 0.5f, -1.0f, 1.0f ), ang = std::acos( tr );
+		if( ang > 1e-6f )
+		{
+			const float s2 = 2.0f * std::sin( ang );
+			w[ 0 ] = ( D[ 5 ] - D[ 7 ] ) / s2 * ang / dt, w[ 1 ] = ( D[ 6 ] - D[ 2 ] ) / s2 * ang / dt, w[ 2 ] = ( D[ 1 ] - D[ 3 ] ) / s2 * ang / dt;
+		}
+		for( int k = 0; k < 3; ++k )
+			alpha[ k ] = ( w[ k ] - J.prevW[ k ] ) / dt;
+		const float sv = ( sc - J.prevScale ) / dt, sa = ( sv - J.prevScaleV ) / dt;
+		const bool drive = J.seen >= 2;
+		J.seen = std::min( J.seen + 1, 2 );
+		std::memcpy( J.prevPos, pos, sizeof( pos ) ), std::memcpy( J.prevVel, vel, sizeof( vel ) ), std::memcpy( J.prevW, w, sizeof( w ) ), std::memcpy( J.prevR, R, sizeof( R ) );
+		J.prevScale = sc, J.prevScaleV = sv;
+		// into mask space (R^T, per mask unit); clamped: a teleport (a pose jump) is not a shake
+		float aL[ 3 ] = {}, alL[ 3 ] = {};
+		for( int k = 0; k < 3; ++k )
+			for( int r = 0; r < 3; ++r )
+				aL[ k ] += R[ k * 3 + r ] * acc[ r ] / std::max( sc, 1e-6f ), alL[ k ] += R[ k * 3 + r ] * alpha[ r ];
+		const float om = 2.0f * 3.14159265f * 1.6f, ze = 0.22f;
+		const int n    = std::max( 1, (int)std::ceil( dt * 240.0f ) );
+		const float h  = dt / n;
+		for( int i = 0; i < n; ++i )
+			for( int k = 0; k < 3; ++k )
+			{
+				const float fl = drive ? std::clamp( -aL[ k ] * 0.04f, -60.0f, 60.0f ) : 0.0f, fa = drive ? std::clamp( -alL[ k ] * 0.04f, -60.0f, 60.0f ) : 0.0f;
+				J.linV[ k ] += ( fl - om * om * J.lin[ k ] - 2.0f * ze * om * J.linV[ k ] ) * h, J.lin[ k ] += J.linV[ k ] * h;
+				J.angV[ k ] += ( fa - om * om * J.ang[ k ] - 2.0f * ze * om * J.angV[ k ] ) * h, J.ang[ k ] += J.angV[ k ] * h;
+				J.lin[ k ] = std::clamp( J.lin[ k ], -0.6f, 0.6f ), J.ang[ k ] = std::clamp( J.ang[ k ], -1.0f, 1.0f );
+			}
+		const float fs = drive ? std::clamp( -sa / std::max( sc, 1e-6f ) * 0.04f, -60.0f, 60.0f ) : 0.0f;
+		for( int i = 0; i < n; ++i )
+			J.scaleV += ( fs - om * om * J.scale - 2.0f * ze * om * J.scaleV ) * h, J.scale += J.scaleV * h;
+		J.scale = std::clamp( J.scale, -0.5f, 0.5f );
 	}
 
 	// ---- W21 letters: every glyph / logo shape moves as one piece (Type On, Wave, Spin, Hop). Pieces in reading order.
@@ -3731,9 +3807,17 @@ private:
 		double swarm = 0, swarmBlink = 0;                                    // W26 swarm: wander drift (64), seconds (kSwarmLoop)
 		double lavaFlow = 0, lavaHaze = 0;                                   // W26 lava: flow drift (64), haze cycles (1)
 		double caustic = 0;                                                  // W26 caustic ripple drift (64)
-		double mirror = 0;                                                   // W26 mirror room LED chase (cycles)
 		double transPlay = 0; // W28 Transition Play, seconds (Once: held at Transition Time; Ping-Pong: wraps at 2 x; Loop: 1 x + hold)
+		double video = 0;            // W2 projector video: seconds (Loop: wraps at the clip length, Ping-Pong at twice it; Once clamps)
+		double warp = 0, glitch = 0; // W2 Deform: Noise Warp drift (lattice cells, wraps at 256), Glitch steps (wraps at 1000)
 	} clk;
+	// W2 Jelly: a damped spring per instance (fitted / mask space), driven by the mask's own acceleration (move, spin, bounce)
+	struct Jelly
+	{
+		float lin[ 3 ] = {}, linV[ 3 ] = {}, ang[ 3 ] = {}, angV[ 3 ] = {}, scale = 0, scaleV = 0;
+		float prevPos[ 3 ] = {}, prevVel[ 3 ] = {}, prevW[ 3 ] = {}, prevScale = 1, prevScaleV = 0, prevR[ 9 ] = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+		int seen = 0; // frames of history (the first two only fill it: no kick from nothing)
+	} jelly;
 	// W28 trigger watch + Transition Play
 	uint64_t frames = 0, lastJumpLog = 0;
 	int msVotes = 0;        // W28: > 0 = the host clock is in milliseconds (Arena 7.28)
@@ -3759,6 +3843,10 @@ private:
 	int strikeNext = 0;
 	float burstT = 10.0f;
 	std::string projImageFile;
+	std::shared_ptr< VideoPlayer > video; // W2: Proj File is a video
+	bool videoRestart = true, videoLogged = false;
+	uint64_t videoLateLogged = 0;
+	float videoStatT = 0.0f;
 	std::shared_ptr< struct ProjDecode > projImageJob;
 	std::shared_ptr< const ProjImage > projImage;
 	uint64_t projImageSerial = 0;
@@ -3861,11 +3949,11 @@ void DeinitBundle()
 
 #if LOADEHR_WOW && LOADEHR_FX
 CFFGLPluginInfo PluginInfo( PluginFactory< LoadEhrPlugin >, "LEwf", "LoadEhr Wow FX", 2, 3, 1, 0, FF_EFFECT,
-                            "LoadEhr with the W26 showpieces (projector, fire, lightning, swarm, lava, caustics, mirror room, ...); the incoming layer can be background, skin or reflection.",
+                            "LoadEhr with the W26 showpieces (projector + video, fire, lightning, swarm, lava, caustics, trip, ...); the incoming layer can be background, skin or reflection.",
                             "LoadEhr by Amrit Rosell", 0, nullptr, nullptr, DeinitBundle );
 #elif LOADEHR_WOW
 CFFGLPluginInfo PluginInfo( PluginFactory< LoadEhrPlugin >, "LEwo", "LoadEhr Wow", 2, 3, 1, 0, FF_SOURCE,
-                            "LoadEhr with the W26 showpieces (projector, fire, lightning, swarm, lava, caustics, mirror room, ...) over a transparent background.",
+                            "LoadEhr with the W26 showpieces (projector + video, fire, lightning, swarm, lava, caustics, trip, ...) over a transparent background.",
                             "LoadEhr by Amrit Rosell", 0, nullptr, nullptr, DeinitBundle );
 #elif LOADEHR_FX
 CFFGLPluginInfo PluginInfo( PluginFactory< LoadEhrPlugin >, "LEfx", "LoadEhr FX", 2, 3, 1, 0, FF_EFFECT,

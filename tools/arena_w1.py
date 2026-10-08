@@ -9,7 +9,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.dont_write_bytecode = True
 import w22_smoke as W
 import w26_wow as V
-import w27_mirror as R
 import w28_review as F
 
 API = 'http://127.0.0.1:8080/api/v1'
@@ -47,9 +46,6 @@ def recipe(look):
     for e in W.EXAMPLES:
         if 'w22_' + W.slug(e) == look:
             return list(e['dials']), e['model']
-    for e in R.ALL:
-        if 'w27_' + R.slug(e) == look:
-            return V.recipe_dials(e), e.get('model')
     for f in F.FIXES:
         e = F.look(f['name'])
         if 'w28_' + V.slug(e) == look:
@@ -91,7 +87,7 @@ def main():
     for k, v in dials:
         if k in done:
             continue
-        if k.endswith(' Color') or k in ('Mirror Color',):
+        if k.endswith(' Color'):
             base = k[:-6]
             an = V.ALPHA_NAMES.get(base, base + ' Alpha')
             h, s, b, a = d[k], d.get(base + ' Sat', 0), d.get(base + ' Bri', 1), d.get(an, 1)

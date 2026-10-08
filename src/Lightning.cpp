@@ -2,7 +2,6 @@
 // segments as instanced screen-space quads (LightningShaders.h), additively after the composite.
 #include "LightningShaders.h"
 #include "MathUtil.h"
-#include "MirrorShaders.h"
 #include "Renderer.h"
 #include "Shaders.h"
 #include "VolumeShaders.h"
@@ -21,16 +20,12 @@ bool Renderer::InitBolts( std::string& error )
 {
 	progBolt    = Link( kBoltVS, std::string( kToneLib ) + kBoltFS, error );
 	progBoltAdd = Link( kQuadVS, std::string( kToneLib ) + kBoltAddFS, error );
-	progBoltM   = Link( std::string( "#define MIRROR\n" ) + kMirrorLib + kMirrorPointLib + kBoltVS, std::string( kToneLib ) + kBoltFS, error ); // W27
-	if( !progBolt || !progBoltAdd || !progBoltM )
+	if( !progBolt || !progBoltAdd )
 		return false;
 	glUseProgram( progBoltAdd );
 	glUniform1i( U( progBoltAdd, "uBolts" ), 0 );
-	for( GLuint p : { progBolt, progBoltM } )
-	{
-		glUseProgram( p );
-		glUniform1i( U( p, "uDepth" ), 0 );
-	}
+	glUseProgram( progBolt );
+	glUniform1i( U( progBolt, "uDepth" ), 0 );
 	glUseProgram( 0 );
 	glGenVertexArrays( 1, &boltVAO );
 	glGenBuffers( 1, &boltVBO );
@@ -49,7 +44,7 @@ bool Renderer::InitBolts( std::string& error )
 
 void Renderer::ReleaseBolts()
 {
-	for( GLuint* p : { &progBolt, &progBoltAdd, &progBoltM } )
+	for( GLuint* p : { &progBolt, &progBoltAdd } )
 		if( *p )
 			glDeleteProgram( *p ), *p = 0;
 	if( boltTex )
@@ -112,32 +107,21 @@ void Renderer::RenderGlow( const FrameState& fs, int w, int h )
 	glBlendEquation( GL_MAX );
 	glDisable( GL_DEPTH_TEST );
 	glBindVertexArray( boltVAO );
-	const int images = n > 0 ? MirrorImages( fs ) : 0; // W27: the bolts again in each of the nearest mirror cells
-	for( int c = -1; c < images && n > 0; ++c )
+	if( n > 0 )
 	{
-		const GLuint p = c < 0 ? progBolt : progBoltM;
-		float color[ 3 ];
-		for( int k = 0; k < 3; ++k )
-			color[ k ] = b.color[ k ] * ( c < 0 ? 1.0f : std::pow( fs.mirror.tint[ k ], fs.mirror.cells[ size_t( c ) ].bounces ) );
-		if( c <= 0 )
-		{
-			glUseProgram( p );
-			glUniformMatrix4fv( U( p, "uViewProj" ), 1, GL_FALSE, VP.m );
-			glUniform2f( U( p, "uScreen" ), float( w ), float( h ) );
-			glUniform1f( U( p, "uWidth" ), b.width * px );
-			glUniform1f( U( p, "uReach" ), ( b.width * 24.0f + 2.0f ) * px );
-			glUniform1f( U( p, "uGlow" ), b.glow );
-			glUniform1f( U( p, "uP10" ), -fs.proj[ 10 ] );
-			glUniform1f( U( p, "uP14" ), -fs.proj[ 14 ] );
-			glUniform1f( U( p, "uTol" ), b.tol );
-			glUniform1f( U( p, "uExposure" ), fs.exposure );
-			glUniform1i( U( p, "uTonemap" ), fs.tonemap );
-			if( c == 0 )
-				SetMirrorUniforms( p, fs );
-		}
-		if( c >= 0 )
-			SetMirrorCell( p, fs, c );
-		glUniform3fv( U( p, "uColor" ), 1, color );
+		const GLuint p = progBolt;
+		glUseProgram( p );
+		glUniformMatrix4fv( U( p, "uViewProj" ), 1, GL_FALSE, VP.m );
+		glUniform2f( U( p, "uScreen" ), float( w ), float( h ) );
+		glUniform1f( U( p, "uWidth" ), b.width * px );
+		glUniform1f( U( p, "uReach" ), ( b.width * 24.0f + 2.0f ) * px );
+		glUniform1f( U( p, "uGlow" ), b.glow );
+		glUniform1f( U( p, "uP10" ), -fs.proj[ 10 ] );
+		glUniform1f( U( p, "uP14" ), -fs.proj[ 14 ] );
+		glUniform1f( U( p, "uTol" ), b.tol );
+		glUniform1f( U( p, "uExposure" ), fs.exposure );
+		glUniform1i( U( p, "uTonemap" ), fs.tonemap );
+		glUniform3fv( U( p, "uColor" ), 1, b.color );
 		glDrawArraysInstanced( GL_TRIANGLE_STRIP, 0, 4, n );
 	}
 	glBlendEquation( GL_FUNC_ADD );

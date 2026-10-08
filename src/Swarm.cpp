@@ -4,7 +4,6 @@
 #include "Generate.h"
 #include "Log.h"
 #include "MathUtil.h"
-#include "MirrorShaders.h"
 #include "Renderer.h"
 #include "Shaders.h"
 #include "SwarmShaders.h"
@@ -59,16 +58,12 @@ bool Renderer::InitSwarm( std::string& error )
 	}
 	progSwarmSplat = Link( std::string( kSwarmGridLib ) + kSwarmSplatVS, kSwarmSplatFS, error );
 	progSwarmDraw  = Link( kSwarmDrawVS, kSwarmDrawFS, error );
-	progSwarmDrawM = Link( std::string( "#define MIRROR\n" ) + kMirrorLib + kMirrorPointLib + kSwarmDrawVS, kSwarmDrawFS, error ); // W27
-	if( !progSwarmSplat || !progSwarmDraw || !progSwarmDrawM )
+	if( !progSwarmSplat || !progSwarmDraw )
 		return false;
 	glUseProgram( progSwarmSim );
 	glUniform1i( U( progSwarmSim, "uGrid" ), 0 );
-	for( GLuint p : { progSwarmDraw, progSwarmDrawM } )
-	{
-		glUseProgram( p );
-		glUniform1i( U( p, "uDepth" ), 0 );
-	}
+	glUseProgram( progSwarmDraw );
+	glUniform1i( U( progSwarmDraw, "uDepth" ), 0 );
 	glUseProgram( 0 );
 	glGenTextures( 1, &swarmGrid );
 	glBindTexture( GL_TEXTURE_2D, swarmGrid );
@@ -131,11 +126,8 @@ void Renderer::WarmSwarm( const FrameState& fs, int w, int h )
 	glEnable( GL_PROGRAM_POINT_SIZE );
 	glEnable( GL_BLEND );
 	glBindTexture( GL_TEXTURE_2D, sceneDepthTex );
-	for( GLuint p : { progSwarmDraw, progSwarmDrawM } ) // + W27 the mirror room's images
-	{
-		glUseProgram( p );
-		glDrawArrays( GL_POINTS, 0, 1 );
-	}
+	glUseProgram( progSwarmDraw );
+	glDrawArrays( GL_POINTS, 0, 1 );
 	glDisable( GL_BLEND );
 	glDisable( GL_PROGRAM_POINT_SIZE );
 	glBindTexture( GL_TEXTURE_2D, 0 );
@@ -148,7 +140,7 @@ void Renderer::WarmSwarm( const FrameState& fs, int w, int h )
 
 void Renderer::ReleaseSwarm()
 {
-	for( GLuint* p : { &progSwarmSim, &progSwarmSplat, &progSwarmDraw, &progSwarmDrawM } )
+	for( GLuint* p : { &progSwarmSim, &progSwarmSplat, &progSwarmDraw } )
 		if( *p )
 			glDeleteProgram( *p ), *p = 0;
 	SwarmSlot& s = swarmSlot;
@@ -320,26 +312,15 @@ void Renderer::DrawSwarm( const FrameState& fs, int w, int h )
 	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, sceneDepthTex );
 	glBindVertexArray( s.drawVAO[ s.idx ] );
-	const int images = MirrorImages( fs ); // W27: the swarm again in each of the nearest mirror cells
-	for( int c = -1; c < images; ++c )
-	{
-		const GLuint p = c < 0 ? progSwarmDraw : progSwarmDrawM;
-		if( c <= 0 )
-		{
-			glUseProgram( p );
-			glUniformMatrix4fv( U( p, "uViewProj" ), 1, GL_FALSE, VP.m );
-			glUniform1f( U( p, "uSize" ), fs.swarm.size * float( h ) / 1080.0f );
-			glUniform1f( U( p, "uTime" ), fs.swarm.time );
-			glUniform1f( U( p, "uTwinkle" ), fs.swarm.twinkle );
-			glUniform3fv( U( p, "uColor" ), 1, fs.swarm.color );
-			glUniform2f( U( p, "uScreen" ), float( w ), float( h ) );
-			if( c == 0 )
-				SetMirrorUniforms( p, fs );
-		}
-		if( c >= 0 )
-			SetMirrorCell( p, fs, c );
-		glDrawArrays( GL_POINTS, 0, s.count );
-	}
+	const GLuint p = progSwarmDraw;
+	glUseProgram( p );
+	glUniformMatrix4fv( U( p, "uViewProj" ), 1, GL_FALSE, VP.m );
+	glUniform1f( U( p, "uSize" ), fs.swarm.size * float( h ) / 1080.0f );
+	glUniform1f( U( p, "uTime" ), fs.swarm.time );
+	glUniform1f( U( p, "uTwinkle" ), fs.swarm.twinkle );
+	glUniform3fv( U( p, "uColor" ), 1, fs.swarm.color );
+	glUniform2f( U( p, "uScreen" ), float( w ), float( h ) );
+	glDrawArrays( GL_POINTS, 0, s.count );
 	glBindVertexArray( 0 );
 	glDisable( GL_PROGRAM_POINT_SIZE );
 }

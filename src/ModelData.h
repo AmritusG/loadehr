@@ -59,6 +59,7 @@ struct Part
 	float glass          = 0.0f;            // W18: transmission / see-through BLEND -> the Glass surface at this amount
 	float glassTint[ 3 ] = { 1, 1, 1 };     // linear: base colour factor x the base colour map's average
 	int slot             = 0;               // control slot ("Part N" params), 0..kMaxParts-1
+	bool fractured       = false;           // W2: a part of the fractured copy (text / logo pieces): drawn only while pieces fly
 	float boxMin[ 3 ]    = { 0, 0, 0 };     // bbox of the part's triangles, model units (after orient.txt)
 	float boxMax[ 3 ]    = { 0, 0, 0 };
 };
@@ -85,6 +86,12 @@ struct CpuGeometry
 	std::vector< uint16_t > triGroup;               // W21: letter / logo shape per triangle (empty for files)
 	int groupCount = 0;
 	std::vector< float > groupBox;                  // W21: per group min xyz, max xyz (fitted space: the letter's pivot)
+	// W2: the fractured copy (text / logo pieces). idx / parts above are the WHOLE mesh only (dust, SDFs, LODs, surface points);
+	// the copy's triangles follow it in the GPU buffers: fracIdx (absolute vertex ids), its piece per triangle. triGroup covers
+	// both (whole first), so the letters move the pieces too.
+	std::vector< uint32_t > fracIdx;
+	std::vector< uint16_t > fracPiece;
+	int pieceCount = 0;
 	float fitCenter[ 3 ] = { 0, 0, 0 };
 	float fitScale       = 1;
 };
@@ -98,6 +105,9 @@ struct ModelData
 	std::vector< std::string > slotNames; // at most kMaxParts: the names shown on the "Part N" params
 	std::vector< uint16_t > triGroup;     // W21: generated models only (see CpuGeometry)
 	int groupCount = 0;
+	size_t wholeIndexCount = 0;           // W2: > 0 = indices [0, wholeIndexCount) are the whole mesh, the fractured copy follows
+	std::vector< uint16_t > triPiece;     // W2: the piece of each fractured triangle (buffer order)
+	int pieceCount = 0;
 	std::string status;                   // W21: generated models: the Status line
 	float bboxMin[ 3 ] = { 0, 0, 0 };
 	float bboxMax[ 3 ] = { 0, 0, 0 };

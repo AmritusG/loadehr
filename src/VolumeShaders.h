@@ -304,29 +304,15 @@ void main()
 	float c  = dot( oc, oc ) - uVolRadius * uVolRadius;
 	float h  = b * b - c;
 	outDepth = vec4( min( tEnd, 1e4 ) );
-#ifdef MIRROR
-	// W27 mirror room: the real ray ends where it leaves the box through a mirror (mr.x); its reflections run on to mr.y
-	vec2 mr  = MirrorRange( rd, tEnd );
-	bool mOn = mr.x < mr.y;
-	if( h <= 0.0 && !mOn )
-#else
 	if( h <= 0.0 )
-#endif
 	{
 		outFog = vec4( 0.0 );
 		return;
 	}
-#ifdef MIRROR
-	h        = sqrt( max( h, 0.0 ) );
-	float t0 = max( -b - h, 0.0 );
-	float t1 = h > 0.0 ? min( -b + h, mOn ? mr.x : tEnd ) : t0;
-	if( t1 <= t0 && !mOn )
-#else
 	h        = sqrt( h );
 	float t0 = max( -b - h, 0.0 );
 	float t1 = min( -b + h, tEnd );
 	if( t1 <= t0 )
-#endif
 	{
 		outFog = vec4( 0.0 );
 		return;
@@ -338,32 +324,9 @@ void main()
 #ifdef TRIP
 	gRd = rd;
 #endif
-#ifdef MIRROR
-	int nReal = t1 > t0 ? uSteps : 0;
-	for( int s = 0; s < nReal + ( mOn ? uMSteps : 0 ); ++s )
-	{
-		if( s == nReal )
-		{
-			dt = ( mr.y - mr.x ) / float( uMSteps );
-			t  = mr.x + dt * IGN( gl_FragCoord.yx + uFrame * vec2( 3.1459, 5.588238 ) );
-		}
-		vec3 p  = uCamPos + rd * t;
-		vec3 wb = vec3( 1.0 ), rdF = rd;
-		if( s >= nReal )
-		{
-			float nb;
-			p  = MirrorFold( p, rd, rdF, nb );
-			wb = pow( uMTint, vec3( nb ) );
-		}
-		vec3 rd = rdF; // the ray's direction where the sample really is
-#ifdef TRIP
-		gRd = rd;
-#endif
-#else
 	for( int s = 0; s < uSteps; ++s )
 	{
 		vec3 p = uCamPos + rd * t;
-#endif
 		float smoke;
 		vec2 dens = MediumAt( p, smoke );
 		float sig = dens.x + dens.y;
@@ -385,22 +348,12 @@ void main()
 			}
 			if( uSKOn == 1 && gSmokeDen > 0.0 )
 				S += gSmokeTint * gSmokeDen * ( uSKAmb + uSKColor * ( SKLit( p ) * HG( dot( uSKDir, -rd ), uG ) ) );
-#ifdef MIRROR
-			S *= wb;
-#ifdef TRIP
-			gEmit *= wb;
-#endif
-#endif
 			float ext = exp( -sig * dt );
 			L += T * S * ( 1.0 - ext ) / sig; // S already carries sigma: (S - S*ext)/sigma_t per unit sigma
 #ifdef TRIP
 			L += T * gEmit * ( 1.0 - ext ) / sig; // Trip: the smoke's own light (emission per unit length)
 #endif
-#ifdef MIRROR
-			T *= 1.0 - dot( wb, vec3( 1.0 / 3.0 ) ) * ( 1.0 - ext ); // a reflection covers as much as it shows
-#else
 			T *= ext;
-#endif
 			if( T < 0.005 )
 				break;
 		}
@@ -684,9 +637,6 @@ void main()
 	float tw     = 0.35 + 0.65 * pow( 0.5 + 0.5 * sin( 6.2831853 * Cycles( uTime, ( 2.0 + 5.0 * h.x ) / 6.2831853 ) + h.y * 40.0 ), 4.0 );
 	vColor       = c * tw * df * 1.5;
 	vec4 clip    = uViewProj * vec4( p, 1.0 );
-#ifdef MIRROR
-	clip = MirrorClip( uViewProj, p ), vColor *= uMTint; // W27: lit where it really is (uCamPos = the folded camera)
-#endif
 	float lit    = max( max( c.r, c.g ), c.b );
 	gl_Position  = lit > 0.002 ? clip : vec4( 2.0, 2.0, 2.0, 1.0 );
 	gl_PointSize = uPointScale * ( 1.0 + 2.0 * h.z ) / max( clip.w, 0.3 );

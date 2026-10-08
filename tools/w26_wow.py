@@ -18,10 +18,10 @@ colour = W.colour
 MASK = W.MASK
 SKULL = LIB + '/Skulls/Human Skull/scene.gltf'
 
-OPTIONS = {'Mirror Room': 'Off|Box|Corridor|Two Mirrors', 'LED Colors': 'Picker|Rainbow', 'Shatter Physics': 'Analytic|Bounce', 'Catcher Plane': 'Floor|Wall', 'Caustic Source': 'Glass Parts|Whole Mask', 'Crack On Beat': 'Off|Every Beat|Every 2|Every 4|Every 8', 'Swarm Count': 'Off|2k|5k|10k|20k|40k', 'Release On Beat': 'Off|Every Beat|Every 2|Every 4|Every 8', 'Bolt Path': 'Crawl|Eye To Eye|To Floor|To Clones', 'Strike On Beat': 'Off|Every Beat|Every 2|Every 4|Every 8', 'Transition Style': 'Dissolve|Shatter|Dust|Slice|Liquid', 'Liquid Look': 'Chrome|Paint', 'Fire Burst': 'Off|Every Beat|Every 2|Every 4|Every 8', 'Proj Source': 'Input|Image File', 'Transition Play': 'Off|Once On Trigger|Ping-Pong|Loop', 'Style Order': 'Fixed|Cycle|Random'}
+OPTIONS = {'Shatter Physics': 'Analytic|Bounce', 'Catcher Plane': 'Floor|Wall', 'Caustic Source': 'Glass Parts|Whole Mask', 'Crack On Beat': 'Off|Every Beat|Every 2|Every 4|Every 8', 'Swarm Count': 'Off|2k|5k|10k|20k|40k', 'Release On Beat': 'Off|Every Beat|Every 2|Every 4|Every 8', 'Bolt Path': 'Crawl|Eye To Eye|To Floor|To Clones', 'Strike On Beat': 'Off|Every Beat|Every 2|Every 4|Every 8', 'Transition Style': 'Dissolve|Shatter|Dust|Slice|Liquid', 'Liquid Look': 'Chrome|Paint', 'Fire Burst': 'Off|Every Beat|Every 2|Every 4|Every 8', 'Proj Source': 'Input|File', 'Transition Play': 'Off|Once On Trigger|Ping-Pong|Loop', 'Style Order': 'Fixed|Cycle|Random'}
 W.OPTIONS.update(OPTIONS)
 # pickers whose ALPHA is not "<base> Alpha"
-ALPHA_NAMES = {'Mirror': 'Mirror Reflect', 'Lava Tint': 'Lava Tint Mix', 'Flame Tint': 'Flame Tint Mix', 'Liquid': 'Liquid Tint Mix'}
+ALPHA_NAMES = {'Lava Tint': 'Lava Tint Mix', 'Flame Tint': 'Flame Tint Mix', 'Liquid': 'Liquid Tint Mix'}
 
 LOOKS = [
     # ---- Stage 2: projector
@@ -30,7 +30,7 @@ LOOKS = [
         ('Proj Intensity', 25), ('Proj Beam', 1.2), ('Haze', 0.25), ('Smoke Amount', 1.2), ('Smoke Speed', 0.25), ('Orbit Yaw', 15),
         ('Key Intensity', 1.5)]),
     dict(name='Projection Mapped', stage=2, model=SKULL, effect=('Proj Enable', 0), dials=[
-        ('Proj Image', ROOT + '/test_images/projector_test.png'), ('Proj Enable', 1), ('Proj Pos X', 1.2), ('Proj Pos Y', 0.8), ('Proj Pos Z', 4.5), ('Proj Throw', 18), ('Proj Intensity', 60),
+        ('Proj File', ROOT + '/test_images/projector_test.png'), ('Proj Enable', 1), ('Proj Pos X', 1.2), ('Proj Pos Y', 0.8), ('Proj Pos Z', 4.5), ('Proj Throw', 18), ('Proj Intensity', 60),
         ('Proj Surface', 1.5), ('Proj Beam', 0.6), ('Haze', 0.15), ('Smoke Amount', 0.8), ('Key Intensity', 0.6), ('Env Intensity', 0.4),
         ('Orbit Yaw', -25)]),
     # ---- Stage 3: fire
@@ -97,14 +97,6 @@ LOOKS = [
          at={2.6: ['pulse Reform']}, dials=[
         ('Shatter Physics', 1), ('Bounciness', 0.7), ('Floor Friction', 0.2), ('Shard Count', 128), ('Shatter Force', 3),
         ('Shatter Gravity', 4), ('Catcher Plane', 1), ('Wall Distance', 1.2), ('Shadow Catcher', 0.6), ('Orbit Yaw', 55), ('Orbit Pitch', 10)]),
-    # ---- Stage 10: infinity mirror room
-    dict(name='Mirror Room', stage=10, model=SKULL, effect=('Mirror Room', 0), dials=[
-        ('Mirror Room', 1), ('Mirror Count', 3), ('Box Size', 1.5), ('Box Depth', 1.5), ('Mirror Color', 0.55), ('Mirror Sat', 0.12), ('Mirror Bri', 1.0), ('Mirror Reflect', 0.8),
-        ('Mirror Gap', 1.2), ('LED Colors', 1), ('LED Speed', 0.25), ('Distance', 8), ('Orbit Yaw', 35), ('Orbit Pitch', 18),
-        ('Spin Y', 6), ('Key Intensity', 2)]),
-    dict(name='Infinity Corridor', stage=10, model=MASK, effect=('Mirror Room', 0), dials=[
-        ('Mirror Room', 2), ('Mirror Count', 4), ('Box Size', 1.6), ('Box Depth', 1.6), ('Mirror Color', 0.6), ('Mirror Sat', 0.25), ('Mirror Bri', 1.0), ('Mirror Reflect', 0.8),
-        ('Mirror Gap', 1), ('LED Colors', 1), ('LED Speed', 0.4), ('Orbit Yaw', 18), ('Orbit Pitch', 6)]),  # LoadEhr: MaskEhr's lasers removed
 ]
 
 
@@ -136,7 +128,7 @@ def preamble(e, w=1920, h=1080):
         L.insert(-1, 'fft %g' % e['fft'])
     sets = []
     for k, v in recipe_dials(e):
-        if k in W.TEXT_PARAMS or k in ('Model B', 'Proj Image'):
+        if k in W.TEXT_PARAMS or k in ('Model B', 'Proj File'):
             sets.append('text %s %s' % (k.replace(' ', '_'), v))
         else:
             sets.append('set %s %g' % (k, v))

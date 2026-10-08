@@ -138,9 +138,6 @@ void main()
 	float tw = mix( 1.0, smoothstep( 0.1, 0.9, b ), uTwinkle );
 	vColor   = uColor * tw * ( 0.7 + 0.6 * h.z );
 	vec4 c   = uViewProj * vec4( aPos, 1.0 );
-#ifdef MIRROR
-	c = MirrorClip( uViewProj, aPos ), vColor *= uMTint; // W27: the swarm's image in one mirror cell
-#endif
 	gl_Position  = c;
 	gl_PointSize = uSize * ( 0.7 + 0.6 * h.z ) * 4.0;
 }

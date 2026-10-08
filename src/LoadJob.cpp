@@ -79,9 +79,16 @@ std::shared_ptr< LoadTicket > RequestLoad( const std::string& path, int maxTextu
 				g->pos[ i * 3 ] = v.px, g->pos[ i * 3 + 1 ] = v.py, g->pos[ i * 3 + 2 ] = v.pz;
 				g->uv[ i * 2 ] = v.u, g->uv[ i * 2 + 1 ] = v.v;
 			}
-			g->idx = model->indices;
+			// W2: a text / logo with its fractured copy: the geometry jobs see the whole mesh only (the copy is drawn, not sampled)
+			const size_t whole = model->wholeIndexCount ? model->wholeIndexCount : model->indices.size();
+			g->idx.assign( model->indices.begin(), model->indices.begin() + whole );
+			g->fracIdx.assign( model->indices.begin() + whole, model->indices.end() );
+			g->fracPiece  = model->triPiece;
+			g->pieceCount = model->pieceCount;
 			for( const Part& p : model->parts )
 			{
+				if( p.fractured )
+					continue;
 				g->parts.push_back( { p.firstIndex, p.indexCount } );
 				g->partSlot.push_back( p.slot );
 			}

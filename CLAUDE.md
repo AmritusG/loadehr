@@ -13,6 +13,10 @@
    W1 brief, which allowed it by path). Never used: not in Arena clips, not in renders (local or committed), not in tests, tools or
    recipes; never copied, never committed. MaskEhr recipes that used it run on MaskEhr's `Masks/Plague Mask/scene.gltf` file in
    LoadEhr (both sides of the parity). `tools/parity.py` refuses any recipe or script that names it.
+4. **NO MIRROR ROOM** (W2, Amrit: "Remove mirror room."). Guard G6: no param Mirror Room / Mirror Count / Box Size / Box Depth /
+   LED*, no Mirror* source, no MIRROR program variant. (Mirror Floor in the Floor group and Mirror Fold in Deform are not it.)
+5. **LICENCES MIT / BSD / Apache / zlib / ISC / Boost only** (W2: libtess2, SGI-B, swapped for Clipper2 + earcut). Guard G7: no
+   libtess2 / tesselator / SGI-B in src, third_party, CMakeLists.txt.
 
 LoadEhr is a spinoff of MaskEhr (W1, 2026-10-07, from MaskEhr c7ced33): every MaskEhr feature except the lasers and the library,
 plus four model slots that morph into each other. Amrit's words: "I want a version of MaskEhr called LoadEhr that has basically
@@ -23,19 +27,24 @@ Cowork's pick under "add, then prune": he may cut to 2. Expect him to prune more
 Four bundles from one codebase (`src/LoadEhrPlugin.cpp`, compiled with `LOADEHR_FX=0/1` x `LOADEHR_WOW=0/1`):
 - **LoadEhr** (source, ID `LEhr`) — renders any .fbx / .obj / .gltf / .glb over transparent.
 - **LoadEhr FX** (effect, ID `LEfx`) — same renderer; the incoming layer can be background, skin or reflection.
-- **LoadEhr Wow** (source, `LEwo`) / **LoadEhr Wow FX** (effect, `LEwf`) — the same renderer carrying the W26 showpieces.
+- **LoadEhr Wow** (source, `LEwo`) / **LoadEhr Wow FX** (effect, `LEwf`) — the same renderer carrying the W26 showpieces, Trip and
+  the projector (+ W2 video files).
 IDs checked against every bundle in Extra Effects (2026-10-07: no LEhr / LEfx / LEwo / LEwf anywhere).
 
 BUNDLES: **Resolume shows at most 512 FFGL params per plugin** (Arena drops every param past index 511). One code base, every
 param id exists in every build; `MEHR_REGION` blocks in `src/ParamList.inc` say who CARRIES a param: 0 = all, `MEHR_CLASSIC` =
 LoadEhr / FX only (Logo, Extrude, Letters, Camera Live, Surface except Glass, Shape except Shatter, Copies, FX, Project Input,
-Debug View), `MEHR_WOW` = Wow / Wow FX only (the W26 groups without Lasers, Liquid, Shatter Physics, Spots, Silhouette, and
-(LoadEhr W1) Face). A param a bundle does not carry keeps its default (= off). The host sees the carried params as FFGL indices
+Debug View, W2: Spots), `MEHR_WOW` = Wow / Wow FX only (the W26 groups without Lasers / Mirror Room, Liquid, Physics Speed,
+Silhouette, (LoadEhr W1) Face, (W2) Trip, the projector's video dials). W2: Deform (25) and Shatter Mode, Shatter Physics,
+Bounciness, Floor Friction are in every bundle. A param a bundle does not carry keeps its default (= off). The host sees the carried params as FFGL indices
 0..n-1 in id order (`Map()`; the SDK calls are shimmed by id in `LoadEhrPlugin`, the host entry points convert index -> id).
 W1: lasers (-24, Wow side) and the library (-2) went out; four slots (+12: Model / Status / Reload x A..D, replacing Model File,
 Status, Reload, Model B) and the chain (+3: Chain Loop, Style Order, Hold Time) came in. That put LoadEhr FX at 521, so Face (10,
-FX only) moved to the Wow side. Counts: **LoadEhr 507, FX 511, Wow 493, Wow FX 507** (`tools/param_map.py`). Fewest bundles:
-the union of the params is ~650 and an effect is a different plugin type than a source, so two carriers per type = four bundles.
+FX only) moved to the Wow side. W2: Mirror Room out (-20, Wow), Deform in (+25 everywhere, 9 of them moved from classic Shape),
+Shatter Mode (+1), video (+3, Wow). Both FX carriers must fit 2 x shared + both sides' extras <= 1024, so one shared group had to
+become single-carrier: Trip (60) went to Wow only; Spots (15) moved Wow -> classic for room; Shatter Physics / Bounciness / Floor
+Friction became shared (a logo, classic-only, can bounce). Counts: **LoadEhr 482, FX 486, Wow 487, Wow FX 501**
+(`tools/param_map.py`). Fewest bundles: an effect is a different plugin type than a source, so two carriers per type = four.
 
 Nothing model-specific lives in code. A new model = point a Model slot at a file.
 
@@ -50,6 +59,12 @@ tools/regress.sh <tag>                    # the reference set (max 0 vs verify/w
 tools/chain_test.py all <out>             # the morph chain: styles x slot counts, play modes, backward scrub, cost, load
 tools/parity.py run|report|strips ...     # every non-laser MaskEhr look vs MaskEhr (reference build in a scratch folder)
 tools/w14_wraps.py after|times <out>      # every clock's wrap + the 180 min drift test (incl. the chain clock)
+PARITY_REF=<w1 build> PARITY_L=<frozen build> tools/parity.py run|report  # W2: parity vs an earlier LoadEhr build
+tools/w2_text.py run <out> <ref build>    # W2: text / logo silhouettes + triangle counts vs a reference build (strips: strips)
+tools/w2_shatter.py run|strips            # W2: solid pieces (modes, counts, logos, Bounce, transition; reform = rest)
+tools/w2_deform.py run|strips             # W2: every deform + its cost
+tools/w2_video.py make|run|modes          # W2: projector video files (test media from faces_clip.mp4; HAP via glenc-cli)
+tools/arena_w2.py <layer> [col]           # W2: dial the W2 Arena clips by param name (never triggers)
 ```
 Log: `~/Library/Logs/LoadEhr/LoadEhr.log` (per-material texture resolution, load/upload/swap times per slot, shader compile
 logs; with Debug Log: PERF + MEM (GPU MB per slot) lines every second, CHAIN hops). `LOADEHR_LOG_STDERR=1` mirrors it to stderr.
@@ -109,9 +124,8 @@ MaskEhr reference builds go to a scratch folder (`cmake -S <MaskEhr> -B <scratch
 - `tools/harness/` — offline host. `third_party/` — FFGL SDK
   (lib only), ufbx, cgltf, stb, meshoptimizer (simplifier only) (all MIT/PD); versions in `third_party/VERSIONS.txt`.
 - W20: `src/Sim.cpp`, `src/SimShaders.h`, `src/SdfBuilder.*` (3D smoke sim, see below).
-- W21: `src/Generate.*` (text / logos -> a generated model, see below), `third_party/nanosvg` (zlib), `third_party/libtess2`
-  (SGI Free Software License B 2.0: NOT on Amrit's licence list (MIT / BSD / Apache / zlib / ISC / Boost); open question to him, see
-  the W1 handoff). `tools/probe/TextProbe.cpp` = the W21 text-editor probe (not installed). `test_logos/` = OUR generated test
+- W21: `src/Generate.*` (text / logos -> a generated model, see below), `third_party/nanosvg` (zlib), W2: `third_party/clipper2`
+  (Boost: fill rules, PolyTree) + `third_party/earcut` (ISC: triangulation), replacing libtess2 (SGI-B; Amrit 2026-10-08: "swap"). `tools/probe/TextProbe.cpp` = the W21 text-editor probe (not installed). `test_logos/` = OUR generated test
   emblem (`tools/w21_test_logos.py`: SVG + PDF from one geometry, PNG via sips). `tools/w21_arena.py` = set clip params by name over REST.
 - W1: `tools/gen_test_models.py` (our test models), `tools/chain_test.py`, `tools/parity.py`, `tools/guards.sh`.
 - W3 chain additions: `src/ParamList.inc` (THE param list), `src/Volume.cpp` + `VolumeShaders.h` (Stage 1 shadow maps,
@@ -251,13 +265,13 @@ d) W17: KHR_materials_pbrSpecularGlossiness -> diffuse = BaseColor, its spec/glo
 - Stage 2 PROJECTOR (group Projector, `src/Projector.cpp`, `ProjectorShaders.h`): a COOKIE LIGHT. One 1024^2 RGBA32F texture
   in the projector's frustum (aspect = the picture's, Proj Throw = degrees across it): the shadow programs write the distance
   into all four channels, then kProjCookieFS writes the picture into rgb (colour mask RGB; Focus = mip level). So a cookie
-  light costs ONE sampler wherever it is read. Picture: FX Proj Source Input (the mip-mapped input copy) or Proj Image (png /
-  jpg decoded on a worker thread, <= 2048 px, rows flipped bottom-up, CPU box mips). Beam = kProjMarchFS added (rgb) onto the
+  light costs ONE sampler wherever it is read. Picture: FX Proj Source Input (the mip-mapped input copy) or Proj File (png /
+  jpg decoded on a worker thread, <= 2048 px, rows flipped bottom-up, CPU box mips; W2: or a video file, see W2 below). Beam = kProjMarchFS added (rgb) onto the
   fog's march target before the temporal blend, the ray clipped to the frustum (5 clip-space planes of its VP) so all Vol
   Quality steps land in the beam; the projector alone forces the volume on with `vol.projOnly` (the main march is skipped:
   cleared target). On the mask = the PROJ_PASS variants of the main programs (`progProjMain / Soup / SoupL`, uPLTex0/1 on
   units 22/23: the main FS has 14 samplers + these 2 = 16), drawn additively over the mask (LEQUAL, polygon offset -1/-4),
-  only for the plain draw (no clones / Shatter transition; W27: + the mirror room's copies). The plain programs' source is unchanged (#ifdef PROJ_PASS).
+  only for the plain draw (no clones / Shatter transition). The plain programs' source is unchanged (#ifdef PROJ_PASS).
   `LOADEHR_PROJ_DEBUG=1` logs the shadow map's coverage. Cost 1080p: +1.7 ms (skull) to +3 ms (a 719k-tri mask: the shadow
   and surface redraws dominate).
 - Stage 3 FIRE (group Fire). Reading: Nguyen, Fedkiw, Jensen 2002 "Physically Based Modeling and Animation of Fire": gaseous
@@ -343,46 +357,64 @@ d) W17: KHR_materials_pbrSpecularGlossiness -> diffuse = BaseColor, its spec/glo
   while flying; clones and the Shatter transition stay analytic) read it at the flight time, so Reform (time running back)
   retraces the flight; at time 0 the shatter code does not run: measured bit-identical after a full shatter + reform (max 0).
   Cost +0.5 ms.
-- Stage 10 INFINITY MIRROR ROOM (group Mirror Room, `src/Mirror.cpp`, `MirrorShaders.h`). InfiniCube's model
-  (~/Documents/claude/ffgl/hypercube): bounces UNFOLDED into a lattice of mirrored cells, bounces = |i| + |j| + |k|, tint x
-  reflectance per bounce. Here a world-aligned box round the mask (Box Size / Depth, mask units), the front a two-way mirror
-  (only cells k <= 0 are seen through it); shapes Box (all six), Corridor (the four upright walls: cells j = 0), Two Mirrors
-  (front + back: i = j = 0). The mask's reflections = instanced copies (mirrored on the odd axes, LOD by distance, nearest
-  bounces first, <= 192 in batches of 64) through the MIRROR variants (progMainM / SoupM: tint^bounces from Instance::bounces
-  in uInstX.w; a fragment shows only if the camera ray to it passes through the box). LED strips = one full-screen pass after
-  the composite: the edges of the shape (distance = length of the two smallest per-axis distances to the cell walls),
-  sphere-traced from the box entry, dimmed per bounce, hidden by the scene depth; LED Colors Rainbow + a chase (wraps at 1).
-  NOT reflected: the volume lights, the
-  smoke, fire, lightning, the swarm (they draw once, unmirrored). Cost: skull box +1.1 ms; 719k-tri corridor +6.3 ms (MaskEhr, with
-  lasers; tris x the copies).
-- W27 MIRROR ROOM FINISHED (`tools/w27_mirror.py`: CLIPS = the 5 Arena clips, TESTS = one look per feature; run / before / pair /
-  perf / arena). Arena: layer Wow C22-C26 = Mirror Smoke, Mirror Fire, Mirror Swarm, Mirror Storm, Mirror Projector. Dials (Mirror Room group, Wow only): Mirror Volumes (on), Mirror Vol Steps (4/8/16/32 per bounce, default 8), Mirror
-  Particles (on: particles, bolts), Particle Images (1..64 cells, default 24). Room Off = W26 frames (every W26 look
-  lands on a W26 outcome; the bimodal ones stay bimodal, Lava Split is multimodal in W26 too).
-  * COPIES are shaded where the mask really is: the MIRROR VS folds wpos / normal / tangent back with the instance's fold matrix
-    (riding in uInstNext; `Instance::next`), keeps gl_Position unfolded; the FS sees it from the folded camera (`#define uCamPos
-    vMCam`) and flips Ng / T / B on odd-bounce copies (an odd reflection turns the winding: gl_FrontFacing reads the other side;
-    W26 lit odd copies inside-out and all copies at their unfolded spot). So lights, shadows, env, fire light, flashes are right
-    on reflections. Copies also get the projector / caustic picture (progProjMainM / SoupM), the lava glow (progCrackMainM /
-    SoupM, unsplit: Lava Split stays on the real mask) and the recorded Bounce flights (progSoupBM).
-  * VOLUMES (kMirrorMarchLib): the march's real stretch ends where the ray leaves the box through a mirror (MirrorRange walks
-    the wall crossings: stops at Mirror Count bounces, an open side, a +z exit = the two-way front, or the scene depth); the rest
-    marches uMSteps = Vol Steps x Count samples, each folded into the box (MirrorFold: density / heat / lights / shadow maps read
-    in real space, the ray direction folded for the phase function), light x tint^bounces, coverage x the same. MIRROR variants
-    of all five marches (noise, Trip, sim, sim Trip, fire) and of the cookie march (projector beam, caustic smoke). Plain sources
-    unchanged (#ifdef MIRROR; `vec3 rd = rdF` shadows the outer ray inside the loop).
-  * PARTICLES: fireflies, bolts, motes drawn again per cell (kMirrorPointLib MirrorClip: only what is inside the box,
-    only seen through it; uMTint = tint^bounces; motes lit at the real point from the folded camera). Dust (Blow To Dust) is a
-    classic-bundle param and never meets the room: not mirrored.
-  * Seam (verify/w27/seam): smoke |gradient| on the inner wall seams mean 2.43 / p99 11.9 vs beside them 2.53 / 12.1 (no doubling
-    or gaps); smoke images stop at the LED frames for Count 1 / 2 / 4 / 8 (counts.png).
-  * NOT reflected: the floor catcher (shadow, mirror floor, caustic floor: composite-pass planes, a floor inside the room is a
-    real surface but its image would need the composite to march the lattice), Screen Rays (screen-space: works on the final
-    image, no light images), bloom / flares / hue echo / heat haze (screen-space: they include the reflections automatically),
-    trails / ghosts / dust (classic bundle), Lava Split (copies stay whole), the Liquid transition and Model B mid-transition
-    (copies are drawn only outside transitions, as W26).
-  * Cost 1080p (GPU avg, count 3 / 8 / room off): Mirror Smoke 7.4 / 10.3 / 5.5, Mirror Fire 7.7 / 11.0 / 5.7, Mirror Swarm 1.2 /
-    1.7 / 0.7, Mirror Storm 3.7 / 6.5 / 2.0, Mirror Projector 4.2 / 6.3 / 2.3. (MaskEhr measurements.)
+- (Stage 10 Infinity Mirror Room and its W27 finish: REMOVED in LoadEhr W2, Amrit "Remove mirror room."; HARD RULE 4.)
+
+## W2 (2026-10-08): mirror room out, Clipper2 + earcut, solid text pieces, Deform, projector video
+- MIRROR ROOM OUT: Mirror.cpp, MirrorShaders.h, every MIRROR program variant (main / soup / proj / crack / bounce / the five marches /
+  cookie march / bolts / swarm / motes), the LED pass, its prewarm, BuildMirror, the LED chase clock, tools/w27_mirror.py, the w26
+  Stage 10 recipes. `Instance::bounces` went; uInstX.w is unused (0). Parity vs W1 (66 -> 64 looks, PARITY_REF): 0 DIFFERS.
+- TEXT / LOGO OUTLINES: `Boundary()` = Clipper2 Union under the source's fill rule (NonZero / EvenOdd; Positive for the Outline
+  Only ring and the caps) -> PolyTree -> contours, outers CCW, holes CW (region on the left, as libtess2 gave); `Triangulate()`
+  = each PolyTree outer + its holes -> earcut (islands in holes recurse). Precision: ~9 significant digits of the largest coordinate.
+  Proof (tools/w2_text.py, docs/parity/w2_text): 15 cases (holes O A B 8 % @, Bold, Italic, Letter Spacing, '|' rows, CJK, a font
+  file, our even-odd / nonzero / nested / self-crossing SVGs, the emblem SVG / PDF / traced PNG): silhouettes max 0 vs W1, triangle
+  counts equal except CJK (20958 -> 20840); lit 3/4 views bit-identical except z-fighting between two coplanar overlapping shapes.
+- SOLID PIECES (Shape: Shatter Mode Letters / Pieces / Pieces + Letters, default Pieces). With Pieces the spec carries
+  `frac=<Shard Count>` and the generator builds a FRACTURED COPY next to the whole mesh (`Fracture()` in Generate.cpp): per letter,
+  seeds on its front cap (best of 12 candidates, count shared by front area, >= 1 per letter), 2D Voronoi cells (convex, bisector
+  half-planes); every finished triangle (caps, bevels, side) is Sutherland-Hodgman clipped by each cell in barycentric space
+  (attributes interpolated), so a piece's outer faces ARE the letter's surface; each cell edge through the solid gets a flat cut face
+  between the top and bottom section lines read off the clipped triangles' edges on it (no back cap: down to the back plane): the
+  part "Core" (slot after Bevel; on the whole mesh an empty part, so the label exists at rest). The copy is finished on its own
+  (no vertex merges into the whole mesh) and appended to the same buffers: parts flagged `fractured` (same control slots),
+  `ModelData::wholeIndexCount`, triPiece. CpuGeometry idx / parts = the WHOLE mesh only (dust, SDFs, LODs, surface points unchanged);
+  fracIdx / fracPiece / pieceCount carry the copy; triGroup covers both (the letters move the pieces). DrawModel draws the copy
+  instead of the whole mesh only while pieces fly (soup, shape on, shatterT > 0, mode > 0) -> at rest and once reformed the whole
+  mesh: bit-identical (tools/w2_shatter.py: 12 cases + the transition, reform = rest max 0). Shards: ids 0..L-1 letters, L.. pieces
+  (Pieces + Letters: a piece takes its letter's seed = one kick / spin per letter); ShardKey = serial, count, mode. Bounce, the
+  Shatter transition, Lava Split, Letters work on them unchanged (same soup programs). LOADEHR 64: 65 pieces, 17.5k tris, built in
+  ~10-30 ms with the spec. Loaded models: unchanged (Voronoi surface patches).
+- DEFORM group (every bundle; `src/ParamList.inc`): Deform Amount (x every deform, + Audio > Deform x low band), Axis, Taper, Twist,
+  Bend, Squash (+ Squash Beat: the beat envelope), Shear, Bulge (rounds the axis' middle out: radial, crack-free; NOT along vertex
+  normals, which tear text open at its hard edges), Spherize (to 0.8 fitted), Noise Warp / Scale / Speed (64-periodic value noise,
+  drift x:y:z = 1 : 0.5 : 0.25 cells, wraps at 256), Ripple x4, Melt / Drip, Glitch Shift / Bands / Rate (steps / s; hash per band
+  and step, wraps at 1000 steps), Mirror Fold Off / X / X+Y / X+Y+Z, Jelly. Fixed order in `DeformPre` / `DeformPost` (kSoupVS).
+  ZERO-COST OFF: every program linked from kSoupVS gets a DEFORM twin at Init (Link() spots the soup VS; 21 twins; sampler units
+  copied from the plain one); DrawModel swaps the twin in when `shape.deform` (any deform non-zero) -> the plain programs draw
+  otherwise (regress max 0; the plain source differs from W1 only inside #ifdef DEFORM and the INST_ID macro). The plain soup's
+  twist / bend / ripple / melt code is unchanged, but those dials now always draw through the twin (smooth deformed normals instead
+  of W1's flat facets: the only W1 parity change in w6_shape). NORMALS: finite differences of the chain along the vertex tangent /
+  bitangent (0.01 fitted), Glitch left out (a band's jump is a translation). MIRROR FOLD: every draw becomes 2 / 4 / 8 instanced
+  copies (`uFoldN`, `INST_ID = gl_InstanceID / uFoldN` for clones), copy c keeps its own side of each folded centre plane; a
+  triangle reflected an odd number of times swaps two corners (winding stays front-facing) and flips its FD normal; Deform Amount
+  folds it gradually. JELLY: a damped spring per instance (1.6 Hz, damping 0.22, 240 Hz steps, clamped) driven by the mask's own
+  linear / angular / scale acceleration in mask space (`StepJelly`); the shader offsets, rotates and scales by it x min(|f|, 1.5).
+  NOT deformed: the sim obstacle SDF, the eye finder, the liquid SDF, the dust points (they stay the rigid model). Prewarm: the
+  main twins at model swap, the shadow twins in WarmVolume. No new samplers. Cost (harness, 1080p, Human Skull 31k tris, GPU ms
+  avg vs every deform 0): each deform -0.2..+0.5 (noise), Mirror Fold X+Y+Z +1.6, everything at Amount 2 +1.3 (tools/w2_deform.py).
+  Clocks: Noise Warp and Glitch rows in tools/w14_wraps.py (ok); the 'deform' scene flat over 180 min.
+- PROJECTOR VIDEO (Wow bundles): Proj File = png / jpg or mov / mp4 / m4v (`src/Video.h/.mm`). One VideoPlayer per file, its own
+  worker: AVAssetReader; H.264 / HEVC / ProRes (4444 alpha too) -> BGRA IOSurface-backed CVPixelBuffers, bound zero-copy
+  (CGLTexImageIOSurface2D on a GL_TEXTURE_RECTANGLE); HAP / HAP Alpha / HAP Q / HAP Q Alpha / HAP Alpha-Only = raw samples
+  (outputSettings nil; skip zero-sample marker buffers), sections parsed + Snappy (our own decoder, from the format docs) -> DXT1 /
+  DXT5 / BC4 uploads, Hap Q's scaled YCoCg converted in the copy shader. HAP R / HDR (BC7 / BC6): refused (no BPTC here). DXV: not
+  supported (Glance's DXV3 decoders are LGPL FFmpeg ports). The frame is drawn into the picture texture (<= 2048 px, premultiplied
+  by its alpha) — kProjVideoFS; mips only while Focus > 0. Decode window: the play position + 6 frames in its direction (Loop
+  wraps it); a backward window is read forward from a few frames before; the render thread never waits (a frame not decoded yet
+  -> the nearest one behind, else the last one: counted "late"). Dials: Video Speed (x real time), Video Loop (Loop / Ping-Pong /
+  Once), Video Restart; clock `clk.video` (Loop wraps at the clip length, Ping-Pong at twice it, Once clamps); a clip trigger
+  restarts it. Debug Log: one VIDEO line per second (decoded, ms each, late, upload ms, cache MB). Measured: tools/w2_video.py
+  (13 files, harness) and Arena (MBP M3 Max): see the W2 results handoff.
 
 ## W28: Amrit's Wow review (`tools/w28_review.py`: strip / speed / lag (HEAD vs this build) / timeline / arena; FIXES = the fresh clips, lasers gone)
 - TIME SCALES (1 = the W26 pace, 2 = crazy; Amrit: "Soooooft I want, Crazy as max MAYBE"): Fire Speed (default 0.5: sim time x it,
@@ -482,7 +514,7 @@ d) W17: KHR_materials_pbrSpecularGlossiness -> diffuse = BaseColor, its spec/glo
   (CGPDFScanner: m l c v y h re, f F f* B B* b b*, n S s, cm q Q, rg g k sc scn, form XObjects; page 1), PNG / JPG (traced:
   field = alpha, else darkness on light; <=512 px; components = groups; interpolated marching squares, Douglas-Peucker,
   Chaikin; the image maps onto every face, sides sample 3 px inside the edge). EPS: "EPS not supported on this macOS".
-- Extrusion: libtess2 boundary contours (the source fill rule) -> collinear points dropped -> caps; bevel profiles Flat /
+- Extrusion: Clipper2 boundary contours (the source fill rule; W2, was libtess2) -> collinear points dropped -> caps; bevel profiles Flat /
   Round / Chamfer / Inset as inset rings (miter limit 4); the bevel's width is capped per shape at 0.8 x area / perimeter
   (wider insets fold); side normals = length-weighted mean of 2 or 4 edges, sharp above 35 deg. Parts Front / Back / Side /
   Bevel (Part N controls). File Colours = a palette texture (4x4 px per shape). Sizes: 1 = the text line / logo height.
@@ -541,10 +573,11 @@ d) W17: KHR_materials_pbrSpecularGlossiness -> diffuse = BaseColor, its spec/glo
 Source of truth: `src/ParamList.inc` (one X-macro list builds the enum and the definitions; FX-only lines sit under
 `#if LOADEHR_FX`). Resolume stores values by NAME: never rename a param; inserting at new indices is safe.
 Generated by `tools/param_map.py` from the harness `params` dump of the four bundles (W26; each column = that bundle's FFGL
-index, "—" = not carried). **LoadEhr 507 params, FX 511, Wow 493, Wow FX 507.**
-Group order: Model, Text, Logo, Extrude, Letters, Transform, Camera, Camera Live, Motion, Material, Surface, Parts, Shape, Copies, Lighting,
-Volume, Smoke Sim, Trip, Fire, Lightning, Swarm, Lava, Caustics, Mirror Room, Light A, Light B, Light C, Spots, Projector, Post, Floor,
-Silhouette, FX, Output, Input + Face (FX), Audio, Debug. (W26 also added Liquid to Model and Shatter Physics to Shape.)
+index, "—" = not carried). **LoadEhr 482 params, FX 486, Wow 487, Wow FX 501.**
+Group order: Model, Text, Logo, Extrude, Letters, Transform, Camera, Camera Live, Motion, Material, Surface, Parts, Shape, Deform, Copies,
+Lighting, Volume, Smoke Sim, Trip, Fire, Lightning, Swarm, Lava, Caustics, Light A, Light B, Light C, Spots, Projector, Post, Floor,
+Silhouette, FX, Output, Input + Face (FX), Audio, Debug. (W26 also added Liquid to Model and Shatter Physics to Shape; W2 Shatter Mode
+to Shape, the Deform group, the projector's video dials; the Mirror Room group went.)
 Part slots: "Part N <field>" is renamed to "<material> <field>" (cut to 16 chars) at load; unused slots are hidden;
 Skin is hidden in the source build. "Pose Data" is a hidden TEXT param that stores the four camera poses; "C Placed For"
 (hidden TEXT) records the model Light C was placed for (the auto-place on C Enable runs once per model).
@@ -756,473 +789,473 @@ Colours: every "<X> Color" row starts a HUE / SAT / BRI / ALPHA quartet = ONE pi
 | 192 | 192 | 129 | 129 | Parts | Part 8 Glow | STD | 0..5 | 0 |
 | 193 | 193 | 130 | 130 | Parts | Part 8 Skin | BOOL | - | 0 |
 | 194 | 194 | 131 | 131 | Parts | Part 8 Surface | STD | 0..1 | 1 |
-| 195 | 195 | — | — | Shape | Melt | STD | 0..1 | 0 |
-| 196 | 196 | — | — | Shape | Drip | STD | 0..3 | 1 |
-| 197 | 197 | 132 | 132 | Shape | Shatter | EVENT | - | - |
-| 198 | 198 | 133 | 133 | Shape | Reform | EVENT | - | - |
-| 199 | 199 | 134 | 134 | Shape | Shatter On Beat | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
-| 200 | 200 | 135 | 135 | Shape | Shard Count | STD | 8..512 | 64 |
-| 201 | 201 | 136 | 136 | Shape | Shatter Force | STD | 0..10 | 1.5 |
-| 202 | 202 | 137 | 137 | Shape | Shatter Gravity | STD | 0..20 | 2 |
-| 203 | 203 | 138 | 138 | Shape | Shard Spin | STD | 0..20 | 3 |
-| 204 | 204 | 139 | 139 | Shape | Reform Time | STD | 0.05..10 | 1.2 |
-| 205 | 205 | — | — | Shape | Slice Count | STD | 2..64 | 12 |
-| 206 | 206 | — | — | Shape | Slice Gap | STD | 0..2 | 0 |
-| 207 | 207 | — | — | Shape | Slice Axis | OPT | X / Y / Z | 1 |
-| 208 | 208 | — | — | Shape | Slice Wave | STD | 0..4 | 0 |
-| 209 | 209 | — | — | Shape | Voxel | STD | 0..1 | 0 |
-| 210 | 210 | — | — | Shape | Voxel Size | STD | 0.005..0.5 | 0.06 |
-| 211 | 211 | — | — | Shape | Low Poly | STD | 0..1 | 0 |
-| 212 | 212 | — | — | Shape | Low Poly Size | STD | 0.01..0.8 | 0.15 |
-| 213 | 213 | — | — | Shape | LowPoly Rot X | STD | -180..180 | 0 |
-| 214 | 214 | — | — | Shape | LowPoly Rot Y | STD | -180..180 | 0 |
-| 215 | 215 | — | — | Shape | LowPoly Rot Z | STD | -180..180 | 0 |
-| 216 | 216 | — | — | Shape | LowPoly Spin X | STD | -30..30 | 0 |
-| 217 | 217 | — | — | Shape | LowPoly Spin Y | STD | -30..30 | 0 |
-| 218 | 218 | — | — | Shape | LowPoly Spin Z | STD | -30..30 | 0 |
-| 219 | 219 | — | — | Shape | Facet Tumble | OPT | Off / Together / Separate | 0 |
-| 220 | 220 | — | — | Shape | Tumble X | STD | -30..30 | 0 |
-| 221 | 221 | — | — | Shape | Tumble Y | STD | -30..30 | 0 |
-| 222 | 222 | — | — | Shape | Tumble Z | STD | -30..30 | 0 |
-| 223 | 223 | — | — | Shape | Tumble Random | STD | 0..1 | 0.5 |
-| 224 | 224 | — | — | Shape | Tumble Sway | STD | 0..1 | 0 |
-| 225 | 225 | — | — | Shape | Tumble On Beat | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
-| 226 | 226 | — | — | Shape | Tumble Beat Flip | OPT | 90 / 180 | 0 |
-| 227 | 227 | — | — | Shape | Facet Gap | STD | 0..1 | 0 |
-| 228 | 228 | — | — | Shape | Tumble Reset | EVENT | - | - |
-| 229 | 229 | — | — | Shape | Deform Axis | OPT | X / Y / Z | 1 |
-| 230 | 230 | — | — | Shape | Twist | STD | -8..8 | 0 |
-| 231 | 231 | — | — | Shape | Bend | STD | -4..4 | 0 |
-| 232 | 232 | — | — | Shape | Ripple | STD | 0..0.5 | 0 |
-| 233 | 233 | — | — | Shape | Ripple Freq | STD | 1..80 | 14 |
-| 234 | 234 | — | — | Shape | Ripple Speed | STD | -20..20 | 4 |
-| 235 | 235 | — | — | Shape | Ripple Beat | STD | 0..4 | 0 |
-| 236 | 236 | — | — | Shape | Blow To Dust | EVENT | - | - |
-| 237 | 237 | — | — | Shape | Dust Reform | EVENT | - | - |
-| 238 | 238 | — | — | Shape | Dust On Beat | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
-| 239 | 239 | — | — | Shape | Dust Hold | STD | 0..30 | 0 |
-| 240 | 240 | — | — | Shape | Dust | STD | 0..1 | 0 |
-| 241 | 241 | — | — | Shape | Dust Count | OPT | 25k / 50k / 100k / 200k / 400k | 2 |
-| 242 | 242 | — | — | Shape | Dust Wind | STD | 0..6 | 1 |
-| 243 | 243 | — | — | Shape | Dust Size | STD | 0.3..8 | 1.5 |
-| 244 | 244 | — | — | Shape | Contours | STD | 0..10 | 0 |
-| 245 | 245 | — | — | Shape | Contour Mode | OPT | X / Y / Z / Height Map / Radial | 1 |
-| 246 | 246 | — | — | Shape | Contour Spacing | STD | 0.005..0.5 | 0.06 |
-| 247 | 247 | — | — | Shape | Contour Width | STD | 0.01..1 | 0.15 |
-| 248 | 248 | — | — | Shape | Contour Speed | STD | -4..4 | 0.3 |
-| 249 | 249 | — | — | Shape | Contour Color | HUE | 0..1 | 0.0784314 |
-| 250 | 250 | — | — | Shape | Contour Sat | SAT | 0..1 | 0.85 |
-| 251 | 251 | — | — | Shape | Contour Bri | BRI | 0..1 | 1 |
-| 252 | 252 | — | — | Shape | Contour Alpha | ALPHA | 0..1 | 1 |
-| 253 | 253 | — | — | Copies | Clone Layout | OPT | Off / Ring / Grid / Tunnel / Carousel | 0 |
-| 254 | 254 | — | — | Copies | Clone Count | STD | 1..64 | 8 |
-| 255 | 255 | — | — | Copies | Clone Spacing | STD | 0.2..12 | 2.4 |
-| 256 | 256 | — | — | Copies | Clone Spin Step | STD | -180..180 | 0 |
-| 257 | 257 | — | — | Copies | Clone Hue Spread | STD | 0..1 | 0 |
-| 258 | 258 | — | — | Copies | Clone Orbit | STD | -30..30 | 0 |
-| 259 | 259 | — | — | Copies | Clone Scale | STD | 0.05..3 | 0.6 |
-| 260 | 260 | — | — | Copies | Tunnel Fade | STD | 0..1 | 0.25 |
-| 261 | 261 | — | — | Copies | Keep Original | BOOL | - | 1 |
-| 262 | 262 | — | — | Copies | LOD Bias | STD | 0.1..4 | 1 |
-| 263 | 263 | — | — | Copies | Trail Echoes | STD | 0..7 | 0 |
-| 264 | 264 | — | — | Copies | Trail Delay | STD | 1..30 | 4 |
-| 265 | 265 | — | — | Copies | Trail Decay | STD | 0..1 | 0.7 |
-| 266 | 266 | — | — | Copies | Trail Offset X | STD | -0.1..0.1 | 0 |
-| 267 | 267 | — | — | Copies | Trail Offset Y | STD | -0.1..0.1 | 0 |
-| 268 | 268 | — | — | Copies | Ghosts | STD | 0..8 | 0 |
-| 269 | 269 | — | — | Copies | Ghost Spacing | STD | 1..30 | 5 |
-| 270 | 270 | — | — | Copies | Ghost Fade | STD | 0..1 | 0.6 |
-| 271 | 271 | — | — | Copies | Trail Smear | STD | 0..1 | 0 |
-| 272 | 272 | — | — | Copies | Trail Blur | STD | 0..2 | 0 |
-| 273 | 273 | — | — | Copies | Trail Dust | STD | 0..1 | 0 |
-| 274 | 274 | — | — | Copies | Trail Grain | STD | 1..12 | 2.5 |
-| 275 | 275 | — | — | Copies | Trail Drift | STD | 0..2 | 0.15 |
-| 276 | 276 | — | — | Copies | Trail Drift Dir | STD | -180..180 | 90 |
-| 277 | 277 | — | — | Copies | Trail Fade Curve | OPT | Linear / Soft / Long Tail | 0 |
-| 278 | 278 | — | — | Copies | Trail Glow | STD | 0..10 | 0 |
-| 279 | 279 | — | — | Copies | Trail Color | HUE | 0..1 | 0.55 |
-| 280 | 280 | — | — | Copies | Trail Sat | SAT | 0..1 | 0.6 |
-| 281 | 281 | — | — | Copies | Trail Bri | BRI | 0..1 | 1 |
-| 282 | 282 | — | — | Copies | Trail Alpha | ALPHA | 0..1 | 1 |
-| 283 | 283 | — | — | Copies | Trail Color Mix | STD | 0..1 | 0 |
-| — | — | 140 | 140 | Shape | Shatter Physics | OPT | Analytic / Bounce | 0 |
-| — | — | 141 | 141 | Shape | Bounciness | STD | 0..1 | 0.5 |
-| — | — | 142 | 142 | Shape | Floor Friction | STD | 0..1 | 0.3 |
-| — | — | 143 | 143 | Shape | Physics Speed | STD | 0..2 | 0.35 |
-| 284 | 284 | 144 | 144 | Lighting | Key Azimuth | STD | -180..180 | 35 |
-| 285 | 285 | 145 | 145 | Lighting | Key Elevation | STD | -90..90 | 35 |
-| 286 | 286 | 146 | 146 | Lighting | Key Intensity | STD | 0..20 | 3 |
-| 287 | 287 | 147 | 147 | Lighting | Key Color | HUE | 0..1 | 0.104167 |
-| 288 | 288 | 148 | 148 | Lighting | Key Sat | SAT | 0..1 | 0.08 |
-| 289 | 289 | 149 | 149 | Lighting | Key Bri | BRI | 0..1 | 1 |
-| 290 | 290 | 150 | 150 | Lighting | Key Alpha | ALPHA | 0..1 | 1 |
-| 291 | 291 | 151 | 151 | Lighting | Ambient | STD | 0..1 | 0.03 |
-| 292 | 292 | 152 | 152 | Lighting | Env Intensity | STD | 0..10 | 1 |
-| 293 | 293 | 153 | 153 | Lighting | Env Source | OPT | Studio / Input (FX) / Off | 0 |
-| 294 | 294 | 154 | 154 | Lighting | Env Rotate | STD | -180..180 | 0 |
-| 295 | 295 | 155 | 155 | Lighting | Exposure | STD | -5..5 | 0 |
-| 296 | 296 | 156 | 156 | Lighting | Tonemap | OPT | ACES / Filmic / None | 0 |
-| 297 | 297 | 157 | 157 | Volume | Vol Method | OPT | Raymarch / Screen Rays | 0 |
-| 298 | 298 | 158 | 158 | Volume | Haze | STD | 0..2 | 0.12 |
-| 299 | 299 | 159 | 159 | Volume | Smoke Amount | STD | 0..4 | 1 |
-| 300 | 300 | 160 | 160 | Volume | Smoke Scale | STD | 0.1..10 | 1.5 |
-| 301 | 301 | 161 | 161 | Volume | Smoke Speed | STD | 0..4 | 0.3 |
-| 302 | 302 | 162 | 162 | Volume | Smoke Turbulence | STD | 0..4 | 1 |
-| 303 | 303 | 163 | 163 | Volume | Smoke Rise | STD | -2..2 | 0.15 |
-| 304 | 304 | 164 | 164 | Volume | Glow Cloud | STD | 0..10 | 1 |
-| 305 | 305 | 165 | 165 | Volume | Smoke Ambient | STD | 0..4 | 0 |
-| 306 | 306 | 166 | 166 | Volume | Smoke Key Light | STD | 0..4 | 0 |
-| 307 | 307 | 167 | 167 | Volume | Volume Size | STD | 0.5..12 | 3.5 |
-| 308 | 308 | 168 | 168 | Volume | Scatter G | STD | -0.9..0.99 | 0.6 |
-| 309 | 309 | 169 | 169 | Volume | Shaft Length | STD | 0.2..20 | 6 |
-| 310 | 310 | 170 | 170 | Volume | Motes | STD | 0..4 | 0 |
-| 311 | 311 | 171 | 171 | Volume | Vol Quality | OPT | 16 / 32 / 64 / 128 | 1 |
-| 312 | 312 | 172 | 172 | Volume | Vol Res | OPT | Full / Half / Quarter | 1 |
-| 313 | 313 | 173 | 173 | Volume | Fog Blend | OPT | Add / Over | 0 |
-| 314 | 314 | 174 | 174 | Volume | Drift Return | STD | 0..3 | 0.4 |
-| 315 | 315 | 175 | 175 | Smoke Sim | Smoke Engine | OPT | Noise / Sim / Sim + Detail | 0 |
-| 316 | 316 | 176 | 176 | Smoke Sim | Sim Res | OPT | 48 / 64 / 96 / 128 | 1 |
-| 317 | 317 | 177 | 177 | Smoke Sim | Sim Box | STD | 1..6 | 2.5 |
-| 318 | 318 | 178 | 178 | Smoke Sim | Sim Iterations | STD | 10..40 | 20 |
-| 319 | 319 | 179 | 179 | Smoke Sim | Buoyancy | STD | 0..10 | 2 |
-| 320 | 320 | 180 | 180 | Smoke Sim | Heat Decay | STD | 0..5 | 0.5 |
-| 321 | 321 | 181 | 181 | Smoke Sim | Vorticity | STD | 0..10 | 2 |
-| 322 | 322 | 182 | 182 | Smoke Sim | Smoke Fade | STD | 0..3 | 0.6 |
-| 323 | 323 | 183 | 183 | Smoke Sim | Wind X | STD | -3..3 | 0 |
-| 324 | 324 | 184 | 184 | Smoke Sim | Wind Y | STD | -3..3 | 0 |
-| 325 | 325 | 185 | 185 | Smoke Sim | Wind Z | STD | -3..3 | 0 |
-| 326 | 326 | 186 | 186 | Smoke Sim | Sim Turbulence | STD | 0..2 | 0.5 |
-| 327 | 327 | 187 | 187 | Smoke Sim | Emit Eyes | STD | 0..10 | 0 |
-| 328 | 328 | 188 | 188 | Smoke Sim | Eyes Heat | STD | 0..5 | 1 |
-| 329 | 329 | 189 | 189 | Smoke Sim | Emit Behind | STD | 0..10 | 0 |
-| 330 | 330 | 190 | 190 | Smoke Sim | Behind Heat | STD | 0..5 | 1 |
-| 331 | 331 | 191 | 191 | Smoke Sim | Emit Rim | STD | 0..10 | 0 |
-| 332 | 332 | 192 | 192 | Smoke Sim | Rim Heat | STD | 0..5 | 1 |
-| 333 | 333 | 193 | 193 | Smoke Sim | Emit Inside | STD | 0..10 | 0 |
-| 334 | 334 | 194 | 194 | Smoke Sim | Inside Heat | STD | 0..5 | 1 |
-| 335 | 335 | 195 | 195 | Smoke Sim | Emit Offset | STD | 0..0.5 | 0 |
-| 336 | 336 | 196 | 196 | Smoke Sim | Beat Puff | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
-| 337 | 337 | 197 | 197 | Smoke Sim | Puff Amount | STD | 0..10 | 3 |
-| 338 | 338 | 198 | 198 | Smoke Sim | Audio > Emit | STD | 0..4 | 0 |
-| 339 | 339 | 199 | 199 | Smoke Sim | Sim Reset | EVENT | - | - |
-| 340 | 340 | 200 | 200 | Smoke Sim | Smoke Color | HUE | 0..1 | 0 |
-| 341 | 341 | 201 | 201 | Smoke Sim | Smoke Sat | SAT | 0..1 | 0 |
-| 342 | 342 | 202 | 202 | Smoke Sim | Smoke Bri | BRI | 0..1 | 1 |
-| 343 | 343 | 203 | 203 | Smoke Sim | Smoke Alpha | ALPHA | 0..1 | 1 |
-| 344 | 344 | 204 | 204 | Smoke Sim | Smoke Confine | STD | 0..1 | 0 |
-| — | 345 | — | — | Smoke Sim | Project Input | STD | 0..1 | 0 |
-| 345 | 346 | 205 | 205 | Trip | Trip Master | STD | 0..2 | 1 |
-| 346 | 347 | 206 | 206 | Trip | Colour By | OPT | Off / Density / Heat / Speed / Swirl / Age / Height | 0 |
-| 347 | 348 | 207 | 207 | Trip | Trip Palette | OPT | Rainbow / Acid / Neon / Fire / Ice / Picker Pair | 0 |
-| 348 | 349 | 208 | 208 | Trip | Palette Shift | STD | -2..2 | 0 |
-| 349 | 350 | 209 | 209 | Trip | Palette Spread | STD | 0..4 | 1 |
-| 350 | 351 | 210 | 210 | Trip | Trip A Color | HUE | 0..1 | 0.83 |
-| 351 | 352 | 211 | 211 | Trip | Trip A Sat | SAT | 0..1 | 1 |
-| 352 | 353 | 212 | 212 | Trip | Trip A Bri | BRI | 0..1 | 1 |
-| 353 | 354 | 213 | 213 | Trip | Trip A Alpha | ALPHA | 0..1 | 1 |
-| 354 | 355 | 214 | 214 | Trip | Trip B Color | HUE | 0..1 | 0.45 |
-| 355 | 356 | 215 | 215 | Trip | Trip B Sat | SAT | 0..1 | 1 |
-| 356 | 357 | 216 | 216 | Trip | Trip B Bri | BRI | 0..1 | 1 |
-| 357 | 358 | 217 | 217 | Trip | Trip B Alpha | ALPHA | 0..1 | 1 |
-| 358 | 359 | 218 | 218 | Trip | Thin Film | STD | 0..2 | 0 |
-| 359 | 360 | 219 | 219 | Trip | Thin Film Thick | STD | 0.1..3 | 1 |
-| 360 | 361 | 220 | 220 | Trip | Prism | STD | 0..2 | 0 |
-| 361 | 362 | 221 | 221 | Trip | Prism Angle | STD | -180..180 | 0 |
-| 362 | 363 | 222 | 222 | Trip | Kaleido Smoke | STD | 1..16 | 1 |
-| 363 | 364 | 223 | 223 | Trip | Kaleido Twist | STD | -360..360 | 0 |
-| 364 | 365 | 224 | 224 | Trip | Kaleido Spin | STD | -30..30 | 0 |
-| 365 | 366 | 225 | 225 | Trip | Fractal Fog | STD | 0..2 | 0 |
-| 366 | 367 | 226 | 226 | Trip | Fractal Scale | STD | 0.2..4 | 1 |
-| 367 | 368 | 227 | 227 | Trip | Fractal Iter | STD | 1..6 | 3 |
-| 368 | 369 | 228 | 228 | Trip | Fractal Morph | STD | -30..30 | 6 |
-| 369 | 370 | 229 | 229 | Trip | Neon Veins | STD | 0..10 | 0 |
-| 370 | 371 | 230 | 230 | Trip | Vein Width | STD | 0..1 | 0.4 |
-| 371 | 372 | 231 | 231 | Trip | Vein Color | HUE | 0..1 | 0.5 |
-| 372 | 373 | 232 | 232 | Trip | Vein Sat | SAT | 0..1 | 1 |
-| 373 | 374 | 233 | 233 | Trip | Vein Bri | BRI | 0..1 | 1 |
-| 374 | 375 | 234 | 234 | Trip | Vein Alpha | ALPHA | 0..1 | 1 |
-| 375 | 376 | 235 | 235 | Trip | Smoke Contours | STD | 0..10 | 0 |
-| 376 | 377 | 236 | 236 | Trip | Contour Bands | STD | 2..32 | 8 |
-| 377 | 378 | 237 | 237 | Trip | Band Sharpness | STD | 0..1 | 0.6 |
-| 378 | 379 | 238 | 238 | Trip | Band Scroll | STD | -4..4 | 0.3 |
-| 379 | 380 | 239 | 239 | Trip | Contour Style | OPT | Lines / Bands | 0 |
-| 380 | 381 | 240 | 240 | Trip | Line Width | STD | 0.5..6 | 1.5 |
-| 381 | 382 | 241 | 241 | Trip | Line Glow | STD | 0..4 | 1 |
-| 382 | 383 | 242 | 242 | Trip | Blacklight | STD | 0..10 | 0 |
-| 383 | 384 | 243 | 243 | Trip | Blacklight By | OPT | Density / Heat | 0 |
-| 384 | 385 | 244 | 244 | Trip | Blacklight Color | HUE | 0..1 | 0.76 |
-| 385 | 386 | 245 | 245 | Trip | Blacklight Sat | SAT | 0..1 | 0.85 |
-| 386 | 387 | 246 | 246 | Trip | Blacklight Bri | BRI | 0..1 | 1 |
-| 387 | 388 | 247 | 247 | Trip | Blacklight Alpha | ALPHA | 0..1 | 1 |
-| 388 | 389 | 248 | 248 | Trip | Fire Ring | EVENT | - | - |
-| 389 | 390 | 249 | 249 | Trip | Ring On Beat | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
-| 390 | 391 | 250 | 250 | Trip | Ring From | OPT | Eyes / Mouth / Behind | 0 |
-| 391 | 392 | 251 | 251 | Trip | Ring Size | STD | 0.05..1 | 0.3 |
-| 392 | 393 | 252 | 252 | Trip | Ring Speed | STD | 0..6 | 2 |
-| 393 | 394 | 253 | 253 | Trip | Ring Spin | STD | -10..10 | 0 |
-| 394 | 395 | 254 | 254 | Trip | Ring Smoke | STD | 0..10 | 4 |
-| 395 | 396 | 255 | 255 | Trip | Smoke Ghosts | STD | 0..4 | 0 |
-| 396 | 397 | 256 | 256 | Trip | Ghost Offset | STD | 0..3 | 1 |
-| 397 | 398 | 257 | 257 | Trip | Ghost Scale | STD | 0.3..3 | 1.3 |
-| 398 | 399 | 258 | 258 | Trip | Ghost Fade Time | STD | 0.1..5 | 1.5 |
-| 399 | 400 | 259 | 259 | Trip | Whirlpool | STD | -5..5 | 0 |
-| 400 | 401 | 260 | 260 | Trip | Hyperspace | STD | -5..5 | 0 |
-| 401 | 402 | 261 | 261 | Trip | Hue Echo | STD | 0..1 | 0 |
-| 402 | 403 | 262 | 262 | Trip | Echo Hue Step | STD | -0.1..0.1 | 0.02 |
-| 403 | 404 | 263 | 263 | Trip | Time Warp | STD | 0..2 | 1 |
-| 404 | 405 | 264 | 264 | Trip | Freeze | EVENT | - | - |
-| — | — | 265 | 265 | Fire | Fire | STD | 0..1 | 0 |
-| — | — | 266 | 266 | Fire | Fire Speed | STD | 0..2 | 0.5 |
-| — | — | 267 | 267 | Fire | Burn Rate | STD | 0.2..10 | 2 |
-| — | — | 268 | 268 | Fire | Flame Temp | STD | 1000..6000 | 2000 |
-| — | — | 269 | 269 | Fire | Flame Height | STD | 0..4 | 1 |
-| — | — | 270 | 270 | Fire | Flame Glow | STD | 0..10 | 2 |
-| — | — | 271 | 271 | Fire | Fire Smoke | STD | 0..2 | 0.4 |
-| — | — | 272 | 272 | Fire | Flame Tint Color | HUE | 0..1 | 0.6 |
-| — | — | 273 | 273 | Fire | Flame Tint Sat | SAT | 0..1 | 0.8 |
-| — | — | 274 | 274 | Fire | Flame Tint Bri | BRI | 0..1 | 1 |
-| — | — | 275 | 275 | Fire | Flame Tint Mix | ALPHA | 0..1 | 0 |
-| — | — | 276 | 276 | Fire | Fire Burst | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
-| — | — | 277 | 277 | Fire | Burst Amount | STD | 0..10 | 2 |
-| — | — | 278 | 278 | Fire | Fire Light | STD | 0..10 | 2 |
-| — | — | 279 | 279 | Lightning | Lightning Strike | EVENT | - | - |
-| — | — | 280 | 280 | Lightning | Strike On Beat | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
-| — | — | 281 | 281 | Lightning | Strike Rate | STD | 0..10 | 0 |
-| — | — | 282 | 282 | Lightning | Bolt Path | OPT | Crawl / Eye To Eye / To Floor / To Clones | 0 |
-| — | — | 283 | 283 | Lightning | Bolt Count | STD | 1..8 | 2 |
-| — | — | 284 | 284 | Lightning | Branching | STD | 0..1 | 0.5 |
-| — | — | 285 | 285 | Lightning | Jaggedness | STD | 0..1 | 0.5 |
-| — | — | 286 | 286 | Lightning | Bolt Life | STD | 0.05..2 | 0.4 |
-| — | — | 287 | 287 | Lightning | Bolt Width | STD | 0.5..6 | 1.5 |
-| — | — | 288 | 288 | Lightning | Bolt Glow | STD | 0..10 | 3 |
-| — | — | 289 | 289 | Lightning | Bolt Color | HUE | 0..1 | 0.64 |
-| — | — | 290 | 290 | Lightning | Bolt Sat | SAT | 0..1 | 0.55 |
-| — | — | 291 | 291 | Lightning | Bolt Bri | BRI | 0..1 | 1 |
-| — | — | 292 | 292 | Lightning | Bolt Alpha | ALPHA | 0..1 | 1 |
-| — | — | 293 | 293 | Lightning | Bolt Flash | STD | 0..10 | 2 |
-| — | — | 294 | 294 | Swarm | Swarm Count | OPT | Off / 2k / 5k / 10k / 20k / 40k | 0 |
-| — | — | 295 | 295 | Swarm | Swarm Release | EVENT | - | - |
-| — | — | 296 | 296 | Swarm | Release On Beat | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
-| — | — | 297 | 297 | Swarm | Release Time | STD | 0.2..10 | 2 |
-| — | — | 298 | 298 | Swarm | Attraction | STD | 0..10 | 3 |
-| — | — | 299 | 299 | Swarm | Flock | STD | 0..2 | 1 |
-| — | — | 300 | 300 | Swarm | Swarm Speed | STD | 0..4 | 1 |
-| — | — | 301 | 301 | Swarm | Swarm Offset | STD | 0..1 | 0.03 |
-| — | — | 302 | 302 | Swarm | Firefly Size | STD | 0.5..8 | 2 |
-| — | — | 303 | 303 | Swarm | Firefly Glow | STD | 0..10 | 3 |
-| — | — | 304 | 304 | Swarm | Twinkle | STD | 0..1 | 0.5 |
-| — | — | 305 | 305 | Swarm | Firefly Color | HUE | 0..1 | 0.14 |
-| — | — | 306 | 306 | Swarm | Firefly Sat | SAT | 0..1 | 0.75 |
-| — | — | 307 | 307 | Swarm | Firefly Bri | BRI | 0..1 | 1 |
-| — | — | 308 | 308 | Swarm | Firefly Alpha | ALPHA | 0..1 | 1 |
-| — | — | 309 | 309 | Swarm | Mask Visible | BOOL | - | 1 |
-| — | — | 310 | 310 | Lava | Lava Cracks | STD | 0..1 | 0 |
-| — | — | 311 | 311 | Lava | Crack Spread | STD | 0..1 | 1 |
-| — | — | 312 | 312 | Lava | Crack Start | EVENT | - | - |
-| — | — | 313 | 313 | Lava | Crack Reverse | EVENT | - | - |
-| — | — | 314 | 314 | Lava | Crack On Beat | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
-| — | — | 315 | 315 | Lava | Crack Time | STD | 0.2..10 | 2 |
-| — | — | 316 | 316 | Lava | Crack Scale | STD | 0.5..8 | 2.5 |
-| — | — | 317 | 317 | Lava | Crack Width | STD | 0..1 | 0.3 |
-| — | — | 318 | 318 | Lava | Lava Temp | STD | 800..4000 | 1600 |
-| — | — | 319 | 319 | Lava | Lava Glow | STD | 0..10 | 3 |
-| — | — | 320 | 320 | Lava | Lava Tint Color | HUE | 0..1 | 0.55 |
-| — | — | 321 | 321 | Lava | Lava Tint Sat | SAT | 0..1 | 0.8 |
-| — | — | 322 | 322 | Lava | Lava Tint Bri | BRI | 0..1 | 1 |
-| — | — | 323 | 323 | Lava | Lava Tint Mix | ALPHA | 0..1 | 0 |
-| — | — | 324 | 324 | Lava | Heat Haze | STD | 0..2 | 0.5 |
-| — | — | 325 | 325 | Lava | Lava Split | STD | 0..1 | 0 |
-| — | — | 326 | 326 | Lava | Lava Light | STD | 0..40 | 10 |
-| — | — | 327 | 327 | Caustics | Caustics | STD | 0..4 | 0 |
-| — | — | 328 | 328 | Caustics | Caustic Source | OPT | Glass Parts / Whole Mask | 0 |
-| — | — | 329 | 329 | Caustics | Caustic IOR | STD | 1..2.5 | 1.5 |
-| — | — | 330 | 330 | Caustics | Caustic Rainbow | STD | 0..2 | 0.5 |
-| — | — | 331 | 331 | Caustics | Caustic Sharp | STD | 0..1 | 0.6 |
-| — | — | 332 | 332 | Caustics | Caustic Ripple | STD | 0..1 | 0.3 |
-| — | — | 333 | 333 | Caustics | Caustic Floor | STD | 0..2 | 1 |
-| — | — | 334 | 334 | Caustics | Caustic Smoke | STD | 0..2 | 0.5 |
-| — | — | 335 | 335 | Caustics | Caustic Surface | STD | 0..2 | 1 |
-| — | — | 336 | 336 | Caustics | Caustic Color | HUE | 0..1 | 0.12 |
-| — | — | 337 | 337 | Caustics | Caustic Sat | SAT | 0..1 | 0.15 |
-| — | — | 338 | 338 | Caustics | Caustic Bri | BRI | 0..1 | 1 |
-| — | — | 339 | 339 | Caustics | Caustic Alpha | ALPHA | 0..1 | 1 |
-| — | — | 340 | 340 | Mirror Room | Mirror Room | OPT | Off / Box / Corridor / Two Mirrors | 0 |
-| — | — | 341 | 341 | Mirror Room | Mirror Count | STD | 1..8 | 3 |
-| — | — | 342 | 342 | Mirror Room | Box Size | STD | 0.8..6 | 1.6 |
-| — | — | 343 | 343 | Mirror Room | Box Depth | STD | 0.5..6 | 1.6 |
-| — | — | 344 | 344 | Mirror Room | Mirror Color | HUE | 0..1 | 0.55 |
-| — | — | 345 | 345 | Mirror Room | Mirror Sat | SAT | 0..1 | 0.12 |
-| — | — | 346 | 346 | Mirror Room | Mirror Bri | BRI | 0..1 | 1 |
-| — | — | 347 | 347 | Mirror Room | Mirror Reflect | ALPHA | 0..1 | 0.8 |
-| — | — | 348 | 348 | Mirror Room | Mirror Gap | STD | 0..4 | 1 |
-| — | — | 349 | 349 | Mirror Room | LED Width | STD | 0.2..4 | 1 |
-| — | — | 350 | 350 | Mirror Room | LED Colors | OPT | Picker / Rainbow | 0 |
-| — | — | 351 | 351 | Mirror Room | LED Color | HUE | 0..1 | 0.58 |
-| — | — | 352 | 352 | Mirror Room | LED Sat | SAT | 0..1 | 0.3 |
-| — | — | 353 | 353 | Mirror Room | LED Bri | BRI | 0..1 | 1 |
-| — | — | 354 | 354 | Mirror Room | LED Alpha | ALPHA | 0..1 | 1 |
-| — | — | 355 | 355 | Mirror Room | LED Speed | STD | -4..4 | 0.3 |
-| — | — | 356 | 356 | Mirror Room | Mirror Volumes | BOOL | - | 1 |
-| — | — | 357 | 357 | Mirror Room | Mirror Vol Steps | OPT | 4 / 8 / 16 / 32 | 1 |
-| — | — | 358 | 358 | Mirror Room | Mirror Particles | BOOL | - | 1 |
-| — | — | 359 | 359 | Mirror Room | Particle Images | STD | 1..64 | 24 |
-| 405 | 406 | 360 | 360 | Light A | A Enable | BOOL | - | 0 |
-| 406 | 407 | 361 | 361 | Light A | A Type | OPT | Spot / Point | 0 |
-| 407 | 408 | 362 | 362 | Light A | A Anchor To Mask | BOOL | - | 1 |
-| 408 | 409 | 363 | 363 | Light A | A Pos X | STD | -6..6 | 0 |
-| 409 | 410 | 364 | 364 | Light A | A Pos Y | STD | -6..6 | 0 |
-| 410 | 411 | 365 | 365 | Light A | A Pos Z | STD | -6..6 | -1.5 |
-| 411 | 412 | 366 | 366 | Light A | A Aim Mode | OPT | At Camera / At Mask / Free | 0 |
-| 412 | 413 | 367 | 367 | Light A | A Aim Yaw | STD | -180..180 | 0 |
-| 413 | 414 | 368 | 368 | Light A | A Aim Pitch | STD | -90..90 | 0 |
-| 414 | 415 | 369 | 369 | Light A | A Cone Angle | STD | 1..170 | 45 |
-| 415 | 416 | 370 | 370 | Light A | A Cone Soft | STD | 0..1 | 0.5 |
-| 416 | 417 | 371 | 371 | Light A | A Intensity | STD | 0..100 | 12 |
-| 417 | 418 | 372 | 372 | Light A | A Color | HUE | 0..1 | 0.105263 |
-| 418 | 419 | 373 | 373 | Light A | A Sat | SAT | 0..1 | 0.38 |
-| 419 | 420 | 374 | 374 | Light A | A Bri | BRI | 0..1 | 1 |
-| 420 | 421 | 375 | 375 | Light A | A Alpha | ALPHA | 0..1 | 1 |
-| 421 | 422 | 376 | 376 | Light A | A Hue Drift | STD | -0.7..0.7 | 0 |
-| 422 | 423 | 377 | 377 | Light A | A Beat Pulse | STD | 0..4 | 0 |
-| 423 | 424 | 378 | 378 | Light A | A Audio > Light | STD | 0..4 | 0 |
-| 424 | 425 | 379 | 379 | Light B | B Enable | BOOL | - | 0 |
-| 425 | 426 | 380 | 380 | Light B | B Type | OPT | Spot / Point | 0 |
-| 426 | 427 | 381 | 381 | Light B | B Anchor To Mask | BOOL | - | 0 |
-| 427 | 428 | 382 | 382 | Light B | B Pos X | STD | -6..6 | 2.5 |
-| 428 | 429 | 383 | 383 | Light B | B Pos Y | STD | -6..6 | 0.6 |
-| 429 | 430 | 384 | 384 | Light B | B Pos Z | STD | -6..6 | 1 |
-| 430 | 431 | 385 | 385 | Light B | B Aim Mode | OPT | At Camera / At Mask / Free | 1 |
-| 431 | 432 | 386 | 386 | Light B | B Aim Yaw | STD | -180..180 | 0 |
-| 432 | 433 | 387 | 387 | Light B | B Aim Pitch | STD | -90..90 | 0 |
-| 433 | 434 | 388 | 388 | Light B | B Cone Angle | STD | 1..170 | 45 |
-| 434 | 435 | 389 | 389 | Light B | B Cone Soft | STD | 0..1 | 0.5 |
-| 435 | 436 | 390 | 390 | Light B | B Intensity | STD | 0..100 | 12 |
-| 436 | 437 | 391 | 391 | Light B | B Color | HUE | 0..1 | 0.592593 |
-| 437 | 438 | 392 | 392 | Light B | B Sat | SAT | 0..1 | 0.45 |
-| 438 | 439 | 393 | 393 | Light B | B Bri | BRI | 0..1 | 1 |
-| 439 | 440 | 394 | 394 | Light B | B Alpha | ALPHA | 0..1 | 1 |
-| 440 | 441 | 395 | 395 | Light B | B Hue Drift | STD | -0.7..0.7 | 0 |
-| 441 | 442 | 396 | 396 | Light B | B Beat Pulse | STD | 0..4 | 0 |
-| 442 | 443 | 397 | 397 | Light B | B Audio > Light | STD | 0..4 | 0 |
-| 443 | 444 | 398 | 398 | Light C | C Enable | BOOL | - | 0 |
-| 444 | 445 | 399 | 399 | Light C | C Place At Eyes | EVENT | - | - |
-| 445 | 446 | 400 | 400 | Light C | C Fit Cone | EVENT | - | - |
-| 446 | 447 | 401 | 401 | Light C | C Front Only | BOOL | - | 1 |
-| 447 | 448 | 402 | 402 | Light C | C Behind Depth | STD | 0.02..2 | 0.3 |
-| 448 | 449 | 403 | 403 | Light C | C Anchor To Mask | BOOL | - | 1 |
-| 449 | 450 | 404 | 404 | Light C | C Mirror X | BOOL | - | 1 |
-| 450 | 451 | 405 | 405 | Light C | C Left Pos X | STD | -6..6 | -0.3 |
-| 451 | 452 | 406 | 406 | Light C | C Left Pos Y | STD | -6..6 | 0.2 |
-| 452 | 453 | 407 | 407 | Light C | C Left Pos Z | STD | -6..6 | 0.2 |
-| 453 | 454 | 408 | 408 | Light C | C Right Pos X | STD | -6..6 | 0.3 |
-| 454 | 455 | 409 | 409 | Light C | C Right Pos Y | STD | -6..6 | 0.2 |
-| 455 | 456 | 410 | 410 | Light C | C Right Pos Z | STD | -6..6 | 0.2 |
-| 456 | 457 | 411 | 411 | Light C | C Aim Mode | OPT | Through Hole / At Camera / Free | 0 |
-| 457 | 458 | 412 | 412 | Light C | C Aim Yaw | STD | -180..180 | 0 |
-| 458 | 459 | 413 | 413 | Light C | C Aim Pitch | STD | -90..90 | 0 |
-| 459 | 460 | 414 | 414 | Light C | C Cone Angle | STD | 1..170 | 20 |
-| 460 | 461 | 415 | 415 | Light C | C Cone Soft | STD | 0..1 | 0.5 |
-| 461 | 462 | 416 | 416 | Light C | C Intensity | STD | 0..100 | 6 |
-| 462 | 463 | 417 | 417 | Light C | C Left Color | HUE | 0..1 | 0.105263 |
-| 463 | 464 | 418 | 418 | Light C | C Left Sat | SAT | 0..1 | 0.38 |
-| 464 | 465 | 419 | 419 | Light C | C Left Bri | BRI | 0..1 | 1 |
-| 465 | 466 | 420 | 420 | Light C | C Left Alpha | ALPHA | 0..1 | 1 |
-| 466 | 467 | 421 | 421 | Light C | C Link Colors | BOOL | - | 1 |
-| 467 | 468 | 422 | 422 | Light C | C Right Color | HUE | 0..1 | 0.105263 |
-| 468 | 469 | 423 | 423 | Light C | C Right Sat | SAT | 0..1 | 0.38 |
-| 469 | 470 | 424 | 424 | Light C | C Right Bri | BRI | 0..1 | 1 |
-| 470 | 471 | 425 | 425 | Light C | C Right Alpha | ALPHA | 0..1 | 1 |
-| 471 | 472 | 426 | 426 | Light C | C Hue Drift | STD | -0.7..0.7 | 0 |
-| 472 | 473 | 427 | 427 | Light C | C Beat Pulse | STD | 0..4 | 0 |
-| 473 | 474 | 428 | 428 | Light C | C Audio > Light | STD | 0..4 | 0 |
-| 474 | 475 | 429 | 429 | Light C | C Placed For | TEXT (hidden) | - | - |
-| — | — | 430 | 430 | Spots | Spot Count | OPT | Off / 1 / 2 / 3 / 4 | 0 |
-| — | — | 431 | 431 | Spots | Spot Intensity | STD | 0..100 | 25 |
-| — | — | 432 | 432 | Spots | Spot Cone | STD | 2..90 | 14 |
-| — | — | 433 | 433 | Spots | Spot Speed | STD | 0..15 | 3.75 |
-| — | — | 434 | 434 | Spots | Spot Pattern | OPT | Pan / Circle / Figure 8 / Cross / Random | 0 |
-| — | — | 435 | 435 | Spots | Spot Width | STD | 0..4 | 1.2 |
-| — | — | 436 | 436 | Spots | Spot Rig Height | STD | -4..6 | 2.5 |
-| — | — | 437 | 437 | Spots | Spot Rig Dist | STD | 0.5..10 | 3 |
-| — | — | 438 | 438 | Spots | Spot Color | HUE | 0..1 | 0 |
-| — | — | 439 | 439 | Spots | Spot Sat | SAT | 0..1 | 0 |
-| — | — | 440 | 440 | Spots | Spot Bri | BRI | 0..1 | 1 |
-| — | — | 441 | 441 | Spots | Spot Alpha | ALPHA | 0..1 | 1 |
-| — | — | 442 | 442 | Spots | Spot Color Mode | OPT | Single / Rainbow / Pairs | 0 |
-| — | — | 443 | 443 | Spots | Spot Beat Strobe | STD | 0..1 | 0 |
-| — | — | 444 | 444 | Spots | Spot Beams | STD | 0..4 | 1 |
-| — | — | 445 | 445 | Projector | Proj Enable | BOOL | - | 0 |
-| — | — | — | 446 | Projector | Proj Source | OPT | Input / Image File | 0 |
-| — | — | 446 | 447 | Projector | Proj Image | FILE | fbx obj gltf glb | - |
-| — | — | 447 | 448 | Projector | Proj Anchor | BOOL | - | 0 |
-| — | — | 448 | 449 | Projector | Proj Pos X | STD | -6..6 | 0.8 |
-| — | — | 449 | 450 | Projector | Proj Pos Y | STD | -6..6 | 1.2 |
-| — | — | 450 | 451 | Projector | Proj Pos Z | STD | -6..6 | 4 |
-| — | — | 451 | 452 | Projector | Proj Aim Mode | OPT | At Mask / Free | 0 |
-| — | — | 452 | 453 | Projector | Proj Aim Yaw | STD | -180..180 | 0 |
-| — | — | 453 | 454 | Projector | Proj Aim Pitch | STD | -90..90 | 0 |
-| — | — | 454 | 455 | Projector | Proj Throw | STD | 5..120 | 30 |
-| — | — | 455 | 456 | Projector | Proj Focus | STD | 0..1 | 0 |
-| — | — | 456 | 457 | Projector | Proj Intensity | STD | 0..100 | 25 |
-| — | — | 457 | 458 | Projector | Proj Color | HUE | 0..1 | 0 |
-| — | — | 458 | 459 | Projector | Proj Sat | SAT | 0..1 | 0 |
-| — | — | 459 | 460 | Projector | Proj Bri | BRI | 0..1 | 1 |
-| — | — | 460 | 461 | Projector | Proj Alpha | ALPHA | 0..1 | 1 |
-| — | — | 461 | 462 | Projector | Proj Beam | STD | 0..4 | 1 |
-| — | — | 462 | 463 | Projector | Proj Surface | STD | 0..4 | 1 |
-| 475 | 476 | 463 | 464 | Post | Bloom | STD | 0..10 | 0 |
-| 476 | 477 | 464 | 465 | Post | Bloom Threshold | STD | 0..1 | 0.65 |
-| 477 | 478 | 465 | 466 | Post | Bloom Radius | STD | 0..1 | 0.6 |
-| 478 | 479 | 466 | 467 | Post | Flare Ghosts | STD | 0..10 | 0 |
-| 479 | 480 | 467 | 468 | Post | Flare Streak | STD | 0..10 | 0 |
-| 480 | 481 | 468 | 469 | Floor | Shadow Catcher | STD | 0..1 | 0 |
-| 481 | 482 | 469 | 470 | Floor | Catcher Plane | OPT | Floor / Wall | 0 |
-| 482 | 483 | 470 | 471 | Floor | Floor Height | STD | -4..2 | -1.02 |
-| 483 | 484 | 471 | 472 | Floor | Wall Distance | STD | 0..8 | 1.5 |
-| 484 | 485 | 472 | 473 | Floor | Shadow Soft | STD | 0..1 | 0.4 |
-| 485 | 486 | 473 | 474 | Floor | Mirror Floor | STD | 0..1 | 0 |
-| 486 | 487 | 474 | 475 | Floor | Mirror Blur | STD | 0..1 | 0.2 |
-| 487 | 488 | 475 | 476 | Floor | Mirror Fade | STD | 0..1 | 0.2 |
-| 488 | 489 | 476 | 477 | Floor | Floor Light | STD | 0..1 | 0.5 |
-| 489 | 490 | 477 | 478 | Floor | Floor Camera | STD | 0..1 | 1 |
-| 490 | 491 | — | — | FX | Wireframe Mix | STD | 0..1 | 0 |
-| 491 | 492 | — | — | FX | Wire Thickness | STD | 0.2..8 | 1 |
-| 492 | 493 | — | — | FX | Explode | STD | 0..3 | 0 |
-| 493 | 494 | — | — | FX | Explode Random | STD | 0..1 | 0.5 |
-| 494 | 495 | — | — | FX | Dissolve | STD | 0..1 | 0 |
-| 495 | 496 | — | — | FX | Dissolve Glow | STD | 0..10 | 1 |
-| 496 | 497 | — | — | FX | Toon Steps | STD | 0..8 | 0 |
-| 497 | 498 | — | — | FX | Outline | STD | 0..1 | 0 |
-| 498 | 499 | — | — | FX | Depth Fog | STD | 0..3 | 0 |
-| — | — | 478 | 479 | Silhouette | Silhouette | STD | 0..1 | 0 |
-| — | — | 479 | 480 | Silhouette | Sil Fill | STD | 0..1 | 0 |
-| — | — | 480 | 481 | Silhouette | Sil Glow | STD | 0..10 | 2 |
-| — | — | 481 | 482 | Silhouette | Sil Width | STD | 0.5..60 | 8 |
-| — | — | 482 | 483 | Silhouette | Sil Color | HUE | 0..1 | 0.523809 |
-| — | — | 483 | 484 | Silhouette | Sil Sat | SAT | 0..1 | 0.7 |
-| — | — | 484 | 485 | Silhouette | Sil Bri | BRI | 0..1 | 1 |
-| — | — | 485 | 486 | Silhouette | Sil Alpha | ALPHA | 0..1 | 1 |
-| 499 | 500 | 486 | 487 | Output | Background Color | HUE | 0..1 | 0 |
-| 500 | 501 | 487 | 488 | Output | Background Sat | SAT | 0..1 | 0 |
-| 501 | 502 | 488 | 489 | Output | Background Bri | BRI | 0..1 | 0 |
-| 502 | 503 | 489 | 490 | Output | Background Alpha | ALPHA | 0..1 | 0 |
-| 503 | 504 | 490 | 491 | Output | MSAA | OPT | 1x / 4x / 8x | 1 |
-| — | 505 | — | 492 | Input | Input Use | OPT | Off / Background / Skin on flagged parts / Skin all | 0 |
-| — | 506 | — | 493 | Input | Input Projection | OPT | Front planar / Model UV / Spherical | 0 |
-| — | 507 | — | 494 | Input | Input Mix | STD | 0..1 | 1 |
-| — | — | — | 495 | Face | Face Track | BOOL | - | 0 |
-| — | — | — | 496 | Face | Max Faces | STD | 1..4 | 4 |
-| — | — | — | 497 | Face | Face Scale | STD | 0.1..5 | 1.2 |
-| — | — | — | 498 | Face | Face Offset X | STD | -1..1 | 0 |
-| — | — | — | 499 | Face | Face Offset Y | STD | -1..1 | 0.3 |
-| — | — | — | 500 | Face | Follow Roll | STD | 0..1 | 1 |
-| — | — | — | 501 | Face | Follow Yaw | STD | 0..1 | 1 |
-| — | — | — | 502 | Face | Follow Pitch | STD | 0..1 | 0.6 |
-| — | — | — | 503 | Face | Face Smooth | STD | 0..1 | 0.5 |
-| — | — | — | 504 | Face | Hide No Face | BOOL | - | 1 |
-| 504 | 508 | 491 | 505 | Audio | Audio FFT | BUFFER | 512 bins (FFT) | - |
-| 505 | 509 | — | — | Debug | Debug View | OPT | Final / Albedo / Normal / Roughness / Metallic / UV / Part IDs | 0 |
-| 506 | 510 | 492 | 506 | Debug | Debug Log | BOOL | - | 0 |
+| 195 | 195 | 132 | 132 | Shape | Shatter | EVENT | - | - |
+| 196 | 196 | 133 | 133 | Shape | Reform | EVENT | - | - |
+| 197 | 197 | 134 | 134 | Shape | Shatter On Beat | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
+| 198 | 198 | 135 | 135 | Shape | Shard Count | STD | 8..512 | 64 |
+| 199 | 199 | 136 | 136 | Shape | Shatter Mode | OPT | Letters / Pieces / Pieces + Letters | 1 |
+| 200 | 200 | 137 | 137 | Shape | Shatter Force | STD | 0..10 | 1.5 |
+| 201 | 201 | 138 | 138 | Shape | Shatter Gravity | STD | 0..20 | 2 |
+| 202 | 202 | 139 | 139 | Shape | Shard Spin | STD | 0..20 | 3 |
+| 203 | 203 | 140 | 140 | Shape | Reform Time | STD | 0.05..10 | 1.2 |
+| 204 | 204 | 141 | 141 | Shape | Shatter Physics | OPT | Analytic / Bounce | 0 |
+| 205 | 205 | 142 | 142 | Shape | Bounciness | STD | 0..1 | 0.5 |
+| 206 | 206 | 143 | 143 | Shape | Floor Friction | STD | 0..1 | 0.3 |
+| 207 | 207 | — | — | Shape | Slice Count | STD | 2..64 | 12 |
+| 208 | 208 | — | — | Shape | Slice Gap | STD | 0..2 | 0 |
+| 209 | 209 | — | — | Shape | Slice Axis | OPT | X / Y / Z | 1 |
+| 210 | 210 | — | — | Shape | Slice Wave | STD | 0..4 | 0 |
+| 211 | 211 | — | — | Shape | Voxel | STD | 0..1 | 0 |
+| 212 | 212 | — | — | Shape | Voxel Size | STD | 0.005..0.5 | 0.06 |
+| 213 | 213 | — | — | Shape | Low Poly | STD | 0..1 | 0 |
+| 214 | 214 | — | — | Shape | Low Poly Size | STD | 0.01..0.8 | 0.15 |
+| 215 | 215 | — | — | Shape | LowPoly Rot X | STD | -180..180 | 0 |
+| 216 | 216 | — | — | Shape | LowPoly Rot Y | STD | -180..180 | 0 |
+| 217 | 217 | — | — | Shape | LowPoly Rot Z | STD | -180..180 | 0 |
+| 218 | 218 | — | — | Shape | LowPoly Spin X | STD | -30..30 | 0 |
+| 219 | 219 | — | — | Shape | LowPoly Spin Y | STD | -30..30 | 0 |
+| 220 | 220 | — | — | Shape | LowPoly Spin Z | STD | -30..30 | 0 |
+| 221 | 221 | — | — | Shape | Facet Tumble | OPT | Off / Together / Separate | 0 |
+| 222 | 222 | — | — | Shape | Tumble X | STD | -30..30 | 0 |
+| 223 | 223 | — | — | Shape | Tumble Y | STD | -30..30 | 0 |
+| 224 | 224 | — | — | Shape | Tumble Z | STD | -30..30 | 0 |
+| 225 | 225 | — | — | Shape | Tumble Random | STD | 0..1 | 0.5 |
+| 226 | 226 | — | — | Shape | Tumble Sway | STD | 0..1 | 0 |
+| 227 | 227 | — | — | Shape | Tumble On Beat | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
+| 228 | 228 | — | — | Shape | Tumble Beat Flip | OPT | 90 / 180 | 0 |
+| 229 | 229 | — | — | Shape | Facet Gap | STD | 0..1 | 0 |
+| 230 | 230 | — | — | Shape | Tumble Reset | EVENT | - | - |
+| 231 | 231 | — | — | Shape | Blow To Dust | EVENT | - | - |
+| 232 | 232 | — | — | Shape | Dust Reform | EVENT | - | - |
+| 233 | 233 | — | — | Shape | Dust On Beat | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
+| 234 | 234 | — | — | Shape | Dust Hold | STD | 0..30 | 0 |
+| 235 | 235 | — | — | Shape | Dust | STD | 0..1 | 0 |
+| 236 | 236 | — | — | Shape | Dust Count | OPT | 25k / 50k / 100k / 200k / 400k | 2 |
+| 237 | 237 | — | — | Shape | Dust Wind | STD | 0..6 | 1 |
+| 238 | 238 | — | — | Shape | Dust Size | STD | 0.3..8 | 1.5 |
+| 239 | 239 | — | — | Shape | Contours | STD | 0..10 | 0 |
+| 240 | 240 | — | — | Shape | Contour Mode | OPT | X / Y / Z / Height Map / Radial | 1 |
+| 241 | 241 | — | — | Shape | Contour Spacing | STD | 0.005..0.5 | 0.06 |
+| 242 | 242 | — | — | Shape | Contour Width | STD | 0.01..1 | 0.15 |
+| 243 | 243 | — | — | Shape | Contour Speed | STD | -4..4 | 0.3 |
+| 244 | 244 | — | — | Shape | Contour Color | HUE | 0..1 | 0.0784314 |
+| 245 | 245 | — | — | Shape | Contour Sat | SAT | 0..1 | 0.85 |
+| 246 | 246 | — | — | Shape | Contour Bri | BRI | 0..1 | 1 |
+| 247 | 247 | — | — | Shape | Contour Alpha | ALPHA | 0..1 | 1 |
+| — | — | 144 | 144 | Shape | Physics Speed | STD | 0..2 | 0.35 |
+| 248 | 248 | 145 | 145 | Deform | Deform Amount | STD | 0..2 | 1 |
+| 249 | 249 | 146 | 146 | Deform | Deform Axis | OPT | X / Y / Z | 1 |
+| 250 | 250 | 147 | 147 | Deform | Taper | STD | -2..2 | 0 |
+| 251 | 251 | 148 | 148 | Deform | Twist | STD | -8..8 | 0 |
+| 252 | 252 | 149 | 149 | Deform | Bend | STD | -4..4 | 0 |
+| 253 | 253 | 150 | 150 | Deform | Squash | STD | -1..1 | 0 |
+| 254 | 254 | 151 | 151 | Deform | Squash Beat | STD | 0..2 | 0 |
+| 255 | 255 | 152 | 152 | Deform | Shear | STD | -2..2 | 0 |
+| 256 | 256 | 153 | 153 | Deform | Bulge | STD | -1..2 | 0 |
+| 257 | 257 | 154 | 154 | Deform | Spherize | STD | 0..1 | 0 |
+| 258 | 258 | 155 | 155 | Deform | Noise Warp | STD | 0..2 | 0 |
+| 259 | 259 | 156 | 156 | Deform | Warp Scale | STD | 0.2..10 | 2 |
+| 260 | 260 | 157 | 157 | Deform | Warp Speed | STD | 0..4 | 0.3 |
+| 261 | 261 | 158 | 158 | Deform | Ripple | STD | 0..0.5 | 0 |
+| 262 | 262 | 159 | 159 | Deform | Ripple Freq | STD | 1..80 | 14 |
+| 263 | 263 | 160 | 160 | Deform | Ripple Speed | STD | -20..20 | 4 |
+| 264 | 264 | 161 | 161 | Deform | Ripple Beat | STD | 0..4 | 0 |
+| 265 | 265 | 162 | 162 | Deform | Melt | STD | 0..1 | 0 |
+| 266 | 266 | 163 | 163 | Deform | Drip | STD | 0..3 | 1 |
+| 267 | 267 | 164 | 164 | Deform | Glitch Shift | STD | 0..1 | 0 |
+| 268 | 268 | 165 | 165 | Deform | Glitch Bands | STD | 2..64 | 12 |
+| 269 | 269 | 166 | 166 | Deform | Glitch Rate | STD | 0..30 | 6 |
+| 270 | 270 | 167 | 167 | Deform | Mirror Fold | OPT | Off / X / X+Y / X+Y+Z | 0 |
+| 271 | 271 | 168 | 168 | Deform | Jelly | STD | 0..2 | 0 |
+| 272 | 272 | 169 | 169 | Deform | Audio > Deform | STD | 0..4 | 0 |
+| 273 | 273 | — | — | Copies | Clone Layout | OPT | Off / Ring / Grid / Tunnel / Carousel | 0 |
+| 274 | 274 | — | — | Copies | Clone Count | STD | 1..64 | 8 |
+| 275 | 275 | — | — | Copies | Clone Spacing | STD | 0.2..12 | 2.4 |
+| 276 | 276 | — | — | Copies | Clone Spin Step | STD | -180..180 | 0 |
+| 277 | 277 | — | — | Copies | Clone Hue Spread | STD | 0..1 | 0 |
+| 278 | 278 | — | — | Copies | Clone Orbit | STD | -30..30 | 0 |
+| 279 | 279 | — | — | Copies | Clone Scale | STD | 0.05..3 | 0.6 |
+| 280 | 280 | — | — | Copies | Tunnel Fade | STD | 0..1 | 0.25 |
+| 281 | 281 | — | — | Copies | Keep Original | BOOL | - | 1 |
+| 282 | 282 | — | — | Copies | LOD Bias | STD | 0.1..4 | 1 |
+| 283 | 283 | — | — | Copies | Trail Echoes | STD | 0..7 | 0 |
+| 284 | 284 | — | — | Copies | Trail Delay | STD | 1..30 | 4 |
+| 285 | 285 | — | — | Copies | Trail Decay | STD | 0..1 | 0.7 |
+| 286 | 286 | — | — | Copies | Trail Offset X | STD | -0.1..0.1 | 0 |
+| 287 | 287 | — | — | Copies | Trail Offset Y | STD | -0.1..0.1 | 0 |
+| 288 | 288 | — | — | Copies | Ghosts | STD | 0..8 | 0 |
+| 289 | 289 | — | — | Copies | Ghost Spacing | STD | 1..30 | 5 |
+| 290 | 290 | — | — | Copies | Ghost Fade | STD | 0..1 | 0.6 |
+| 291 | 291 | — | — | Copies | Trail Smear | STD | 0..1 | 0 |
+| 292 | 292 | — | — | Copies | Trail Blur | STD | 0..2 | 0 |
+| 293 | 293 | — | — | Copies | Trail Dust | STD | 0..1 | 0 |
+| 294 | 294 | — | — | Copies | Trail Grain | STD | 1..12 | 2.5 |
+| 295 | 295 | — | — | Copies | Trail Drift | STD | 0..2 | 0.15 |
+| 296 | 296 | — | — | Copies | Trail Drift Dir | STD | -180..180 | 90 |
+| 297 | 297 | — | — | Copies | Trail Fade Curve | OPT | Linear / Soft / Long Tail | 0 |
+| 298 | 298 | — | — | Copies | Trail Glow | STD | 0..10 | 0 |
+| 299 | 299 | — | — | Copies | Trail Color | HUE | 0..1 | 0.55 |
+| 300 | 300 | — | — | Copies | Trail Sat | SAT | 0..1 | 0.6 |
+| 301 | 301 | — | — | Copies | Trail Bri | BRI | 0..1 | 1 |
+| 302 | 302 | — | — | Copies | Trail Alpha | ALPHA | 0..1 | 1 |
+| 303 | 303 | — | — | Copies | Trail Color Mix | STD | 0..1 | 0 |
+| 304 | 304 | 170 | 170 | Lighting | Key Azimuth | STD | -180..180 | 35 |
+| 305 | 305 | 171 | 171 | Lighting | Key Elevation | STD | -90..90 | 35 |
+| 306 | 306 | 172 | 172 | Lighting | Key Intensity | STD | 0..20 | 3 |
+| 307 | 307 | 173 | 173 | Lighting | Key Color | HUE | 0..1 | 0.104167 |
+| 308 | 308 | 174 | 174 | Lighting | Key Sat | SAT | 0..1 | 0.08 |
+| 309 | 309 | 175 | 175 | Lighting | Key Bri | BRI | 0..1 | 1 |
+| 310 | 310 | 176 | 176 | Lighting | Key Alpha | ALPHA | 0..1 | 1 |
+| 311 | 311 | 177 | 177 | Lighting | Ambient | STD | 0..1 | 0.03 |
+| 312 | 312 | 178 | 178 | Lighting | Env Intensity | STD | 0..10 | 1 |
+| 313 | 313 | 179 | 179 | Lighting | Env Source | OPT | Studio / Input (FX) / Off | 0 |
+| 314 | 314 | 180 | 180 | Lighting | Env Rotate | STD | -180..180 | 0 |
+| 315 | 315 | 181 | 181 | Lighting | Exposure | STD | -5..5 | 0 |
+| 316 | 316 | 182 | 182 | Lighting | Tonemap | OPT | ACES / Filmic / None | 0 |
+| 317 | 317 | 183 | 183 | Volume | Vol Method | OPT | Raymarch / Screen Rays | 0 |
+| 318 | 318 | 184 | 184 | Volume | Haze | STD | 0..2 | 0.12 |
+| 319 | 319 | 185 | 185 | Volume | Smoke Amount | STD | 0..4 | 1 |
+| 320 | 320 | 186 | 186 | Volume | Smoke Scale | STD | 0.1..10 | 1.5 |
+| 321 | 321 | 187 | 187 | Volume | Smoke Speed | STD | 0..4 | 0.3 |
+| 322 | 322 | 188 | 188 | Volume | Smoke Turbulence | STD | 0..4 | 1 |
+| 323 | 323 | 189 | 189 | Volume | Smoke Rise | STD | -2..2 | 0.15 |
+| 324 | 324 | 190 | 190 | Volume | Glow Cloud | STD | 0..10 | 1 |
+| 325 | 325 | 191 | 191 | Volume | Smoke Ambient | STD | 0..4 | 0 |
+| 326 | 326 | 192 | 192 | Volume | Smoke Key Light | STD | 0..4 | 0 |
+| 327 | 327 | 193 | 193 | Volume | Volume Size | STD | 0.5..12 | 3.5 |
+| 328 | 328 | 194 | 194 | Volume | Scatter G | STD | -0.9..0.99 | 0.6 |
+| 329 | 329 | 195 | 195 | Volume | Shaft Length | STD | 0.2..20 | 6 |
+| 330 | 330 | 196 | 196 | Volume | Motes | STD | 0..4 | 0 |
+| 331 | 331 | 197 | 197 | Volume | Vol Quality | OPT | 16 / 32 / 64 / 128 | 1 |
+| 332 | 332 | 198 | 198 | Volume | Vol Res | OPT | Full / Half / Quarter | 1 |
+| 333 | 333 | 199 | 199 | Volume | Fog Blend | OPT | Add / Over | 0 |
+| 334 | 334 | 200 | 200 | Volume | Drift Return | STD | 0..3 | 0.4 |
+| 335 | 335 | 201 | 201 | Smoke Sim | Smoke Engine | OPT | Noise / Sim / Sim + Detail | 0 |
+| 336 | 336 | 202 | 202 | Smoke Sim | Sim Res | OPT | 48 / 64 / 96 / 128 | 1 |
+| 337 | 337 | 203 | 203 | Smoke Sim | Sim Box | STD | 1..6 | 2.5 |
+| 338 | 338 | 204 | 204 | Smoke Sim | Sim Iterations | STD | 10..40 | 20 |
+| 339 | 339 | 205 | 205 | Smoke Sim | Buoyancy | STD | 0..10 | 2 |
+| 340 | 340 | 206 | 206 | Smoke Sim | Heat Decay | STD | 0..5 | 0.5 |
+| 341 | 341 | 207 | 207 | Smoke Sim | Vorticity | STD | 0..10 | 2 |
+| 342 | 342 | 208 | 208 | Smoke Sim | Smoke Fade | STD | 0..3 | 0.6 |
+| 343 | 343 | 209 | 209 | Smoke Sim | Wind X | STD | -3..3 | 0 |
+| 344 | 344 | 210 | 210 | Smoke Sim | Wind Y | STD | -3..3 | 0 |
+| 345 | 345 | 211 | 211 | Smoke Sim | Wind Z | STD | -3..3 | 0 |
+| 346 | 346 | 212 | 212 | Smoke Sim | Sim Turbulence | STD | 0..2 | 0.5 |
+| 347 | 347 | 213 | 213 | Smoke Sim | Emit Eyes | STD | 0..10 | 0 |
+| 348 | 348 | 214 | 214 | Smoke Sim | Eyes Heat | STD | 0..5 | 1 |
+| 349 | 349 | 215 | 215 | Smoke Sim | Emit Behind | STD | 0..10 | 0 |
+| 350 | 350 | 216 | 216 | Smoke Sim | Behind Heat | STD | 0..5 | 1 |
+| 351 | 351 | 217 | 217 | Smoke Sim | Emit Rim | STD | 0..10 | 0 |
+| 352 | 352 | 218 | 218 | Smoke Sim | Rim Heat | STD | 0..5 | 1 |
+| 353 | 353 | 219 | 219 | Smoke Sim | Emit Inside | STD | 0..10 | 0 |
+| 354 | 354 | 220 | 220 | Smoke Sim | Inside Heat | STD | 0..5 | 1 |
+| 355 | 355 | 221 | 221 | Smoke Sim | Emit Offset | STD | 0..0.5 | 0 |
+| 356 | 356 | 222 | 222 | Smoke Sim | Beat Puff | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
+| 357 | 357 | 223 | 223 | Smoke Sim | Puff Amount | STD | 0..10 | 3 |
+| 358 | 358 | 224 | 224 | Smoke Sim | Audio > Emit | STD | 0..4 | 0 |
+| 359 | 359 | 225 | 225 | Smoke Sim | Sim Reset | EVENT | - | - |
+| 360 | 360 | 226 | 226 | Smoke Sim | Smoke Color | HUE | 0..1 | 0 |
+| 361 | 361 | 227 | 227 | Smoke Sim | Smoke Sat | SAT | 0..1 | 0 |
+| 362 | 362 | 228 | 228 | Smoke Sim | Smoke Bri | BRI | 0..1 | 1 |
+| 363 | 363 | 229 | 229 | Smoke Sim | Smoke Alpha | ALPHA | 0..1 | 1 |
+| 364 | 364 | 230 | 230 | Smoke Sim | Smoke Confine | STD | 0..1 | 0 |
+| — | 365 | — | — | Smoke Sim | Project Input | STD | 0..1 | 0 |
+| — | — | 231 | 231 | Trip | Trip Master | STD | 0..2 | 1 |
+| — | — | 232 | 232 | Trip | Colour By | OPT | Off / Density / Heat / Speed / Swirl / Age / Height | 0 |
+| — | — | 233 | 233 | Trip | Trip Palette | OPT | Rainbow / Acid / Neon / Fire / Ice / Picker Pair | 0 |
+| — | — | 234 | 234 | Trip | Palette Shift | STD | -2..2 | 0 |
+| — | — | 235 | 235 | Trip | Palette Spread | STD | 0..4 | 1 |
+| — | — | 236 | 236 | Trip | Trip A Color | HUE | 0..1 | 0.83 |
+| — | — | 237 | 237 | Trip | Trip A Sat | SAT | 0..1 | 1 |
+| — | — | 238 | 238 | Trip | Trip A Bri | BRI | 0..1 | 1 |
+| — | — | 239 | 239 | Trip | Trip A Alpha | ALPHA | 0..1 | 1 |
+| — | — | 240 | 240 | Trip | Trip B Color | HUE | 0..1 | 0.45 |
+| — | — | 241 | 241 | Trip | Trip B Sat | SAT | 0..1 | 1 |
+| — | — | 242 | 242 | Trip | Trip B Bri | BRI | 0..1 | 1 |
+| — | — | 243 | 243 | Trip | Trip B Alpha | ALPHA | 0..1 | 1 |
+| — | — | 244 | 244 | Trip | Thin Film | STD | 0..2 | 0 |
+| — | — | 245 | 245 | Trip | Thin Film Thick | STD | 0.1..3 | 1 |
+| — | — | 246 | 246 | Trip | Prism | STD | 0..2 | 0 |
+| — | — | 247 | 247 | Trip | Prism Angle | STD | -180..180 | 0 |
+| — | — | 248 | 248 | Trip | Kaleido Smoke | STD | 1..16 | 1 |
+| — | — | 249 | 249 | Trip | Kaleido Twist | STD | -360..360 | 0 |
+| — | — | 250 | 250 | Trip | Kaleido Spin | STD | -30..30 | 0 |
+| — | — | 251 | 251 | Trip | Fractal Fog | STD | 0..2 | 0 |
+| — | — | 252 | 252 | Trip | Fractal Scale | STD | 0.2..4 | 1 |
+| — | — | 253 | 253 | Trip | Fractal Iter | STD | 1..6 | 3 |
+| — | — | 254 | 254 | Trip | Fractal Morph | STD | -30..30 | 6 |
+| — | — | 255 | 255 | Trip | Neon Veins | STD | 0..10 | 0 |
+| — | — | 256 | 256 | Trip | Vein Width | STD | 0..1 | 0.4 |
+| — | — | 257 | 257 | Trip | Vein Color | HUE | 0..1 | 0.5 |
+| — | — | 258 | 258 | Trip | Vein Sat | SAT | 0..1 | 1 |
+| — | — | 259 | 259 | Trip | Vein Bri | BRI | 0..1 | 1 |
+| — | — | 260 | 260 | Trip | Vein Alpha | ALPHA | 0..1 | 1 |
+| — | — | 261 | 261 | Trip | Smoke Contours | STD | 0..10 | 0 |
+| — | — | 262 | 262 | Trip | Contour Bands | STD | 2..32 | 8 |
+| — | — | 263 | 263 | Trip | Band Sharpness | STD | 0..1 | 0.6 |
+| — | — | 264 | 264 | Trip | Band Scroll | STD | -4..4 | 0.3 |
+| — | — | 265 | 265 | Trip | Contour Style | OPT | Lines / Bands | 0 |
+| — | — | 266 | 266 | Trip | Line Width | STD | 0.5..6 | 1.5 |
+| — | — | 267 | 267 | Trip | Line Glow | STD | 0..4 | 1 |
+| — | — | 268 | 268 | Trip | Blacklight | STD | 0..10 | 0 |
+| — | — | 269 | 269 | Trip | Blacklight By | OPT | Density / Heat | 0 |
+| — | — | 270 | 270 | Trip | Blacklight Color | HUE | 0..1 | 0.76 |
+| — | — | 271 | 271 | Trip | Blacklight Sat | SAT | 0..1 | 0.85 |
+| — | — | 272 | 272 | Trip | Blacklight Bri | BRI | 0..1 | 1 |
+| — | — | 273 | 273 | Trip | Blacklight Alpha | ALPHA | 0..1 | 1 |
+| — | — | 274 | 274 | Trip | Fire Ring | EVENT | - | - |
+| — | — | 275 | 275 | Trip | Ring On Beat | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
+| — | — | 276 | 276 | Trip | Ring From | OPT | Eyes / Mouth / Behind | 0 |
+| — | — | 277 | 277 | Trip | Ring Size | STD | 0.05..1 | 0.3 |
+| — | — | 278 | 278 | Trip | Ring Speed | STD | 0..6 | 2 |
+| — | — | 279 | 279 | Trip | Ring Spin | STD | -10..10 | 0 |
+| — | — | 280 | 280 | Trip | Ring Smoke | STD | 0..10 | 4 |
+| — | — | 281 | 281 | Trip | Smoke Ghosts | STD | 0..4 | 0 |
+| — | — | 282 | 282 | Trip | Ghost Offset | STD | 0..3 | 1 |
+| — | — | 283 | 283 | Trip | Ghost Scale | STD | 0.3..3 | 1.3 |
+| — | — | 284 | 284 | Trip | Ghost Fade Time | STD | 0.1..5 | 1.5 |
+| — | — | 285 | 285 | Trip | Whirlpool | STD | -5..5 | 0 |
+| — | — | 286 | 286 | Trip | Hyperspace | STD | -5..5 | 0 |
+| — | — | 287 | 287 | Trip | Hue Echo | STD | 0..1 | 0 |
+| — | — | 288 | 288 | Trip | Echo Hue Step | STD | -0.1..0.1 | 0.02 |
+| — | — | 289 | 289 | Trip | Time Warp | STD | 0..2 | 1 |
+| — | — | 290 | 290 | Trip | Freeze | EVENT | - | - |
+| — | — | 291 | 291 | Fire | Fire | STD | 0..1 | 0 |
+| — | — | 292 | 292 | Fire | Fire Speed | STD | 0..2 | 0.5 |
+| — | — | 293 | 293 | Fire | Burn Rate | STD | 0.2..10 | 2 |
+| — | — | 294 | 294 | Fire | Flame Temp | STD | 1000..6000 | 2000 |
+| — | — | 295 | 295 | Fire | Flame Height | STD | 0..4 | 1 |
+| — | — | 296 | 296 | Fire | Flame Glow | STD | 0..10 | 2 |
+| — | — | 297 | 297 | Fire | Fire Smoke | STD | 0..2 | 0.4 |
+| — | — | 298 | 298 | Fire | Flame Tint Color | HUE | 0..1 | 0.6 |
+| — | — | 299 | 299 | Fire | Flame Tint Sat | SAT | 0..1 | 0.8 |
+| — | — | 300 | 300 | Fire | Flame Tint Bri | BRI | 0..1 | 1 |
+| — | — | 301 | 301 | Fire | Flame Tint Mix | ALPHA | 0..1 | 0 |
+| — | — | 302 | 302 | Fire | Fire Burst | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
+| — | — | 303 | 303 | Fire | Burst Amount | STD | 0..10 | 2 |
+| — | — | 304 | 304 | Fire | Fire Light | STD | 0..10 | 2 |
+| — | — | 305 | 305 | Lightning | Lightning Strike | EVENT | - | - |
+| — | — | 306 | 306 | Lightning | Strike On Beat | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
+| — | — | 307 | 307 | Lightning | Strike Rate | STD | 0..10 | 0 |
+| — | — | 308 | 308 | Lightning | Bolt Path | OPT | Crawl / Eye To Eye / To Floor / To Clones | 0 |
+| — | — | 309 | 309 | Lightning | Bolt Count | STD | 1..8 | 2 |
+| — | — | 310 | 310 | Lightning | Branching | STD | 0..1 | 0.5 |
+| — | — | 311 | 311 | Lightning | Jaggedness | STD | 0..1 | 0.5 |
+| — | — | 312 | 312 | Lightning | Bolt Life | STD | 0.05..2 | 0.4 |
+| — | — | 313 | 313 | Lightning | Bolt Width | STD | 0.5..6 | 1.5 |
+| — | — | 314 | 314 | Lightning | Bolt Glow | STD | 0..10 | 3 |
+| — | — | 315 | 315 | Lightning | Bolt Color | HUE | 0..1 | 0.64 |
+| — | — | 316 | 316 | Lightning | Bolt Sat | SAT | 0..1 | 0.55 |
+| — | — | 317 | 317 | Lightning | Bolt Bri | BRI | 0..1 | 1 |
+| — | — | 318 | 318 | Lightning | Bolt Alpha | ALPHA | 0..1 | 1 |
+| — | — | 319 | 319 | Lightning | Bolt Flash | STD | 0..10 | 2 |
+| — | — | 320 | 320 | Swarm | Swarm Count | OPT | Off / 2k / 5k / 10k / 20k / 40k | 0 |
+| — | — | 321 | 321 | Swarm | Swarm Release | EVENT | - | - |
+| — | — | 322 | 322 | Swarm | Release On Beat | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
+| — | — | 323 | 323 | Swarm | Release Time | STD | 0.2..10 | 2 |
+| — | — | 324 | 324 | Swarm | Attraction | STD | 0..10 | 3 |
+| — | — | 325 | 325 | Swarm | Flock | STD | 0..2 | 1 |
+| — | — | 326 | 326 | Swarm | Swarm Speed | STD | 0..4 | 1 |
+| — | — | 327 | 327 | Swarm | Swarm Offset | STD | 0..1 | 0.03 |
+| — | — | 328 | 328 | Swarm | Firefly Size | STD | 0.5..8 | 2 |
+| — | — | 329 | 329 | Swarm | Firefly Glow | STD | 0..10 | 3 |
+| — | — | 330 | 330 | Swarm | Twinkle | STD | 0..1 | 0.5 |
+| — | — | 331 | 331 | Swarm | Firefly Color | HUE | 0..1 | 0.14 |
+| — | — | 332 | 332 | Swarm | Firefly Sat | SAT | 0..1 | 0.75 |
+| — | — | 333 | 333 | Swarm | Firefly Bri | BRI | 0..1 | 1 |
+| — | — | 334 | 334 | Swarm | Firefly Alpha | ALPHA | 0..1 | 1 |
+| — | — | 335 | 335 | Swarm | Mask Visible | BOOL | - | 1 |
+| — | — | 336 | 336 | Lava | Lava Cracks | STD | 0..1 | 0 |
+| — | — | 337 | 337 | Lava | Crack Spread | STD | 0..1 | 1 |
+| — | — | 338 | 338 | Lava | Crack Start | EVENT | - | - |
+| — | — | 339 | 339 | Lava | Crack Reverse | EVENT | - | - |
+| — | — | 340 | 340 | Lava | Crack On Beat | OPT | Off / Every Beat / Every 2 / Every 4 / Every 8 | 0 |
+| — | — | 341 | 341 | Lava | Crack Time | STD | 0.2..10 | 2 |
+| — | — | 342 | 342 | Lava | Crack Scale | STD | 0.5..8 | 2.5 |
+| — | — | 343 | 343 | Lava | Crack Width | STD | 0..1 | 0.3 |
+| — | — | 344 | 344 | Lava | Lava Temp | STD | 800..4000 | 1600 |
+| — | — | 345 | 345 | Lava | Lava Glow | STD | 0..10 | 3 |
+| — | — | 346 | 346 | Lava | Lava Tint Color | HUE | 0..1 | 0.55 |
+| — | — | 347 | 347 | Lava | Lava Tint Sat | SAT | 0..1 | 0.8 |
+| — | — | 348 | 348 | Lava | Lava Tint Bri | BRI | 0..1 | 1 |
+| — | — | 349 | 349 | Lava | Lava Tint Mix | ALPHA | 0..1 | 0 |
+| — | — | 350 | 350 | Lava | Heat Haze | STD | 0..2 | 0.5 |
+| — | — | 351 | 351 | Lava | Lava Split | STD | 0..1 | 0 |
+| — | — | 352 | 352 | Lava | Lava Light | STD | 0..40 | 10 |
+| — | — | 353 | 353 | Caustics | Caustics | STD | 0..4 | 0 |
+| — | — | 354 | 354 | Caustics | Caustic Source | OPT | Glass Parts / Whole Mask | 0 |
+| — | — | 355 | 355 | Caustics | Caustic IOR | STD | 1..2.5 | 1.5 |
+| — | — | 356 | 356 | Caustics | Caustic Rainbow | STD | 0..2 | 0.5 |
+| — | — | 357 | 357 | Caustics | Caustic Sharp | STD | 0..1 | 0.6 |
+| — | — | 358 | 358 | Caustics | Caustic Ripple | STD | 0..1 | 0.3 |
+| — | — | 359 | 359 | Caustics | Caustic Floor | STD | 0..2 | 1 |
+| — | — | 360 | 360 | Caustics | Caustic Smoke | STD | 0..2 | 0.5 |
+| — | — | 361 | 361 | Caustics | Caustic Surface | STD | 0..2 | 1 |
+| — | — | 362 | 362 | Caustics | Caustic Color | HUE | 0..1 | 0.12 |
+| — | — | 363 | 363 | Caustics | Caustic Sat | SAT | 0..1 | 0.15 |
+| — | — | 364 | 364 | Caustics | Caustic Bri | BRI | 0..1 | 1 |
+| — | — | 365 | 365 | Caustics | Caustic Alpha | ALPHA | 0..1 | 1 |
+| 365 | 366 | 366 | 366 | Light A | A Enable | BOOL | - | 0 |
+| 366 | 367 | 367 | 367 | Light A | A Type | OPT | Spot / Point | 0 |
+| 367 | 368 | 368 | 368 | Light A | A Anchor To Mask | BOOL | - | 1 |
+| 368 | 369 | 369 | 369 | Light A | A Pos X | STD | -6..6 | 0 |
+| 369 | 370 | 370 | 370 | Light A | A Pos Y | STD | -6..6 | 0 |
+| 370 | 371 | 371 | 371 | Light A | A Pos Z | STD | -6..6 | -1.5 |
+| 371 | 372 | 372 | 372 | Light A | A Aim Mode | OPT | At Camera / At Mask / Free | 0 |
+| 372 | 373 | 373 | 373 | Light A | A Aim Yaw | STD | -180..180 | 0 |
+| 373 | 374 | 374 | 374 | Light A | A Aim Pitch | STD | -90..90 | 0 |
+| 374 | 375 | 375 | 375 | Light A | A Cone Angle | STD | 1..170 | 45 |
+| 375 | 376 | 376 | 376 | Light A | A Cone Soft | STD | 0..1 | 0.5 |
+| 376 | 377 | 377 | 377 | Light A | A Intensity | STD | 0..100 | 12 |
+| 377 | 378 | 378 | 378 | Light A | A Color | HUE | 0..1 | 0.105263 |
+| 378 | 379 | 379 | 379 | Light A | A Sat | SAT | 0..1 | 0.38 |
+| 379 | 380 | 380 | 380 | Light A | A Bri | BRI | 0..1 | 1 |
+| 380 | 381 | 381 | 381 | Light A | A Alpha | ALPHA | 0..1 | 1 |
+| 381 | 382 | 382 | 382 | Light A | A Hue Drift | STD | -0.7..0.7 | 0 |
+| 382 | 383 | 383 | 383 | Light A | A Beat Pulse | STD | 0..4 | 0 |
+| 383 | 384 | 384 | 384 | Light A | A Audio > Light | STD | 0..4 | 0 |
+| 384 | 385 | 385 | 385 | Light B | B Enable | BOOL | - | 0 |
+| 385 | 386 | 386 | 386 | Light B | B Type | OPT | Spot / Point | 0 |
+| 386 | 387 | 387 | 387 | Light B | B Anchor To Mask | BOOL | - | 0 |
+| 387 | 388 | 388 | 388 | Light B | B Pos X | STD | -6..6 | 2.5 |
+| 388 | 389 | 389 | 389 | Light B | B Pos Y | STD | -6..6 | 0.6 |
+| 389 | 390 | 390 | 390 | Light B | B Pos Z | STD | -6..6 | 1 |
+| 390 | 391 | 391 | 391 | Light B | B Aim Mode | OPT | At Camera / At Mask / Free | 1 |
+| 391 | 392 | 392 | 392 | Light B | B Aim Yaw | STD | -180..180 | 0 |
+| 392 | 393 | 393 | 393 | Light B | B Aim Pitch | STD | -90..90 | 0 |
+| 393 | 394 | 394 | 394 | Light B | B Cone Angle | STD | 1..170 | 45 |
+| 394 | 395 | 395 | 395 | Light B | B Cone Soft | STD | 0..1 | 0.5 |
+| 395 | 396 | 396 | 396 | Light B | B Intensity | STD | 0..100 | 12 |
+| 396 | 397 | 397 | 397 | Light B | B Color | HUE | 0..1 | 0.592593 |
+| 397 | 398 | 398 | 398 | Light B | B Sat | SAT | 0..1 | 0.45 |
+| 398 | 399 | 399 | 399 | Light B | B Bri | BRI | 0..1 | 1 |
+| 399 | 400 | 400 | 400 | Light B | B Alpha | ALPHA | 0..1 | 1 |
+| 400 | 401 | 401 | 401 | Light B | B Hue Drift | STD | -0.7..0.7 | 0 |
+| 401 | 402 | 402 | 402 | Light B | B Beat Pulse | STD | 0..4 | 0 |
+| 402 | 403 | 403 | 403 | Light B | B Audio > Light | STD | 0..4 | 0 |
+| 403 | 404 | 404 | 404 | Light C | C Enable | BOOL | - | 0 |
+| 404 | 405 | 405 | 405 | Light C | C Place At Eyes | EVENT | - | - |
+| 405 | 406 | 406 | 406 | Light C | C Fit Cone | EVENT | - | - |
+| 406 | 407 | 407 | 407 | Light C | C Front Only | BOOL | - | 1 |
+| 407 | 408 | 408 | 408 | Light C | C Behind Depth | STD | 0.02..2 | 0.3 |
+| 408 | 409 | 409 | 409 | Light C | C Anchor To Mask | BOOL | - | 1 |
+| 409 | 410 | 410 | 410 | Light C | C Mirror X | BOOL | - | 1 |
+| 410 | 411 | 411 | 411 | Light C | C Left Pos X | STD | -6..6 | -0.3 |
+| 411 | 412 | 412 | 412 | Light C | C Left Pos Y | STD | -6..6 | 0.2 |
+| 412 | 413 | 413 | 413 | Light C | C Left Pos Z | STD | -6..6 | 0.2 |
+| 413 | 414 | 414 | 414 | Light C | C Right Pos X | STD | -6..6 | 0.3 |
+| 414 | 415 | 415 | 415 | Light C | C Right Pos Y | STD | -6..6 | 0.2 |
+| 415 | 416 | 416 | 416 | Light C | C Right Pos Z | STD | -6..6 | 0.2 |
+| 416 | 417 | 417 | 417 | Light C | C Aim Mode | OPT | Through Hole / At Camera / Free | 0 |
+| 417 | 418 | 418 | 418 | Light C | C Aim Yaw | STD | -180..180 | 0 |
+| 418 | 419 | 419 | 419 | Light C | C Aim Pitch | STD | -90..90 | 0 |
+| 419 | 420 | 420 | 420 | Light C | C Cone Angle | STD | 1..170 | 20 |
+| 420 | 421 | 421 | 421 | Light C | C Cone Soft | STD | 0..1 | 0.5 |
+| 421 | 422 | 422 | 422 | Light C | C Intensity | STD | 0..100 | 6 |
+| 422 | 423 | 423 | 423 | Light C | C Left Color | HUE | 0..1 | 0.105263 |
+| 423 | 424 | 424 | 424 | Light C | C Left Sat | SAT | 0..1 | 0.38 |
+| 424 | 425 | 425 | 425 | Light C | C Left Bri | BRI | 0..1 | 1 |
+| 425 | 426 | 426 | 426 | Light C | C Left Alpha | ALPHA | 0..1 | 1 |
+| 426 | 427 | 427 | 427 | Light C | C Link Colors | BOOL | - | 1 |
+| 427 | 428 | 428 | 428 | Light C | C Right Color | HUE | 0..1 | 0.105263 |
+| 428 | 429 | 429 | 429 | Light C | C Right Sat | SAT | 0..1 | 0.38 |
+| 429 | 430 | 430 | 430 | Light C | C Right Bri | BRI | 0..1 | 1 |
+| 430 | 431 | 431 | 431 | Light C | C Right Alpha | ALPHA | 0..1 | 1 |
+| 431 | 432 | 432 | 432 | Light C | C Hue Drift | STD | -0.7..0.7 | 0 |
+| 432 | 433 | 433 | 433 | Light C | C Beat Pulse | STD | 0..4 | 0 |
+| 433 | 434 | 434 | 434 | Light C | C Audio > Light | STD | 0..4 | 0 |
+| 434 | 435 | 435 | 435 | Light C | C Placed For | TEXT (hidden) | - | - |
+| 435 | 436 | — | — | Spots | Spot Count | OPT | Off / 1 / 2 / 3 / 4 | 0 |
+| 436 | 437 | — | — | Spots | Spot Intensity | STD | 0..100 | 25 |
+| 437 | 438 | — | — | Spots | Spot Cone | STD | 2..90 | 14 |
+| 438 | 439 | — | — | Spots | Spot Speed | STD | 0..15 | 3.75 |
+| 439 | 440 | — | — | Spots | Spot Pattern | OPT | Pan / Circle / Figure 8 / Cross / Random | 0 |
+| 440 | 441 | — | — | Spots | Spot Width | STD | 0..4 | 1.2 |
+| 441 | 442 | — | — | Spots | Spot Rig Height | STD | -4..6 | 2.5 |
+| 442 | 443 | — | — | Spots | Spot Rig Dist | STD | 0.5..10 | 3 |
+| 443 | 444 | — | — | Spots | Spot Color | HUE | 0..1 | 0 |
+| 444 | 445 | — | — | Spots | Spot Sat | SAT | 0..1 | 0 |
+| 445 | 446 | — | — | Spots | Spot Bri | BRI | 0..1 | 1 |
+| 446 | 447 | — | — | Spots | Spot Alpha | ALPHA | 0..1 | 1 |
+| 447 | 448 | — | — | Spots | Spot Color Mode | OPT | Single / Rainbow / Pairs | 0 |
+| 448 | 449 | — | — | Spots | Spot Beat Strobe | STD | 0..1 | 0 |
+| 449 | 450 | — | — | Spots | Spot Beams | STD | 0..4 | 1 |
+| — | — | 436 | 436 | Projector | Proj Enable | BOOL | - | 0 |
+| — | — | — | 437 | Projector | Proj Source | OPT | Input / File | 0 |
+| — | — | 437 | 438 | Projector | Proj File | FILE | fbx obj gltf glb | - |
+| — | — | 438 | 439 | Projector | Video Speed | STD | 0..4 | 1 |
+| — | — | 439 | 440 | Projector | Video Loop | OPT | Loop / Ping-Pong / Once | 0 |
+| — | — | 440 | 441 | Projector | Video Restart | EVENT | - | - |
+| — | — | 441 | 442 | Projector | Proj Anchor | BOOL | - | 0 |
+| — | — | 442 | 443 | Projector | Proj Pos X | STD | -6..6 | 0.8 |
+| — | — | 443 | 444 | Projector | Proj Pos Y | STD | -6..6 | 1.2 |
+| — | — | 444 | 445 | Projector | Proj Pos Z | STD | -6..6 | 4 |
+| — | — | 445 | 446 | Projector | Proj Aim Mode | OPT | At Mask / Free | 0 |
+| — | — | 446 | 447 | Projector | Proj Aim Yaw | STD | -180..180 | 0 |
+| — | — | 447 | 448 | Projector | Proj Aim Pitch | STD | -90..90 | 0 |
+| — | — | 448 | 449 | Projector | Proj Throw | STD | 5..120 | 30 |
+| — | — | 449 | 450 | Projector | Proj Focus | STD | 0..1 | 0 |
+| — | — | 450 | 451 | Projector | Proj Intensity | STD | 0..100 | 25 |
+| — | — | 451 | 452 | Projector | Proj Color | HUE | 0..1 | 0 |
+| — | — | 452 | 453 | Projector | Proj Sat | SAT | 0..1 | 0 |
+| — | — | 453 | 454 | Projector | Proj Bri | BRI | 0..1 | 1 |
+| — | — | 454 | 455 | Projector | Proj Alpha | ALPHA | 0..1 | 1 |
+| — | — | 455 | 456 | Projector | Proj Beam | STD | 0..4 | 1 |
+| — | — | 456 | 457 | Projector | Proj Surface | STD | 0..4 | 1 |
+| 450 | 451 | 457 | 458 | Post | Bloom | STD | 0..10 | 0 |
+| 451 | 452 | 458 | 459 | Post | Bloom Threshold | STD | 0..1 | 0.65 |
+| 452 | 453 | 459 | 460 | Post | Bloom Radius | STD | 0..1 | 0.6 |
+| 453 | 454 | 460 | 461 | Post | Flare Ghosts | STD | 0..10 | 0 |
+| 454 | 455 | 461 | 462 | Post | Flare Streak | STD | 0..10 | 0 |
+| 455 | 456 | 462 | 463 | Floor | Shadow Catcher | STD | 0..1 | 0 |
+| 456 | 457 | 463 | 464 | Floor | Catcher Plane | OPT | Floor / Wall | 0 |
+| 457 | 458 | 464 | 465 | Floor | Floor Height | STD | -4..2 | -1.02 |
+| 458 | 459 | 465 | 466 | Floor | Wall Distance | STD | 0..8 | 1.5 |
+| 459 | 460 | 466 | 467 | Floor | Shadow Soft | STD | 0..1 | 0.4 |
+| 460 | 461 | 467 | 468 | Floor | Mirror Floor | STD | 0..1 | 0 |
+| 461 | 462 | 468 | 469 | Floor | Mirror Blur | STD | 0..1 | 0.2 |
+| 462 | 463 | 469 | 470 | Floor | Mirror Fade | STD | 0..1 | 0.2 |
+| 463 | 464 | 470 | 471 | Floor | Floor Light | STD | 0..1 | 0.5 |
+| 464 | 465 | 471 | 472 | Floor | Floor Camera | STD | 0..1 | 1 |
+| 465 | 466 | — | — | FX | Wireframe Mix | STD | 0..1 | 0 |
+| 466 | 467 | — | — | FX | Wire Thickness | STD | 0.2..8 | 1 |
+| 467 | 468 | — | — | FX | Explode | STD | 0..3 | 0 |
+| 468 | 469 | — | — | FX | Explode Random | STD | 0..1 | 0.5 |
+| 469 | 470 | — | — | FX | Dissolve | STD | 0..1 | 0 |
+| 470 | 471 | — | — | FX | Dissolve Glow | STD | 0..10 | 1 |
+| 471 | 472 | — | — | FX | Toon Steps | STD | 0..8 | 0 |
+| 472 | 473 | — | — | FX | Outline | STD | 0..1 | 0 |
+| 473 | 474 | — | — | FX | Depth Fog | STD | 0..3 | 0 |
+| — | — | 472 | 473 | Silhouette | Silhouette | STD | 0..1 | 0 |
+| — | — | 473 | 474 | Silhouette | Sil Fill | STD | 0..1 | 0 |
+| — | — | 474 | 475 | Silhouette | Sil Glow | STD | 0..10 | 2 |
+| — | — | 475 | 476 | Silhouette | Sil Width | STD | 0.5..60 | 8 |
+| — | — | 476 | 477 | Silhouette | Sil Color | HUE | 0..1 | 0.523809 |
+| — | — | 477 | 478 | Silhouette | Sil Sat | SAT | 0..1 | 0.7 |
+| — | — | 478 | 479 | Silhouette | Sil Bri | BRI | 0..1 | 1 |
+| — | — | 479 | 480 | Silhouette | Sil Alpha | ALPHA | 0..1 | 1 |
+| 474 | 475 | 480 | 481 | Output | Background Color | HUE | 0..1 | 0 |
+| 475 | 476 | 481 | 482 | Output | Background Sat | SAT | 0..1 | 0 |
+| 476 | 477 | 482 | 483 | Output | Background Bri | BRI | 0..1 | 0 |
+| 477 | 478 | 483 | 484 | Output | Background Alpha | ALPHA | 0..1 | 0 |
+| 478 | 479 | 484 | 485 | Output | MSAA | OPT | 1x / 4x / 8x | 1 |
+| — | 480 | — | 486 | Input | Input Use | OPT | Off / Background / Skin on flagged parts / Skin all | 0 |
+| — | 481 | — | 487 | Input | Input Projection | OPT | Front planar / Model UV / Spherical | 0 |
+| — | 482 | — | 488 | Input | Input Mix | STD | 0..1 | 1 |
+| — | — | — | 489 | Face | Face Track | BOOL | - | 0 |
+| — | — | — | 490 | Face | Max Faces | STD | 1..4 | 4 |
+| — | — | — | 491 | Face | Face Scale | STD | 0.1..5 | 1.2 |
+| — | — | — | 492 | Face | Face Offset X | STD | -1..1 | 0 |
+| — | — | — | 493 | Face | Face Offset Y | STD | -1..1 | 0.3 |
+| — | — | — | 494 | Face | Follow Roll | STD | 0..1 | 1 |
+| — | — | — | 495 | Face | Follow Yaw | STD | 0..1 | 1 |
+| — | — | — | 496 | Face | Follow Pitch | STD | 0..1 | 0.6 |
+| — | — | — | 497 | Face | Face Smooth | STD | 0..1 | 0.5 |
+| — | — | — | 498 | Face | Hide No Face | BOOL | - | 1 |
+| 479 | 483 | 485 | 499 | Audio | Audio FFT | BUFFER | 512 bins (FFT) | - |
+| 480 | 484 | — | — | Debug | Debug View | OPT | Final / Albedo / Normal / Roughness / Metallic / UV / Part IDs | 0 |
+| 481 | 485 | 486 | 500 | Debug | Debug Log | BOOL | - | 0 |
 
 ## Standing rules
 - COLOURS (W11, Amrit: "always have color use Resolume's built in color picker"): every colour in both bundles is ONE

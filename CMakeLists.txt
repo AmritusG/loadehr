@@ -18,16 +18,11 @@ add_library(loadehr_thirdparty STATIC
     "${TP}/ufbx/ufbx.c"
     "${TP}/meshoptimizer/simplifier.cpp"
     "${TP}/meshoptimizer/allocator.cpp"
-    "${TP}/libtess2/Source/bucketalloc.c"
-    "${TP}/libtess2/Source/dict.c"
-    "${TP}/libtess2/Source/geom.c"
-    "${TP}/libtess2/Source/mesh.c"
-    "${TP}/libtess2/Source/priorityq.c"
-    "${TP}/libtess2/Source/sweep.c"
-    "${TP}/libtess2/Source/tess.c"
+    "${TP}/clipper2/src/clipper.engine.cpp"
+    "${TP}/clipper2/src/clipper.offset.cpp"
     src/ThirdPartyImpl.cpp
 )
-target_include_directories(loadehr_thirdparty PUBLIC "${TP}/ufbx" "${TP}/cgltf" "${TP}/stb" "${TP}/meshoptimizer" "${TP}/libtess2/Include" "${TP}/nanosvg")
+target_include_directories(loadehr_thirdparty PUBLIC "${TP}/ufbx" "${TP}/cgltf" "${TP}/stb" "${TP}/meshoptimizer" "${TP}/clipper2/include" "${TP}/earcut" "${TP}/nanosvg")
 set_target_properties(loadehr_thirdparty PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_compile_options(loadehr_thirdparty PRIVATE -O3 -w)
 
@@ -48,15 +43,17 @@ add_library(loadehr_core STATIC
     src/Swarm.cpp
     src/Crack.cpp
     src/Caustic.cpp
-    src/Mirror.cpp
     src/SdfBuilder.cpp
     src/Post.cpp
     src/Shape.cpp
     src/EyeFinder.cpp
     src/Generate.cpp
+    src/Video.mm
 )
+set_source_files_properties(src/Video.mm PROPERTIES COMPILE_FLAGS "-fobjc-arc")
 target_include_directories(loadehr_core PUBLIC src "${FFGL_LIB}")
-target_link_libraries(loadehr_core PUBLIC loadehr_thirdparty "-framework OpenGL" "-framework CoreText" "-framework CoreGraphics" "-framework CoreFoundation")
+target_link_libraries(loadehr_core PUBLIC loadehr_thirdparty "-framework OpenGL" "-framework CoreText" "-framework CoreGraphics" "-framework CoreFoundation"
+    "-framework AVFoundation" "-framework CoreMedia" "-framework CoreVideo" "-framework IOSurface" "-framework Foundation")
 target_compile_definitions(loadehr_core PUBLIC GL_SILENCE_DEPRECATION)
 set_target_properties(loadehr_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 

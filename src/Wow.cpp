@@ -111,8 +111,6 @@ void Renderer::WarmWow( const FrameState& fs, GpuModel* model, int w, int h )
 		glDisable( GL_DEPTH_TEST );
 		causticOk = false;
 	}
-	// Stage 10 mirror room (+ W27: the copies' light passes, the marches, beams and particles through the lattice)
-	WarmMirror( t, model, w, h );
 	glDisable( GL_DEPTH_TEST );
 	glDisable( GL_SCISSOR_TEST );
 }
