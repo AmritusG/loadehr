@@ -4,6 +4,7 @@
 #include "Shaders.h"
 #include "VolumeShaders.h"
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <cstdlib>
 #include <vector>
@@ -45,6 +46,8 @@ std::vector< std::pair< GLuint, GLuint > >* g_deformSink = nullptr;
 // W5: the same for WIRE twins, of the soup programs that link the MAIN fragment stage (not the shadow / crack / projector / photon
 // passes); a WIRE twin gets its own DEFORM twin
 std::vector< std::pair< GLuint, GLuint > >* g_wireSink = nullptr;
+// W6: and their POINTS twins (WIRE + POINTS: the soup stage at a point's spot, drawn as a sprite), each with its own DEFORM twin
+std::vector< std::pair< GLuint, GLuint > >* g_pointSink = nullptr;
 GLuint LinkPlain( const std::string& vs, const std::string& fs, std::string& error );
 }
 
@@ -67,6 +70,14 @@ GLuint Link( const std::string& vs, const std::string& fs, std::string& error )
 			if( g_deformSink )
 				if( const GLuint d = LinkPlain( "#define WIRE\n#define DEFORM\n" + vs, "#define WIRE\n" + fs, error ) )
 					g_deformSink->push_back( { w, d } );
+		}
+	if( p && g_pointSink && soup && mainFS && !pass )
+		if( const GLuint q = LinkPlain( "#define WIRE\n#define POINTS\n" + vs, "#define WIRE\n#define POINTS\n" + fs, error ) )
+		{
+			g_pointSink->push_back( { p, q } );
+			if( g_deformSink )
+				if( const GLuint d = LinkPlain( "#define WIRE\n#define POINTS\n#define DEFORM\n" + vs, "#define WIRE\n#define POINTS\n" + fs, error ) )
+					g_deformSink->push_back( { q, d } );
 		}
 	return p;
 }
@@ -193,12 +204,17 @@ void BindSamplers( GLuint prog )
 
 bool Renderer::Init( std::string& error )
 {
+	const auto t0 = std::chrono::steady_clock::now();
 	g_deformSink = &deformTwins; // W2: every soup program linked from here on gets its DEFORM twin
 	g_wireSink   = &wireTwins;   // W5: and the main-pass ones their WIRE twin
+	g_pointSink  = &pointTwins;  // W6: and their POINTS twin
 	const bool ok = InitPrograms( error );
 	g_deformSink  = nullptr;
 	g_wireSink    = nullptr;
+	g_pointSink   = nullptr;
 	for( const auto& t : wireTwins ) // before the DEFORM copies: a WIRE twin hands its units on to its own DEFORM twin
+		CopySamplerUnits( t.first, t.second );
+	for( const auto& t : pointTwins )
 		CopySamplerUnits( t.first, t.second );
 	for( const auto& t : deformTwins )
 		CopySamplerUnits( t.first, t.second );
@@ -208,10 +224,17 @@ bool Renderer::Init( std::string& error )
 			glUseProgram( q );
 			glUniform1i( U( q, "uEdgeMask" ), 25 );
 		}
+	for( const auto& t : pointTwins )
+		for( GLuint q : { t.second, DeformTwin( t.second ) } )
+		{
+			glUseProgram( q );
+			glUniform1i( U( q, "uPointRef" ), 26 );
+		}
 	glUseProgram( 0 );
 	if( ok )
-		Log( "DEFORM %zu soup programs have their DEFORM twin, %zu their WIRE twin", deformTwins.size(), wireTwins.size() );
-	return ok && InitWire( error );
+		Log( "DEFORM %zu soup programs have their DEFORM twin, %zu their WIRE twin, %zu their POINTS twin (%.0f ms)", deformTwins.size(), wireTwins.size(),
+		     pointTwins.size(), std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - t0 ).count() );
+	return ok && InitWire( error ) && InitPoints( error );
 }
 
 GLuint Renderer::DeformTwin( GLuint p ) const
@@ -291,7 +314,11 @@ void Renderer::Release()
 	for( const auto& t : wireTwins )
 		glDeleteProgram( t.second );
 	wireTwins.clear();
+	for( const auto& t : pointTwins )
+		glDeleteProgram( t.second );
+	pointTwins.clear();
 	ReleaseWire();
+	ReleasePoints();
 	ReleaseTargets();
 	for( GLuint* p : { &progMain, &progSoup, &progMainI, &progSoupI, &progSoupT, &progSoupTI, &progSoupL, &progSoupLI, &progComposite, &progCopy, &progCompositeHaze } )
 		if( *p )
@@ -448,6 +475,8 @@ void Renderer::PrepareSlot( int slot, GpuModel* model, const FrameState& fs, uns
 		UpdateLiquidSlot( slot, model );
 	if( uses & kUseSim )
 		EnsureSimSdf( slot, model );
+	if( uses & kUsePoints ) // W6: Points Only / Points + Wire: the slot's points are built before its hop
+		PointsFor( model, fs.wire.pointSource );
 	sideSlot[ 0 ] = keepSlot, activeSide = keepSide;
 }
 
@@ -548,11 +577,21 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 		glBindTexture( GL_TEXTURE_BUFFER, ls.xfTex );
 		glActiveTexture( GL_TEXTURE0 );
 	}
-	// W5: the WIRE twin (main-pass soup programs only; any other program has none and stays itself)
+	// W5: the WIRE twin (main-pass soup programs only; any other program has none and stays itself). W6: the POINTS twin while
+	// DrawWired draws points; no twin, or the model's point set still building = no points this frame
 	const GLuint beforeWire = p;
 	if( soup && fs.wire.on && !outline )
-		p = WireTwin( p );
+		p = pointsNow ? PointTwin( p ) : WireTwin( p );
 	const bool wired = p != beforeWire;
+	const PointSet* pts = nullptr;
+	if( pointsNow )
+	{
+		if( !wired )
+			return;
+		pts = warmingNow ? nullptr : PointsFor( model, fs.wire.pointSource );
+		if( !pts && !warmingNow )
+			return;
+	}
 	// W2 Deform: any deform on = the DEFORM twin of whatever soup program this draw ended up with (plain programs untouched)
 	const bool deform = soup && fs.shape.on && fs.shape.deform;
 	if( deform )
@@ -624,6 +663,17 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 	glUniform1f( U( p, "uWireThickness" ), fs.wireThickness );
 	if( wired )
 		SetWireUniforms( p, fs, model );
+	if( pointsNow )
+	{
+		glUniform1f( U( p, "uPointPx" ), std::max( 1.5f, 2.0f * fs.wireThickness ) ); // the dot as wide as a line (a line spans both sides of its edge)
+		glUniform1f( U( p, "uPointLift" ), 0.012f * fs.modelScale / std::max( model->fitScale, 1e-12f ) );
+		glUniform1f( U( p, "uTwinkle" ), fs.wire.twinkle );
+		glUniform1f( U( p, "uTwinklePhase" ), fs.wire.twinklePhase );
+		glActiveTexture( GL_TEXTURE0 + 26 );
+		glBindTexture( GL_TEXTURE_BUFFER, pts ? pts->tex : pointDummy );
+		glActiveTexture( GL_TEXTURE0 );
+		glEnable( GL_PROGRAM_POINT_SIZE );
+	}
 	glUniform1f( U( p, "uDissolve" ), fs.dissolve );
 	glUniform1f( U( p, "uDissolveEdge" ), fs.dissolveEdge );
 	glUniform1f( U( p, "uToonSteps" ), fs.toonSteps );
@@ -705,7 +755,7 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 	if( instanced )
 	{
 		const int maxLod    = model->LodsReady() - 1;
-		const bool needL0   = soup && fs.shape.shatterT > 0.0f; // shard ids exist for the full mesh only
+		const bool needL0   = soup && ( fs.shape.shatterT > 0.0f || pointsNow ); // shard ids (and the points) exist for the full mesh only
 		const int n         = std::min( (int)inst->size(), 64 );
 		float mats[ 64 * 16 ], nexts[ 64 * 16 ], ha[ 64 * 2 ], xa[ 64 * 4 ];
 		int k = 0;
@@ -830,6 +880,27 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 		glUniform1i( locPS, pc.inputSkin ? 1 : 0 );
 		glUniform1i( locPI, (int)i );
 		glUniform1f( locPSurf, pc.surface );
+		// W6: this part's run of points (the prewarm: the one dummy point)
+		const std::array< uint32_t, 2 > prun = pts ? ( i < pts->ranges.size() ? pts->ranges[ i ] : std::array< uint32_t, 2 >{ 0, 0 } ) : std::array< uint32_t, 2 >{ 0, 1 };
+		if( pointsNow )
+		{
+			const GLsizei pc = limit ? (GLsizei)std::min( limit, prun[ 1 ] ) : (GLsizei)prun[ 1 ];
+			if( pc == 0 )
+				continue;
+			if( instanced )
+				for( const Group& g : groups )
+				{
+					glUniform1i( locInstBase, g.base );
+					glDrawArraysInstanced( GL_POINTS, (GLint)prun[ 0 ], pc, g.n * folds );
+				}
+			else if( folds > 1 )
+				glDrawArraysInstanced( GL_POINTS, (GLint)prun[ 0 ], pc, folds );
+			else
+				glDrawArrays( GL_POINTS, (GLint)prun[ 0 ], pc );
+			if( limit )
+				break;
+			continue;
+		}
 		if( instanced )
 		{
 			for( const Group& g : groups )
@@ -880,6 +951,12 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 	}
 	}
 	glBindVertexArray( 0 );
+	if( pointsNow )
+	{
+		glDisable( GL_PROGRAM_POINT_SIZE );
+		glActiveTexture( GL_TEXTURE0 + 26 );
+		glBindTexture( GL_TEXTURE_BUFFER, 0 );
+	}
 	if( soup )
 	{
 		for( int u : { 9, 10 } )
@@ -1153,6 +1230,15 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 				DrawModel( progSoupT, d, model, false, true, 3 );
 				d.shape.on = d.shape.deform = true;
 				DrawModel( progSoup, d, model, false, true, 3 );
+				// W6: the POINTS twins (through the one dummy point: the model's point set may not exist yet)
+				pointsNow = warmingNow = true;
+				d.shape.on = d.shape.deform = false;
+				DrawModel( progSoup, d, model, false, true, 3 );
+				DrawModel( progSoup, d, model, false, true, 0, nullptr, nullptr, &one );
+				DrawModel( progSoupT, d, model, false, true, 3 );
+				d.shape.on = d.shape.deform = true;
+				DrawModel( progSoup, d, model, false, true, 3 );
+				pointsNow = warmingNow = false;
 				glDisable( GL_BLEND );
 			}
 			glDisable( GL_SCISSOR_TEST );
@@ -1222,7 +1308,7 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 				DrawWired( progSoup, fs, model, fs.inst.empty() ? nullptr : &fs.inst );
 			else
 				DrawModel( soup ? progSoup : progMain, fs, model, false, soup, 0, nullptr, nullptr, fs.inst.empty() ? nullptr : &fs.inst );
-			if( !fs.wire.on || fs.wire.mode != 2 ) // Wire Only has no surface for the picture / the cracks to land on
+			if( !fs.wire.on || ( fs.wire.mode != 2 && fs.wire.mode < 4 ) ) // Wire Only / the points: no surface for the picture / the cracks
 			{
 				DrawProjSurface( fs, model ); // W26: the projected picture on the mask
 				DrawCracks( fs, model );      // W26: lava cracks

@@ -335,7 +335,9 @@ X( P_AUDIO_DEFORM, "Audio > Deform", STD, 0, 4, 0, "Deform", "", 0 )     // the 
 // program twins (lines from the triangle-soup barycentrics; Feature Edges from per-triangle edge flags built off-thread).
 // LoadEhr W6 (Amrit: "At full."): Wire Mode defaults to Off and Wireframe Mix to 1, so a fresh clip shows no wire and any mode picked
 // draws at full strength.
-X( P_WIRE_MODE, "Wire Mode", OPT, 0, 3, 0, "Wireframe", "Off|Over Surface|Wire Only|Wire + Dark Fill", 0 )
+// W6 Stage 1 (Amrit: "Can we have points only also?"): Points Only / Points + Wire draw round sprites (Wire Thickness = their size) in the
+// lines' look (Wire Color, Glow, Bloom, Fade, Back) through the POINTS twins; every point rides its triangle
+X( P_WIRE_MODE, "Wire Mode", OPT, 0, 5, 0, "Wireframe", "Off|Over Surface|Wire Only|Wire + Dark Fill|Points Only|Points + Wire", 0 )
 X( P_WIRE_MIX, "Wireframe Mix", STD, 0, 1, 1, "Wireframe", "", 0 )      // the wire's strength (W1: also fades the fill)
 X( P_WIRE_THICKNESS, "Wire Thickness", STD, 0.2f, 8, 1, "Wireframe", "", 0 ) // px, constant on screen
 X( P_WIRE_BACK, "Wire Back", OPT, 0, 1, 0, "Wireframe", "Hidden|X-Ray", 0 ) // Hidden: the solid's own back lines are hidden
@@ -345,6 +347,9 @@ X( P_WIRE_GLOW, "Wire Glow", STD, 0, 10, 0, "Wireframe", "", 0 )        // the l
 X( P_WIRE_BLOOM, "Wire Bloom", STD, 0, 10, 0, "Wireframe", "", 0 )      // a halo round the lines only
 X( P_WIRE_BLOOM_SIZE, "Wire Bloom Size", STD, 0, 1, 0.5f, "Wireframe", "", 0 )
 X( P_WIRE_FADE, "Wire Fade", STD, 0, 1, 0, "Wireframe", "", 0 )         // lines fade with distance from the camera (across the model)
+// W6: where the points sit: every vertex (welded), the vertices on the feature edges, or evenly over the area (sparse models still read)
+X( P_POINT_SOURCE, "Point Source", OPT, 0, 4, 3, "Wireframe", "Vertices|Feature Vertices|Surface 25k|Surface 100k|Surface 400k", 0 )
+X( P_POINT_TWINKLE, "Point Twinkle", STD, 0, 1, 0, "Wireframe", "", 0 ) // each point flickers on its own (~1 twinkle / s, this deep)
 #undef MEHR_REGION
 #define MEHR_REGION MEHR_CLASSIC
 // COPIES: instanced clones (LODs by screen size), echo trails, ghost poses

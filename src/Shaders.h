@@ -147,6 +147,17 @@ uniform usamplerBuffer uEdgeMask; // W5 Feature Edges: per triangle, bit k = dra
 uniform int uWireEdges;
 flat out vec3 vEdge;
 #endif
+#ifdef POINTS
+// W6 Points: vertex i = point i, a spot on a triangle (global triangle, barycentric b1, b2): the whole stage below runs at that spot,
+// so the point rides its triangle through every deform, letter move, shard flight, clone and morph; drawn as a sprite
+uniform samplerBuffer uPointRef;
+uniform float uPointPx;      // sprite diameter, pixels
+uniform float uPointLift;    // world: a hair toward the camera, so the solid's own depth (Back Hidden) does not eat the sprite
+uniform float uTwinkle;      // Point Twinkle: flicker depth
+uniform float uTwinklePhase; // twinkles, wrapped at 1000 (each point's rate is a whole number of twinkles per 1000)
+uniform vec3 uCamPos;
+flat out float vTwinkle;
+#endif
 
 uniform mat4 uModel;
 uniform mat4 uViewProj;
@@ -504,13 +515,22 @@ vec3 LowPoly( vec3 f, Facet fc )
 
 void main()
 {
+#ifdef POINTS
+	vec4 pref  = texelFetch( uPointRef, gl_VertexID );
+	int tri    = int( pref.x );
+	int corner = 0;
+	int base   = tri * 3;
+#else
 	int tri    = gl_VertexID / 3;
 	int corner = gl_VertexID - tri * 3;
 	int base   = uFirstIndex + tri * 3;
+#endif
 	int i0 = int( texelFetch( uIdxBuf, base ).r ), i1 = int( texelFetch( uIdxBuf, base + 1 ).r ), i2 = int( texelFetch( uIdxBuf, base + 2 ).r );
-#ifdef WIRE
+#if defined( WIRE ) && !defined( POINTS )
 	uint em = uWireEdges == 1 ? texelFetch( uEdgeMask, base / 3 ).r : 7u;
 	vEdge   = vec3( float( em & 1u ), float( ( em >> 1u ) & 1u ), float( ( em >> 2u ) & 1u ) );
+#elif defined( WIRE )
+	vEdge   = vec3( 1.0 );
 #endif
 #ifdef DEFORM
 	if( uFoldN > 1 )
@@ -527,11 +547,13 @@ void main()
 			            DeformPre( ( FetchPos( i2 ) - uFitCenter ) * uFitScale, FetchNrm( i2 ) ) ) / 3.0;
 			vec3 r     = step( 0.5, uFoldAxes ) * step( 0.0, -gFoldS * c3 );
 			gFoldFlip  = mod( r.x + r.y + r.z, 2.0 ) > 0.5;
+#ifndef POINTS
 			if( gFoldFlip )
 			{
 				int sw = i1;
 				i1 = i2, i2 = sw;
 			}
+#endif
 		}
 	}
 #endif
@@ -542,6 +564,14 @@ void main()
 	vec2 uv = FetchUV( me );
 	vec3 n  = FetchNrm( me );
 	vec4 t  = UnpackSnorm( texelFetch( uVtxBuf, b + 6 ).r );
+#ifdef POINTS
+	{
+		vec3 bw3 = vec3( 1.0 - pref.y - pref.z, pref.y, pref.z );
+		p        = FetchPos( i0 ) * bw3.x + FetchPos( i1 ) * bw3.y + FetchPos( i2 ) * bw3.z;
+		uv       = FetchUV( i0 ) * bw3.x + FetchUV( i1 ) * bw3.y + FetchUV( i2 ) * bw3.z;
+		n        = normalize( FetchNrm( i0 ) * bw3.x + FetchNrm( i1 ) * bw3.y + FetchNrm( i2 ) * bw3.z + vec3( 1e-6 ) );
+	}
+#endif
 
 	if( uHas4 == 1 && uHeightAmt != 0.0 )
 	{
@@ -726,6 +756,13 @@ void main()
 	vo.opos     = opos;
 #endif
 	vo.bary     = corner == 0 ? vec3( 1, 0, 0 ) : ( corner == 1 ? vec3( 0, 1, 0 ) : vec3( 0, 0, 1 ) );
+#ifdef POINTS
+	w += normalize( uCamPos - w + vec3( 1e-6 ) ) * uPointLift;
+	float ph = fract( sin( float( gl_VertexID ) * 12.9898 + 4.1 ) * 43758.5453 );
+	float rt = floor( ( 0.6 + 0.9 * fract( ph * 7.31 ) ) * 1000.0 + 0.5 ) / 1000.0; // whole twinkles per 1000: seamless at the wrap
+	vTwinkle = 1.0 - uTwinkle * ( 0.5 + 0.5 * cos( 6.2831853 * ( fract( uTwinklePhase * rt ) + ph ) ) );
+	gl_PointSize = uPointPx;
+#endif
 	gl_Position = uViewProj * vec4( w, 1.0 );
 }
 )GLSL";
@@ -805,8 +842,12 @@ out vec4 fragColor;
 flat in vec2 vInstHA; // clone hue offset, ghost alpha
 #ifdef WIRE
 // W5: the WIRE twins. uWirePass 0 depth only, 1 dark fill (+ lines), 2 lines only, 3 over the surface (the W1 formula), 4 the lines'
-// glow into the HDR wire buffer (light at alpha 0)
+// glow into the HDR wire buffer (light at alpha 0). W6: the POINTS twins draw passes 2 and 4 as round sprites
 flat in vec3 vEdge;
+#ifdef POINTS
+uniform float uPointPx;
+flat in float vTwinkle;
+#endif
 uniform int uWirePass;
 uniform vec3 uWireColor;
 uniform float uWireColorMix;
@@ -1522,9 +1563,15 @@ void main()
 	vec3 outc   = Encode( Tonemap( color ) );
 	// Branch-free on purpose: a discard inside this block miscompiles on Apple's GL-over-Metal.
 #ifdef WIRE
+#ifdef POINTS
+	// a round sprite, anti-aliased over its last pixel
+	float pr    = length( gl_PointCoord * 2.0 - 1.0 );
+	float wire  = ( 1.0 - smoothstep( 1.0 - 2.0 / max( uPointPx, 1.0 ), 1.0, pr ) ) * vTwinkle;
+#else
 	// an edge the flags leave out (Feature Edges) never draws: its barycentric distance counts as far
 	vec3 e      = max( smoothstep( vec3( 0.0 ), bw * uWireThickness, vi.bary ), vec3( 1.0 ) - vEdge );
 	float wire  = 1.0 - min( min( e.x, e.y ), e.z );
+#endif
 	wire       *= 1.0 - uWireFade * clamp( ( length( uCamPos - vi.wpos ) - uWireFadeNear ) / max( uWireFadeFar - uWireFadeNear, 1e-4 ), 0.0, 1.0 );
 	vec3 lineC  = mix( min( outc * 1.6 + 0.08, 1.0 ), uWireColor, uWireColorMix );
 	float wa    = wire * uWireMix;

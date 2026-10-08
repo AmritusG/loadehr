@@ -523,7 +523,7 @@ public:
 		renderer.perf.Begin( perfOn );
 		// LoadEhr W1: every filled slot gets what its hops will need, ahead of use (the rest model: only its liquid SDF; the renderer
 		// keeps its other caches itself): the incoming model's shards / dust / liquid SDF are ready before its hop begins
-		const unsigned uses = ChainUses() | ( fs.sim.engine > 0 && fs.vol.active ? kUseSim : 0u );
+		const unsigned uses = ChainUses() | ( fs.sim.engine > 0 && fs.vol.active ? kUseSim : 0u ) | ( fs.wire.on && fs.wire.mode >= 4 ? kUsePoints : 0u );
 		for( int i = 0; i < kModelSlots; ++i )
 			if( slots[ i ].current && SlotFilled( i ) )
 				renderer.PrepareSlot( i, slots[ i ].current.get(), fs, i == chain.cur ? uses & kUseLiquid : uses );
@@ -1355,6 +1355,7 @@ private:
 		BuildSwarm( fs, anchor, dt );
 		BuildPost( fs, anchor, scale );
 
+		clk.pointTwinkle = Wrap( clk.pointTwinkle + dt, 1000.0 ); // W6 Point Twinkle: ~1 twinkle / s (each point's rate: whole twinkles per 1000)
 		BuildWire( fs );
 		fs.explode       = values[ P_EXPLODE ] + values[ P_AUDIO_EXPLODE ] * 0.5f * audio[ 2 ];
 		fs.explodeRandom = values[ P_EXPLODE_RANDOM ];
@@ -2952,6 +2953,9 @@ private:
 		w.bloom     = values[ P_WIRE_BLOOM ];
 		w.bloomSize = values[ P_WIRE_BLOOM_SIZE ];
 		w.fade      = values[ P_WIRE_FADE ];
+		w.pointSource  = Opt( P_POINT_SOURCE );
+		w.twinkle      = values[ P_POINT_TWINKLE ];
+		w.twinklePhase = float( clk.pointTwinkle );
 		const bool w5 = w.mode >= 2 || w.colorMix > 0.0f || w.glow > 0.0f || w.bloom > 0.0f || w.fade > 0.0f || w.back == 1 || w.edges == 1;
 		w.on             = w.mode >= 1 && w5;
 		fs.wireMix       = w.mode == 1 && !w5 ? w.mix : 0.0f;
@@ -3926,6 +3930,7 @@ private:
 		double transPlay = 0; // W28 Transition Play, seconds (Once: held at Transition Time; Ping-Pong: wraps at 2 x; Loop: 1 x + hold)
 		double video = 0;            // W2 projector video: seconds (Loop: wraps at the clip length, Ping-Pong at twice it; Once clamps)
 		double warp = 0, glitch = 0; // W2 Deform: Noise Warp drift (lattice cells, wraps at 256), Glitch steps (wraps at 1000)
+		double pointTwinkle = 0;     // W6 Point Twinkle: twinkles (wraps at 1000)
 	} clk;
 	// W2 Jelly: a damped spring per instance (fitted / mask space), driven by the mask's own acceleration (move, spin, bounce)
 	struct Jelly

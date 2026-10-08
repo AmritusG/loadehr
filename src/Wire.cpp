@@ -35,11 +35,10 @@ void main()
 	fragColor = vec4( texture( uGlowTex, vUV ).rgb * uGlow + texture( uHaloTex, vUV ).rgb * uHalo, 0.0 );
 }
 )GLSL";
+}
 
-// Feature edges of a mesh in GPU index order (the whole mesh, then the fractured copy per piece: each piece keeps its own edges).
-// Vertices are welded by position (loaders split them by normal / uv); an edge draws when it is open (one face), shared by more
-// than two faces, or its two faces bend more than 20 degrees. Bit k = the edge opposite corner k.
-void BuildEdgeFlags( const CpuGeometry& g, std::vector< uint8_t >& out )
+// Vertices welded by position (loaders split them by normal / uv): the welded id per vertex. W6: the points share it.
+std::vector< uint32_t > WeldByPosition( const CpuGeometry& g )
 {
 	const size_t nv = g.pos.size() / 3;
 	float lo[ 3 ] = { 1e30f, 1e30f, 1e30f }, hi[ 3 ] = { -1e30f, -1e30f, -1e30f };
@@ -57,6 +56,15 @@ void BuildEdgeFlags( const CpuGeometry& g, std::vector< uint8_t >& out )
 			key = ( key << 21 ) | uint64_t( std::lround( ( g.pos[ v * 3 + k ] - lo[ k ] ) / ext * 2097150.0 ) & 0x1FFFFF );
 		weld[ v ] = weldOf.emplace( key, uint32_t( weldOf.size() ) ).first->second;
 	}
+	return weld;
+}
+
+// Feature edges of a mesh in GPU index order (the whole mesh, then the fractured copy per piece: each piece keeps its own edges).
+// An edge draws when it is open (one face), shared by more than two faces, or its two faces bend more than 20 degrees. Bit k = the
+// edge opposite corner k. W6: the Feature Vertices points use it too.
+void BuildEdgeFlags( const CpuGeometry& g, std::vector< uint8_t >& out )
+{
+	const std::vector< uint32_t > weld = WeldByPosition( g );
 	const size_t nw = g.idx.size() / 3, nt = nw + g.fracIdx.size() / 3;
 	out.assign( nt, 0 );
 	auto corner = [ & ]( size_t t, int c ) { return t < nw ? g.idx[ t * 3 + c ] : g.fracIdx[ ( t - nw ) * 3 + c ]; };
@@ -114,7 +122,6 @@ void BuildEdgeFlags( const CpuGeometry& g, std::vector< uint8_t >& out )
 		if( e.n >= 2 )
 			out[ e.t1 ] |= uint8_t( 1u << e.k1 );
 	}
-}
 }
 
 GLuint Renderer::WireTwin( GLuint p ) const
@@ -241,6 +248,8 @@ void Renderer::SetWireUniforms( GLuint p, const FrameState& fs, GpuModel* model 
 //   Over Surface   Hidden: one draw (the W1 formula with the line colour)  X-Ray: the surface, then the lines with no depth test
 //   Wire Only      Hidden: depth of the solid, then the lines (LEQUAL)     X-Ray: the lines, no depth test
 //   + Dark Fill    Hidden: one opaque black draw with the lines            X-Ray: the black fill, then the lines with no depth test
+//   W6 Points Only Hidden: depth of the solid, then the points (LEQUAL)    X-Ray: the points, no depth test
+//   Points + Wire  Hidden: depth of the solid, the lines, the points       X-Ray: the lines, then the points, no depth test
 void Renderer::DrawWired( GLuint prog, const FrameState& fs, GpuModel* model, const std::vector< Instance >* inst )
 {
 	const FrameState::WireState& w = fs.wire;
@@ -251,35 +260,45 @@ void Renderer::DrawWired( GLuint prog, const FrameState& fs, GpuModel* model, co
 		wirePassNow = pass, wireMixNow = mix;
 		DrawModel( prog, fs, model, false, true, 0, nullptr, nullptr, inst );
 	};
-	auto lines = [ & ]( bool xray ) {
+	auto lines = [ & ]( bool xray, bool points ) {
 		glDepthMask( GL_FALSE );
 		if( xray )
 			glDisable( GL_DEPTH_TEST );
 		else
 			glDepthFunc( GL_LEQUAL );
+		pointsNow = points;
 		draw( 2, -1.0f );
+		pointsNow = false;
 		glEnable( GL_DEPTH_TEST );
 		glDepthFunc( GL_LESS );
 		glDepthMask( GL_TRUE );
 	};
 	const bool xray = w.back == 1;
-	if( w.mode == 2 )
+	if( w.mode >= 4 )
 	{
 		if( !xray )
 			draw( 0, -1.0f );
-		lines( xray );
+		if( w.mode == 5 )
+			lines( xray, false );
+		lines( xray, true );
+	}
+	else if( w.mode == 2 )
+	{
+		if( !xray )
+			draw( 0, -1.0f );
+		lines( xray, false );
 	}
 	else if( w.mode == 3 )
 	{
 		draw( 1, xray ? 0.0f : -1.0f );
 		if( xray )
-			lines( true );
+			lines( true, false );
 	}
 	else
 	{
 		draw( 3, xray ? 0.0f : -1.0f );
 		if( xray )
-			lines( true );
+			lines( true, false );
 	}
 	wirePassNow = 3, wireMixNow = -1.0f;
 	if( !blendWas )
@@ -350,7 +369,16 @@ void Renderer::RenderWireGlow( const FrameState& fs, int w, int h )
 				else
 					glDepthFunc( GL_LEQUAL );
 			}
-			DrawModel( d.prog, *d.fs, d.model, false, true, 0, nullptr, nullptr, d.inst );
+			// W6: Points Only glows its points, Points + Wire its lines and its points
+			const int mode = d.fs->wire.mode;
+			if( step == 0 || mode != 4 )
+				DrawModel( d.prog, *d.fs, d.model, false, true, 0, nullptr, nullptr, d.inst );
+			if( step == 1 && mode >= 4 )
+			{
+				pointsNow = true;
+				DrawModel( d.prog, *d.fs, d.model, false, true, 0, nullptr, nullptr, d.inst );
+				pointsNow = false;
+			}
 			glEnable( GL_DEPTH_TEST );
 			glDepthFunc( GL_LESS );
 		}

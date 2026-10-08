@@ -56,7 +56,7 @@ struct XLight
 // per-model cache (shards, dust, letters, liquid SDF, sim obstacle SDF) has one entry per SLOT, so a slot's data is built once,
 // ahead of use, and a hop between any two slots finds it ready.
 static constexpr int kSlots = 4;
-enum SlotUse : unsigned { kUseShards = 1, kUseDust = 2, kUseLiquid = 4, kUseSim = 8 };
+enum SlotUse : unsigned { kUseShards = 1, kUseDust = 2, kUseLiquid = 4, kUseSim = 8, kUsePoints = 16 };
 static constexpr int kSKShadowUnit = 21; // W23: the key shadow map in the volume march (Smoke Key Light)
 static constexpr int kMaxVolLights = 4; // A, B, C left, C right (only A/B can be point lights: cube maps 0/1)
 static constexpr int kMaxXLights   = 8;
@@ -361,13 +361,16 @@ struct FrameState
 	int tonemap          = 0;
 	// fx
 	float wireMix = 0, wireThickness = 1, explode = 0, explodeRandom = 0, explodeSeed = 0; // wireMix: the W1 wire (plain programs) only
-	// W5 wireframe through the WIRE program twins (on = anything past the W1 look). mode 1 over surface, 2 wire only, 3 + dark fill
+	// W5 wireframe through the WIRE program twins (on = anything past the W1 look). mode 1 over surface, 2 wire only, 3 + dark fill;
+	// W6: 4 points only, 5 points + wire (the POINTS twins)
 	struct WireState
 	{
 		bool on = false;
 		int mode = 1, back = 0, edges = 0; // back 0 hidden, 1 x-ray; edges 0 all triangles, 1 feature edges
 		float mix = 0, color[ 3 ] = { 0, 1, 1 }, colorMix = 0, glow = 0, bloom = 0, bloomSize = 0.5f, fade = 0;
 		float fadeNear = 0, fadeFar = 1; // camera distances the fade runs across (the model's near / far side)
+		int pointSource = 3;              // W6: 0 vertices, 1 feature vertices, 2..4 surface 25k / 100k / 400k
+		float twinkle = 0, twinklePhase = 0; // W6 Point Twinkle: depth; the clock in twinkles (wraps at 1000)
 	} wire;
 	float dissolve = 0, dissolveEdge = 0, toonSteps = 0, outline = 0, fogDensity = 0, fogStart = 0;
 	// output
@@ -404,6 +407,30 @@ struct FrameState
 	// W21 text / logos: per-letter transforms, 12 floats per letter (pivot + scale, quaternion, offset + unused);
 	// empty = the letters are at rest (the plain programs draw)
 	std::vector< float > letterXf;
+};
+
+// W6 Stage 1: a model's points for one Point Source (Points.cpp): refs on unit 26, a run per GPU part
+struct PointSet
+{
+	struct Part
+	{
+		uint32_t first, count;
+		bool fractured;
+	};
+	struct Job
+	{
+		std::atomic< bool > done{ false }, cancel{ false };
+		std::vector< float > refs; // 4 per point: global triangle, b1, b2, 0
+		std::vector< std::array< uint32_t, 2 > > ranges;
+		double ms = 0;
+	};
+	uint64_t serial = 0;
+	int source      = -1;
+	std::shared_ptr< Job > job;
+	GLuint buf = 0, tex = 0;
+	std::vector< std::array< uint32_t, 2 > > ranges; // per GPU part: first point, count
+	size_t count = 0;
+	bool ready   = false;
 };
 
 GLuint Link( const std::string& vs, const std::string& fs, std::string& error );
@@ -457,6 +484,17 @@ private:
 	void DrawWired( GLuint prog, const FrameState& fs, GpuModel* model, const std::vector< Instance >* inst ); // the main pass, wired
 	void SetWireUniforms( GLuint prog, const FrameState& fs, GpuModel* model ); // + binds the edge flags (unit 25)
 	int wirePassNow = 3; // the WIRE pass a wired DrawModel draws (DrawWired sets it per draw)
+	// W6 points (Points.cpp): the POINTS twins, the point sets, and whether a wired DrawModel draws points (DrawWired sets it)
+	std::vector< std::pair< GLuint, GLuint > > pointTwins;
+	GLuint PointTwin( GLuint p ) const;
+	static constexpr int kPointSets = 8;
+	PointSet pointSets[ kPointSets ];
+	unsigned pointNext = 0;
+	GLuint pointDummy = 0, pointDummyBuf = 0; // one point (the prewarm draws through it before a set exists)
+	bool pointsNow = false, warmingNow = false;
+	bool InitPoints( std::string& error );
+	void ReleasePoints();
+	const PointSet* PointsFor( GpuModel* model, int source );
 	void RenderWireGlow( const FrameState& fs, int w, int h ); // the wired draws of this frame, again, into the HDR wire buffer
 	struct WireDraw
 	{

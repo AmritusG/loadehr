@@ -91,6 +91,8 @@ TESTS = [
     # at 1000 steps (a wrap is one more random step); Ripple's phase is in the row above (2 pi)
     ('Noise Warp drift', '4 cells/s', [('Noise Warp', 1), ('Warp Scale', 2), ('Warp Speed', 4)], {'after': (256 / 4, 1, 120)}),
     ('Glitch step', '30 steps/s', [('Glitch Shift', 0.3), ('Glitch Rate', 30)], {'after': (1000 / 30, 1, 120)}),
+    # LoadEhr W6: Point Twinkle's clock runs at 1 twinkle / s and wraps at 1000 (every point's rate is a whole number of twinkles per 1000)
+    ('Point Twinkle', '1 twinkle/s, depth 1', [('Wire Mode', 4), ('Point Twinkle', 1), ('Wire Glow', 1)], {'after': (1000, 1, 120)}),
 ]
 # W26 / W28 features live in the Wow bundles only (Resolume's 512-param cap)
 # extra commands before the clocks are fast-forwarded (a second model)
