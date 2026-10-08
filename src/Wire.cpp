@@ -304,7 +304,7 @@ void Renderer::DrawWired( GLuint prog, const FrameState& fs, GpuModel* model, co
 	if( !blendWas )
 		glDisable( GL_BLEND );
 	if( w.glow > 0.0f || w.bloom > 0.0f )
-		wireDraws.push_back( { prog, &fs, model, inst, activeSide } );
+		wireDraws.push_back( { prog, &fs, model, inst, activeSide, 1.0f } );
 }
 
 // The lines' light into the HDR wire buffer: the solids' depth first (Back Hidden), then the lines added (ONE, ONE). Then the
@@ -375,9 +375,9 @@ void Renderer::RenderWireGlow( const FrameState& fs, int w, int h )
 				DrawModel( d.prog, *d.fs, d.model, false, true, 0, nullptr, nullptr, d.inst );
 			if( step == 1 && mode >= 4 )
 			{
-				pointsNow = true;
+				pointsNow = true, pointShareNow = d.share;
 				DrawModel( d.prog, *d.fs, d.model, false, true, 0, nullptr, nullptr, d.inst );
-				pointsNow = false;
+				pointsNow = false, pointShareNow = 1.0f;
 			}
 			glEnable( GL_DEPTH_TEST );
 			glDepthFunc( GL_LESS );
@@ -420,7 +420,8 @@ void Renderer::AddWireLight( const FrameState& fs, int w, int h )
 	glEnable( GL_BLEND );
 	glBlendFunc( GL_ONE, GL_ONE ); // light: rgb added, alpha untouched (W23)
 	glUseProgram( progWireAdd );
-	glUniform1f( U( progWireAdd, "uGlow" ), fs.wire.glow * 0.35f );
+	// W7: with sparkles in the buffer and no Wire Glow, the buffer adds at Glow 1 (the sparkles' gain is set against it)
+	glUniform1f( U( progWireAdd, "uGlow" ), ( sparkleNow && fs.wire.glow <= 0.0f ? 1.0f : fs.wire.glow ) * 0.35f );
 	glUniform1f( U( progWireAdd, "uHalo" ), fs.wire.bloom > 0.0f ? fs.wire.bloom * 0.6f : 0.0f );
 	glActiveTexture( GL_TEXTURE1 );
 	glBindTexture( GL_TEXTURE_2D, fs.wire.bloom > 0.0f ? wireBlur[ 1 ] : wireTex );

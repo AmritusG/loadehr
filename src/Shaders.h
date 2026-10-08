@@ -267,25 +267,19 @@ uniform samplerBuffer uLetterXf;  // per letter, 3 texels: pivot (fitted) + scal
 #ifdef MORPH
 // W6 Stage 2: the transition pack's vertex side (this program variant only). uMorphSide 1 = the hop's outgoing model, 2 = the
 // incoming one; uMorphK = the style's progress on this side; Trans Stagger orders the pieces by a key, Trans Spread = how far / wide
-uniform int uMorphVS;              // 1 shrinkwrap, 2 pieces, 3 implode, 4 glitch, 5 ripple, 6 spin swap
+uniform int uMorphVS;              // 2 pieces, 3 implode, 4 glitch, 5 ripple, 6 spin swap, 7 twist, 8 melt (W7: 1 shrinkwrap went)
 uniform int uMorphSide;
 uniform float uMorphK, uMorphE, uMorphStagger, uMorphSpread, uMorphScale, uMorphStep, uMorphFreq;
-uniform mat4 uMorphToOther;        // this model's fitted space -> the other model's raw space (both drawn at the frame's pose)
-uniform mat4 uMorphFromOther;      // and back
-uniform sampler3D uMorphSdf;       // shrinkwrap: the other model's liquid SDF (raw units, unit 27)
-uniform vec3 uMorphSdfMin;
-uniform float uMorphSdfSize;
+uniform mat4 uMorphFromOther;      // the other model's raw space -> this model's fitted space (both drawn at the frame's pose)
 uniform samplerBuffer uPartnerData; // pieces: the other model's shard centroids (its fitted space) + seed (unit 28)
 uniform samplerBuffer uRankSelf;   // per shard: (rank 0..1 bottom-up, the shard of rank i) of this model (unit 29) ...
 uniform samplerBuffer uRankOther;  // ... and of the other one (unit 30)
 uniform float uPartnerN;
 uniform vec4 uOtherFit;            // the other model's fit: centre xyz, scale (raw -> fitted)
+uniform float uMorphLead;          // W7 twist: which end winds first (> 0 the top, < 0 the bottom) and how far ahead (|lead| 0..1)
+uniform vec2 uMorphRange;          // W7 twist: the model's extent along the deform axis (fitted min, max)
+uniform vec4 uMorphPlane;          // W7 melt: the floor in fitted space: up (xyz), its height along up (w)
 float MorphU( float k ) { return clamp( ( uMorphK - uMorphStagger * k ) / max( 1.0 - uMorphStagger, 1e-3 ), 0.0, 1.0 ); }
-float MorphSdf( vec3 q ) // the field inside its box, + the distance to the box outside it (as the liquid's Box)
-{
-	vec3 u = ( q - uMorphSdfMin ) / uMorphSdfSize, c = clamp( u, vec3( 0.0 ), vec3( 1.0 ) );
-	return texture( uMorphSdf, c ).r + length( ( u - c ) * uMorphSdfSize );
-}
 #endif
 
 out VData
@@ -336,6 +330,53 @@ float VNoise( vec2 p )
 	return mix( mix( a, b, f.x ), mix( c, d, f.x ), f.y );
 }
 
+#ifdef MORPH
+// W7 TWIST (uMorphVS 7): the model winds round the deform axis, the leading end first (uMorphLead): its ends turn +-uMorphScale
+// radians at full wind (Trans Spread), wrung thin across the axis as it winds (uMorphFreq); uMorphK = the wind 0..1
+vec3 MorphTwist( vec3 f )
+{
+	vec3 q    = ToAxis( f, uDeformAxis );
+	float h   = clamp( ( q.z - uMorphRange.x ) / max( uMorphRange.y - uMorphRange.x, 1e-4 ), 0.0, 1.0 );
+	float lag = min( abs( uMorphLead ), 0.95 );
+	float u   = clamp( ( uMorphK - lag * ( uMorphLead >= 0.0 ? 1.0 - h : h ) ) / ( 1.0 - lag ), 0.0, 1.0 );
+	float w   = u * u * ( 3.0 - 2.0 * u );
+	float z   = h * 2.0 - 1.0;                         // -1 .. 1 over this model, whatever its proportions
+	float a   = uMorphScale * z * w, c = cos( a ), s = sin( a );
+	q.xy      = vec2( c * q.x - s * q.y, s * q.x + c * q.y ) * ( 1.0 - uMorphFreq * w * ( 1.0 - 0.5 * z * z ) );
+	return FromAxis( q, uDeformAxis );
+}
+// W7 MELT (uMorphVS 8): sags, the drip columns (Drip, Trans Spread = runny) run ahead, every point lands in a puddle on the floor
+// plane: a lens of radius uMorphScale (fitted) whose shape depends only on the direction and the radius share, so every model's
+// puddle is the same and the swap is a cross-fade inside it. uMorphK = the melt 0..1 (1 = all puddle)
+vec3 MorphMelt( vec3 f, out float u )
+{
+	vec3 up  = uMorphPlane.xyz;
+	float y  = dot( f, up ) - uMorphPlane.w;           // height above the floor
+	vec3 hz  = f - up * dot( f, up );                  // across the floor, from the model's centre
+	float r  = length( hz );
+	vec3 dir = r > 1e-5 ? hz / r : normalize( cross( up, abs( up.x ) < 0.9 ? vec3( 1, 0, 0 ) : vec3( 0, 0, 1 ) ) );
+	float dn = pow( VNoise( f.xz * 7.0 + 3.1 ), 3.0 ) * uDrip * 2.5;
+	u        = clamp( uMorphK * ( 1.0 + dn * ( 0.4 + 0.6 * uMorphSpread ) ), 0.0, 1.0 );
+	// the puddle: the angle round the centre wobbles the rim, the radius share sets the thickness (a lens), both model-free
+	vec3 side  = normalize( cross( up, abs( up.y ) < 0.9 ? vec3( 0, 1, 0 ) : vec3( 1, 0, 0 ) ) );
+	float ang  = atan( dot( dir, cross( up, side ) ), dot( dir, side ) );
+	float rim  = 1.0 + 0.12 * sin( ang * 5.0 + 1.3 ) + 0.07 * sin( ang * 11.0 + 4.1 );
+	float rs   = sqrt( min( r, 1.0 ) );
+	float pr   = uMorphScale * rs * rim;
+	float py   = 0.015 + 0.09 * ( 1.0 - rs * rs ) / max( uMorphScale, 0.5 );
+	float fall = u * u;                                 // gravity: slow, then fast
+	float flow = smoothstep( 0.45, 1.0, u );            // the spread happens on the floor
+	float yy   = mix( y, py, fall );
+	vec3 hh    = mix( hz, dir * pr, flow );
+	hh *= 1.0 + 0.25 * sin( 3.14159265 * u ) * u * ( 1.0 - flow ); // the sag bulges out on the way down (from rest gently: x u)
+	return hh + up * ( yy + uMorphPlane.w );
+}
+vec3 MorphField( vec3 f )
+{
+	float u;
+	return uMorphVS == 7 ? MorphTwist( f ) : MorphMelt( f, u );
+}
+#endif
 #ifdef DEFORM
 // W2 Deform group (this program variant only: with every deform at 0 the plain programs draw). Fitted space; the fixed order:
 // Taper, Twist, Bend, Squash, Shear, Bulge, Spherize, Noise Warp, Ripple, Melt / Drip, Glitch, Mirror Fold, Jelly. The values
@@ -643,8 +684,13 @@ void main()
 			vec3 dn = cross( dT, dB );
 			if( dot( dn, dn ) > 1e-16 )
 				n = normalize( dn ) * ( gFoldFlip ? -1.0 : 1.0 );
-			if( dot( dT, dT ) > 1e-16 )
-				t.xyz = normalize( dT );
+			// W7: the tangent = the file's own tangent carried through the deform (the one squared to the normal changed normal-mapped
+			// shading at a deform's first step: max 75 / 255)
+			gNormalPass = true;
+			vec3 dt     = Continuous( opos + t.xyz * 0.01, n ) - f0n;
+			gNormalPass = false;
+			if( dot( dt, dt ) > 1e-16 )
+				t.xyz = normalize( dt );
 		}
 #endif
 		if( uLowPoly > 0.0 )
@@ -732,28 +778,7 @@ void main()
 			const float PI_ = 3.14159265;
 			vec3 cen = ( f0 + f1 + f2 ) / 3.0;
 			vec3 rest = ( ( FetchPos( i0 ) + FetchPos( i1 ) + FetchPos( i2 ) ) / 3.0 - uFitCenter ) * uFitScale; // the triangle at rest
-			if( uMorphVS == 1 )
-			{
-				// SHRINKWRAP: every vertex slides onto the other model's surface (4 steps down its SDF), the top first
-				float u = MorphU( clamp( 0.5 - 0.5 * opos.y, 0.0, 1.0 ) );
-				u       = u * u * ( 3.0 - 2.0 * u );
-				vec3 q  = ( uMorphToOther * vec4( f, 1.0 ) ).xyz;
-				vec3 g  = vec3( 0.0, 1.0, 0.0 );
-				float h = uMorphSdfSize / 64.0;
-				for( int it = 0; it < 4; ++it )
-				{
-					float d = MorphSdf( q );
-					g = vec3( MorphSdf( q + vec3( h, 0, 0 ) ) - MorphSdf( q - vec3( h, 0, 0 ) ), MorphSdf( q + vec3( 0, h, 0 ) ) - MorphSdf( q - vec3( 0, h, 0 ) ),
-					          MorphSdf( q + vec3( 0, 0, h ) ) - MorphSdf( q - vec3( 0, 0, h ) ) );
-					g = dot( g, g ) > 1e-20 ? normalize( g ) : vec3( 0.0, 1.0, 0.0 );
-					q -= g * d;
-				}
-				vec3 fw = ( uMorphFromOther * vec4( q, 1.0 ) ).xyz;
-				vec3 gn = normalize( mat3( uMorphFromOther ) * g );
-				f       = mix( f, fw, u );
-				nOut    = normalize( mix( nOut, gn, u ) + vec3( 1e-6 ) );
-			}
-			else if( uMorphVS == 2 )
+			if( uMorphVS == 2 )
 			{
 				// PIECES: each shard flies from its home to its partner's home on the other model (partners matched by rank, bottom-up),
 				// shrinking away (outgoing) / growing in (incoming) over the far / near half of its flight, turning on the way
@@ -812,6 +837,30 @@ void main()
 				f      = R * f * uMorphScale;
 				nOut   = R * nOut;
 				t.xyz  = R * t.xyz;
+			}
+			else if( uMorphVS >= 7 )
+			{
+				// W7 TWIST / MELT: a field over fitted space; the normal follows it by finite differences (as DEFORM)
+				vec3 Tn = t.xyz - nOut * dot( nOut, t.xyz );
+				Tn      = dot( Tn, Tn ) > 1e-12 ? normalize( Tn ) : normalize( cross( nOut, abs( nOut.x ) < 0.9 ? vec3( 1, 0, 0 ) : vec3( 0, 1, 0 ) ) );
+				vec3 Bn = cross( nOut, Tn );
+				vec3 g  = MorphField( f );
+				vec3 dT = MorphField( f + Tn * 0.01 ) - g, dB = MorphField( f + Bn * 0.01 ) - g;
+				vec3 dn = cross( dT, dB );
+				if( dot( dn, dn ) > 1e-16 )
+					nOut = normalize( dn );
+				// the tangent: the file's own tangent carried through the field (not the one squared to the normal above: at no
+				// deform that one changed normal-mapped shading, max 75 / 255 at a hop's end)
+				vec3 dt = MorphField( f + t.xyz * 0.01 ) - g;
+				if( dot( dt, dt ) > 1e-16 )
+					t.xyz = normalize( dt );
+				if( uMorphVS == 8 )
+				{
+					float u;
+					g    = MorphMelt( f, u );
+					nOut = normalize( mix( nOut, uMorphPlane.xyz, smoothstep( 0.75, 1.0, u ) ) + vec3( 1e-6 ) ); // the puddle faces up
+				}
+				f = g;
 			}
 		}
 #endif

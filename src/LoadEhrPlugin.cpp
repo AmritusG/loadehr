@@ -39,7 +39,7 @@ struct ParamDef
 	unsigned type;
 	float min, max, def;
 	const char* group;
-	std::vector< std::string > options; // FF_TYPE_OPTION element names (values 0..n-1)
+	std::vector< std::string > options; // FF_TYPE_OPTION element names (values 0..n-1; W7: "~name" = a retired value, not listed)
 	bool hidden;
 	int region; // MEHR_REGION: 0 every bundle, MEHR_WOW / MEHR_CLASSIC one family only
 };
@@ -241,9 +241,14 @@ public:
 				}
 				else
 				{
-					SetOptionParamInfo( p.id, p.name, (unsigned)p.options.size(), p.def );
-					for( size_t i = 0; i < p.options.size(); ++i )
-						SetParamElementInfo( p.id, (unsigned)i, p.options[ i ].c_str(), float( i ) );
+					// an element's VALUE is its place in the list; a retired one ("~") keeps its value unlisted (W7)
+					unsigned n = 0;
+					for( const std::string& o : p.options )
+						n += o[ 0 ] != '~';
+					SetOptionParamInfo( p.id, p.name, n, p.def );
+					for( size_t i = 0, e = 0; i < p.options.size(); ++i )
+						if( p.options[ i ][ 0 ] != '~' )
+							SetParamElementInfo( p.id, (unsigned)e++, p.options[ i ].c_str(), float( i ) );
 				}
 				break;
 			case FF_TYPE_BOOLEAN:
@@ -523,7 +528,8 @@ public:
 		renderer.perf.Begin( perfOn );
 		// LoadEhr W1: every filled slot gets what its hops will need, ahead of use (the rest model: only its liquid SDF; the renderer
 		// keeps its other caches itself): the incoming model's shards / dust / liquid SDF are ready before its hop begins
-		const unsigned uses = ChainUses() | ( fs.sim.engine > 0 && fs.vol.active ? kUseSim : 0u ) | ( fs.wire.on && fs.wire.mode >= 4 ? kUsePoints : 0u );
+		const unsigned uses = ChainUses() | ( fs.sim.engine > 0 && fs.vol.active ? kUseSim : 0u ) | ( fs.wire.on && fs.wire.mode >= 4 ? kUsePoints : 0u ) |
+		                      ( chain.hops > 0 && values[ P_TRANS_SPARKLE ] > 0.0f ? kUseSparkle : 0u );
 		for( int i = 0; i < kModelSlots; ++i )
 			if( slots[ i ].current && SlotFilled( i ) )
 				renderer.PrepareSlot( i, slots[ i ].current.get(), fs, i == chain.cur ? uses & kUseLiquid : uses );
@@ -2085,20 +2091,28 @@ private:
 	// (stable while scrubbing, the same hop always morphs the same way)
 	int HopStyle( int h, int hops ) const
 	{
-		const int base = std::clamp( Opt( P_TRANSITION_STYLE ), 0, kStyleCount - 1 ), order = Opt( P_STYLE_ORDER );
+		const int base = LiveStyle( Opt( P_TRANSITION_STYLE ) ), order = Opt( P_STYLE_ORDER );
 		// W6: while Transition Play loops (Loop / Ping-Pong), every pass round the chain moves on by its hops, so a 4-slot loop goes
-		// round all the styles, not the same 4 (chainLoops: passes since the restart, kept modulo kStyleCount; 0 while the slider drives)
+		// round all the styles, not the same 4 (chainLoops: passes since the restart, kept modulo kStyleCount; 0 while the slider drives).
+		// W7: round the styles in the list (kLiveStyles: the retired ones are skipped)
 		h += chainLoops * std::max( 1, hops );
 		if( order == 1 )
-			return ( base + h ) % kStyleCount;
+		{
+			int at = 0;
+			while( at < kStyleCount - 1 && kLiveStyles[ at ] != base )
+				++at;
+			return kLiveStyles[ ( at + h ) % kStyleCount ];
+		}
 		if( order == 2 )
 		{
 			uint32_t x = uint32_t( h + 1 ) * 2654435761u;
 			x ^= x >> 15, x *= 2246822519u, x ^= x >> 13;
-			return int( x % uint32_t( kStyleCount ) );
+			return kLiveStyles[ x % uint32_t( kStyleCount ) ];
 		}
 		return base;
 	}
+	// W7: a retired value (a clip saved with Shrinkwrap / Fold) dissolves
+	static int LiveStyle( int st ) { return st < 0 || st >= kStyleValues || st == kStyleRetired6 || st == kStyleRetired22 ? kStyleDissolve : st; }
 	// W6: Swarm, Burn and Lava read the Wow bundles' dials (Firefly, Fire, Lava): in LoadEhr / FX they dissolve
 	static int StyleHere( int st ) { return !LOADEHR_WOW && ( st == kStyleSwarm || st == kStyleBurn || st == kStyleLava ) ? kStyleDissolve : st; }
 	// which per-slot caches the chain's hops need ahead of use (the styles any hop can take)
@@ -2107,13 +2121,13 @@ private:
 		if( chain.hops == 0 )
 			return 0;
 		const int order = Opt( P_STYLE_ORDER );
-		const int style = StyleHere( std::clamp( Opt( P_TRANSITION_STYLE ), 0, kStyleCount - 1 ) );
+		const int style = StyleHere( LiveStyle( Opt( P_TRANSITION_STYLE ) ) );
 		auto use = []( int st ) {
 			return st == kStyleShatter || st == kStylePieces ? (unsigned)kUseShards : st == kStyleDust ? (unsigned)kUseDust
 			     : st == kStylePoints || st == kStyleSwarm ? (unsigned)kUseCloud : st == kStyleSmoke ? (unsigned)kUseSim : 0u;
 		};
 		// the liquid SDF is built for every filled slot whatever the style (CPU, off the render thread; 1 MB GPU each), so switching
-		// the style to Liquid (or W6 Shrinkwrap, which slides onto it) mid-show finds every hop ready
+		// the style to Liquid mid-show finds every hop ready
 		return ( order == 0 ? use( style ) : ( kUseShards | kUseDust | kUseCloud | kUseSim ) ) | kUseLiquid;
 	}
 
@@ -2224,6 +2238,9 @@ private:
 		m.flame    = values[ P_FLAME_GLOW ];
 		m.lavaGlow = values[ P_LAVA_GLOW ];
 		m.cloudPhase = float( clk.pointTwinkle );
+		// W7 Trans Sparkle: 3 twinkles / s (x 3 of the Point Twinkle clock: still whole twinkles per 1000, seamless at its wrap)
+		m.sparkle      = values[ P_TRANS_SPARKLE ];
+		m.sparklePhase = float( std::fmod( 3.0 * clk.pointTwinkle, 1000.0 ) );
 		if( st == kStyleSwarm )
 		{
 			Colour( P_FIREFLY_COL_H, m.cloudColor );

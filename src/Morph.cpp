@@ -1,13 +1,13 @@
 // W6 Stage 2: the transition pack (Transition Style 5..22; Amrit: "how many transitions types between models can be added?").
 //   The MORPH program variants (`#define MORPH` on the triangle-soup programs: plain, instanced, their shadow-pass twins, and through
-//   Link() their DEFORM / WIRE / POINTS twins) carry the styles that move vertices (Shrinkwrap, Pieces, Implode, Glitch, Ripple, Spin
-//   Swap) or cut the surface along a front (Scan, Glitch, Ripple, Burn). They draw only during such a hop: every other draw, and every
+//   Link() their DEFORM / WIRE / POINTS twins) carry the styles that move vertices (Pieces, Implode, Glitch, Ripple, Spin Swap; W7:
+//   Twist, Melt) or cut the surface along a front (Scan, Glitch, Ripple, Burn). They draw only during such a hop: every other draw, and every
 //   other style, runs the programs it ran before (zero cost when not selected; regress max 0).
 //   The point cloud (Points, Swarm): per model slot 65,536 points spread evenly over the area (a worker), sorted by an order key
 //   (48 height bands bottom-up, round the up axis in each), their colour baked once from the part textures (a tiny GPU pass). Point i
 //   of the outgoing model flies to point i of the incoming one: the same key, so the bottom ring goes to the bottom ring.
 //   Everything is slider-driven (scrubbing back retraces, holding still is still); each side's state comes from TransitionOut / In
-//   (Renderer.cpp), the pair's data (the other model's SDF, shards, ranks, cloud) from here.
+//   (Renderer.cpp), the pair's data (the other model's shards, ranks, cloud) from here.
 #include "Log.h"
 #include "MathUtil.h"
 #include "Renderer.h"
@@ -196,7 +196,6 @@ void BindMorphSamplers( GLuint p )
 	glUniform1i( U( p, "uInputTex" ), 8 );
 	glUniform1i( U( p, "uIdxBuf" ), 9 );
 	glUniform1i( U( p, "uVtxBuf" ), 10 );
-	glUniform1i( U( p, "uMorphSdf" ), 27 );
 	glUniform1i( U( p, "uPartnerData" ), 28 );
 	glUniform1i( U( p, "uRankSelf" ), 29 );
 	glUniform1i( U( p, "uRankOther" ), 30 );
@@ -226,14 +225,6 @@ bool Renderer::InitMorph( std::string& error )
 	glUseProgram( progCloudBake );
 	glUniform1i( U( progCloudBake, "uBase" ), 0 );
 	glUseProgram( 0 );
-	// 1-texel stand-ins: every declared sampler needs a loadable texture of its type (the 3D SDF; the buffers use dummyShardData)
-	const float zero[ 2 ] = { 1, 0 };
-	glGenTextures( 1, &dummySdf3D );
-	glBindTexture( GL_TEXTURE_3D, dummySdf3D );
-	glTexImage3D( GL_TEXTURE_3D, 0, GL_RG16F, 1, 1, 1, 0, GL_RG, GL_FLOAT, zero );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-	glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-	glBindTexture( GL_TEXTURE_3D, 0 );
 	glGenFramebuffers( 1, &cloudBakeFBO );
 	return true;
 }
@@ -253,8 +244,6 @@ void Renderer::ReleaseMorph()
 			c.job->cancel.store( true );
 		c = CloudSlot();
 	}
-	if( dummySdf3D )
-		glDeleteTextures( 1, &dummySdf3D ), dummySdf3D = 0;
 	if( cloudBakeFBO )
 		glDeleteFramebuffers( 1, &cloudBakeFBO ), cloudBakeFBO = 0;
 	if( cloudWarmVAO )
@@ -366,7 +355,6 @@ bool Renderer::MorphPairReady( const FrameState& fs, GpuModel* a, GpuModel* b )
 {
 	switch( fs.transitionStyle )
 	{
-	case kStyleShrinkwrap: return UpdateLiquidSlot( sideSlot[ 1 ], b );
 	case kStylePieces:
 	{
 		ShapeState ks;
@@ -404,10 +392,24 @@ void Renderer::SetMorphUniforms( GLuint p, const FrameState& fs, GpuModel* model
 	glUniform1f( U( p, "uMorphFlame" ), m.flame );
 	glUniform3fv( U( p, "uMorphColor" ), 1, m.color );
 	glUniform3fv( U( p, "uMorphSeed" ), 1, m.seed );
+	glUniform1f( U( p, "uMorphLead" ), m.lead );
+	if( model )
+	{
+		const float* bx = model->geometry ? model->geometry->fitBox : nullptr;
+		const int ax    = std::min( 2, std::max( 0, fs.shape.deformAxis ) );
+		glUniform2f( U( p, "uMorphRange" ), bx ? bx[ ax ] : -1.0f, bx ? bx[ 3 + ax ] : 1.0f );
+		// W7 melt: the floor plane (world y = Floor Height) in this model's fitted space: world y = a . f + b
+		const float s = 1.0f / std::max( model->fitScale, 1e-12f );
+		float a[ 3 ], b = fs.model[ 13 ], l = 0;
+		for( int k = 0; k < 3; ++k )
+			a[ k ] = fs.model[ k * 4 + 1 ] * s, b += fs.model[ k * 4 + 1 ] * model->fitCenter[ k ], l += a[ k ] * a[ k ];
+		l = std::max( std::sqrt( l ), 1e-12f );
+		glUniform4f( U( p, "uMorphPlane" ), a[ 0 ] / l, a[ 1 ] / l, a[ 2 ] / l, ( fs.post.floorY - b ) / l );
+	}
 	const int other        = m.side == 1 ? 1 : 0;
 	GpuModel* om           = pairOn ? pairModel[ other ] : nullptr;
 	const FrameState* ofs  = pairOn ? pairFs[ other ] : nullptr;
-	GLuint sdf = dummySdf3D, pdata = dummyShardData, rself = dummyShardData, rother = dummyShardData;
+	GLuint pdata = dummyShardData, rself = dummyShardData, rother = dummyShardData;
 	if( om && ofs && model )
 	{
 		// this model's fitted space -> raw -> world (its matrix) -> the other model's raw space (the inverse of its matrix)
@@ -418,16 +420,9 @@ void Renderer::SetMorphUniforms( GLuint p, const FrameState& fs, GpuModel* model
 		const float fm[ 16 ] = { s, 0, 0, 0, 0, s, 0, 0, 0, 0, s, 0, model->fitCenter[ 0 ], model->fitCenter[ 1 ], model->fitCenter[ 2 ], 1 };
 		std::memcpy( F.m, fm, sizeof( fm ) );
 		const Mat4 to = Mo.Inverse() * Ms * F;
-		glUniformMatrix4fv( U( p, "uMorphToOther" ), 1, GL_FALSE, to.m );
 		glUniformMatrix4fv( U( p, "uMorphFromOther" ), 1, GL_FALSE, to.Inverse().m );
 		glUniform4f( U( p, "uOtherFit" ), om->fitCenter[ 0 ], om->fitCenter[ 1 ], om->fitCenter[ 2 ], om->fitScale );
 		const int os = sideSlot[ other ];
-		if( liquidSdf[ os ].tex )
-		{
-			sdf = liquidSdf[ os ].tex;
-			glUniform3fv( U( p, "uMorphSdfMin" ), 1, liquidSdf[ os ].min );
-			glUniform1f( U( p, "uMorphSdfSize" ), liquidSdf[ os ].size );
-		}
 		const ShardSlot &so = shards[ os ], &ss = shards[ SlotOf( model ) ];
 		if( so.rankTex && ss.rankTex )
 		{
@@ -435,8 +430,6 @@ void Renderer::SetMorphUniforms( GLuint p, const FrameState& fs, GpuModel* model
 			glUniform1f( U( p, "uPartnerN" ), float( std::max( 1, so.count ) ) );
 		}
 	}
-	glActiveTexture( GL_TEXTURE0 + 27 );
-	glBindTexture( GL_TEXTURE_3D, sdf );
 	glActiveTexture( GL_TEXTURE0 + 28 );
 	glBindTexture( GL_TEXTURE_BUFFER, pdata );
 	glActiveTexture( GL_TEXTURE0 + 29 );
@@ -540,7 +533,7 @@ void Renderer::WarmMorph( const FrameState& fs, GpuModel* model )
 {
 	FrameState d    = fs;
 	d.shape.on      = true;
-	d.morph.vs      = 1;
+	d.morph.vs      = 7;
 	d.morph.mask    = 1;
 	d.morph.side    = 1;
 	std::vector< Instance > one( 1 );

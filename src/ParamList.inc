@@ -54,9 +54,10 @@ X( P_MAX_TEX, "Max Texture Size", OPT, 0, 2, 0, "Model", "Full|4K|2K", 0 )
 X( P_TRANSITION, "Transition", STD, 0, 1, 0, "Model", "", 0 )
 X( P_CHAIN_LOOP, "Chain Loop", BOOL, 0, 1, 0, "Model", "", 0 )
 // W6 Stage 2 (Amrit: "how many transitions types between models can be added?"): the pack appended (0..4 keep their numbers, so saved
-// clips keep their style). Swarm, Burn and Lava need the Wow bundles' dials: in LoadEhr / FX they dissolve.
+// clips keep their style). Swarm, Burn and Lava need the Wow bundles' dials: in LoadEhr / FX they dissolve. W7: "~" = a retired option
+// (Shrinkwrap 6, Fold 22: Amrit "Fold can go and also Shrink Wrap"): not in the list, its value kept (a tombstone), so no style moves.
 X( P_TRANSITION_STYLE, "Transition Style", OPT, 0, 22, 0, "Model",
-   "Dissolve|Shatter|Dust|Slice|Liquid|Points|Shrinkwrap|Wire|Voxel|Low Poly|Pieces|Implode|Twist|Melt|Scan|Glitch|Ripple|Swarm|Smoke|Burn|Lava|Spin Swap|Fold", 0 ) // W26: + Liquid
+   "Dissolve|Shatter|Dust|Slice|Liquid|Points|~Shrinkwrap|Wire|Voxel|Low Poly|Pieces|Implode|Twist|Melt|Scan|Glitch|Ripple|Swarm|Smoke|Burn|Lava|Spin Swap|~Fold", 0 ) // W26: + Liquid
 // the style per hop: Fixed = Transition Style every hop; Cycle = Transition Style, then the next style each hop; Random = a
 // style per hop from a hash of the hop (stable while scrubbing)
 X( P_STYLE_ORDER, "Style Order", OPT, 0, 2, 0, "Model", "Fixed|Cycle|Random", 0 )
@@ -71,6 +72,9 @@ X( P_HOLD_TIME, "Hold Time", STD, 0, 60, 0, "Model", "", 0 )         // seconds 
 X( P_TRANS_EASE, "Trans Ease", STD, 0, 1, 1, "Model", "", 0 )
 X( P_TRANS_STAGGER, "Trans Stagger", STD, 0, 1, 0.85, "Model", "", 0 )
 X( P_TRANS_SPREAD, "Trans Spread", STD, 0, 4, 0.6, "Model", "", 0 )
+// W7 (Amrit: "perhaps a sparkle that kicks in between the models shifting"): sparkles on both models' surfaces, rising from ~0.2 of a
+// hop before its swap point, peaking there, gone ~0.2 after; light into the wire glow buffer (Wire Glow / Wire Bloom / Bloom catch it)
+X( P_TRANS_SPARKLE, "Trans Sparkle", STD, 0, 10, 0, "Model", "", 0 )
 #undef MEHR_REGION
 #define MEHR_REGION MEHR_WOW
 // W26 Stage 4: Transition Style Liquid = A melts into B as one liquid surface (the two models' SDFs blended and raymarched)

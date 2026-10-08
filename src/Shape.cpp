@@ -183,36 +183,6 @@ void BuildShards( const CpuGeometry& g, int count, int mode, ShardJob& job )
 	job.ms = std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - t0 ).count();
 }
 
-// ---- the dust noise on the CPU (Hash3 / Noise3 / Fbm of kDustNoise, in float): the Dust transition's key per point
-float FractF( float x ) { return x - std::floor( x ); }
-float Hash3F( float x, float y, float z )
-{
-	x = FractF( x * 0.3183099f + 0.1f ) * 17.0f, y = FractF( y * 0.3183099f + 0.1f ) * 17.0f, z = FractF( z * 0.3183099f + 0.1f ) * 17.0f;
-	return FractF( x * y * z * ( x + y + z ) );
-}
-float Noise3F( const float* p )
-{
-	float i[ 3 ], f[ 3 ];
-	for( int k = 0; k < 3; ++k )
-		i[ k ] = std::floor( p[ k ] ), f[ k ] = p[ k ] - i[ k ], f[ k ] = f[ k ] * f[ k ] * ( 3.0f - 2.0f * f[ k ] );
-	auto h   = [ & ]( float a, float b, float c ) { return Hash3F( i[ 0 ] + a, i[ 1 ] + b, i[ 2 ] + c ); };
-	auto mix = []( float a, float b, float t ) { return a + ( b - a ) * t; };
-	return mix( mix( mix( h( 0, 0, 0 ), h( 1, 0, 0 ), f[ 0 ] ), mix( h( 0, 1, 0 ), h( 1, 1, 0 ), f[ 0 ] ), f[ 1 ] ),
-	            mix( mix( h( 0, 0, 1 ), h( 1, 0, 1 ), f[ 0 ] ), mix( h( 0, 1, 1 ), h( 1, 1, 1 ), f[ 0 ] ), f[ 1 ] ), f[ 2 ] );
-}
-float FbmF( float x, float y, float z )
-{
-	float p[ 3 ] = { x, y, z }, v = 0, a = 0.5f;
-	for( int o = 0; o < 4; ++o )
-	{
-		v += a * Noise3F( p );
-		for( float& c : p )
-			c *= 2.03f;
-		a *= 0.5f;
-	}
-	return v / 0.9375f;
-}
-
 // ---- dust: area-weighted points on the surface, sorted by part (raw position + uv)
 void BuildDust( const CpuGeometry& g, int count, DustJob& job )
 {

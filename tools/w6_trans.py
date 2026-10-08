@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""LoadEhr W6 Stage 2: the transition pack (Transition Style 5..22) in the harness.
+"""LoadEhr W6 Stage 2: the transition pack (Transition Style 5..21; W7: Shrinkwrap 6 / Fold 22 retired) in the harness.
 
 usage: tools/w6_trans.py strips <out> [style ...]  every style, 9-step scrub strips t = 0 .. 1 forward, then the same steps backward,
                                                    on skull -> SciFi helmet and text -> skull (LoadEhr) and skull -> Crown 1918 (Wow):
@@ -21,8 +21,9 @@ ROOT = W.ROOT
 LIB = W.LIB
 SKULL, HELMET = W.SKULL, W.HELMET
 CROWN = LIB + '/Crowns/Crown 1918/scene.gltf'
-STYLES = ['Dissolve', 'Shatter', 'Dust', 'Slice', 'Liquid', 'Points', 'Shrinkwrap', 'Wire', 'Voxel', 'Low Poly', 'Pieces', 'Implode', 'Twist', 'Melt',
-          'Scan', 'Glitch', 'Ripple', 'Swarm', 'Smoke', 'Burn', 'Lava', 'Spin Swap', 'Fold']
+STYLES = ['Dissolve', 'Shatter', 'Dust', 'Slice', 'Liquid', 'Points', '~Shrinkwrap', 'Wire', 'Voxel', 'Low Poly', 'Pieces', 'Implode', 'Twist', 'Melt',
+          'Scan', 'Glitch', 'Ripple', 'Swarm', 'Smoke', 'Burn', 'Lava', 'Spin Swap', '~Fold']
+PACK = [st for st in range(5, 23) if not STYLES[st].startswith('~')]  # W7: Shrinkwrap (6) and Fold (22) retired (tombstones)
 WOW_ONLY = (17, 19, 20)
 STEPS = [k / 8 for k in range(9)]
 LOOK = ['set Rotate Y 25', 'set Rotate X -8', 'set Wire Glow 1', 'set Wire Color Mix 0']
@@ -56,7 +57,7 @@ def compare(so):
 
 def strips(out, only):
     os.makedirs(out, exist_ok=True)
-    styles = [int(s) for s in only] if only else list(range(5, 23))
+    styles = [int(s) for s in only] if only else PACK
     rows = ['| pair | style | forward = backward (9 steps: max diff, worst) | t = 0 vs Model A alone | t = 1 vs Model B alone | onset t = 0.01 / 0.99 '
             'vs plain (mean, max) | strip |', '|---|---|---|---|---|---|---|']
     for tag, bundle, a, b in PAIRS:
@@ -103,19 +104,20 @@ def chain(out):
     L = ['bundle %s/build/LoadEhrWow.bundle' % ROOT, 'size 640 360', 'instance', 'mark', 'text Model_A ' + SKULL, 'text Model_B ' + HELMET,
          'text Model_C ' + CROWN, 'text Model_D %s/knot/knot.obj' % G, 'wait_slots 4 90', 'set Chain Loop 1'] + LOOK + ['realtime 2']
     # 4 slots + Chain Loop = 4 hops: Transition 0.875 = the middle of hop 4 (D -> A)
-    for st in range(5, 23):
+    for st in PACK:
         L += ['set Transition_Style %d' % st, 'set Transition 0.875'] + shot('%s/da_%02d.png' % (out, st))
     so, log = W.harness(L, out, 'chain')
-    subprocess.run(['montage'] + ['%s/da_%02d.png' % (out, st) for st in range(5, 23)] + ['-tile', '6x3', '-geometry', '320x180+1+1', '%s/chain_da.png' % out],
+    subprocess.run(['montage'] + ['%s/da_%02d.png' % (out, st) for st in PACK] + ['-tile', '6x3', '-geometry', '320x180+1+1', '%s/chain_da.png' % out],
                    capture_output=True)
-    print('chain: %s/chain_da.png (D -> A mid-hop, styles 5..22)' % out)
+    print('chain: %s/chain_da.png (D -> A mid-hop, the pack styles)' % out)
 
 
 def cost(out):
     os.makedirs(out, exist_ok=True)
     L = pair_setup('LoadEhrWow', SKULL, HELMET, (1920, 1080)) + ['set Wire Glow 0']
     cases = [('rest (Transition 0)', ['set Transition 0', 'set Transition_Style 0'])]
-    cases += [('%d %s, t = 0.5' % (st, STYLES[st]), ['set Transition_Style %d' % st, 'set Transition 0.5']) for st in range(0, 23)]
+    cases += [('%d %s, t = 0.5' % (st, STYLES[st]), ['set Transition_Style %d' % st, 'set Transition 0.5']) for st in range(0, 23)
+              if not STYLES[st].startswith('~')]
     for i, (c, cmd) in enumerate(cases):
         L += cmd + ['realtime 1.0', 'stats_reset', 'frames 120', 'stats C%d' % i]
     so, _ = W.harness(L, out, 'cost')

@@ -94,6 +94,10 @@ struct CpuGeometry
 	int pieceCount = 0;
 	float fitCenter[ 3 ] = { 0, 0, 0 };
 	float fitScale       = 1;
+	// W7: the dissolve noise (Fbm( fitted x 3 + 7 ), the main FS) at quantiles 0, 1/128 .. 1 over the whole mesh's area (the tails are skewed: 16 steps were too coarse there): a transition's
+	// swap cuts at the quantile of its progress, so the share of the surface swapped follows the progress (the noise clusters near 0.5)
+	float fitBox[ 6 ] = { -1, -1, -1, 1, 1, 1 }; // W7: the whole mesh's bbox in fitted space (min xyz, max xyz)
+	float swapQ[ 129 ] = {}; // filled by the load worker (all 0 = no geometry: Cut() then runs evenly)
 };
 
 struct ModelData

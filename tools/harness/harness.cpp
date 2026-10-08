@@ -858,6 +858,46 @@ int main( int argc, char** argv )
 							Shot( prefix + "_" + ( q < 10 ? "0" : "" ) + std::to_string( q ) + ".png" );
 			}
 		}
+		else if( cmd == "scrub" )
+		{
+			// W7: scrub <from> <to> <steps> <param>: sets the param from -> to in <steps> steps, one frame each, and prints per step
+			// the mean |change| (all channels), the max |change| and the pixels whose rgb changed by > 32 vs the previous step
+			float from = 0, to = 1;
+			int steps  = 100;
+			std::string name;
+			ss >> from >> to >> steps;
+			std::getline( ss >> std::ws, name );
+			int idx = ParamIndex( name );
+			if( idx < 0 || steps < 1 )
+				continue;
+			SetFloat( (unsigned)idx, from );
+			RenderFrame( 1.0 / 60.0 );
+			std::vector< uint8_t > prev = ReadFrame();
+			for( int s = 1; s <= steps; ++s )
+			{
+				const float v = from + ( to - from ) * float( s ) / float( steps );
+				SetFloat( (unsigned)idx, v );
+				RenderFrame( 1.0 / 60.0 );
+				std::vector< uint8_t > cur = ReadFrame();
+				double sum = 0;
+				int mx     = 0;
+				size_t big = 0;
+				for( size_t k = 0; k < cur.size(); k += 4 )
+				{
+					int pm = 0;
+					for( int c = 0; c < 4; ++c )
+					{
+						const int d = std::abs( int( cur[ k + c ] ) - int( prev[ k + c ] ) );
+						sum += d, mx = std::max( mx, d );
+						if( c < 3 )
+							pm = std::max( pm, d );
+					}
+					big += pm > 32;
+				}
+				printf( "scrub %.4f change %.4f max %d big %zu\n", v, sum / cur.size(), mx, big );
+				prev.swap( cur );
+			}
+		}
 		else if( cmd == "means" )
 		{
 			int n = 1;

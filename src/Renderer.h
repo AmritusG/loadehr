@@ -56,15 +56,21 @@ struct XLight
 // per-model cache (shards, dust, letters, liquid SDF, sim obstacle SDF) has one entry per SLOT, so a slot's data is built once,
 // ahead of use, and a hop between any two slots finds it ready.
 static constexpr int kSlots = 4;
-enum SlotUse : unsigned { kUseShards = 1, kUseDust = 2, kUseLiquid = 4, kUseSim = 8, kUsePoints = 16, kUseCloud = 32 };
-// W6 Stage 2: Transition Style (0..4 as before; the pack 5..22 appended, so saved clips keep their style)
+enum SlotUse : unsigned { kUseShards = 1, kUseDust = 2, kUseLiquid = 4, kUseSim = 8, kUsePoints = 16, kUseCloud = 32, kUseSparkle = 64 };
+// W6 Stage 2: Transition Style (0..4 as before; the pack 5..22 appended, so saved clips keep their style). W7 (Amrit: "Fold can go and
+// also Shrink Wrap"): their values 6 and 22 are TOMBSTONES (not in the list, never renumbered: a clip holding one dissolves)
 enum TransStyle : int
 {
 	kStyleDissolve = 0, kStyleShatter, kStyleDust, kStyleSlice, kStyleLiquid,
-	kStylePoints, kStyleShrinkwrap, kStyleWire, kStyleVoxel, kStyleLowPoly, kStylePieces, kStyleImplode, kStyleTwist, kStyleMelt, kStyleScan,
-	kStyleGlitch, kStyleRipple, kStyleSwarm, kStyleSmoke, kStyleBurn, kStyleLava, kStyleSpinSwap, kStyleFold,
-	kStyleCount
+	kStylePoints, kStyleRetired6, kStyleWire, kStyleVoxel, kStyleLowPoly, kStylePieces, kStyleImplode, kStyleTwist, kStyleMelt, kStyleScan,
+	kStyleGlitch, kStyleRipple, kStyleSwarm, kStyleSmoke, kStyleBurn, kStyleLava, kStyleSpinSwap, kStyleRetired22,
+	kStyleValues // option values 0 .. kStyleValues - 1
 };
+// the styles in the list, in its order (Style Order Cycle / Random go round these)
+static constexpr int kLiveStyles[] = { kStyleDissolve, kStyleShatter, kStyleDust, kStyleSlice, kStyleLiquid, kStylePoints, kStyleWire, kStyleVoxel,
+                                       kStyleLowPoly, kStylePieces, kStyleImplode, kStyleTwist, kStyleMelt, kStyleScan, kStyleGlitch, kStyleRipple,
+                                       kStyleSwarm, kStyleSmoke, kStyleBurn, kStyleLava, kStyleSpinSwap };
+static constexpr int kStyleCount = int( sizeof( kLiveStyles ) / sizeof( kLiveStyles[ 0 ] ) );
 static constexpr int kSKShadowUnit = 21; // W23: the key shadow map in the volume march (Smoke Key Light)
 static constexpr int kMaxVolLights = 4; // A, B, C left, C right (only A/B can be point lights: cube maps 0/1)
 static constexpr int kMaxXLights   = 8;
@@ -299,6 +305,8 @@ struct MorphState
 	float temp = 2000, flame = 2;             // burn: Flame Temp, Flame Glow
 	float lavaGlow = 3;                       // lava: Lava Glow (the style glows whatever Lava Cracks says)
 	float seed[ 3 ] = { 0, 0.4f, 0.9f };       // burn: where the fire starts (fitted)
+	float lead = 0;                           // W7 twist: which end winds first (> 0 the top) and how far ahead
+	float sparkle = 0, sparklePhase = 0;      // W7 Trans Sparkle (0..10) and its twinkle clock (twinkles, wraps at 1000)
 	// the point cloud (styles 5 / 17): drawn while cloud > 0 (its fade), flight progress cloudK
 	float cloud = 0, cloudK = 0;
 	bool swarm = false;
@@ -533,6 +541,9 @@ private:
 	unsigned pointNext = 0;
 	GLuint pointDummy = 0, pointDummyBuf = 0; // one point (the prewarm draws through it before a set exists)
 	bool pointsNow = false, warmingNow = false;
+	float pointShareNow = 1.0f;  // W7: the share of each part's points a POINTS draw takes (the sparkles: a few thousand of 25k)
+	bool sparkleNow     = false; // W7: this frame's wire buffer holds sparkles
+	FrameState sparkFs[ 2 ];     // W7: the pair's sparkle draws (Points Only, glow only), kept for RenderWireGlow
 	bool InitPoints( std::string& error );
 	void ReleasePoints();
 	const PointSet* PointsFor( GpuModel* model, int source );
@@ -544,6 +555,7 @@ private:
 		GpuModel* model;
 		const std::vector< Instance >* inst;
 		int side;
+		float share = 1.0f; // W7: the share of the points the glow pass draws
 	};
 	std::vector< WireDraw > wireDraws; // this frame's wired draws that glow (DrawWired adds them)
 	float wireMixNow = -1.0f;          // a wired draw's Wireframe Mix override (-1 = the dial)
@@ -638,7 +650,7 @@ private:
 	void DrawCloud( const FrameState& fsA, const FrameState& fsB, int w, int h, bool glow ); // main pass (sprites) / light (glow)
 	void WarmMorph( const FrameState& fs, GpuModel* model );
 	GLuint progSoupM = 0, progSoupMI = 0, progShadowSoupM = 0, progShadowSoupMI = 0;
-	GLuint progCloud = 0, progCloudBake = 0, cloudBakeFBO = 0, dummySdf3D = 0, cloudVAO = 0, cloudWarmVAO = 0, cloudWarmVBO = 0;
+	GLuint progCloud = 0, progCloudBake = 0, cloudBakeFBO = 0, cloudVAO = 0, cloudWarmVAO = 0, cloudWarmVBO = 0;
 	struct CloudSlot
 	{
 		uint64_t serial = 0;

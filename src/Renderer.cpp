@@ -478,6 +478,8 @@ void Renderer::PrepareSlot( int slot, GpuModel* model, const FrameState& fs, uns
 		EnsureSimSdf( slot, model );
 	if( uses & kUsePoints ) // W6: Points Only / Points + Wire: the slot's points are built before its hop
 		PointsFor( model, fs.wire.pointSource );
+	if( uses & kUseSparkle ) // W7 Trans Sparkle: the sparkles ride Surface 25k
+		PointsFor( model, 2 );
 	if( uses & kUseCloud ) // W6: the Points / Swarm styles' cloud
 		UpdateCloud( slot, model );
 	sideSlot[ 0 ] = keepSlot, activeSide = keepSide;
@@ -890,7 +892,9 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 		const std::array< uint32_t, 2 > prun = pts ? ( i < pts->ranges.size() ? pts->ranges[ i ] : std::array< uint32_t, 2 >{ 0, 0 } ) : std::array< uint32_t, 2 >{ 0, 1 };
 		if( pointsNow )
 		{
-			const GLsizei pc = limit ? (GLsizei)std::min( limit, prun[ 1 ] ) : (GLsizei)prun[ 1 ];
+			GLsizei pc = limit ? (GLsizei)std::min( limit, prun[ 1 ] ) : (GLsizei)prun[ 1 ];
+			if( pointShareNow < 1.0f ) // W7 sparkles: the first share of the run (the surface points are random within a part)
+				pc = (GLsizei)std::ceil( float( pc ) * pointShareNow );
 			if( pc == 0 )
 				continue;
 			if( instanced )
@@ -1030,15 +1034,27 @@ float Sm( float x )
 	return x * x * ( 3.0f - 2.0f * x );
 }
 float Rm( float e, float a, float b ) { return std::min( 1.0f, std::max( 0.0f, ( e - a ) / ( b - a ) ) ); }
-void Swap( FrameState& f, float e, int side, float a, float b )
+// W7: the dissolve value that cuts share d of this model's surface. The noise clusters near 0.5 (an Fbm), so a cut moved evenly
+// swapped nearly the whole surface in the middle ~15 % of a window: in Twist / Melt's 0.4 .. 0.6 (Ease 1) the swap took t 0.48 .. 0.53,
+// a pop. The cut walks the model's own noise quantiles (CpuGeometry::swapQ) from its measured min to its max, so the share follows d.
+float Cut( float d, const float* q )
 {
-	const float d = Sm( Rm( e, a, b ) );
+	if( d <= 0.0f || d >= 1.0f || !q || q[ 128 ] <= q[ 0 ] )
+		return std::min( 1.0f, std::max( 0.0f, d ) );
+	const float x = d * 128.0f;
+	const int i   = std::min( 127, int( x ) );
+	const float lo = q[ i ], hi = q[ i + 1 ]; // d 0 / 1 exactly: nothing / everything (below q0 / above q128: ~1 / 16k of the surface)
+	return ( lo + ( hi - lo ) * ( x - float( i ) ) + 0.04f ) / 1.08f; // the shader cuts at uDissolve x 1.08 - 0.04
+}
+void Swap( FrameState& f, float e, int side, float a, float b, const float* q )
+{
+	const float d = Cut( Sm( Rm( e, a, b ) ), q );
 	if( side == 1 )
 		f.dissolve = std::max( f.dissolve, d );
 	else
 		f.dissolve = std::max( 1e-4f, d ), f.dissolveInvert = true; // > 0: inverted, 0 would show it all
 }
-void TransitionPack( FrameState& f, float t, int side )
+void TransitionPack( FrameState& f, float t, int side, const float* q )
 {
 	MorphState& m = f.morph;
 	ShapeState& s = f.shape;
@@ -1053,29 +1069,24 @@ void TransitionPack( FrameState& f, float t, int side )
 	case kStylePoints:
 	case kStyleSwarm: // the mesh turns into the cloud (0 .. 0.3), the cloud flies, the other mesh condenses out of it (0.7 .. 1)
 		if( out )
-			f.dissolve = std::max( f.dissolve, Sm( Rm( e, 0.02f, 0.3f ) ) );
+			f.dissolve = std::max( f.dissolve, Cut( Sm( Rm( e, 0.02f, 0.3f ) ), q ) );
 		else
-			f.dissolve = std::max( 1e-4f, Sm( Rm( e, 0.7f, 0.98f ) ) ), f.dissolveInvert = true;
+			f.dissolve = std::max( 1e-4f, Cut( Sm( Rm( e, 0.7f, 0.98f ) ), q ) ), f.dissolveInvert = true;
 		m.cloud  = std::min( Sm( Rm( e, 0.0f, 0.2f ) ), 1.0f - Sm( Rm( e, 0.8f, 1.0f ) ) );
 		m.cloudK = Rm( e, 0.15f, 0.85f );
 		m.swarm  = f.transitionStyle == kStyleSwarm;
-		break;
-	case kStyleShrinkwrap: // the outgoing model slides onto the incoming one's surface, which then appears on top of it
-		if( out )
-			m.vs = 1, m.k = Rm( e, 0.0f, 0.6f ), s.on = true;
-		Swap( f, e, side, 0.55f, 0.8f );
 		break;
 	case kStyleWire: // the fill dissolves, the lines stay; the lines swap; the incoming fill returns
 		f.wire.on = true, f.wireMix = 0.0f;
 		if( f.wire.mode < 2 )
 			f.wire.mode = 1, f.wire.mix = out ? Sm( Rm( e, 0.0f, 0.35f ) ) : 1.0f - Sm( Rm( e, 0.65f, 1.0f ) );
-		Swap( f, e, side, 0.4f, 0.6f );
+		Swap( f, e, side, 0.4f, 0.6f, q );
 		break;
 	case kStyleVoxel: // voxelise, the cubes grow (Trans Spread), swap, shrink back as the other model
 	{
 		const float v = ramp( 0.0f, 0.4f, 0.6f, 1.0f ), g = ramp( 0.1f, 0.5f, 0.5f, 0.9f );
 		s.on = true, s.voxel = std::max( s.voxel, v ), s.voxelSize = std::max( 0.02f, s.voxelSize ) * ( 1.0f + 5.0f * f.transSpread * g );
-		Swap( f, e, side, 0.4f, 0.6f );
+		Swap( f, e, side, 0.4f, 0.6f, q );
 		break;
 	}
 	case kStyleLowPoly: // big facets (Trans Spread = their size), tumbling, swap, back
@@ -1086,7 +1097,7 @@ void TransitionPack( FrameState& f, float t, int side )
 		const float dir = out ? 1.0f : -1.0f;
 		s.tumbleAng[ 0 ] = 150.0f * g * dir, s.tumbleAng[ 1 ] = 110.0f * g * dir, s.tumbleAng[ 2 ] = 70.0f * g * dir;
 		s.tumblePhase[ 0 ] = s.tumblePhase[ 1 ] = s.tumblePhase[ 2 ] = 0.0f;
-		Swap( f, e, side, 0.4f, 0.6f );
+		Swap( f, e, side, 0.4f, 0.6f, q );
 		break;
 	}
 	case kStylePieces: // solid pieces fly to the other model's pieces (ranked bottom-up) and become them
@@ -1095,15 +1106,20 @@ void TransitionPack( FrameState& f, float t, int side )
 	case kStyleImplode: // triangles fall into the centre point; the incoming ones burst out of it
 		m.vs = 3, m.k = out ? Rm( e, 0.0f, 0.6f ) : Rm( e, 0.4f, 1.0f ), s.on = true;
 		break;
-	case kStyleTwist: // twists away round the deform axis (Trans Spread = how far), the other untwists in
-		s.on = s.deform = true;
-		s.twist += ( out ? 1.0f : -1.0f ) * ( 2.0f + 6.0f * f.transSpread ) * ramp( 0.0f, 0.55f, 0.45f, 1.0f );
-		Swap( f, e, side, 0.4f, 0.6f );
+	case kStyleTwist: // winds up round the deform axis, wrung thin (Trans Spread: up to 7 turns end to end), the leading end first
+		// (Trans Stagger: above 0.5 the top, below it the bottom); the incoming model arrives wound the same way and unwinds
+		m.vs = 7, s.on = true;
+		m.k     = out ? Rm( e, 0.0f, 0.4f ) : 1.0f - Rm( e, 0.6f, 1.0f );
+		m.scale = PI * ( 1.0f + 1.5f * f.transSpread );
+		m.freq  = std::min( 0.8f, 0.35f + 0.12f * f.transSpread );
+		m.lead  = ( std::min( 1.0f, std::max( 0.0f, f.transStagger ) ) - 0.5f ) * 2.0f;
+		Swap( f, e, side, 0.32f, 0.68f, q );
 		break;
-	case kStyleMelt: // melts into a puddle; the other rises out of it
-		s.on = s.deform = true;
-		s.melt = std::max( s.melt, ramp( 0.0f, 0.55f, 0.45f, 1.0f ) );
-		Swap( f, e, side, 0.4f, 0.6f );
+	case kStyleMelt: // melts to a puddle on the floor (Floor Height) by mid-hop; the other rises out of the same puddle and firms up
+		m.vs = 8, s.on = true;
+		m.k     = out ? Rm( e, 0.0f, 0.4f ) : 1.0f - Rm( e, 0.6f, 1.0f );
+		m.scale = 1.1f + 0.6f * f.transSpread; // the puddle's radius (fitted units): Trans Spread = how runny / how far it spreads
+		Swap( f, e, side, 0.4f, 0.6f, q );
 		break;
 	case kStyleScan: // a plane sweeps up the deform axis: the incoming model behind it, the outgoing ahead, a wire band at the plane
 		m.mask = 1, m.band = 0.03f + 0.1f * f.transSpread, m.k = -m.band - 0.01f + e * ( 1.0f + 2.0f * m.band + 0.02f ), s.on = true;
@@ -1115,20 +1131,23 @@ void TransitionPack( FrameState& f, float t, int side )
 		m.vs = 5, m.mask = 3, m.k = -0.3f + 2.2f * e, s.on = true;
 		break;
 	case kStyleSmoke: // dissolves into the sim's smoke (the plugin emits it), the other condenses out of it
-		Swap( f, e, side, out ? 0.05f : 0.4f, out ? 0.6f : 0.95f );
+		Swap( f, e, side, out ? 0.05f : 0.4f, out ? 0.6f : 0.95f, q );
 		break;
 	case kStyleBurn: // a fire front eats the outgoing model (blackbody edge, charred crust), the incoming one is behind it
 		m.mask = 4, m.band = 0.06f + 0.12f * f.transSpread, m.k = -0.25f + 1.6f * e, s.on = true;
 		break;
-	case kStyleLava: // cracks spread over the outgoing model, it splits, the incoming one is underneath
-		if( out )
-		{
-			LavaState& l = f.lava;
-			l.on = true, l.front = Sm( Rm( e, 0.0f, 0.5f ) ) * 3.6f, l.split = Sm( Rm( e, 0.3f, 0.8f ) ), s.on = true;
-			l.glow = std::max( l.glow, m.lavaGlow );
-		}
-		Swap( f, e, side, out ? 0.6f : 0.45f, out ? 0.95f : 0.9f );
+	case kStyleLava: // W7: cracks spread over the outgoing model and it splits open; the incoming one is under it, still split and
+	                 // glowing, and heals and cools. Both sides carry the lava (a hop played back cracks the other model: Ping-Pong).
+	                 // The crack glow is the edge: no dissolve edge glow (it lit 22-32 % of an arriving model white)
+	{
+		LavaState& l = f.lava;
+		l.on = true, s.on = true, f.dissolveEdge = 0.0f;
+		l.front = 3.6f * ( out ? Sm( Rm( e, 0.0f, 0.45f ) ) : 1.0f - Sm( Rm( e, 0.6f, 1.0f ) ) );
+		l.split = 0.6f * ( out ? Sm( Rm( e, 0.25f, 0.7f ) ) : 1.0f - Sm( Rm( e, 0.4f, 0.85f ) ) );
+		l.glow  = std::max( l.glow, m.lavaGlow ) * ( out ? 1.0f : 1.0f - 0.7f * Sm( Rm( e, 0.6f, 1.0f ) ) );
+		Swap( f, e, side, out ? 0.5f : 0.25f, out ? 0.9f : 0.6f, q );
 		break;
+	}
 	case kStyleSpinSwap: // spins up and shrinks; the other spins down and grows (Trans Spread = turns)
 	{
 		const float turns = 1.0f + 2.0f * f.transSpread;
@@ -1137,22 +1156,23 @@ void TransitionPack( FrameState& f, float t, int side )
 		m.scale = out ? 1.0f - Sm( Rm( e, 0.15f, 0.6f ) ) : Sm( Rm( e, 0.4f, 0.85f ) );
 		break;
 	}
-	case kStyleFold: // folds into a kaleidoscope (Mirror Fold; Trans Spread: X / X+Y / X+Y+Z), swap, unfolds as the other
-		s.on = s.deform = true;
-		s.foldAxes[ 0 ] = 1.0f, s.foldAxes[ 1 ] = f.transSpread >= 0.5f ? 1.0f : 0.0f, s.foldAxes[ 2 ] = f.transSpread >= 1.2f ? 1.0f : 0.0f;
-		s.foldN = 1 << int( s.foldAxes[ 0 ] + s.foldAxes[ 1 ] + s.foldAxes[ 2 ] );
-		s.foldK = ramp( 0.0f, 0.45f, 0.55f, 1.0f );
-		Swap( f, e, side, 0.4f, 0.6f );
-		break;
 	default: break;
 	}
 }
+// W7 Trans Sparkle: the burst round a style's swap point (the eased progress where the models trade places): up from 0.2 before it,
+// the peak there, gone 0.2 after. Lava's incoming model shows through from 0.25 and the outgoing one is gone by 0.9: 0.55; the rest 0.5.
+float SparklePeak( int style ) { return style == kStyleLava ? 0.55f : 0.5f; }
+float SparkleEnvelope( int style, float t, float ease )
+{
+	const float e = t + ease * ( t * t * ( 3.0f - 2.0f * t ) - t ), p = SparklePeak( style );
+	return Sm( Rm( e, p - 0.2f, p ) ) * ( 1.0f - Sm( Rm( e, p, p + 0.2f ) ) );
+}
 // A hop: the outgoing model (a) leaves at progress t ...
-void TransitionOut( FrameState& f, float t )
+void TransitionOut( FrameState& f, float t, const float* q )
 {
 	if( f.transitionStyle >= kStylePoints )
 	{
-		TransitionPack( f, t, 1 );
+		TransitionPack( f, t, 1, q );
 		return;
 	}
 	switch( f.transitionStyle )
@@ -1170,11 +1190,11 @@ void TransitionOut( FrameState& f, float t )
 	}
 }
 // ... and the incoming one (b) arrives through the same system run backwards.
-void TransitionIn( FrameState& f, float t )
+void TransitionIn( FrameState& f, float t, const float* q )
 {
 	if( f.transitionStyle >= kStylePoints )
 	{
-		TransitionPack( f, t, 2 );
+		TransitionPack( f, t, 2, q );
 		return;
 	}
 	switch( f.transitionStyle )
@@ -1196,6 +1216,7 @@ void TransitionIn( FrameState& f, float t )
 void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slotA, int slotB )
 {
 	wireDraws.clear(); // W5: filled by this frame's wired draws
+	sparkleNow = false;
 	sideSlot[ 0 ] = slotA, sideSlot[ 1 ] = slotB, activeSide = 0;
 	GpuModel* bReady = b && b->Complete() ? b : nullptr;
 	const float t    = bReady ? std::min( 1.0f, std::max( 0.0f, fsIn.transition ) ) : 0.0f;
@@ -1218,11 +1239,11 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 		// W6: a pack style whose per-slot data is not on the GPU yet dissolves this frame (never a wait)
 		if( fsA.transitionStyle >= kStylePoints && !MorphPairReady( fsA, a, bReady ) )
 			fsA.transitionStyle = kStyleDissolve;
-		TransitionOut( fsA, t );
+		TransitionOut( fsA, t, a->geometry ? a->geometry->swapQ : nullptr );
 		fsB = AsModelB( fsIn );
 		fsB.transitionStyle = fsA.transitionStyle;
 		fsB.liquid.ready = fsA.liquid.ready;
-		TransitionIn( fsB, t );
+		TransitionIn( fsB, t, bReady->geometry ? bReady->geometry->swapQ : nullptr );
 	}
 	pairOn         = both;
 	pairFs[ 0 ]    = &fsA, pairFs[ 1 ] = &fsB;
@@ -1434,12 +1455,40 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 				else
 					DrawModel( sp ? soupP : progMain, f, g, false, sp, 0, nullptr, nullptr, f.inst.empty() ? nullptr : &f.inst );
 				DrawDust( f, g, h );
-				if( m == 0 && f.lava.on && f.transitionStyle == kStyleLava )
-					DrawCracks( f, g ); // W6 Lava style: the outgoing model's cracks glow
+				if( f.lava.on && f.transitionStyle == kStyleLava )
+					DrawCracks( f, g ); // W6 Lava style: the cracks glow (W7: on both models)
 				if( m == 1 )
 					EnsureVAO( model );
 			}
 			activeSide = 0;
+			// W7 Trans Sparkle: each model's sparkles = a Points Only draw of it (Surface 25k, a share of it), glow only: into the wire
+			// buffer as light (RenderWireGlow: behind the pair's depth), the surface colour lifted halfway to white, twinkling.
+			// The POINTS twins run the whole soup stage, so a sparkle sits on the twisted / melted / split / flying surface.
+			const float env = fsA.morph.sparkle * SparkleEnvelope( fsA.transitionStyle, t, fsA.transEase );
+			if( env > 0.0f && !solo )
+			{
+				const float s = fsA.morph.sparkle;
+				for( int m = 0; m < 2; ++m )
+				{
+					const FrameState& f = m == 0 ? fsA : fsB;
+					FrameState& x       = sparkFs[ m ];
+					x                   = f;
+					FrameState::WireState& wv = x.wire;
+					wv.on = true, wv.mode = 4, wv.back = 0, wv.edges = 0, wv.pointSource = 2;
+					wv.color[ 0 ] = wv.color[ 1 ] = wv.color[ 2 ] = 1.0f, wv.colorMix = 0.5f, wv.fade = 0.0f;
+					wv.twinkle = 0.9f, wv.twinklePhase = f.morph.sparklePhase;
+					// light = 1.2 x the envelope x Trans Sparkle; AddWireLight multiplies the buffer by 0.35 x its glow (1 with no Wire Glow).
+					// Spin Swap / Implode squeeze a model to a point at the swap: its sparkles dim with what is left of it (else they pile
+					// into one white dot)
+					const float left = f.morph.vs == 6 ? f.morph.scale : f.morph.vs == 3 ? ( m == 0 ? 1.0f - f.morph.k : f.morph.k ) : 1.0f;
+					wv.mix          = 1.2f * env * left * left / ( 0.35f * ( fs.wire.glow > 0.0f ? fs.wire.glow : 1.0f ) );
+					x.wireThickness = 1.2f + 0.15f * s; // 2.4 px .. 5.4 px
+					x.wireMix       = 0.0f;
+					const GLuint soupP = f.morph.On() ? progSoupM : f.shape.transSide > 0 && !f.shape.dustTrans ? progSoupT : progSoup;
+					wireDraws.push_back( { soupP, &x, m == 0 ? model : bReady, nullptr, m, std::min( 1.0f, 0.06f + 0.024f * s ) } ); // 1.5k .. 7.5k
+					sparkleNow = true;
+				}
+			}
 			if( fsA.morph.cloud > 0.0f && !fsA.morph.swarm )
 				DrawCloud( fsA, fsB, w, h, false ); // W6 Points style: the cloud between the two meshes
 			if( fsA.liquid.ready )
