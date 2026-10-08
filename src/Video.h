@@ -6,7 +6,8 @@
 //   HAP / HAP Alpha / HAP Q / HAP Q Alpha / HAP Alpha-Only: the raw compressed samples (outputSettings nil), the HAP sections parsed
 //     and Snappy-decompressed here (our own decoder, written from the HAP and Snappy format descriptions), uploaded as DXT / BC
 //     textures: no CPU pixel decode.
-//   DXV: not supported (the only reachable decoder ports FFmpeg's LGPL code).
+//   DXV (W3): DXVKit (third_party/dxvkit, our clean-room MIT decoder) opens every file first; a DXV track (DXV3 DXT1 / DXT5 / YCG6 /
+//     YG10, legacy DXDI) is read and decoded to its BCn block planes here (random access, no AVFoundation) and uploaded like HAP.
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
@@ -24,10 +25,12 @@ struct VideoFrame
 	double pts      = 0;   // seconds from the clip start
 	int index       = 0;   // frame number
 	int w = 0, h = 0;      // picture size
-	void* pixelBuffer = nullptr; // CVPixelBufferRef (BGRA, IOSurface-backed), retained; null for HAP
-	// HAP: block-compressed planes, rows top-first. format: 1 = DXT1 RGB, 5 = DXT5 RGBA, 6 = scaled YCoCg DXT5, 4 = BC4 alone
+	void* pixelBuffer = nullptr; // CVPixelBufferRef (BGRA, IOSurface-backed), retained; null for HAP / DXV
+	// HAP / DXV: block-compressed planes, rows top-first. format: 1 = DXT1 RGB, 5 = DXT5 RGBA, 6 = scaled YCoCg DXT5 (Hap Q),
+	// 4 = BC4 alone, 7 = DXV YCG6 (BC4 Y + BC5 Co, Cg at half size), 8 = DXV YG10 (BC5 Y, A + BC5 Co, Cg at half size)
 	int format = 0;
-	std::vector< uint8_t > blocks, alpha; // alpha: Hap Q Alpha's BC4 plane
+	int tw = 0, th = 0; // plane 0's texture size: the picture padded to whole blocks (HAP: to 4 px, DXV: to 16 px)
+	std::vector< uint8_t > blocks, blocks2; // blocks2: Hap Q Alpha's BC4 alpha, or DXV HQ's Co, Cg plane
 	uint64_t serial = 0;
 	size_t Bytes() const;
 	~VideoFrame();
@@ -53,6 +56,8 @@ public:
 
 private:
 	void Run();
+	bool RunDxv();                          // false: not a DXV file (AVFoundation reads it)
+	int Window( std::vector< int >& need ); // mtx held: the frames wanted around the request; the first missing one (-1 = none)
 	std::string path, info;
 	std::atomic< bool > ready{ false }, failed{ false }, stop{ false };
 	double duration = 0, frameDur = 1.0 / 30.0;

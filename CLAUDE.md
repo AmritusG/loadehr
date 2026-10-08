@@ -16,7 +16,7 @@
 4. **NO MIRROR ROOM** (W2, Amrit: "Remove mirror room."). Guard G6: no param Mirror Room / Mirror Count / Box Size / Box Depth /
    LED*, no Mirror* source, no MIRROR program variant. (Mirror Floor in the Floor group and Mirror Fold in Deform are not it.)
 5. **LICENCES MIT / BSD / Apache / zlib / ISC / Boost only** (W2: libtess2, SGI-B, swapped for Clipper2 + earcut). Guard G7: no
-   libtess2 / tesselator / SGI-B in src, third_party, CMakeLists.txt.
+   libtess2 / tesselator / SGI-B in src, third_party, CMakeLists.txt; (W3) no LGPL file anywhere in the tree, submodules included.
 
 LoadEhr is a spinoff of MaskEhr (W1, 2026-10-07, from MaskEhr c7ced33): every MaskEhr feature except the lasers and the library,
 plus four model slots that morph into each other. Amrit's words: "I want a version of MaskEhr called LoadEhr that has basically
@@ -43,7 +43,7 @@ Status, Reload, Model B) and the chain (+3: Chain Loop, Style Order, Hold Time) 
 FX only) moved to the Wow side. W2: Mirror Room out (-20, Wow), Deform in (+25 everywhere, 9 of them moved from classic Shape),
 Shatter Mode (+1), video (+3, Wow). Both FX carriers must fit 2 x shared + both sides' extras <= 1024, so one shared group had to
 become single-carrier: Trip (60) went to Wow only; Spots (15) moved Wow -> classic for room; Shatter Physics / Bounciness / Floor
-Friction became shared (a logo, classic-only, can bounce). Counts: **LoadEhr 482, FX 486, Wow 487, Wow FX 501**
+Friction became shared (a logo, classic-only, can bounce). Counts: **LoadEhr 482, FX 486, Wow 488, Wow FX 502** (W3: + Video Alpha)
 (`tools/param_map.py`). Fewest bundles: an effect is a different plugin type than a source, so two carriers per type = four.
 
 Nothing model-specific lives in code. A new model = point a Model slot at a file.
@@ -65,6 +65,8 @@ tools/w2_shatter.py run|strips            # W2: solid pieces (modes, counts, log
 tools/w2_deform.py run|strips             # W2: every deform + its cost
 tools/w2_video.py make|run|modes          # W2: projector video files (test media from faces_clip.mp4; HAP via glenc-cli)
 tools/arena_w2.py <layer> [col]           # W2: dial the W2 Arena clips by param name (never triggers)
+tools/w3_dxv.py proof|alpha|cost <out>    # W3: DXV playback vs dxvtool dump-rgba, the Video Alpha strips, decode / upload cost
+git submodule update --init               # W3: third_party/dxvkit (DXVKit, pinned) must be checked out before cmake
 ```
 Log: `~/Library/Logs/LoadEhr/LoadEhr.log` (per-material texture resolution, load/upload/swap times per slot, shader compile
 logs; with Debug Log: PERF + MEM (GPU MB per slot) lines every second, CHAIN hops). `LOADEHR_LOG_STDERR=1` mirrors it to stderr.
@@ -127,6 +129,7 @@ MaskEhr reference builds go to a scratch folder (`cmake -S <MaskEhr> -B <scratch
 - W21: `src/Generate.*` (text / logos -> a generated model, see below), `third_party/nanosvg` (zlib), W2: `third_party/clipper2`
   (Boost: fill rules, PolyTree) + `third_party/earcut` (ISC: triangulation), replacing libtess2 (SGI-B; Amrit 2026-10-08: "swap"). `tools/probe/TextProbe.cpp` = the W21 text-editor probe (not installed). `test_logos/` = OUR generated test
   emblem (`tools/w21_test_logos.py`: SVG + PDF from one geometry, PNG via sips). `tools/w21_arena.py` = set clip params by name over REST.
+- W3: `third_party/dxvkit` (submodule, MIT: DXV decoding), `tools/w3_dxv.py` (proof / alpha / cost of DXV playback).
 - W1: `tools/gen_test_models.py` (our test models), `tools/chain_test.py`, `tools/parity.py`, `tools/guards.sh`.
 - W3 chain additions: `src/ParamList.inc` (THE param list), `src/Volume.cpp` + `VolumeShaders.h` (Stage 1 shadow maps,
   raymarch, screen rays, motes), `src/Post.cpp` + `PostShaders.h` (Stage 2 key shadow, mirror, silhouette, bloom,
@@ -407,14 +410,30 @@ d) W17: KHR_materials_pbrSpecularGlossiness -> diffuse = BaseColor, its spec/glo
   worker: AVAssetReader; H.264 / HEVC / ProRes (4444 alpha too) -> BGRA IOSurface-backed CVPixelBuffers, bound zero-copy
   (CGLTexImageIOSurface2D on a GL_TEXTURE_RECTANGLE); HAP / HAP Alpha / HAP Q / HAP Q Alpha / HAP Alpha-Only = raw samples
   (outputSettings nil; skip zero-sample marker buffers), sections parsed + Snappy (our own decoder, from the format docs) -> DXT1 /
-  DXT5 / BC4 uploads, Hap Q's scaled YCoCg converted in the copy shader. HAP R / HDR (BC7 / BC6): refused (no BPTC here). DXV: not
-  supported (Glance's DXV3 decoders are LGPL FFmpeg ports). The frame is drawn into the picture texture (<= 2048 px, premultiplied
-  by its alpha) — kProjVideoFS; mips only while Focus > 0. Decode window: the play position + 6 frames in its direction (Loop
+  DXT5 / BC4 uploads, Hap Q's scaled YCoCg converted in the copy shader. HAP R / HDR (BC7 / BC6): refused (no BPTC here). DXV (W3):
+  see below. The frame is drawn into the picture texture (<= 2048 px) — kProjVideoFS; mips only while Focus > 0. Decode window: the play position + 6 frames in its direction (Loop
   wraps it); a backward window is read forward from a few frames before; the render thread never waits (a frame not decoded yet
   -> the nearest one behind, else the last one: counted "late"). Dials: Video Speed (x real time), Video Loop (Loop / Ping-Pong /
   Once), Video Restart; clock `clk.video` (Loop wraps at the clip length, Ping-Pong at twice it, Once clamps); a clip trigger
   restarts it. Debug Log: one VIDEO line per second (decoded, ms each, late, upload ms, cache MB). Measured: tools/w2_video.py
   (13 files, harness) and Arena (MBP M3 Max): see the W2 results handoff.
+- DXV (W3, `RunDxv` in Video.mm): DXVKit (`third_party/dxvkit`, a git submodule pinned at cdbb4bc, our clean-room MIT decoder, built
+  by our CMake as a static universal C lib, no tools / Swift) opens EVERY Proj File video first (`dxvk_mov_open_file`); a DXV track
+  plays here, anything else falls back to AVFoundation. Every packet is a whole frame: the worker reads + decodes the wanted frame
+  directly (no reader state) into DXVKit's block planes over the 16-PADDED coded texture; the decode window / late frames / Loop /
+  Ping-Pong / Once / Speed / Restart / `clk.video` are the shared code (`Window()`). Uploads (each texture defined once per size +
+  format, then glCompressedTexSubImage2D): DXT1 / legacy DXT1 -> 0x83F0 (opaque BC1), DXT5 / legacy DXT5 -> 0x83F3, YCG6 -> RGTC1 Y +
+  RGTC2 Co, Cg at half size, YG10 -> RGTC2 Y, A + RGTC2 Co, Cg; on the copy pass's existing uDxt / uDxtA samplers (no new sampler);
+  uDxtFit = display / coded crops the padding. YCoCg = Hap Q's formula with scale 1 (Co, Cg - 128/255). Chroma is sampled NEAREST
+  (the DXV spec's chroma): linear smeared colour edges (testsrc2 max 107 of 255) and pulled the padding's chroma into the last row
+  (97). GL (M3 Max): GL_COMPRESSED_TEXTURE_FORMATS lists only the three S3TC formats, but RGTC1 / RGTC2 upload without error (core
+  3.0); BPTC: INVALID_ENUM. Proof (`tools/w3_dxv.py proof`, LOADEHR_VIDEO_DUMP=<folder/> = each new picture as raw RGBA, debug):
+  the picture vs `dxvtool dump-rgba` differs only by the GPU's BCn palette precision (DXVKit's palette truncates as the spec says;
+  a float-exact CPU decode of the same blocks matches the picture on 98.6 % of values, the rest +-1).
+- VIDEO ALPHA (W3, Projector, Wow bundles): a file does not say whether its alpha is straight or premultiplied (Alley writes straight,
+  Adobe's exporter premultiplied-looking colour); Arena asks per clip, Premultiplied by default. Video Alpha Premultiplied (default) =
+  the colour as it is; Straight = colour x alpha in kProjVideoFS (`uStraight`; what W2 did for every codec). Every codec with alpha
+  (DXV DXT5 / YG10, HAP Alpha / Q Alpha, ProRes 4444). HAP alpha-only = the alpha itself either way. Changing it redraws the held frame.
 
 ## W28: Amrit's Wow review (`tools/w28_review.py`: strip / speed / lag (HEAD vs this build) / timeline / arena; FIXES = the fresh clips, lasers gone)
 - TIME SCALES (1 = the W26 pace, 2 = crazy; Amrit: "Soooooft I want, Crazy as max MAYBE"): Fire Speed (default 0.5: sim time x it,
@@ -573,7 +592,7 @@ d) W17: KHR_materials_pbrSpecularGlossiness -> diffuse = BaseColor, its spec/glo
 Source of truth: `src/ParamList.inc` (one X-macro list builds the enum and the definitions; FX-only lines sit under
 `#if LOADEHR_FX`). Resolume stores values by NAME: never rename a param; inserting at new indices is safe.
 Generated by `tools/param_map.py` from the harness `params` dump of the four bundles (W26; each column = that bundle's FFGL
-index, "—" = not carried). **LoadEhr 482 params, FX 486, Wow 487, Wow FX 501.**
+index, "—" = not carried). **LoadEhr 482 params, FX 486, Wow 488, Wow FX 502.**
 Group order: Model, Text, Logo, Extrude, Letters, Transform, Camera, Camera Live, Motion, Material, Surface, Parts, Shape, Deform, Copies,
 Lighting, Volume, Smoke Sim, Trip, Fire, Lightning, Swarm, Lava, Caustics, Light A, Light B, Light C, Spots, Projector, Post, Floor,
 Silhouette, FX, Output, Input + Face (FX), Audio, Debug. (W26 also added Liquid to Model and Shatter Physics to Shape; W2 Shatter Mode
@@ -1187,37 +1206,38 @@ Colours: every "<X> Color" row starts a HUE / SAT / BRI / ALPHA quartet = ONE pi
 | — | — | 438 | 439 | Projector | Video Speed | STD | 0..4 | 1 |
 | — | — | 439 | 440 | Projector | Video Loop | OPT | Loop / Ping-Pong / Once | 0 |
 | — | — | 440 | 441 | Projector | Video Restart | EVENT | - | - |
-| — | — | 441 | 442 | Projector | Proj Anchor | BOOL | - | 0 |
-| — | — | 442 | 443 | Projector | Proj Pos X | STD | -6..6 | 0.8 |
-| — | — | 443 | 444 | Projector | Proj Pos Y | STD | -6..6 | 1.2 |
-| — | — | 444 | 445 | Projector | Proj Pos Z | STD | -6..6 | 4 |
-| — | — | 445 | 446 | Projector | Proj Aim Mode | OPT | At Mask / Free | 0 |
-| — | — | 446 | 447 | Projector | Proj Aim Yaw | STD | -180..180 | 0 |
-| — | — | 447 | 448 | Projector | Proj Aim Pitch | STD | -90..90 | 0 |
-| — | — | 448 | 449 | Projector | Proj Throw | STD | 5..120 | 30 |
-| — | — | 449 | 450 | Projector | Proj Focus | STD | 0..1 | 0 |
-| — | — | 450 | 451 | Projector | Proj Intensity | STD | 0..100 | 25 |
-| — | — | 451 | 452 | Projector | Proj Color | HUE | 0..1 | 0 |
-| — | — | 452 | 453 | Projector | Proj Sat | SAT | 0..1 | 0 |
-| — | — | 453 | 454 | Projector | Proj Bri | BRI | 0..1 | 1 |
-| — | — | 454 | 455 | Projector | Proj Alpha | ALPHA | 0..1 | 1 |
-| — | — | 455 | 456 | Projector | Proj Beam | STD | 0..4 | 1 |
-| — | — | 456 | 457 | Projector | Proj Surface | STD | 0..4 | 1 |
-| 450 | 451 | 457 | 458 | Post | Bloom | STD | 0..10 | 0 |
-| 451 | 452 | 458 | 459 | Post | Bloom Threshold | STD | 0..1 | 0.65 |
-| 452 | 453 | 459 | 460 | Post | Bloom Radius | STD | 0..1 | 0.6 |
-| 453 | 454 | 460 | 461 | Post | Flare Ghosts | STD | 0..10 | 0 |
-| 454 | 455 | 461 | 462 | Post | Flare Streak | STD | 0..10 | 0 |
-| 455 | 456 | 462 | 463 | Floor | Shadow Catcher | STD | 0..1 | 0 |
-| 456 | 457 | 463 | 464 | Floor | Catcher Plane | OPT | Floor / Wall | 0 |
-| 457 | 458 | 464 | 465 | Floor | Floor Height | STD | -4..2 | -1.02 |
-| 458 | 459 | 465 | 466 | Floor | Wall Distance | STD | 0..8 | 1.5 |
-| 459 | 460 | 466 | 467 | Floor | Shadow Soft | STD | 0..1 | 0.4 |
-| 460 | 461 | 467 | 468 | Floor | Mirror Floor | STD | 0..1 | 0 |
-| 461 | 462 | 468 | 469 | Floor | Mirror Blur | STD | 0..1 | 0.2 |
-| 462 | 463 | 469 | 470 | Floor | Mirror Fade | STD | 0..1 | 0.2 |
-| 463 | 464 | 470 | 471 | Floor | Floor Light | STD | 0..1 | 0.5 |
-| 464 | 465 | 471 | 472 | Floor | Floor Camera | STD | 0..1 | 1 |
+| — | — | 441 | 442 | Projector | Video Alpha | OPT | Premultiplied / Straight | 0 |
+| — | — | 442 | 443 | Projector | Proj Anchor | BOOL | - | 0 |
+| — | — | 443 | 444 | Projector | Proj Pos X | STD | -6..6 | 0.8 |
+| — | — | 444 | 445 | Projector | Proj Pos Y | STD | -6..6 | 1.2 |
+| — | — | 445 | 446 | Projector | Proj Pos Z | STD | -6..6 | 4 |
+| — | — | 446 | 447 | Projector | Proj Aim Mode | OPT | At Mask / Free | 0 |
+| — | — | 447 | 448 | Projector | Proj Aim Yaw | STD | -180..180 | 0 |
+| — | — | 448 | 449 | Projector | Proj Aim Pitch | STD | -90..90 | 0 |
+| — | — | 449 | 450 | Projector | Proj Throw | STD | 5..120 | 30 |
+| — | — | 450 | 451 | Projector | Proj Focus | STD | 0..1 | 0 |
+| — | — | 451 | 452 | Projector | Proj Intensity | STD | 0..100 | 25 |
+| — | — | 452 | 453 | Projector | Proj Color | HUE | 0..1 | 0 |
+| — | — | 453 | 454 | Projector | Proj Sat | SAT | 0..1 | 0 |
+| — | — | 454 | 455 | Projector | Proj Bri | BRI | 0..1 | 1 |
+| — | — | 455 | 456 | Projector | Proj Alpha | ALPHA | 0..1 | 1 |
+| — | — | 456 | 457 | Projector | Proj Beam | STD | 0..4 | 1 |
+| — | — | 457 | 458 | Projector | Proj Surface | STD | 0..4 | 1 |
+| 450 | 451 | 458 | 459 | Post | Bloom | STD | 0..10 | 0 |
+| 451 | 452 | 459 | 460 | Post | Bloom Threshold | STD | 0..1 | 0.65 |
+| 452 | 453 | 460 | 461 | Post | Bloom Radius | STD | 0..1 | 0.6 |
+| 453 | 454 | 461 | 462 | Post | Flare Ghosts | STD | 0..10 | 0 |
+| 454 | 455 | 462 | 463 | Post | Flare Streak | STD | 0..10 | 0 |
+| 455 | 456 | 463 | 464 | Floor | Shadow Catcher | STD | 0..1 | 0 |
+| 456 | 457 | 464 | 465 | Floor | Catcher Plane | OPT | Floor / Wall | 0 |
+| 457 | 458 | 465 | 466 | Floor | Floor Height | STD | -4..2 | -1.02 |
+| 458 | 459 | 466 | 467 | Floor | Wall Distance | STD | 0..8 | 1.5 |
+| 459 | 460 | 467 | 468 | Floor | Shadow Soft | STD | 0..1 | 0.4 |
+| 460 | 461 | 468 | 469 | Floor | Mirror Floor | STD | 0..1 | 0 |
+| 461 | 462 | 469 | 470 | Floor | Mirror Blur | STD | 0..1 | 0.2 |
+| 462 | 463 | 470 | 471 | Floor | Mirror Fade | STD | 0..1 | 0.2 |
+| 463 | 464 | 471 | 472 | Floor | Floor Light | STD | 0..1 | 0.5 |
+| 464 | 465 | 472 | 473 | Floor | Floor Camera | STD | 0..1 | 1 |
 | 465 | 466 | — | — | FX | Wireframe Mix | STD | 0..1 | 0 |
 | 466 | 467 | — | — | FX | Wire Thickness | STD | 0.2..8 | 1 |
 | 467 | 468 | — | — | FX | Explode | STD | 0..3 | 0 |
@@ -1227,35 +1247,35 @@ Colours: every "<X> Color" row starts a HUE / SAT / BRI / ALPHA quartet = ONE pi
 | 471 | 472 | — | — | FX | Toon Steps | STD | 0..8 | 0 |
 | 472 | 473 | — | — | FX | Outline | STD | 0..1 | 0 |
 | 473 | 474 | — | — | FX | Depth Fog | STD | 0..3 | 0 |
-| — | — | 472 | 473 | Silhouette | Silhouette | STD | 0..1 | 0 |
-| — | — | 473 | 474 | Silhouette | Sil Fill | STD | 0..1 | 0 |
-| — | — | 474 | 475 | Silhouette | Sil Glow | STD | 0..10 | 2 |
-| — | — | 475 | 476 | Silhouette | Sil Width | STD | 0.5..60 | 8 |
-| — | — | 476 | 477 | Silhouette | Sil Color | HUE | 0..1 | 0.523809 |
-| — | — | 477 | 478 | Silhouette | Sil Sat | SAT | 0..1 | 0.7 |
-| — | — | 478 | 479 | Silhouette | Sil Bri | BRI | 0..1 | 1 |
-| — | — | 479 | 480 | Silhouette | Sil Alpha | ALPHA | 0..1 | 1 |
-| 474 | 475 | 480 | 481 | Output | Background Color | HUE | 0..1 | 0 |
-| 475 | 476 | 481 | 482 | Output | Background Sat | SAT | 0..1 | 0 |
-| 476 | 477 | 482 | 483 | Output | Background Bri | BRI | 0..1 | 0 |
-| 477 | 478 | 483 | 484 | Output | Background Alpha | ALPHA | 0..1 | 0 |
-| 478 | 479 | 484 | 485 | Output | MSAA | OPT | 1x / 4x / 8x | 1 |
-| — | 480 | — | 486 | Input | Input Use | OPT | Off / Background / Skin on flagged parts / Skin all | 0 |
-| — | 481 | — | 487 | Input | Input Projection | OPT | Front planar / Model UV / Spherical | 0 |
-| — | 482 | — | 488 | Input | Input Mix | STD | 0..1 | 1 |
-| — | — | — | 489 | Face | Face Track | BOOL | - | 0 |
-| — | — | — | 490 | Face | Max Faces | STD | 1..4 | 4 |
-| — | — | — | 491 | Face | Face Scale | STD | 0.1..5 | 1.2 |
-| — | — | — | 492 | Face | Face Offset X | STD | -1..1 | 0 |
-| — | — | — | 493 | Face | Face Offset Y | STD | -1..1 | 0.3 |
-| — | — | — | 494 | Face | Follow Roll | STD | 0..1 | 1 |
-| — | — | — | 495 | Face | Follow Yaw | STD | 0..1 | 1 |
-| — | — | — | 496 | Face | Follow Pitch | STD | 0..1 | 0.6 |
-| — | — | — | 497 | Face | Face Smooth | STD | 0..1 | 0.5 |
-| — | — | — | 498 | Face | Hide No Face | BOOL | - | 1 |
-| 479 | 483 | 485 | 499 | Audio | Audio FFT | BUFFER | 512 bins (FFT) | - |
+| — | — | 473 | 474 | Silhouette | Silhouette | STD | 0..1 | 0 |
+| — | — | 474 | 475 | Silhouette | Sil Fill | STD | 0..1 | 0 |
+| — | — | 475 | 476 | Silhouette | Sil Glow | STD | 0..10 | 2 |
+| — | — | 476 | 477 | Silhouette | Sil Width | STD | 0.5..60 | 8 |
+| — | — | 477 | 478 | Silhouette | Sil Color | HUE | 0..1 | 0.523809 |
+| — | — | 478 | 479 | Silhouette | Sil Sat | SAT | 0..1 | 0.7 |
+| — | — | 479 | 480 | Silhouette | Sil Bri | BRI | 0..1 | 1 |
+| — | — | 480 | 481 | Silhouette | Sil Alpha | ALPHA | 0..1 | 1 |
+| 474 | 475 | 481 | 482 | Output | Background Color | HUE | 0..1 | 0 |
+| 475 | 476 | 482 | 483 | Output | Background Sat | SAT | 0..1 | 0 |
+| 476 | 477 | 483 | 484 | Output | Background Bri | BRI | 0..1 | 0 |
+| 477 | 478 | 484 | 485 | Output | Background Alpha | ALPHA | 0..1 | 0 |
+| 478 | 479 | 485 | 486 | Output | MSAA | OPT | 1x / 4x / 8x | 1 |
+| — | 480 | — | 487 | Input | Input Use | OPT | Off / Background / Skin on flagged parts / Skin all | 0 |
+| — | 481 | — | 488 | Input | Input Projection | OPT | Front planar / Model UV / Spherical | 0 |
+| — | 482 | — | 489 | Input | Input Mix | STD | 0..1 | 1 |
+| — | — | — | 490 | Face | Face Track | BOOL | - | 0 |
+| — | — | — | 491 | Face | Max Faces | STD | 1..4 | 4 |
+| — | — | — | 492 | Face | Face Scale | STD | 0.1..5 | 1.2 |
+| — | — | — | 493 | Face | Face Offset X | STD | -1..1 | 0 |
+| — | — | — | 494 | Face | Face Offset Y | STD | -1..1 | 0.3 |
+| — | — | — | 495 | Face | Follow Roll | STD | 0..1 | 1 |
+| — | — | — | 496 | Face | Follow Yaw | STD | 0..1 | 1 |
+| — | — | — | 497 | Face | Follow Pitch | STD | 0..1 | 0.6 |
+| — | — | — | 498 | Face | Face Smooth | STD | 0..1 | 0.5 |
+| — | — | — | 499 | Face | Hide No Face | BOOL | - | 1 |
+| 479 | 483 | 486 | 500 | Audio | Audio FFT | BUFFER | 512 bins (FFT) | - |
 | 480 | 484 | — | — | Debug | Debug View | OPT | Final / Albedo / Normal / Roughness / Metallic / UV / Part IDs | 0 |
-| 481 | 485 | 486 | 500 | Debug | Debug Log | BOOL | - | 0 |
+| 481 | 485 | 487 | 501 | Debug | Debug Log | BOOL | - | 0 |
 
 ## Standing rules
 - COLOURS (W11, Amrit: "always have color use Resolume's built in color picker"): every colour in both bundles is ONE

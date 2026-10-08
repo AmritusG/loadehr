@@ -95,6 +95,7 @@ void Renderer::ReleaseProjector()
 		glDeleteFramebuffers( 1, &projVideoFBO ), projVideoFBO = 0;
 	projVideoHeld.reset();
 	projImageW = projImageH = 0;
+	projVideoDxtFmt = projVideoAlphaFmt = 0, projDxtW = projDxtH = 0;
 	if( projFBO )
 		glDeleteFramebuffers( 1, &projFBO ), projFBO = 0;
 	if( projDepth )
@@ -104,7 +105,7 @@ void Renderer::ReleaseProjector()
 }
 
 // W2: a video frame -> projImageTex (<= 2048 px, all levels allocated; the mips are built on the GPU only when Focus needs them)
-bool Renderer::UploadVideoFrame( const VideoFrame& f, bool mips )
+bool Renderer::UploadVideoFrame( const VideoFrame& f, bool mips, bool straight )
 {
 	const auto t0 = std::chrono::steady_clock::now();
 	int w = f.w, h = f.h;
@@ -150,36 +151,46 @@ bool Renderer::UploadVideoFrame( const VideoFrame& f, bool mips )
 	}
 	else
 	{
-		// HAP: the block planes straight into compressed textures (no CPU pixel decode)
-		const int bw = ( f.w + 3 ) / 4 * 4, bh = ( f.h + 3 ) / 4 * 4;
-		const GLenum fmt = f.format == 1 ? 0x83F0 /* RGB S3TC DXT1 */ : f.format == 4 ? 0x8DBB /* RED RGTC1 */ : 0x83F3 /* RGBA S3TC DXT5 */;
-		auto put = [ & ]( GLuint& tex, const std::vector< uint8_t >& data, GLenum format ) {
-			const GLsizei bytes = GLsizei( ( bw / 4 ) * ( bh / 4 ) * ( format == 0x83F0 || format == 0x8DBB ? 8 : 16 ) );
-			const bool fresh    = !tex || projVideoFmt != f.format || projDxtW != bw || projDxtH != bh;
+		// HAP / DXV (W3): the block planes straight into compressed textures (no CPU pixel decode), each defined once per size + format;
+		// the textures are block-padded (HAP to 4 px, DXV to 16): uDxtFit crops the padding
+		const int bw = f.tw, bh = f.th;
+		const GLenum fmt = f.format == 1 ? 0x83F0 /* RGB S3TC DXT1 */ : f.format == 4 || f.format == 7 ? 0x8DBB /* RED RGTC1 */
+		                 : f.format == 8 ? 0x8DBD /* RG RGTC2 */ : 0x83F3 /* RGBA S3TC DXT5 */;
+		auto put = [ & ]( GLuint& tex, GLenum& texFmt, const std::vector< uint8_t >& data, GLenum format, int w4, int h4 ) {
+			const GLsizei bytes = GLsizei( ( w4 / 4 ) * ( h4 / 4 ) * ( format == 0x83F0 || format == 0x8DBB ? 8 : 16 ) );
 			if( !tex )
 				glGenTextures( 1, &tex );
 			glBindTexture( GL_TEXTURE_2D, tex );
-			if( fresh )
+			if( texFmt != format || projDxtW != bw || projDxtH != bh )
 			{
-				glCompressedTexImage2D( GL_TEXTURE_2D, 0, format, bw, bh, 0, bytes, data.data() );
+				glCompressedTexImage2D( GL_TEXTURE_2D, 0, format, w4, h4, 0, bytes, data.data() );
 				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0 );
 				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+				texFmt = format;
 			}
 			else
-				glCompressedTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, bw, bh, format, bytes, data.data() );
+				glCompressedTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, w4, h4, format, bytes, data.data() );
 		};
 		glActiveTexture( GL_TEXTURE1 );
-		put( projVideoDxt, f.blocks, fmt );
-		if( !f.alpha.empty() )
+		put( projVideoDxt, projVideoDxtFmt, f.blocks, fmt, bw, bh );
+		if( !f.blocks2.empty() )
 		{
 			glActiveTexture( GL_TEXTURE2 );
-			put( projVideoAlpha, f.alpha, 0x8DBB );
+			if( f.format >= 7 )
+			{
+				// DXV HQ: Co, Cg as BC5 at half size, sampled NEAREST (the DXV spec's chroma: one sample per 2 x 2 pixels). Linear chroma
+				// smeared colour edges (testsrc2: max 107 of 255 vs DXVKit) and pulled the padding's chroma into the last row (97).
+				put( projVideoAlpha, projVideoAlphaFmt, f.blocks2, 0x8DBD, bw / 2, bh / 2 );
+				glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST ), glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+			}
+			else
+				put( projVideoAlpha, projVideoAlphaFmt, f.blocks2, 0x8DBB, bw, bh );
 		}
-		projVideoFmt = f.format, projDxtW = bw, projDxtH = bh;
-		mode         = f.format == 6 ? ( f.alpha.empty() ? 2 : 3 ) : f.format == 4 ? 4 : 1;
+		projDxtW = bw, projDxtH = bh;
+		mode     = f.format == 6 ? ( f.blocks2.empty() ? 2 : 3 ) : f.format == 4 ? 4 : f.format == 7 ? 5 : f.format == 8 ? 6 : 1;
 		glActiveTexture( GL_TEXTURE0 );
 	}
 	// bind every sampler with a texture of its type, draw the frame into the picture
@@ -188,18 +199,31 @@ bool Renderer::UploadVideoFrame( const VideoFrame& f, bool mips )
 	glActiveTexture( GL_TEXTURE1 );
 	glBindTexture( GL_TEXTURE_2D, mode != 0 && projVideoDxt ? projVideoDxt : whiteTex );
 	glActiveTexture( GL_TEXTURE2 );
-	glBindTexture( GL_TEXTURE_2D, mode == 3 && projVideoAlpha ? projVideoAlpha : whiteTex );
+	glBindTexture( GL_TEXTURE_2D, ( mode == 3 || mode >= 5 ) && projVideoAlpha ? projVideoAlpha : whiteTex );
 	glBindFramebuffer( GL_FRAMEBUFFER, projVideoFBO );
 	glViewport( 0, 0, w, h );
 	glDisable( GL_BLEND );
 	glDisable( GL_DEPTH_TEST );
 	glUseProgram( progProjVideo );
 	glUniform1i( U( progProjVideo, "uMode" ), mode );
+	glUniform1i( U( progProjVideo, "uStraight" ), straight ? 1 : 0 );
 	glUniform2f( U( progProjVideo, "uSize" ), float( f.w ), float( f.h ) );
 	glUniform2f( U( progProjVideo, "uDxtFit" ), mode ? float( f.w ) / float( std::max( 1, projDxtW ) ) : 1.0f, mode ? float( f.h ) / float( std::max( 1, projDxtH ) ) : 1.0f );
 	glBindVertexArray( quadVAO );
 	glDrawArrays( GL_TRIANGLES, 0, 3 );
 	glBindVertexArray( 0 );
+	// W3 proof (debug only): LOADEHR_VIDEO_DUMP=<folder/> writes each new picture as raw RGBA8 rows bottom-up, <frame>_<w>x<h>.rgba
+	static const char* dump = getenv( "LOADEHR_VIDEO_DUMP" );
+	if( dump && f.serial != projImageSerial )
+	{
+		std::vector< uint8_t > px( size_t( w ) * h * 4 );
+		glPixelStorei( GL_PACK_ALIGNMENT, 1 );
+		glReadPixels( 0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, px.data() );
+		char name[ 1024 ];
+		snprintf( name, sizeof( name ), "%s%d_%dx%d.rgba", dump, f.index, w, h );
+		if( FILE* o = fopen( name, "wb" ) )
+			fwrite( px.data(), 1, px.size(), o ), fclose( o );
+	}
 	for( int u = 2; u >= 0; --u )
 	{
 		glActiveTexture( GL_TEXTURE0 + u );
@@ -234,11 +258,11 @@ void Renderer::RenderProjector( const FrameState& fs, GpuModel* model )
 	{
 		// W2: a video file. A new frame is drawn into the picture; the mips only while Focus blurs it
 		const bool mips = pr.focus > 0.0f;
-		if( projImageSerial != pr.video->serial || ( mips && !projMipsValid ) )
+		if( projImageSerial != pr.video->serial || ( mips && !projMipsValid ) || projVideoStraight != pr.videoStraight )
 		{
-			if( UploadVideoFrame( *pr.video, mips ) )
+			if( UploadVideoFrame( *pr.video, mips, pr.videoStraight ) )
 				projVideoHeld = pr.video;
-			projImageSerial = pr.video->serial;
+			projImageSerial = pr.video->serial, projVideoStraight = pr.videoStraight;
 		}
 		if( projVideoHeld )
 			img = projImageTex, iw = projVideoHeld->w, ih = projVideoHeld->h, levels = mips ? projImageLevels : 1;

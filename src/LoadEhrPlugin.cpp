@@ -2887,6 +2887,7 @@ private:
 		p.video.reset();
 		if( video && p.on && p.source == 1 )
 			p.video = VideoClock( dt );
+		p.videoStraight = Opt( P_VIDEO_ALPHA ) == 1;
 		if( projImageJob && projImageJob->done.load() )
 		{
 			if( projImageJob->image.w > 0 )

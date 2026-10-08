@@ -26,6 +26,11 @@ target_include_directories(loadehr_thirdparty PUBLIC "${TP}/ufbx" "${TP}/cgltf" 
 set_target_properties(loadehr_thirdparty PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_compile_options(loadehr_thirdparty PRIVATE -O3 -w)
 
+# W3: DXVKit (our clean-room MIT DXV decoder), a pinned submodule: the C core only, static, universal (no tools, no Swift).
+set(DXVK_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
+add_subdirectory("${TP}/dxvkit" dxvkit EXCLUDE_FROM_ALL)
+set_target_properties(dxvkit PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 # Everything that does not depend on the FFGL SDK: loader, GPU model, renderer.
 add_library(loadehr_core STATIC
     src/Log.cpp
@@ -52,7 +57,7 @@ add_library(loadehr_core STATIC
 )
 set_source_files_properties(src/Video.mm PROPERTIES COMPILE_FLAGS "-fobjc-arc")
 target_include_directories(loadehr_core PUBLIC src "${FFGL_LIB}")
-target_link_libraries(loadehr_core PUBLIC loadehr_thirdparty "-framework OpenGL" "-framework CoreText" "-framework CoreGraphics" "-framework CoreFoundation"
+target_link_libraries(loadehr_core PUBLIC loadehr_thirdparty dxvkit "-framework OpenGL" "-framework CoreText" "-framework CoreGraphics" "-framework CoreFoundation"
     "-framework AVFoundation" "-framework CoreMedia" "-framework CoreVideo" "-framework IOSurface" "-framework Foundation")
 target_compile_definitions(loadehr_core PUBLIC GL_SILENCE_DEPRECATION)
 set_target_properties(loadehr_core PROPERTIES POSITION_INDEPENDENT_CODE ON)

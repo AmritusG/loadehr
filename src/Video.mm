@@ -1,6 +1,7 @@
 // W2 Stage 5: video files for the projector (see Video.h). AVFoundation reads; HAP is parsed + Snappy-decompressed here.
 #include "Video.h"
 #include "Log.h"
+#include "dxvkit.h"
 #import <AVFoundation/AVFoundation.h>
 #import <CoreMedia/CoreMedia.h>
 #import <CoreVideo/CoreVideo.h>
@@ -131,7 +132,7 @@ std::string FourCC( uint32_t f )
 }
 }
 
-size_t VideoFrame::Bytes() const { return blocks.size() + alpha.size() + ( pixelBuffer ? size_t( w ) * h * 4 : 0 ); }
+size_t VideoFrame::Bytes() const { return blocks.size() + blocks2.size() + ( pixelBuffer ? size_t( w ) * h * 4 : 0 ); }
 
 VideoFrame::~VideoFrame()
 {
@@ -218,13 +219,13 @@ bool DecodeHapFrame( const uint8_t* data, size_t n, int w, int h, VideoFrame& ou
 			if( !TextureSection( t, data + q + hh, s, v, f, error ) || !check( v, f ) )
 				return error.empty() ? ( error = "HAP: short plane", false ) : false;
 			if( f == 4 )
-				out.alpha.swap( v );
+				out.blocks2.swap( v );
 			else
 				out.blocks.swap( v ), out.format = f;
 			q += hh + s;
 		}
-		if( !out.format && !out.alpha.empty() )
-			out.blocks.swap( out.alpha ), out.format = 4;
+		if( !out.format && !out.blocks2.empty() )
+			out.blocks.swap( out.blocks2 ), out.format = 4;
 		return out.format != 0;
 	}
 	if( !TextureSection( type, data + hdr, size, out.blocks, out.format, error ) )
@@ -285,8 +286,114 @@ std::shared_ptr< const VideoFrame > VideoPlayer::Frame( double pos, bool forward
 	return last;
 }
 
+// what is needed: the play position and kAhead frames on in the play direction (wrapped when looping); frames outside it leave
+// the cache. Returns the first frame to decode (the one just behind the play position is kept, never fetched), -1 = none.
+int VideoPlayer::Window( std::vector< int >& need )
+{
+	const int t = std::clamp( int( std::floor( wantPos / frameDur + 1e-4 ) ), 0, frames - 1 );
+	for( int k = -1; k <= kAhead; ++k )
+	{
+		int i = wantForward ? t + k : t - k;
+		if( wantLoop )
+			i = ( i % frames + frames ) % frames;
+		else if( i < 0 || i >= frames )
+			continue;
+		if( std::find( need.begin(), need.end(), i ) == need.end() )
+			need.push_back( i );
+	}
+	for( auto it = cache.begin(); it != cache.end(); )
+		it = std::find( need.begin(), need.end(), it->first ) == need.end() ? cache.erase( it ) : std::next( it );
+	int first = -1;
+	for( int i : need )
+		if( !cache.count( i ) && first < 0 && i != ( wantForward ? t - 1 : t + 1 ) )
+			first = i;
+	cacheBytes = 0;
+	for( const auto& kv : cache )
+		cacheBytes += kv.second->Bytes();
+	return first;
+}
+
+// W3: a DXV file through DXVKit. Every packet is a whole frame, so the wanted frame is read and decoded directly: its block planes
+// (plane 0 over the 16-padded picture, HQ chroma at half size) go to the renderer as they are. Alpha is left as stored (Video Alpha).
+bool VideoPlayer::RunDxv()
+{
+	dxvk_mov* mov = nullptr;
+	if( dxvk_mov_open_file( path.c_str(), &mov ) != DXVK_OK )
+		return false;
+	const dxvk_mov_info in = *dxvk_mov_get_info( mov );
+	std::vector< uint8_t > packet( in.max_packet_size );
+	dxvk_variant variant = DXVK_VARIANT_DXT1;
+	int stored           = 0;
+	size_t n             = 0;
+	if( in.frame_count == 0 || dxvk_mov_read_packet( mov, 0, packet.data(), packet.size(), &n ) != DXVK_OK ||
+	    dxvk_packet_variant( in.generation, packet.data(), n, &variant, &stored ) != DXVK_OK )
+	{
+		std::lock_guard< std::mutex > lock( mtx );
+		info = "DXV: cannot read the first frame of " + path.substr( path.find_last_of( '/' ) + 1 ), failed.store( true );
+		dxvk_mov_close( mov );
+		return true;
+	}
+	{
+		std::lock_guard< std::mutex > lock( mtx );
+		frameDur = in.frame_rate > 0 ? 1.0 / in.frame_rate : 1.0 / 30.0;
+		frames   = int( in.frame_count );
+		duration = in.timescale && in.duration ? double( in.duration ) / in.timescale : frames * frameDur;
+		char b[ 200 ];
+		snprintf( b, sizeof( b ), "DXV %s %ux%u, %.4g fps, %.2f s (%d frames), DXVKit: block upload", dxvk_variant_name( variant ), in.width, in.height,
+		          1.0 / frameDur, duration, frames );
+		info = b;
+	}
+	ready.store( true );
+	while( !stop.load() )
+	{
+		std::vector< int > need;
+		int first;
+		{
+			std::unique_lock< std::mutex > lock( mtx );
+			if( ( first = Window( need ) ) < 0 )
+			{
+				const uint64_t s = wantSerial;
+				cv.wait_for( lock, std::chrono::milliseconds( 4 ), [ & ] { return stop.load() || wantSerial != s; } );
+				continue;
+			}
+		}
+		const auto c0 = std::chrono::steady_clock::now();
+		auto f        = std::make_shared< VideoFrame >();
+		f->pts = first * frameDur, f->index = first, f->w = int( in.width ), f->h = int( in.height ), f->serial = ( 1ull << 62 ) + ++g_frameSerial;
+		dxvk_frame_layout lay;
+		dxvk_status st = dxvk_mov_read_packet( mov, uint32_t( first ), packet.data(), packet.size(), &n );
+		if( st == DXVK_OK )
+			st = dxvk_packet_variant( in.generation, packet.data(), n, &variant, &stored );
+		if( st == DXVK_OK )
+			st = dxvk_layout( variant, in.width, in.height, &lay );
+		if( st == DXVK_OK )
+		{
+			f->blocks.resize( lay.bytes[ 0 ] ), f->blocks2.resize( lay.plane_count > 1 ? lay.bytes[ 1 ] : 0 );
+			void* const planes[ 2 ] = { f->blocks.data(), f->blocks2.data() };
+			const size_t caps[ 2 ]  = { f->blocks.size(), f->blocks2.size() };
+			st = dxvk_decode_blocks( in.generation, packet.data(), n, in.width, in.height, nullptr, planes, caps, &lay, nullptr );
+		}
+		if( st != DXVK_OK )
+		{
+			std::lock_guard< std::mutex > lock( mtx );
+			info = "DXV frame " + std::to_string( first ) + ": " + dxvk_status_string( st ), failed.store( true );
+			break;
+		}
+		f->tw = int( lay.coded_width ), f->th = int( lay.coded_height );
+		f->format = lay.variant == DXVK_VARIANT_YCG6 ? 7 : lay.variant == DXVK_VARIANT_YG10 ? 8 : lay.format[ 0 ] == DXVK_BLOCKS_BC3 ? 5 : 1;
+		std::lock_guard< std::mutex > lock( mtx );
+		cache[ first ] = f;
+		++decoded;
+		decodeMs += std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - c0 ).count();
+	}
+	dxvk_mov_close( mov );
+	return true;
+}
+
 void VideoPlayer::Run()
 {
+	if( RunDxv() )
+		return;
 	@autoreleasepool
 	{
 		NSURL* url         = [NSURL fileURLWithPath:[NSString stringWithUTF8String:path.c_str()]];
@@ -331,31 +438,11 @@ void VideoPlayer::Run()
 		int readerNext                    = -1; // the frame the open reader delivers next (-1 = none)
 		while( !stop.load() )
 		{
-			// what is needed: the play position and kAhead frames on in the play direction (wrapped when looping)
 			std::vector< int > need;
-			int first = -1;
+			int first;
 			{
 				std::unique_lock< std::mutex > lock( mtx );
-				const int t = std::clamp( int( std::floor( wantPos / frameDur + 1e-4 ) ), 0, frames - 1 );
-				for( int k = -1; k <= kAhead; ++k )
-				{
-					int i = wantForward ? t + k : t - k;
-					if( wantLoop )
-						i = ( i % frames + frames ) % frames;
-					else if( i < 0 || i >= frames )
-						continue;
-					if( std::find( need.begin(), need.end(), i ) == need.end() )
-						need.push_back( i );
-				}
-				for( auto it = cache.begin(); it != cache.end(); )
-					it = std::find( need.begin(), need.end(), it->first ) == need.end() ? cache.erase( it ) : std::next( it );
-				for( int i : need )
-					if( !cache.count( i ) && first < 0 && i != ( wantForward ? t - 1 : t + 1 ) )
-						first = i;
-				cacheBytes = 0;
-				for( const auto& kv : cache )
-					cacheBytes += kv.second->Bytes();
-				if( first < 0 )
+				if( ( first = Window( need ) ) < 0 )
 				{
 					const uint64_t s = wantSerial;
 					cv.wait_for( lock, std::chrono::milliseconds( 4 ), [ & ] { return stop.load() || wantSerial != s; } );
@@ -411,6 +498,7 @@ void VideoPlayer::Run()
 			{
 				auto f = std::make_shared< VideoFrame >();
 				f->pts = idx * frameDur, f->index = idx, f->w = W, f->h = H, f->serial = ( 1ull << 62 ) + ++g_frameSerial; // never equal to a still image's serial
+				f->tw = ( W + 3 ) / 4 * 4, f->th = ( H + 3 ) / 4 * 4;
 				bool ok = true;
 				if( hap )
 				{

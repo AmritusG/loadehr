@@ -271,6 +271,7 @@ struct ProjState
 	int source = 0;            // 0 the FX input, 1 the image / video file
 	std::shared_ptr< const ProjImage > image;
 	std::shared_ptr< const VideoFrame > video; // W2: the video file's frame for this frame (instead of image)
+	bool videoStraight = false;                // W3 Video Alpha: straight alpha = premultiply the frame in the copy pass
 };
 
 // W26 Stage 4: the Liquid transition style (4). ready: both models' SDFs are on the GPU (otherwise it dissolves like style 0)
@@ -540,10 +541,12 @@ private:
 	GLuint projTex = 0, projFBO = 0, projDepth = 0, projImageTex = 0;
 	// W2 video: the frame -> projImageTex (a draw: BGRA IOSurface bound zero-copy as a rectangle texture, or HAP blocks as DXT / BC)
 	GLuint progProjVideo = 0, projVideoRect = 0, projVideoDxt = 0, projVideoAlpha = 0, projVideoFBO = 0, dummyRect = 0;
-	int projImageW = 0, projImageH = 0, projVideoFmt = 0, projDxtW = 0, projDxtH = 0;
+	int projImageW = 0, projImageH = 0, projDxtW = 0, projDxtH = 0;
+	GLenum projVideoDxtFmt = 0, projVideoAlphaFmt = 0; // the compressed format each video texture was defined with
 	bool projMipsValid = false;
 	std::shared_ptr< const VideoFrame > projVideoHeld; // the frame bound to the rectangle texture (its IOSurface stays alive)
-	bool UploadVideoFrame( const VideoFrame& f, bool mips );
+	bool UploadVideoFrame( const VideoFrame& f, bool mips, bool straight );
+	bool projVideoStraight = false; // the Video Alpha the picture was drawn with
 public:
 	double videoUploadMs = 0; // W2: the last frame's upload (+ mips) ms on the render thread (PERF / harness)
 private:

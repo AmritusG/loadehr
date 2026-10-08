@@ -25,9 +25,11 @@ void main()
 }
 )GLSL";
 
-// W2: a video frame into the projector's picture texture (rows flipped bottom-up, light premultiplied by the frame's alpha).
+// W2: a video frame into the projector's picture texture (rows flipped bottom-up). The picture is light = premultiplied colour:
+// W3 Video Alpha Straight multiplies the colour by the frame's alpha here, Premultiplied (uStraight 0) takes it as it is.
 // mode 0 = a BGRA frame (IOSurface rectangle texture, rows top-first), 1 = DXT1 / DXT5 RGB(A), 2 = Hap Q (scaled YCoCg DXT5),
-// 3 = Hap Q Alpha (+ the BC4 alpha plane), 4 = a BC4 alpha-only frame (white light through it)
+// 3 = Hap Q Alpha (+ the BC4 alpha plane), 4 = a BC4 alpha-only frame (white light through it: the alpha is the picture),
+// W3 DXV HQ: 5 = YCG6 (uDxt BC4 Y, uDxtA BC5 Co, Cg at half size: the same picture coordinates), 6 = YG10 (uDxt BC5 Y, alpha)
 static const char* kProjVideoFS = R"GLSL(
 in vec2 vUV;
 out vec4 fragColor;
@@ -35,6 +37,7 @@ uniform sampler2DRect uRect;
 uniform sampler2D uDxt;
 uniform sampler2D uDxtA;
 uniform int uMode;
+uniform int uStraight;
 uniform vec2 uSize;    // the rectangle texture's size (mode 0)
 uniform vec2 uDxtFit;  // the picture's share of the block-padded DXT texture
 void main()
@@ -56,9 +59,16 @@ void main()
 				c.a = texture( uDxtA, st * uDxtFit ).r;
 		}
 		else if( uMode == 4 )
-			c = vec4( vec3( 1.0 ), c.r );
+			c = vec4( c.rrr, 1.0 );
+		else if( uMode >= 5 )
+		{
+			// plain YCoCg, chroma biased by 128 (DXVKit's README): Hap Q's conversion with scale 1
+			vec2 cc  = texture( uDxtA, st * uDxtFit ).rg - 128.0 / 255.0;
+			float y  = c.r;
+			c = vec4( y + cc.x - cc.y, y + cc.y, y - cc.x - cc.y, uMode == 6 ? c.g : 1.0 );
+		}
 	}
-	fragColor = vec4( clamp( c.rgb, 0.0, 1.0 ) * c.a, 1.0 );
+	fragColor = vec4( clamp( c.rgb, 0.0, 1.0 ) * ( uStraight == 1 ? c.a : 1.0 ), 1.0 );
 }
 )GLSL";
 

@@ -8,7 +8,9 @@
 #  G5 no laser / library source files, no library tools
 #  G6 (W2) the mirror room is gone: no param named Mirror Room / Mirror Count / Box Size / LED*, no Mirror* source, no MIRROR program
 #     variant (Mirror Floor in the Floor group is not the mirror room and stays)
-#  G7 (W2) libtess2 is gone (SGI Free Software License B: not on the licence list): no libtess2 / tesselator / SGI-B in the tree
+#  G7 (W2) libtess2 is gone (SGI Free Software License B: not on the licence list): no libtess2 / tesselator / SGI-B in the tree;
+#     (W3) no LGPL file anywhere in the tree (submodules included): no LGPL SPDX tag, no GNU Lesser / Library GPL licence text,
+#     no COPYING.LESSER / COPYING.LIB file
 cd "$(dirname "$0")/.."
 fail=0
 say() { printf '%s\n' "$*"; }
@@ -41,5 +43,9 @@ mir=$(ls src/Mirror* tools/w27_mirror* 2>/dev/null; grep -l -E 'define MIRROR|if
 if [ -z "$mir" ]; then say "G6 ok   no Mirror* source, no MIRROR program variant"; else say "G6 FAIL: $mir"; fail=1; fi
 tess=$(ls -d third_party/libtess2 2>/dev/null; grep -rl -i -E 'libtess|tesselator\.h|tessNewTess|SGI FREE SOFTWARE|Free Software License B' src third_party CMakeLists.txt 2>/dev/null)
 if [ -z "$tess" ]; then say "G7 ok   no libtess2 / tesselator / SGI-B in src, third_party, CMakeLists.txt"; else say "G7 FAIL: $tess"; fail=1; fi
+lgpl=$( { git ls-files --recurse-submodules -z -- . ":!tools/guards.sh" | xargs -0 grep -l -I -E 'SPDX-License-Identifier:.*LGPL|GNU (LESSER|LIBRARY) GENERAL PUBLIC LICENSE|GNU (Lesser|Library) General Public License' 2>/dev/null
+	git ls-files --recurse-submodules | grep -i -E '(^|/)(COPYING\.(LESSER|LIB)|LGPL[^/]*)$'; } | sort -u)
+nf=$(git ls-files --recurse-submodules | wc -l | tr -d ' ')
+if [ -z "$lgpl" ]; then say "G7 ok   no LGPL file in the tree ($nf tracked files, submodules included)"; else say "G7 FAIL LGPL: $lgpl"; fail=1; fi
 rm -rf "$T"
 exit $fail

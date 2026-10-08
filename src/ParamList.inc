@@ -642,6 +642,9 @@ X( P_PROJ_FILE, "Proj File", FILE, 0, 0, 0, "Projector", "", 0 )
 X( P_VIDEO_SPEED, "Video Speed", STD, 0, 4, 1, "Projector", "", 0 )        // x real time
 X( P_VIDEO_LOOP, "Video Loop", OPT, 0, 2, 0, "Projector", "Loop|Ping-Pong|Once", 0 )
 X( P_VIDEO_RESTART, "Video Restart", EVENT, 0, 1, 0, "Projector", "", 0 )  // back to the first frame (a clip trigger does it too)
+// W3: how a video's alpha is read (the file does not say; Arena asks per clip, Premultiplied by default). Straight = colour x alpha in
+// the copy pass (W2's behaviour for every codec); Premultiplied = the colour as it is. Every codec with alpha.
+X( P_VIDEO_ALPHA, "Video Alpha", OPT, 0, 1, 0, "Projector", "Premultiplied|Straight", 0 )
 X( P_PROJ_ANCHOR, "Proj Anchor", BOOL, 0, 1, 0, "Projector", "", 0 )
 X( P_PROJ_POS_X, "Proj Pos X", STD, -6, 6, 0.8f, "Projector", "", 0 )
 X( P_PROJ_POS_Y, "Proj Pos Y", STD, -6, 6, 1.2f, "Projector", "", 0 )
