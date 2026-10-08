@@ -65,3 +65,11 @@ beta = theta - theta_E^2 / theta (screen-space approximations: Flax / Minecraft-
   centres (letters / part slots / islands / clusters) built on a worker. Black hole: a deform (spiral in, the near points first) + the lens
   in the post pass (the plain post program untouched).
 - Build Speed / On Beat drive the progress; the looks are slider-driven (scrub back = the same path back).
+
+## Stage C: Cut (group "Cut", every bundle: Cut Look Off / Cross-Section / Reveal Box / Window, Cut Position, Cut Size, Cut Speed)
+Reading: stencil capping as Stage B (both faces of a slab capped in turn); a portal / window by the stencil buffer: mark the opening, reset
+the depth there, draw the other scene only where the stencil is set (the standard portal-rendering recipe).
+- Cross-Section: the Print On plane + a slab under it, both faces capped and scanned; the removed part in the Wire Mode's look.
+- Reveal Box: an FS region (rounded box, fitted rest space) drifting on a closed path; inside solid + seam, outside wire / points.
+- Window: eye-opening discs (eye finder) + glass parts (or the silhouette) in the stencil; another model slot, or the projector's
+  picture, behind them.

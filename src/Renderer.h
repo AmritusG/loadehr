@@ -398,6 +398,19 @@ struct XState
 	float capPhase = 0;      // the cap's scan lines, cycles (wrapped at 1)
 	bool lens = false;       // black hole: the screen-space lens + event horizon
 	float lensAmt = 0;
+	// W9 Stage C (Cut group, every bundle): region 0 the plane (Print On / Cross-Section: + slab, 0..1 of the extent under it, 0 = none),
+	// 1 the reveal box; window = the openings show another world
+	int region = 0;
+	float slab = 0;
+	float box[ 4 ] = { 0, 0, 0, 0.5f }, round = 0; // reveal box: centre (fitted), half size, corner share
+	bool removedWire = false; // the removed part as wire even with Wire Mode Off (the reveal box's outside)
+	bool window = false;
+	float eyes[ 2 ][ 4 ] = {}; // window: the eye openings, world centre + radius (radius 0 = none)
+	float front[ 3 ] = { 0, 0, 1 }; // the mask's front (world)
+	GpuModel* winModel = nullptr;   // the other world: a model slot (drawn with winM) ...
+	float winM[ 16 ] = {}, winScale = 1;
+	bool winPicture = false;        // ... or the projector's picture (Wow bundles: Proj Enable with a picture)
+	float winQuad[ 4 ][ 3 ] = {};   // the picture's quad behind the openings (world corners)
 };
 
 struct FrameState
@@ -657,9 +670,12 @@ private:
 	void ReleaseBuild();
 	void SetXUniforms( GLuint prog, const FrameState& fs, GpuModel* model ); // DEFORM twins (binds units 31 / 32)
 	GLuint XGroupTex( GpuModel* model, bool want );
-	void XPlanes( const FrameState& fs, GpuModel* model, float* world, float* fitted, float& worldPerFitted ) const;
+	void XPlanes( const FrameState& fs, GpuModel* model, float* world, float* fitted, float& worldPerFitted, int plane = 0 ) const;
 	void DrawSide( GLuint prog, const FrameState& fs, GpuModel* model, const std::vector< Instance >* inst ); // the main draw of one model
-	void DrawCap( GLuint prog, const FrameState& fs, GpuModel* model );
+	void DrawCap( GLuint prog, const FrameState& fs, GpuModel* model, int plane = 0 ); // plane 1: the cross-section slab's lower plane
+	void DrawWindow( const FrameState& fs, GpuModel* model ); // the openings (stencil) and the other world behind them
+	GLuint progWinMark = 0, progWinQuad = 0, winSampler = 0;
+	GLuint windowPic = 0; // the projector's picture this frame (RenderProjector), 0 = none
 	bool LensOn( const FrameState& fs ) const { return fs.x.lens && fs.x.lensAmt > 0.0f; }
 	void SetLensUniforms( GLuint prog, const FrameState& fs, int w, int h );
 	void WarmLooks( const FrameState& fs, GpuModel* model ); // at model swap, through the 1-pixel scissor

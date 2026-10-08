@@ -938,7 +938,7 @@ private:
 	// the eye lights, smoke emitted from the eyes (W20) or eye-to-eye bolts need the eyes
 	bool WantEyes() const
 	{
-		return On( P_LC_ENABLE ) || ( Opt( P_SMOKE_ENGINE ) > 0 && values[ P_EMIT_EYES ] > 0.0f ) ||
+		return On( P_LC_ENABLE ) || ( Opt( P_SMOKE_ENGINE ) > 0 && values[ P_EMIT_EYES ] > 0.0f ) || Opt( P_CUT_LOOK ) == 3 || // W9 Window
 		       ( Opt( P_BOLT_PATH ) == 1 && ( values[ P_STRIKE_RATE ] > 0.0f || Opt( P_STRIKE_BEAT ) > 0 || strikeCount > 0 ) );
 	}
 
@@ -1248,7 +1248,7 @@ private:
 			domSlot = chain.next;
 		domM = MS[ std::max( domSlot, 0 ) ];
 		for( int i = 0; i < kModelSlots; ++i )
-			slotM[ i ] = MS[ i ];
+			slotM[ i ] = MS[ i ], slotScale[ i ] = scaleS[ i ];
 		const GpuModel* dm = domSlot >= 0 ? slots[ domSlot ].current.get() : nullptr;
 		if( ( dm ? dm->serial : 0 ) != partNamesFor )
 			ApplyPartNames( dm );
@@ -1380,6 +1380,7 @@ private:
 		BuildLightning( fs, anchor, dt );
 		BuildSwarm( fs, anchor, dt );
 		BuildPost( fs, anchor, scale );
+		BuildCut( fs, anchor, dt ); // W9 Stage C (after the projector: the window can show its picture)
 
 		clk.pointTwinkle = Wrap( clk.pointTwinkle + dt, 1000.0 ); // W6 Point Twinkle: ~1 twinkle / s (each point's rate: whole twinkles per 1000)
 		BuildWire( fs );
@@ -3135,6 +3136,107 @@ private:
 		fs.shape.on = fs.shape.deform = true; // the looks draw in the DEFORM twins
 		(void)pulse;
 	}
+	// W9 Stage C: the Cut looks (every bundle). Cut Speed: Cross-Section sweeps (sweeps / min: there and back, eased), the Reveal Box
+	// drifts on a closed Lissajous path (whole frequencies 1 : 2 : 3, one loop per sweep), the Window's world turns (turns / min); the
+	// clock wraps at 1. Build On Beat (classic) hops the box a quarter loop on the beat (gliding 0.3 s). A Cut look wins over Print On's cut.
+	void BuildCut( FrameState& fs, const Mat4& anchor, float dt )
+	{
+		XState& x       = fs.x;
+		const int look  = std::clamp( Opt( P_CUT_LOOK ), 0, 3 );
+		const float pos = values[ P_CUT_POS ], size = values[ P_CUT_SIZE ], sp = values[ P_CUT_SPEED ];
+		const int every = LOADEHR_WOW || Opt( P_BUILD_BEAT ) == 0 ? 0 : 1 << ( Opt( P_BUILD_BEAT ) - 1 );
+		if( look == 2 && every > 0 && beatCount != lastCutBeat2 && beatCount % every == 0 )
+			lastCutBeat2 = beatCount, cutHop += 0.25;
+		const double hop = std::min( cutHop, double( dt ) / 0.3 * 0.25 );
+		cutHop -= hop;
+		clk.cut     = Wrap( clk.cut + dt * sp / 60.0 + hop, 1.0 );
+		clk.cutScan = Wrap( clk.cutScan + dt * 0.5, 1.0 );
+		x.window = false;
+		if( look == 0 )
+			return;
+		Colour( P_WIRE_COL_H, x.color );
+		x.glow = 1.5f + values[ P_WIRE_GLOW ];
+		x.layers = false, x.removedWire = false;
+		if( look == 1 )
+		{
+			const float tri = 1.0f - std::fabs( 2.0f * float( clk.cut ) - 1.0f );
+			x.cut = 1, x.region = 0, x.cutPos = sp > 0.0f ? SmoothStep( 0.0f, 1.0f, tri ) : pos, x.slab = size < 0.999f ? std::max( size, 0.01f ) : 0.0f;
+			x.cap = true, x.capLook = 1, x.capPhase = float( clk.cutScan );
+		}
+		else if( look == 2 )
+		{
+			const double ph = clk.cut * kTwoPi;
+			x.cut = 1, x.region = 1, x.cap = false, x.removedWire = true;
+			x.box[ 0 ] = float( 0.55 * std::sin( ph ) ), x.box[ 1 ] = float( 0.45 * std::sin( 2.0 * ph + 1.0 ) ), x.box[ 2 ] = float( 0.35 * std::sin( 3.0 * ph + 2.0 ) );
+			if( sp <= 0.0f && every == 0 )
+				x.box[ 0 ] = x.box[ 1 ] = x.box[ 2 ] = 0.0f; // still: in the middle
+			x.box[ 3 ] = 0.12f + 0.88f * size;
+			x.round    = pos;
+		}
+		else
+		{
+			// the window: the eye openings (Light C's places + the chain's offsets, the finder's radius), the other world behind them
+			x.window = true;
+			const float o[ 3 ] = { 0, 0, 0 }, fz[ 3 ] = { 0, 0, 1 }, ux[ 3 ] = { 1, 0, 0 }, uy[ 3 ] = { 0, 1, 0 };
+			float c[ 3 ], wx[ 3 ], up[ 3 ], right[ 3 ];
+			anchor.Point( o, c );
+			anchor.Dir( fz, x.front );
+			anchor.Dir( ux, wx );
+			anchor.Dir( uy, up );
+			std::memcpy( right, wx, sizeof( right ) );
+			const float unit = std::max( 1e-3f, std::sqrt( wx[ 0 ] * wx[ 0 ] + wx[ 1 ] * wx[ 1 ] + wx[ 2 ] * wx[ 2 ] ) );
+			Mat4::Norm( x.front ), Mat4::Norm( up ), Mat4::Norm( right );
+			float rad = 0.0f;
+			const int as = chain.n > 0 ? chain.filled[ 0 ] : 0;
+			if( eyeJob && eyeJob->done.load() && eyeJob->result.found && !eyePlacedFor.empty() && slots[ as ].current )
+			{
+				const float s = On( P_AUTO_FIT ) ? 1.0f : 1.0f / std::max( 1e-6f, slots[ as ].current->fitScale );
+				rad = std::max( eyeJob->result.left.radius, eyeJob->result.right.radius ) * s;
+			}
+			for( int e = 0; e < 2; ++e )
+			{
+				float open[ 3 ];
+				EyeOpen( e, open );
+				if( On( P_LC_ANCHOR ) )
+					anchor.Point( open, x.eyes[ e ] );
+				else
+					std::memcpy( x.eyes[ e ], open, sizeof( open ) );
+				// the disc sits half a radius inside the opening: the socket's walls round it hide its edge at an angle
+				for( int k = 0; k < 3; ++k )
+					x.eyes[ e ][ k ] -= x.front[ k ] * 0.5f * rad * unit;
+				x.eyes[ e ][ 3 ] = rad * unit;
+			}
+			const float D = ( 0.6f + 3.0f * pos ) * unit, k = 1.0f + 3.0f * size;
+			const double turn = clk.cut * kTwoPi;
+			const float b[ 3 ] = { c[ 0 ] - x.front[ 0 ] * D, c[ 1 ] - x.front[ 1 ] * D, c[ 2 ] - x.front[ 2 ] * D };
+			x.winPicture = LOADEHR_WOW && fs.projector.on && ( fs.projector.image || fs.projector.video || fs.projector.source == 0 );
+			if( x.winPicture )
+			{
+				const float hw = ( 1.2f + 3.0f * size ) * unit, hh = hw * 9.0f / 16.0f;
+				for( int q = 0; q < 4; ++q )
+					for( int j = 0; j < 3; ++j )
+						x.winQuad[ q ][ j ] = b[ j ] + right[ j ] * hw * ( ( q & 1 ) ? 1.0f : -1.0f ) + up[ j ] * hh * ( ( q & 2 ) ? 1.0f : -1.0f );
+			}
+			// the world's model: the first filled slot that is not on show (Stage D: Surf Source picks it)
+			const int ws = WindowSlot();
+			x.winModel   = nullptr;
+			if( ws >= 0 && slots[ ws ].current )
+			{
+				const Mat4 W = Mat4::Translate( b[ 0 ], b[ 1 ], b[ 2 ] ) * Mat4::RotY( float( turn ) ) * Mat4::Scale( k ) * Mat4::Translate( -c[ 0 ], -c[ 1 ], -c[ 2 ] ) * slotM[ ws ];
+				std::memcpy( x.winM, W.m, sizeof( x.winM ) );
+				x.winScale = slotScale[ ws ] * k;
+				x.winModel = slots[ ws ].current.get();
+			}
+		}
+		fs.shape.on = fs.shape.deform = fs.shape.deform || x.cut > 0; // the cut draws in the DEFORM twins
+	}
+	int WindowSlot() const
+	{
+		for( int i = 0; i < kModelSlots; ++i )
+			if( i != domSlot && slots[ i ].current && SlotFilled( i ) )
+				return i;
+		return -1;
+	}
 	// W9 Stage A: the line looks. Clocks (W14): the pulses' and the swirl's phases wrap at 1000 (whole cycles / turns per 1000 in the
 	// shaders), the ring's time stamps at 3600 s (ages are read mod 3600), the neon flicker steps at 1000.
 	void BuildLines( FrameState& fs, float dt )
@@ -4149,6 +4251,7 @@ private:
 		double pointTwinkle = 0;     // W6 Point Twinkle: twinkles (wraps at 1000)
 		double lineFlow = 0, lineSwirl = 0, linePaint = 0, lineFlicker = 0; // W9 Lines: cycles, turns (1000), seconds (3600), steps (1000)
 		double build = 0, slitTime = 0; // W9 Build: Build Speed cycles (1); the slit history's ticks, seconds (3600)
+		double cut = 0, cutScan = 0;    // W9 Cut: Cut Speed cycles (1), the cap's scan lines (1)
 	} clk;
 	// W2 Jelly: a damped spring per instance (fitted / mask space), driven by the mask's own acceleration (move, spin, bounce)
 	struct Jelly
@@ -4265,6 +4368,7 @@ private:
 	bool reloadRequested[ kModelSlots ] = {};
 	int domSlot = -1;                        // the chain's dominant model this frame (-1: nothing loaded)
 	Mat4 domM, slotM[ kModelSlots ];         // its model matrix; every slot's (this frame)
+	float slotScale[ kModelSlots ] = { 1, 1, 1, 1 }; // W9: every slot's raw -> world scale (this frame)
 	uint64_t partNamesFor = ~0ull;           // the model the Parts group is labelled after (0 = none)
 	int simDomSlot = -1;                     // the slot the sim obstacle was last (a change = a new obstacle, no velocity jump)
 	std::map< unsigned, std::string > texts; // W21 text / file params (Text, Font Name, Font File, Logo File)
@@ -4276,7 +4380,8 @@ private:
 	float audio16[ 16 ] = {}; // W9: 16 bands
 	std::deque< std::array< float, 32 > > slitHist; // W9 slit-scan: newest first, 1/60 s apart, 2 s
 	int64_t slitTick = -1;
-	uint32_t lastBuildBeat = 0;
+	uint32_t lastBuildBeat = 0, lastCutBeat2 = 0;
+	double cutHop = 0; // W9 the reveal box's beat hop still to glide
 	float buildBeatT = 1000.0f;
 	double lastHostTime = 0;
 	bool hostTimeSeen = false, hostTimeValid = false;

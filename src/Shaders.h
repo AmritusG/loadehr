@@ -1266,6 +1266,10 @@ uniform vec3 uXColor;    // Wire Color: the print head / the cut's band
 uniform float uXGlow;    // the band's light
 uniform float uXBand;    // the band's half width, world units
 uniform float uXLayer;   // print on: the layer lines' spacing (fitted), 0 = none
+uniform int uXRegion;    // the cut's region: 0 the plane (+ a slab under it: Cross-Section), 1 a rounded box (Reveal Box)
+uniform vec2 uXSlab;     // cross-section slab thickness: world, fitted (0 = no lower plane)
+uniform vec4 uXBox;      // reveal box (fitted rest space): centre, half size
+uniform float uXRound;   // its corner radius share (0 box .. 1 sphere)
 in float vXFall;
 #endif
 #ifdef SHADOW_PASS
@@ -1603,13 +1607,27 @@ void main()
 	float xKeep = 1.0, xEdge = 1e9;
 	if( uXCut > 0 )
 	{
+		bool kept;
+		if( uXRegion == 1 )
+		{
+			// a rounded box (superellipsoid-like: the corner radius grows to a sphere) in fitted rest space; band in fitted units
+			float r = uXRound * uXBox.w;
+			vec3 q  = abs( vi.opos - uXBox.xyz ) - vec3( uXBox.w - r );
+			float d = length( max( q, 0.0 ) ) + min( max( q.x, max( q.y, q.z ) ), 0.0 ) - r;
+			kept    = d <= 0.0;
+			xEdge   = abs( d );
+		}
+		else
+		{
 #ifdef INSTANCED
-		float sd = dot( uXPlaneO.xyz, vi.opos ) + uXPlaneO.w;
+			float sd = dot( uXPlaneO.xyz, vi.opos ) + uXPlaneO.w, slab = uXSlab.y;
 #else
-		float sd = dot( uXPlane.xyz, vi.wpos ) + uXPlane.w;
+			float sd = dot( uXPlane.xyz, vi.wpos ) + uXPlane.w, slab = uXSlab.x;
 #endif
-		xKeep = ( sd <= 0.0 ) == ( uXCut == 1 ) ? 1.0 : 0.0;
-		xEdge = abs( sd );
+			kept  = sd <= 0.0 && ( slab <= 0.0 || sd >= -slab );
+			xEdge = slab > 0.0 ? min( abs( sd ), abs( sd + slab ) ) : abs( sd );
+		}
+		xKeep = kept == ( uXCut == 1 ) ? 1.0 : 0.0;
 	}
 #ifdef SHADOW_PASS
 	if( xKeep < 0.5 )

@@ -385,6 +385,20 @@ X( P_BUILD_AXIS, "Build Axis", OPT, 0, 2, 1, "Build", "X|Y|Z", 0 )
 #define MEHR_REGION MEHR_CLASSIC
 X( P_BUILD_SPEED, "Build Speed", STD, 0, 30, 0, "Build", "", 0 )
 X( P_BUILD_BEAT, "Build On Beat", OPT, 0, 4, 0, "Build", "Off|Every Beat|Every 2|Every 4|Every 8", 0 )
+// W9 Stage C: CUT (every bundle; the axis = Build Axis). Cross-Section = a plane through the model (Cut Position; Cut Speed sweeps it,
+// sweeps / min), the cut face capped and scanned in Wire Color, a slab Cut Size of the extent thick under it (1 = everything below), the
+// rest in the Wire Mode's look or nothing; Reveal Box = solid only inside a box (Cut Size; Cut Position rounds it into a sphere) that
+// drifts through the model (Cut Speed; Build On Beat hops it), wire outside, a glowing seam; Window = the eye openings and glass parts
+// show another world behind them: another model slot, or the projector's picture (Wow bundles, Proj Enable) (Cut Position = how far
+// behind, Cut Size = how big, Cut Speed = it turns)
+#undef MEHR_REGION
+#define MEHR_REGION 0
+X( P_CUT_LOOK, "Cut Look", OPT, 0, 3, 0, "Cut", "Off|Cross-Section|Reveal Box|Window", 0 )
+X( P_CUT_POS, "Cut Position", STD, 0, 1, 0.5f, "Cut", "", 0 )
+X( P_CUT_SIZE, "Cut Size", STD, 0, 1, 0.4f, "Cut", "", 0 )
+X( P_CUT_SPEED, "Cut Speed", STD, 0, 30, 0, "Cut", "", 0 )
+#undef MEHR_REGION
+#define MEHR_REGION MEHR_CLASSIC
 #undef MEHR_REGION
 #define MEHR_REGION MEHR_CLASSIC
 // COPIES: instanced clones (LODs by screen size), echo trails, ghost poses

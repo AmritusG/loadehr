@@ -104,6 +104,11 @@ TESTS = [
     ('Build Speed (print on)', '30 cycles/min', [('Build Look', 2), ('Build Amount', 1), ('Build Speed', 30)], {'after': (2, 0.5, 60)}),
     ('Build Speed (slit waves)', '30 cycles/min', [('Build Look', 1), ('Build Amount', 1), ('Build Speed', 30), ('Spin Y', 30)], {'after': (2, 0.5, 60)}),
     ('Slit history ticks', 'spin 30', [('Build Look', 1), ('Build Amount', 1), ('Spin Y', 30)], {'after': (3600, 1, 120)}),
+    # LoadEhr W9 Cut: Cut Speed's cycle wraps at 1 (cross-section there and back; the reveal box's Lissajous path 1 : 2 : 3; the window's
+    # world one turn), the cross-section cap's scan lines at 1 (0.5 / s)
+    ('Cut Speed (cross-section)', '30 sweeps/min', [('Cut Look', 1), ('Cut Speed', 30)], {'after': (2, 0.5, 60)}),
+    ('Cut Speed (reveal box)', '30 /min', [('Cut Look', 2), ('Cut Speed', 30)], {'after': (2, 0.5, 60)}),
+    ('Cut scan lines', '0.5 /s', [('Cut Look', 1)], {'after': (2, 0.5, 60)}),
 ]
 # W26 / W28 features live in the Wow bundles only (Resolume's 512-param cap)
 # extra commands before the clocks are fast-forwarded (a second model)

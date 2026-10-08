@@ -1586,6 +1586,13 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 				DrawCracks( fs, model );      // W26: lava cracks
 			}
 		}
+		if( fs.x.window ) // W9 Stage C: the openings show another world (the dominant model's)
+		{
+			const bool dB = both && t >= 0.5f;
+			EnsureVAO( dB ? bReady : model );
+			DrawWindow( dB ? fsB : both ? fsA : fs, dB ? bReady : model );
+			EnsureVAO( model );
+		}
 		if( !fs.ghosts.empty() )
 		{
 			// past poses: behind the live mask (depth tested against it), newest first and writing depth, so

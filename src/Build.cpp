@@ -71,6 +71,62 @@ void main()
 }
 )GLSL";
 
+// the window's openings: a disc facing the mask's front at each eye opening (colour writes off: the stencil only)
+const char* kWinMarkVS = R"GLSL(
+uniform mat4 uViewProj;
+uniform vec3 uCenter, uU, uV;
+out vec2 vQ;
+void main()
+{
+	vec2 q      = vec2( ( gl_VertexID & 1 ) == 0 ? -1.0 : 1.0, ( gl_VertexID & 2 ) == 0 ? -1.0 : 1.0 );
+	vQ          = q;
+	gl_Position = uViewProj * vec4( uCenter + uU * q.x + uV * q.y, 1.0 );
+}
+)GLSL";
+const char* kWinMarkFS = R"GLSL(
+in vec2 vQ;
+out vec4 fragColor;
+void main()
+{
+	if( dot( vQ, vQ ) > 1.0 )
+		discard; // a disc (a small program: the end-of-shader rule is for the big variants)
+	fragColor = vec4( 0.0 );
+}
+)GLSL";
+// inside the openings: the depth reset to far and the other world's backdrop (a deep dark), or the projector's picture on a quad
+const char* kWinQuadVS = R"GLSL(
+uniform int uMode;           // 0 full screen (the backdrop, depth far), 1 the picture's quad (world corners)
+uniform mat4 uViewProj;
+uniform vec3 uCorner[ 4 ];
+out vec2 vUV;
+void main()
+{
+	vec2 q = vec2( ( gl_VertexID & 1 ) == 0 ? 0.0 : 1.0, ( gl_VertexID & 2 ) == 0 ? 0.0 : 1.0 );
+	vUV    = q;
+	if( uMode == 0 )
+		gl_Position = vec4( q * 2.0 - 1.0, 1.0, 1.0 ); // the far plane
+	else
+		gl_Position = uViewProj * vec4( uCorner[ gl_VertexID ], 1.0 );
+}
+)GLSL";
+const char* kWinQuadFS = R"GLSL(
+in vec2 vUV;
+uniform int uMode;
+uniform sampler2D uPicture;
+uniform vec3 uDeep;
+out vec4 fragColor;
+void main()
+{
+	if( uMode == 0 )
+	{
+		float v   = length( vUV - 0.5 );
+		fragColor = vec4( uDeep * ( 1.0 - 0.6 * v ), 1.0 );
+	}
+	else
+		fragColor = vec4( texture( uPicture, vUV ).rgb, 1.0 );
+}
+)GLSL";
+
 // the post pass with the black hole's lens (kPostFS + the lens: the plain post program is unchanged)
 const char* kPostLensFS = R"GLSL(
 in vec2 vUV;
@@ -233,8 +289,17 @@ bool Renderer::InitBuild( std::string& error )
 {
 	progCap      = Link( kCapVS, kCapFS, error );
 	progPostLens = Link( kQuadVS, kPostLensFS, error );
-	if( !progCap || !progPostLens )
+	progWinMark  = Link( kWinMarkVS, kWinMarkFS, error );
+	progWinQuad  = Link( kWinQuadVS, kWinQuadFS, error );
+	if( !progCap || !progPostLens || !progWinMark || !progWinQuad )
 		return false;
+	glUseProgram( progWinQuad );
+	glUniform1i( U( progWinQuad, "uPicture" ), 0 );
+	glGenSamplers( 1, &winSampler );
+	glSamplerParameteri( winSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+	glSamplerParameteri( winSampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glSamplerParameteri( winSampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glSamplerParameteri( winSampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 	glUseProgram( progPostLens );
 	glUniform1i( U( progPostLens, "uBase" ), 0 );
 	glUniform1i( U( progPostLens, "uBloom" ), 1 );
@@ -271,7 +336,9 @@ void Renderer::ReleaseBuild()
 	}
 	delTex( xDummy ), delBuf( xDummyBuf ), delTex( xHistTex ), delBuf( xHistBuf );
 	xHistCap = 0;
-	for( GLuint* p : { &progCap, &progPostLens } )
+	if( winSampler )
+		glDeleteSamplers( 1, &winSampler ), winSampler = 0;
+	for( GLuint* p : { &progCap, &progPostLens, &progWinMark, &progWinQuad } )
 		if( *p )
 			glDeleteProgram( *p ), *p = 0;
 }
@@ -331,14 +398,14 @@ GLuint Renderer::XGroupTex( GpuModel* model, bool want )
 }
 
 // the cut plane along the axis at cutPos of the model's extent: in world (normalised: distances are world units) and in fitted space
-void Renderer::XPlanes( const FrameState& fs, GpuModel* model, float* world, float* fitted, float& worldPerFitted ) const
+void Renderer::XPlanes( const FrameState& fs, GpuModel* model, float* world, float* fitted, float& worldPerFitted, int plane ) const
 {
 	const XState& x = fs.x;
 	const int a     = std::clamp( x.axis, 0, 2 );
 	const float* box = model && model->geometry ? model->geometry->fitBox : nullptr;
 	const float lo   = box ? box[ a ] : -1.0f, hi = box ? box[ 3 + a ] : 1.0f;
 	const float m    = 0.01f * ( hi - lo );
-	const float h    = lo - m + x.cutPos * ( hi - lo + 2.0f * m );
+	const float h    = lo - m + x.cutPos * ( hi - lo + 2.0f * m ) - ( plane == 1 ? x.slab * ( hi - lo ) : 0.0f ); // plane 1: the slab's lower face
 	for( int k = 0; k < 3; ++k )
 		fitted[ k ] = k == a ? 1.0f : 0.0f;
 	fitted[ 3 ] = -h;
@@ -386,7 +453,11 @@ void Renderer::SetXUniforms( GLuint p, const FrameState& fs, GpuModel* model )
 		glUniform1f( U( p, "uXGlow" ), x.glow );
 		const int a = std::clamp( x.axis, 0, 2 );
 		const float ext = model && model->geometry ? model->geometry->fitBox[ 3 + a ] - model->geometry->fitBox[ a ] : 2.0f;
-		glUniform1f( U( p, "uXBand" ), 0.012f * ext * wpf );
+		glUniform1i( U( p, "uXRegion" ), x.region );
+		glUniform2f( U( p, "uXSlab" ), x.slab * ext * wpf, x.slab * ext );
+		glUniform4fv( U( p, "uXBox" ), 1, x.box );
+		glUniform1f( U( p, "uXRound" ), x.round );
+		glUniform1f( U( p, "uXBand" ), x.region == 1 ? 0.025f : 0.012f * ext * wpf ); // the box's band is in fitted units
 		glUniform1f( U( p, "uXLayer" ), x.layers ? ext / 90.0f : 0.0f );
 	}
 }
@@ -407,13 +478,19 @@ void Renderer::DrawSide( GLuint prog, const FrameState& fs, GpuModel* model, con
 	solid.wire.on = false, solid.wireMix = 0.0f;
 	xCutNow = 1;
 	DrawModel( prog, solid, model, false, true, 0, nullptr, nullptr, inst );
-	if( fs.x.cap )
-		DrawCap( prog, solid, model );
-	if( fs.wire.on || fs.wireMix > 0.0f )
+	if( fs.x.cap && fs.x.region == 0 )
+	{
+		DrawCap( prog, solid, model, 0 );
+		if( fs.x.slab > 0.0f )
+			DrawCap( prog, solid, model, 1 ); // the slab's lower face
+	}
+	if( fs.wire.on || fs.wireMix > 0.0f || fs.x.removedWire )
 	{
 		FrameState rem = fs;
-		if( !rem.wire.on )
+		if( !rem.wire.on && fs.wireMix > 0.0f )
 			rem.wire.on = true, rem.wire.mode = 1, rem.wire.mix = fs.wireMix, rem.wireMix = 0.0f;
+		else if( !rem.wire.on ) // the reveal box's outside with Wire Mode Off: Wire Only, full strength
+			rem.wire.on = true, rem.wire.mode = 2, rem.wire.mix = 1.0f, rem.wire.back = 0, rem.wire.edges = 0;
 		xCutNow = 2;
 		DrawWired( prog, rem, model, inst );
 	}
@@ -424,10 +501,10 @@ void Renderer::DrawSide( GLuint prog, const FrameState& fs, GpuModel* model, con
 // along the ray counts), so an odd count = the plane is inside the solid there; then a quad in the plane draws where it is odd, depth
 // tested against the model (the kept part in front of it hides it). Open / non-watertight meshes: the parity is wrong where a hole
 // lets a ray miss a layer (stray cap patches, or none), as with any stencil capping.
-void Renderer::DrawCap( GLuint prog, const FrameState& fs, GpuModel* model )
+void Renderer::DrawCap( GLuint prog, const FrameState& fs, GpuModel* model, int plane )
 {
 	float world[ 4 ], fitted[ 4 ], wpf = 1;
-	XPlanes( fs, model, world, fitted, wpf );
+	XPlanes( fs, model, world, fitted, wpf, plane );
 	glEnable( GL_STENCIL_TEST );
 	glClearStencil( 0 );
 	glStencilMask( 0xFF );
@@ -565,5 +642,108 @@ void Renderer::WarmLooks( const FrameState& fs, GpuModel* model )
 	xCutNow = 1;
 	DrawCap( progSoup, d, model );
 	xCutNow = 0;
+}
+
+// WINDOW: the eye openings (a disc each, from the eye finder) and the glass parts mark the stencil where they show (depth tested: a rim in
+// front hides its disc); a model without either becomes a window as a whole (its silhouette). There the depth is reset to far, a deep
+// backdrop drawn, and the other world: another model slot in its own place behind the mask (bigger, turning), or the projector's picture
+// on a quad behind it (Wow bundles, Proj Enable)
+void Renderer::DrawWindow( const FrameState& fs, GpuModel* model )
+{
+	const XState& x = fs.x;
+	Mat4 V, P;
+	std::memcpy( V.m, fs.view, sizeof( V.m ) );
+	std::memcpy( P.m, fs.proj, sizeof( P.m ) );
+	const Mat4 VP = P * V;
+	glEnable( GL_STENCIL_TEST );
+	glClearStencil( 0 );
+	glStencilMask( 0xFF );
+	glClear( GL_STENCIL_BUFFER_BIT );
+	glStencilFunc( GL_ALWAYS, 1, 0xFF );
+	glStencilOp( GL_KEEP, GL_KEEP, GL_REPLACE );
+	glColorMask( GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE );
+	glDepthMask( GL_FALSE );
+	glEnable( GL_DEPTH_TEST );
+	glDisable( GL_BLEND );
+	bool any = false;
+	glUseProgram( progWinMark );
+	glUniformMatrix4fv( U( progWinMark, "uViewProj" ), 1, GL_FALSE, VP.m );
+	glDepthFunc( GL_LESS );
+	glBindVertexArray( quadVAO );
+	for( int e = 0; e < 2; ++e )
+	{
+		if( x.eyes[ e ][ 3 ] <= 0.0f )
+			continue;
+		float n[ 3 ] = { x.front[ 0 ], x.front[ 1 ], x.front[ 2 ] }, t[ 3 ] = { 0, 1, 0 }, u[ 3 ], v[ 3 ];
+		if( std::fabs( n[ 1 ] ) > 0.9f )
+			t[ 0 ] = 1, t[ 1 ] = 0;
+		Mat4::Cross( n, t, u );
+		Mat4::Norm( u );
+		Mat4::Cross( n, u, v );
+		for( int k = 0; k < 3; ++k )
+			u[ k ] *= x.eyes[ e ][ 3 ], v[ k ] *= x.eyes[ e ][ 3 ];
+		glUniform3fv( U( progWinMark, "uCenter" ), 1, x.eyes[ e ] );
+		glUniform3fv( U( progWinMark, "uU" ), 1, u );
+		glUniform3fv( U( progWinMark, "uV" ), 1, v );
+		glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+		any = true;
+	}
+	bool glass = false;
+	for( const GpuPart& gp : model->parts )
+		glass = glass || gp.glass > 0.0f;
+	if( glass || !any )
+	{
+		// the glass parts (or, with no opening at all, the whole model) where they are in front
+		FrameState f = fs;
+		f.wire.on = false, f.wireMix = 0.0f, f.x.cut = 0;
+		glDepthFunc( GL_LEQUAL );
+		glassFilter = glass ? 1 : 0;
+		const bool soup = f.explode > 0.0f || f.shape.on;
+		EnsureVAO( model );
+		DrawModel( soup ? progSoup : progMain, f, model, false, soup, 0, nullptr, nullptr, f.inst.empty() ? nullptr : &f.inst );
+		glassFilter = 0;
+		glBindVertexArray( quadVAO );
+	}
+	glColorMask( GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE );
+	glDepthMask( GL_TRUE );
+	glStencilFunc( GL_EQUAL, 1, 0xFF );
+	glStencilOp( GL_KEEP, GL_KEEP, GL_KEEP );
+	// the backdrop at the far plane (depth reset there)
+	glDepthFunc( GL_ALWAYS );
+	glUseProgram( progWinQuad );
+	glUniform1i( U( progWinQuad, "uMode" ), 0 );
+	glUniform3f( U( progWinQuad, "uDeep" ), 0.02f + 0.06f * x.color[ 0 ], 0.02f + 0.06f * x.color[ 1 ], 0.03f + 0.06f * x.color[ 2 ] );
+	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+	glDepthFunc( GL_LESS );
+	if( x.winPicture && windowPic )
+	{
+		glUniform1i( U( progWinQuad, "uMode" ), 1 );
+		glUniformMatrix4fv( U( progWinQuad, "uViewProj" ), 1, GL_FALSE, VP.m );
+		glUniform3fv( U( progWinQuad, "uCorner" ), 4, &x.winQuad[ 0 ][ 0 ] );
+		glActiveTexture( GL_TEXTURE0 );
+		glBindTexture( GL_TEXTURE_2D, windowPic );
+		glBindSampler( 0, winSampler ); // level 0, linear: the picture may carry no mips (a video without Focus)
+		glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
+		glBindSampler( 0, 0 );
+		glBindTexture( GL_TEXTURE_2D, 0 );
+	}
+	else if( x.winModel && x.winModel->Complete() )
+	{
+		// the other world: a model slot drawn plainly in its own place (its own fit, the frame's lights)
+		FrameState w = fs;
+		std::memcpy( w.model, x.winM, sizeof( w.model ) );
+		w.modelScale = x.winScale;
+		w.inst.clear(), w.ghosts.clear();
+		w.wire.on = false, w.wireMix = 0.0f, w.x = XState(), w.shape = ShapeState(), w.dissolve = 0.0f, w.explode = 0.0f, w.morph = MorphState();
+		w.letterXf.clear();
+		const int keep = activeSide;
+		EnsureVAO( x.winModel );
+		DrawModel( progMain, w, x.winModel, false, false, 0 );
+		activeSide = keep;
+		EnsureVAO( model );
+	}
+	glBindVertexArray( 0 );
+	glStencilMask( 0xFF );
+	glDisable( GL_STENCIL_TEST );
 }
 }
