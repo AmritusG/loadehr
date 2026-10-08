@@ -9,6 +9,7 @@
 //   DXV (W3): DXVKit (third_party/dxvkit, our clean-room MIT decoder) opens every file first; a DXV track (DXV3 DXT1 / DXT5 / YCG6 /
 //     YG10, legacy DXDI) is read and decoded to its BCn block planes here (random access, no AVFoundation) and uploaded like HAP.
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
 #include <cstdint>
 #include <map>
@@ -46,29 +47,49 @@ public:
 	std::string Info() const; // codec, size, fps, duration (or the error)
 	double Duration() const { return duration; }
 	double FrameDuration() const { return frameDur; }
+	int Frames() const { return frames; }
+	std::string Codec() const; // short: "DXV YCG6", "avc1", "Hap1", ...
 	// render thread: the frame to show at `pos` seconds while playing forward (or backward); never blocks. `pos` is the play
 	// position already wrapped / mirrored into 0..Duration by the caller; `loop` = the frames after the end are the first ones.
-	std::shared_ptr< const VideoFrame > Frame( double pos, bool forward, bool loop );
+	// W4 hold 1 (Scrub) / 2 (a cue waiting): the frame at `pos` exactly; until it is decoded the last frame shown stays (Scrub: from
+	// the 3rd render waiting, the decoded frame nearest to it on the way). The direction = the way it moved.
+	std::shared_ptr< const VideoFrame > Frame( double pos, bool forward, bool loop, int hold = 0 );
 	// stats (Debug Log): frames decoded, decode ms (worker), frames shown late
 	uint64_t decoded = 0, late = 0;
 	double decodeMs = 0;
 	size_t cacheBytes = 0;
+	// W4 scrub latency (render thread): per scrub target reached, ms from the request to the frame returned, and the renders that
+	// showed another frame meanwhile; `superseded` = targets replaced by a newer one before they arrived. TakeScrub() empties them.
+	struct ScrubStat
+	{
+		int frame;
+		double ms;
+		int held;
+	};
+	std::vector< ScrubStat > TakeScrub( uint64_t* superseded );
 
 private:
 	void Run();
 	bool RunDxv();                          // false: not a DXV file (AVFoundation reads it)
 	int Window( std::vector< int >& need ); // mtx held: the frames wanted around the request; the first missing one (-1 = none)
-	std::string path, info;
+	std::string path, info, codec;
 	std::atomic< bool > ready{ false }, failed{ false }, stop{ false };
 	double duration = 0, frameDur = 1.0 / 30.0;
 	int frames = 0;
+	int behind = 6;         // frames kept in the play direction when it runs backward (AVFoundation: more, by a memory budget)
+	std::vector< int > keys; // AVFoundation: the sync (key) frames, ascending; empty = every frame is one (DXV, HAP, ProRes)
 	std::thread worker;
 	mutable std::mutex mtx;
 	std::condition_variable cv;
 	// the request (render thread -> worker) and the decoded frames (worker -> render thread)
 	double wantPos = 0;
-	bool wantForward = true, wantLoop = true;
+	bool wantForward = true, wantLoop = true, wantScrub = false;
 	uint64_t wantSerial = 0;
+	// W4 scrub latency
+	int scrubTarget = -1, scrubHeld = 0;
+	std::chrono::steady_clock::time_point scrubT0;
+	std::vector< ScrubStat > scrubStats;
+	uint64_t scrubSuperseded = 0;
 	std::map< int, std::shared_ptr< const VideoFrame > > cache;
 	std::shared_ptr< const VideoFrame > last;
 };

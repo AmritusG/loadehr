@@ -639,8 +639,13 @@ X( P_PROJ_ENABLE, "Proj Enable", BOOL, 0, 1, 0, "Projector", "", 0 )
 X( P_PROJ_SOURCE, "Proj Source", OPT, 0, 1, 0, "Projector", "Input|File", 0 )
 #endif
 X( P_PROJ_FILE, "Proj File", FILE, 0, 0, 0, "Projector", "", 0 )
-X( P_VIDEO_SPEED, "Video Speed", STD, 0, 4, 1, "Projector", "", 0 )        // x real time
-X( P_VIDEO_LOOP, "Video Loop", OPT, 0, 2, 0, "Projector", "Loop|Ping-Pong|Once", 0 )
+X( P_VIDEO_SPEED, "Video Speed", STD, -4, 4, 1, "Projector", "", 0 )       // x real time (W4: < 0 plays backwards)
+// W4: Scrub = no clock, the frame shown is Video Position (drag it, map a fader, or give it an Arena timeline animation = a transport)
+X( P_VIDEO_LOOP, "Video Loop", OPT, 0, 3, 0, "Projector", "Loop|Ping-Pong|Once|Scrub", 0 )
+// W4: the clip position 0..1, frame-quantised. Scrub: the frame shown. Loop / Ping-Pong / Once: a user change CUES (the clock jumps
+// there and plays on); while playing the plugin pushes its own position here ~15 / s (the playhead; a pushed value is no cue)
+X( P_VIDEO_POS, "Video Position", STD, 0, 1, 0, "Projector", "", 0 )
+X( P_VIDEO_TIME, "Video Time", TEXT, 0, 0, 0, "Projector", "", 0 ) // read-only: "mm:ss.f / mm:ss.f  frame n / N  codec"
 X( P_VIDEO_RESTART, "Video Restart", EVENT, 0, 1, 0, "Projector", "", 0 )  // back to the first frame (a clip trigger does it too)
 // W3: how a video's alpha is read (the file does not say; Arena asks per clip, Premultiplied by default). Straight = colour x alpha in
 // the copy pass (W2's behaviour for every codec); Premultiplied = the colour as it is. Every codec with alpha.

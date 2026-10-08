@@ -366,6 +366,8 @@ public:
 			crackManual = true;
 		if( index == P_VIDEO_RESTART && press )
 			videoRestart = true; // W2
+		if( index == P_VIDEO_POS && value != values[ index ] && !PushEcho( value ) )
+			videoCue = std::clamp( value, 0.0f, 1.0f ); // W4: a user change (the latest wins); in Loop / Ping-Pong / Once it cues
 		if( index == P_SWARM_RELEASE && press )
 			swarmRelease = true; // W26
 		if( index == P_STRIKE && press )
@@ -406,8 +408,8 @@ public:
 		const std::string v = value ? value : "";
 		if( SlotOfParam( index, SF_FILE ) >= 0 )
 			SetModelFile( SlotOfParam( index, SF_FILE ), v );
-		else if( SlotOfParam( index, SF_STATUS ) >= 0 )
-			RaiseParamEvent( index, FF_EVENT_FLAG_VALUE ); // read-only: answer with the real status
+		else if( SlotOfParam( index, SF_STATUS ) >= 0 || index == P_VIDEO_TIME )
+			RaiseParamEvent( index, FF_EVENT_FLAG_VALUE ); // read-only: answer with the real status / video time
 		else if( index == P_POSE_DATA )
 			ParsePoses( v );
 		else if( index == P_LC_PLACED )
@@ -2877,6 +2879,7 @@ private:
 			projImageJob.reset();
 			projImage.reset();
 			video.reset();
+			SetVideoTime( "" );
 			std::string ext = file.substr( file.find_last_of( '.' ) + 1 );
 			std::transform( ext.begin(), ext.end(), ext.begin(), ::tolower );
 			if( ext == "mov" || ext == "mp4" || ext == "m4v" )
@@ -2937,27 +2940,104 @@ private:
 	}
 	// W2: the video's play position. Loop: wraps at the clip length; Ping-Pong: a clock wrapped at twice the length, mirrored back;
 	// Once: runs to the end and holds the last frame. Video Speed x real time; Video Restart / a clip trigger: back to the start.
+	// W4: Video Speed < 0 plays backwards (Loop / Ping-Pong wrap the same; Once runs back to frame 0 and holds it; a restart of Once
+	// at a negative speed starts from the end). Scrub: no clock, the frame = round(Video Position x (frames - 1)). A user change
+	// of Video Position in the other modes cues (the clock jumps to that frame and plays on); the plugin pushes its own position
+	// into Video Position ~15 times a second (the playhead), and Video Time a few times a second.
 	std::shared_ptr< const VideoFrame > VideoClock( float dt )
 	{
 		if( video->Failed() )
 		{
 			if( !videoLogged )
 				Log( "PROJ video %s: %s", projImageFile.c_str(), video->Info().c_str() ), videoLogged = true;
+			SetVideoTime( "video failed: " + video->Info() );
 			return nullptr;
 		}
 		if( !video->Ready() )
 			return nullptr;
 		if( !videoLogged )
 			Log( "PROJ video %s: %s", projImageFile.c_str(), video->Info().c_str() ), videoLogged = true;
-		const double len = std::max( video->Duration(), video->FrameDuration() );
-		const int mode   = std::clamp( Opt( P_VIDEO_LOOP ), 0, 2 );
+		const double fd  = video->FrameDuration();
+		const int n      = std::max( 1, video->Frames() );
+		const double len = std::max( video->Duration(), fd );
+		const int mode   = std::clamp( Opt( P_VIDEO_LOOP ), 0, 3 );
+		const double spd = values[ P_VIDEO_SPEED ];
+		auto at          = [ & ]( float p ) { return int( std::lround( std::clamp( p, 0.0f, 1.0f ) * ( n - 1 ) ) ); }; // position -> frame
+		if( mode == 3 )
+		{
+			// SCRUB: the frame is the slider; the clock waits there (switching back to a playing mode plays on from this frame)
+			const int i       = at( values[ P_VIDEO_POS ] );
+			const bool fwd    = i >= videoScrubLast;
+			videoScrubLast    = i;
+			clk.video         = ( i + 0.5 ) * fd;
+			videoCue          = -1.0f, videoRestart = false;
+			auto f            = video->Frame( ( i + 0.5 ) * fd, fwd, false, 1 );
+			VideoStats( dt, i, n, fd );
+			return f;
+		}
+		const bool back0 = mode == 1 && clk.video >= len; // Ping-Pong's half the clock is in before this frame
+		if( videoCue >= 0.0f )
+		{
+			const double t = ( at( videoCue ) + 0.5 ) * fd; // the middle of the cued frame
+			clk.video      = mode == 1 && back0 ? 2.0 * len - t : t;
+			videoCueHold   = at( videoCue ), videoCueWait = 0.0f; // the clock waits on the cued frame until it is on screen
+			videoCue       = -1.0f;
+		}
 		if( videoRestart )
-			clk.video = 0.0, videoRestart = false;
-		const double adv = double( dt ) * values[ P_VIDEO_SPEED ];
-		clk.video        = mode == 0 ? Wrap( clk.video + adv, len ) : mode == 1 ? Wrap( clk.video + adv, 2.0 * len ) : std::min( clk.video + adv, len );
+			clk.video = mode == 2 && spd < 0.0 ? len : 0.0, videoRestart = false, videoCueHold = -1; // a trigger after a cue in the same frame: the restart wins
+		if( videoCueHold >= 0 && ( videoCueWait += dt ) > 1.0f )
+			videoCueHold = -1; // not decoded within 1 s: play on regardless
+		const double adv = videoCueHold >= 0 ? 0.0 : double( dt ) * spd;
+		clk.video        = mode == 0 ? Wrap( clk.video + adv, len ) : mode == 1 ? Wrap( clk.video + adv, 2.0 * len ) : std::clamp( clk.video + adv, 0.0, len );
 		const bool back  = mode == 1 && clk.video >= len;
-		const double pos = back ? 2.0 * len - clk.video : std::min( clk.video, len - 0.5 * video->FrameDuration() );
-		auto f           = video->Frame( pos, !back, mode == 0 );
+		const double pos = std::min( back ? 2.0 * len - clk.video : clk.video, len - 0.5 * fd );
+		// while a cue waits, the last frame stays (as in Scrub: no frame from before the cue is shown; its latency counts as a SCRUB line)
+		auto f           = video->Frame( pos, ( spd >= 0.0 ) != back, mode == 0, videoCueHold >= 0 ? 2 : 0 );
+		if( f && f->index == videoCueHold )
+			videoCueHold = -1;
+		const int i      = std::clamp( int( std::floor( pos / fd + 1e-4 ) ), 0, n - 1 );
+		videoScrubLast   = i;
+		// the playhead: Video Position follows the play position (rate-limited; Arena reads it back and may echo it late, SCOTTY-005)
+		videoPushT += dt;
+		const float pv = n > 1 ? float( i ) / float( n - 1 ) : 0.0f;
+		if( videoPushT >= 1.0f / 15.0f && pv != values[ P_VIDEO_POS ] )
+		{
+			videoPushT          = 0.0f;
+			values[ P_VIDEO_POS ] = pv;
+			videoPushed[ videoPushN++ % 8 ] = pv;
+			RaiseParamEvent( P_VIDEO_POS, FF_EVENT_FLAG_VALUE );
+		}
+		VideoStats( dt, i, n, fd );
+		return f;
+	}
+	// a host set equal to one of the last 8 pushed playhead values is Arena writing our own value back, not a user cue
+	bool PushEcho( float v ) const
+	{
+		for( float p : videoPushed )
+			if( p >= 0.0f && std::fabs( p - v ) < 1e-6f )
+				return true;
+		return false;
+	}
+	void SetVideoTime( const std::string& t )
+	{
+		if( t == texts[ P_VIDEO_TIME ] )
+			return;
+		texts[ P_VIDEO_TIME ] = t;
+		RaiseParamEvent( P_VIDEO_TIME, FF_EVENT_FLAG_VALUE );
+	}
+	// Video Time ~5 times a second; Debug Log: the VIDEO line and the scrub latencies once a second
+	void VideoStats( float dt, int i, int n, double fd )
+	{
+		videoTimeT += dt;
+		if( videoTimeT >= 0.2f )
+		{
+			videoTimeT  = 0.0f;
+			auto mmss   = []( double s ) {
+				const long t = std::lround( s * 10.0 ); // tenths
+				return Fmt( "%02ld:%02ld.%ld", t / 600, t / 10 % 60, t % 10 );
+			};
+			SetVideoTime( mmss( i * fd ) + " / " + mmss( n * fd ) + Fmt( "  frame %d / %d  ", i + 1, n ) + video->Codec() );
+		}
 		// Debug Log: one VIDEO line per second (frames shown late = the last decoded frame stood in; the drops are only logged here)
 		videoStatT += dt;
 		if( LogVerbose() && videoStatT >= 1.0f )
@@ -2965,9 +3045,21 @@ private:
 			Log( "VIDEO %s | decoded %llu (%.2f ms each, worker), late %llu (+%llu), upload %.2f ms (render thread%s), cache %.0f MB", FileName( projImageFile ).c_str(),
 			     (unsigned long long)video->decoded, video->decoded ? video->decodeMs / video->decoded : 0.0, (unsigned long long)video->late,
 			     (unsigned long long)( video->late - videoLateLogged ), renderer.videoUploadMs, values[ P_PROJ_FOCUS ] > 0.0f ? ", + mips" : "", video->cacheBytes / 1048576.0 );
-			videoLateLogged = video->late, videoStatT = 0.0f;
+			videoLateLogged = video->late;
 		}
-		return f;
+		if( videoStatT >= 1.0f )
+		{
+			videoStatT   = 0.0f;
+			uint64_t sup = 0;
+			const auto scrubs = video->TakeScrub( &sup ); // drained every second, logged with Debug Log
+			if( LogVerbose() )
+			{
+				for( const auto& st : scrubs )
+					Log( "SCRUB %s frame %d: %.2f ms, held %d", FileName( projImageFile ).c_str(), st.frame, st.ms, st.held );
+				if( sup )
+					Log( "SCRUB %s: %llu targets superseded", FileName( projImageFile ).c_str(), (unsigned long long)sup );
+			}
+		}
 	}
 	struct ProjDecode
 	{
@@ -3846,6 +3938,13 @@ private:
 	std::string projImageFile;
 	std::shared_ptr< VideoPlayer > video; // W2: Proj File is a video
 	bool videoRestart = true, videoLogged = false;
+	float videoCue = -1.0f;        // W4: a user's Video Position change waiting to cue (-1 = none)
+	int videoCueHold = -1;         // the cued frame the clock waits on until it is shown (-1 = none)
+	float videoCueWait = 0.0f;
+	int videoScrubLast = 0;        // the frame shown last (the scrub direction)
+	float videoPushT = 0.0f, videoTimeT = 1.0f;
+	float videoPushed[ 8 ] = { -1, -1, -1, -1, -1, -1, -1, -1 }; // the last pushed playhead values (echo filter)
+	unsigned videoPushN = 0;
 	uint64_t videoLateLogged = 0;
 	float videoStatT = 0.0f;
 	std::shared_ptr< struct ProjDecode > projImageJob;

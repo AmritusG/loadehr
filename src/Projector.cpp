@@ -220,7 +220,12 @@ bool Renderer::UploadVideoFrame( const VideoFrame& f, bool mips, bool straight )
 		glPixelStorei( GL_PACK_ALIGNMENT, 1 );
 		glReadPixels( 0, 0, w, h, GL_RGBA, GL_UNSIGNED_BYTE, px.data() );
 		char name[ 1024 ];
-		snprintf( name, sizeof( name ), "%s%d_%dx%d.rgba", dump, f.index, w, h );
+		static const bool seq = getenv( "LOADEHR_VIDEO_DUMP_SEQ" ) != nullptr; // W4: <sequence>_<frame>_<w>x<h>.rgba (the order shown)
+		static int dumpSeq    = 0;
+		if( seq )
+			snprintf( name, sizeof( name ), "%s%06d_%d_%dx%d.rgba", dump, dumpSeq++, f.index, w, h );
+		else
+			snprintf( name, sizeof( name ), "%s%d_%dx%d.rgba", dump, f.index, w, h );
 		if( FILE* o = fopen( name, "wb" ) )
 			fwrite( px.data(), 1, px.size(), o ), fclose( o );
 	}

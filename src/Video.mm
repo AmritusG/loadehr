@@ -6,6 +6,7 @@
 #import <CoreMedia/CoreMedia.h>
 #import <CoreVideo/CoreVideo.h>
 #include <algorithm>
+#include <climits>
 #include <chrono>
 #include <cmath>
 #include <cstring>
@@ -258,18 +259,66 @@ std::string VideoPlayer::Info() const
 	return info;
 }
 
-std::shared_ptr< const VideoFrame > VideoPlayer::Frame( double pos, bool forward, bool loop )
+std::string VideoPlayer::Codec() const
 {
 	std::lock_guard< std::mutex > lock( mtx );
-	wantPos = pos, wantForward = forward, wantLoop = loop, ++wantSerial;
+	return codec;
+}
+
+std::vector< VideoPlayer::ScrubStat > VideoPlayer::TakeScrub( uint64_t* superseded )
+{
+	std::lock_guard< std::mutex > lock( mtx );
+	std::vector< ScrubStat > r;
+	r.swap( scrubStats );
+	if( superseded )
+		*superseded = scrubSuperseded;
+	scrubSuperseded = 0;
+	return r;
+}
+
+std::shared_ptr< const VideoFrame > VideoPlayer::Frame( double pos, bool forward, bool loop, int hold )
+{
+	std::lock_guard< std::mutex > lock( mtx );
+	const bool scrub = hold != 0;
+	wantPos = pos, wantForward = forward, wantLoop = loop, wantScrub = scrub, ++wantSerial;
 	cv.notify_one();
 	if( frames <= 0 )
 		return last;
 	const int target = std::clamp( int( std::floor( pos / frameDur + 1e-4 ) ), 0, frames - 1 );
+	if( !scrub )
+		scrubTarget = -1;
+	else if( target != scrubTarget )
+	{
+		if( scrubTarget >= 0 )
+			++scrubSuperseded; // a newer position before the last one arrived (a fast drag: the latest wins)
+		scrubTarget = target, scrubHeld = 0, scrubT0 = std::chrono::steady_clock::now();
+		if( last && last->index == target )
+			scrubTarget = -1; // already on screen
+	}
 	auto it = cache.find( target );
 	std::shared_ptr< const VideoFrame > pick;
 	if( it != cache.end() )
+	{
 		pick = it->second;
+		if( scrub && scrubTarget == target )
+		{
+			scrubStats.push_back( { target, std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - scrubT0 ).count(), scrubHeld } );
+			scrubTarget = -1;
+		}
+	}
+	else if( scrub )
+	{
+		// never a black frame: until the wanted one is decoded, the decoded frame nearest to it on the way from the last one shown
+		// (from the 3rd render waiting: a fast drag on a long-GOP file moves on through what the reader delivers instead of freezing),
+		// else the last one stays
+		pick = last;
+		if( last && hold == 1 && scrubHeld >= 2 )
+			for( const auto& kv : cache )
+				if( std::min( last->index, target ) <= kv.first && kv.first <= std::max( last->index, target ) &&
+				    std::abs( kv.first - target ) < std::abs( pick->index - target ) )
+					pick = kv.second;
+		++scrubHeld;
+	}
 	else
 	{
 		// not decoded yet: the nearest frame behind the play position, else the last one shown
@@ -290,8 +339,13 @@ std::shared_ptr< const VideoFrame > VideoPlayer::Frame( double pos, bool forward
 // the cache. Returns the first frame to decode (the one just behind the play position is kept, never fetched), -1 = none.
 int VideoPlayer::Window( std::vector< int >& need )
 {
-	const int t = std::clamp( int( std::floor( wantPos / frameDur + 1e-4 ) ), 0, frames - 1 );
-	for( int k = -1; k <= kAhead; ++k )
+	// backward, the window also keeps a whole chunk below the near frames: a chunk is read (forward) only once a frame within kAhead
+	// of the play position is missing, and every frame it delivers stays until the play position passes it (W4: with a window of
+	// `behind` frames each chunk re-read ~31 frames to keep 2 and one-key-frame H.264 fell behind)
+	const int t     = std::clamp( int( std::floor( wantPos / frameDur + 1e-4 ) ), 0, frames - 1 );
+	const int reach = wantForward ? kAhead : kAhead + behind;
+	int first       = -1;
+	for( int k = -1; k <= reach; ++k )
 	{
 		int i = wantForward ? t + k : t - k;
 		if( wantLoop )
@@ -300,13 +354,12 @@ int VideoPlayer::Window( std::vector< int >& need )
 			continue;
 		if( std::find( need.begin(), need.end(), i ) == need.end() )
 			need.push_back( i );
+		// the one just behind the play position is kept, never fetched (a frame the wrap also puts ahead, e.g. a 1-frame clip, is)
+		if( first < 0 && k >= 0 && k <= kAhead && !cache.count( i ) )
+			first = i;
 	}
 	for( auto it = cache.begin(); it != cache.end(); )
 		it = std::find( need.begin(), need.end(), it->first ) == need.end() ? cache.erase( it ) : std::next( it );
-	int first = -1;
-	for( int i : need )
-		if( !cache.count( i ) && first < 0 && i != ( wantForward ? t - 1 : t + 1 ) )
-			first = i;
 	cacheBytes = 0;
 	for( const auto& kv : cache )
 		cacheBytes += kv.second->Bytes();
@@ -341,7 +394,8 @@ bool VideoPlayer::RunDxv()
 		char b[ 200 ];
 		snprintf( b, sizeof( b ), "DXV %s %ux%u, %.4g fps, %.2f s (%d frames), DXVKit: block upload", dxvk_variant_name( variant ), in.width, in.height,
 		          1.0 / frameDur, duration, frames );
-		info = b;
+		info  = b;
+		codec = std::string( "DXV " ) + dxvk_variant_name( variant );
 	}
 	ready.store( true );
 	while( !stop.load() )
@@ -407,8 +461,8 @@ void VideoPlayer::Run()
 			return;
 		}
 		CMFormatDescriptionRef fd = track.formatDescriptions.count ? (__bridge CMFormatDescriptionRef)track.formatDescriptions[ 0 ] : nullptr;
-		const uint32_t codec      = fd ? CMFormatDescriptionGetMediaSubType( fd ) : 0;
-		const std::string cc      = FourCC( codec );
+		const uint32_t sub        = fd ? CMFormatDescriptionGetMediaSubType( fd ) : 0;
+		const std::string cc      = FourCC( sub );
 		const bool hap            = cc == "Hap1" || cc == "Hap5" || cc == "HapY" || cc == "HapM" || cc == "HapA";
 		const CGSize sz           = track.naturalSize;
 		const int W = int( std::lround( sz.width ) ), H = int( std::lround( sz.height ) );
@@ -424,18 +478,99 @@ void VideoPlayer::Run()
 			frames   = std::max( 1, int( std::lround( duration * fps ) ) );
 			char b[ 160 ];
 			snprintf( b, sizeof( b ), "%s %dx%d, %.3g fps, %.2f s (%d frames)%s", cc.c_str(), W, H, fps, duration, frames, hap ? ", HAP: block upload" : ", decoded to BGRA IOSurface" );
-			info = b;
+			info  = b;
+			codec = cc;
+			// backward play reads chunks forward from a few frames before the play position: keep more of them (fewer reader restarts,
+			// each of which decodes from the key frame before it) within ~256 MB of decoded frames
+			behind = hap ? 24 : std::clamp( int( ( 256ull << 20 ) / ( size_t( std::max( 1, W ) ) * std::max( 1, H ) * 4 ) ) - kAhead, kAhead, 30 );
 			if( cc == "Hap7" || cc == "HapH" )
 				info = cc + ": BC7 / BC6 HAP is not supported (GL 4.1 on this Mac has no BPTC)", failed.store( true );
 		}
 		if( failed.load() )
 			return;
+		// W4: the key frames (a reader opened at frame i decodes from the key frame at or before i). All-intra codecs: every frame.
+		std::vector< int > syncs;
+		bool allSync = true;
+		if( track.canProvideSampleCursors )
+			if( AVSampleCursor* c = [track makeSampleCursorAtFirstSampleInDecodeOrder] )
+				do
+				{
+					if( c.currentSampleSyncInfo.sampleIsFullSync )
+						syncs.push_back( std::clamp( int( std::lround( CMTimeGetSeconds( c.presentationTimeStamp ) * fps ) ), 0, frames - 1 ) );
+					else
+						allSync = false;
+				} while( [c stepInDecodeOrderByCount:1] == 1 && !stop.load() );
+		std::sort( syncs.begin(), syncs.end() );
+		{
+			std::lock_guard< std::mutex > lock( mtx );
+			if( !allSync )
+				keys = syncs;
+			char b[ 64 ];
+			snprintf( b, sizeof( b ), allSync ? ", every frame a key frame" : ", %zu key frames", syncs.size() );
+			info += b;
+		}
+		// frames decoded to reach frame i by opening a reader there
+		auto keyCost = [ & ]( int i ) {
+			if( keys.empty() )
+				return 0;
+			auto k = std::upper_bound( keys.begin(), keys.end(), i );
+			return i - ( k == keys.begin() ? 0 : *( k - 1 ) );
+		};
+		constexpr int kOpenCost = 16; // a new reader, in frames delivered (measured W4: cancel ~15 ms + start ~15 ms + first sample ~9 ms)
 		ready.store( true );
 		NSDictionary* settings = hap ? nil : @{ (id)kCVPixelBufferPixelFormatTypeKey : @( kCVPixelFormatType_32BGRA ), (id)kCVPixelBufferIOSurfacePropertiesKey : @{},
 		                                         (id)kCVPixelBufferOpenGLCompatibilityKey : @YES };
 		AVAssetReader* reader             = nil;
 		AVAssetReaderTrackOutput* output  = nil;
 		int readerNext                    = -1; // the frame the open reader delivers next (-1 = none)
+		// one sample -> the cache if it is wanted (HAP: the raw sections decoded; else the BGRA IOSurface buffer kept); its frame index
+		auto take = [ & ]( CMSampleBufferRef sb, const std::vector< int >& need, std::chrono::steady_clock::time_point c0 ) {
+			const double pts = CMTimeGetSeconds( CMSampleBufferGetPresentationTimeStamp( sb ) );
+			const int idx    = std::clamp( int( std::lround( pts / frameDur ) ), 0, frames - 1 );
+			if( CMSampleBufferGetNumSamples( sb ) == 0 )
+				return -1;
+			bool wanted;
+			{
+				std::lock_guard< std::mutex > lock( mtx );
+				wanted = std::find( need.begin(), need.end(), idx ) != need.end() && !cache.count( idx );
+			}
+			if( !wanted )
+				return idx;
+			auto f = std::make_shared< VideoFrame >();
+			f->pts = idx * frameDur, f->index = idx, f->w = W, f->h = H, f->serial = ( 1ull << 62 ) + ++g_frameSerial; // never equal to a still image's serial
+			f->tw = ( W + 3 ) / 4 * 4, f->th = ( H + 3 ) / 4 * 4;
+			bool ok = true;
+			if( hap )
+			{
+				CMBlockBufferRef bb = CMSampleBufferGetDataBuffer( sb );
+				const size_t n      = bb ? CMBlockBufferGetDataLength( bb ) : 0;
+				std::vector< uint8_t > bytes( n );
+				std::string error;
+				ok = n > 0 && CMBlockBufferCopyDataBytes( bb, 0, n, bytes.data() ) == kCMBlockBufferNoErr && DecodeHapFrame( bytes.data(), n, W, H, *f, error );
+				if( !ok && error.empty() )
+					error = "HAP: empty sample (" + std::to_string( n ) + " bytes, " + std::to_string( CMSampleBufferGetNumSamples( sb ) ) + " samples)";
+				if( !ok )
+				{
+					std::lock_guard< std::mutex > lock( mtx );
+					info = error, failed.store( true );
+				}
+			}
+			else if( CVImageBufferRef ib = CMSampleBufferGetImageBuffer( sb ) )
+			{
+				f->pixelBuffer = (void*)CVPixelBufferRetain( (CVPixelBufferRef)ib );
+				f->w = (int)CVPixelBufferGetWidth( (CVPixelBufferRef)ib ), f->h = (int)CVPixelBufferGetHeight( (CVPixelBufferRef)ib );
+			}
+			else
+				ok = false;
+			if( ok )
+			{
+				std::lock_guard< std::mutex > lock( mtx );
+				cache[ idx ] = f;
+				++decoded;
+				decodeMs += std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - c0 ).count();
+			}
+			return idx;
+		};
 		while( !stop.load() )
 		{
 			std::vector< int > need;
@@ -449,13 +584,26 @@ void VideoPlayer::Run()
 					continue;
 				}
 			}
-			const bool fwd = wantForward;
-			// keep reading the open reader if it is about to reach the frame; else open one there (backward: a few frames before it)
-			if( !reader || readerNext < 0 || readerNext > first || first - readerNext > 12 )
+			bool fwd, scrub;
+			{
+				std::lock_guard< std::mutex > lock( mtx );
+				fwd = wantForward, scrub = wantScrub;
+			}
+			// where a new reader would start: the frame (forward); backward a chunk before it read forward, all kept (scrub: no
+			// earlier than its key frame, so the wanted frame is not delayed by frames that are not decoded anyway)
+			int start = fwd ? first : std::max( 0, first - behind );
+			if( !fwd && scrub ) // no earlier than the key frame, but at least kAhead frames (all-intra: a backward drag is not one reader per frame)
+				start = std::max( start, first - std::max( keyCost( first ), kAhead ) );
+			// W4: keep reading the open reader while that delivers fewer frames than a new reader would (key frame to the frame + a
+			// restart, ~16 frames' worth: cancel ~15 ms + start ~15 ms + first sample ~9 ms, measured W4); else a new reader there. The
+			// latest request wins: each sample re-reads it. (A random-access reader re-aimed with resetForReadingTimeRanges was ~10x
+			// faster per jump but corrupted MediaToolbox's heap and deadlocked a worker inside copyNextSampleBuffer: dead end, LOADEHR-009.)
+			const int cont      = reader && readerNext >= 0 && readerNext <= first ? first - readerNext : INT_MAX;
+			const double reopen = first - start + keyCost( start ) + kOpenCost;
+			if( cont > reopen )
 			{
 				[reader cancelReading];
 				reader          = nil;
-				const int start = fwd ? first : std::max( 0, first - kAhead );
 				NSError* err    = nil;
 				reader          = [AVAssetReader assetReaderWithAsset:asset error:&err];
 				output          = [AVAssetReaderTrackOutput assetReaderTrackOutputWithTrack:track outputSettings:settings];
@@ -468,7 +616,9 @@ void VideoPlayer::Run()
 					return;
 				}
 				[reader addOutput:output];
-				const CMTime t0 = CMTimeMakeWithSeconds( std::max( 0.0, ( start - 0.5 ) * frameDur ), 600000 );
+				// W4: a quarter frame INTO the start frame. AVAssetReader hands out the frame covering t0 with its time clamped to t0:
+				// opened at start - 0.5 it delivered frame start - 1 stamped (start - 0.5), which rounded to start (picture one frame early)
+				const CMTime t0 = CMTimeMakeWithSeconds( ( start + 0.25 ) * frameDur, 600000 );
 				reader.timeRange = CMTimeRangeFromTimeToTime( t0, asset.duration );
 				[reader startReading];
 				readerNext = start;
@@ -481,55 +631,8 @@ void VideoPlayer::Run()
 				reader     = nil;
 				continue;
 			}
-			if( CMSampleBufferGetNumSamples( sb ) == 0 ) // a marker buffer (no frame in it)
-			{
-				CFRelease( sb );
-				continue;
-			}
-			const double pts = CMTimeGetSeconds( CMSampleBufferGetPresentationTimeStamp( sb ) );
-			const int idx    = std::clamp( int( std::lround( pts / frameDur ) ), 0, frames - 1 );
-			readerNext       = idx + 1;
-			bool wanted;
-			{
-				std::lock_guard< std::mutex > lock( mtx );
-				wanted = std::find( need.begin(), need.end(), idx ) != need.end() && !cache.count( idx );
-			}
-			if( wanted )
-			{
-				auto f = std::make_shared< VideoFrame >();
-				f->pts = idx * frameDur, f->index = idx, f->w = W, f->h = H, f->serial = ( 1ull << 62 ) + ++g_frameSerial; // never equal to a still image's serial
-				f->tw = ( W + 3 ) / 4 * 4, f->th = ( H + 3 ) / 4 * 4;
-				bool ok = true;
-				if( hap )
-				{
-					CMBlockBufferRef bb = CMSampleBufferGetDataBuffer( sb );
-					const size_t n      = bb ? CMBlockBufferGetDataLength( bb ) : 0;
-					std::vector< uint8_t > bytes( n );
-					std::string error;
-					ok = n > 0 && CMBlockBufferCopyDataBytes( bb, 0, n, bytes.data() ) == kCMBlockBufferNoErr && DecodeHapFrame( bytes.data(), n, W, H, *f, error );
-					if( !ok && error.empty() )
-						error = "HAP: empty sample (" + std::to_string( n ) + " bytes, " + std::to_string( CMSampleBufferGetNumSamples( sb ) ) + " samples)";
-					if( !ok )
-					{
-						std::lock_guard< std::mutex > lock( mtx );
-						info = error, failed.store( true );
-					}
-				}
-				else if( CVImageBufferRef ib = CMSampleBufferGetImageBuffer( sb ) )
-				{
-					f->pixelBuffer = (void*)CVPixelBufferRetain( (CVPixelBufferRef)ib );
-					f->w = (int)CVPixelBufferGetWidth( (CVPixelBufferRef)ib ), f->h = (int)CVPixelBufferGetHeight( (CVPixelBufferRef)ib );
-				}
-				else
-					ok = false;
-				if( ok )
-				{
-					std::lock_guard< std::mutex > lock( mtx );
-					cache[ idx ] = f;
-					++decoded;
-					decodeMs += std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - c0 ).count();
-				}
-			}
+			if( CMSampleBufferGetNumSamples( sb ) > 0 ) // else a marker buffer (no frame in it)
+				readerNext = take( sb, need, c0 ) + 1;
 			CFRelease( sb );
 			if( failed.load() )
 				return;
