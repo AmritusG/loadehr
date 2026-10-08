@@ -444,6 +444,11 @@ d) W17: KHR_materials_pbrSpecularGlossiness -> diffuse = BaseColor, its spec/glo
 - WHY OUR OWN PARAM: Arena's transport bar does not exist for source / FFGL clips and its position never reaches a plugin
   (FF_SET_TIME is a global ms clock, W28; clip_position is refused as a phase source for FFGL params). So the transport is Video
   Position + Arena's own param tools (drag, MIDI / OSC map, the param's timeline animation = Play Once / Loop / BPM sync).
+- W6 (Amrit: Scrub "Limited."): Video Loop Scrub only on codecs whose every frame decodes on its own: DXV, HAP / HAP Alpha / HAP Q /
+  HAP Q Alpha / HAP Alpha-Only (`VideoPlayer::Intra`). Any other codec (H.264, HEVC, ProRes, Motion JPEG) plays Scrub as Loop (a
+  Video Position change cues) and Video Time starts "Scrub: DXV / HAP only". Cue and reverse speed stay for every codec. The scrub
+  hold's "nearest decoded frame on the way" was meant for long-GOP drags but still fires on HAP / HAP Q 4K drags (W6 sweep: 25 / 63
+  pictures on the way), so it stays; the backward start rule (no earlier than the key frame) serves a cue's hold too, so it stays.
 - Video Loop Scrub: no clock; the frame = round(Video Position x (N - 1)) exactly; `clk.video` waits on it (back to a playing mode =
   plays on from there). Until the frame is decoded the last one shown stays (never black). Loop / Ping-Pong / Once: a USER change of
   Video Position CUES: the clock jumps to that frame and waits on it until it is on screen (max 1 s), then plays on. Measured
@@ -476,8 +481,10 @@ d) W17: KHR_materials_pbrSpecularGlossiness -> diffuse = BaseColor, its spec/glo
 
 ## W5 (2026-10-08): wireframe only, a wire colour, wire glow that blooms (every bundle; Amrit: "wireframe surface only? And settings to make the wireframe glow and blom?")
 - GROUP "Wireframe" in all four bundles (Wireframe Mix / Wire Thickness moved out of classic FX, names kept): Wire Mode Off / Over
-  Surface (default: old clips keep their W1 wire) / Wire Only / Wire + Dark Fill; Wireframe Mix = the lines' strength in every mode
-  (0 = no lines: Wire Only at Mix 0 shows nothing); Wire Back Hidden / X-Ray; Wire Edges All Triangles / Feature Edges; Wire Color
+  Surface / Wire Only / Wire + Dark Fill; Wireframe Mix = the lines' strength in every mode (0 = no lines: Wire Only at Mix 0 shows
+  nothing). W6 (Amrit: "At full."): defaults Wire Mode Off, Wireframe Mix 1 (a fresh clip: no wire; any mode picked: full strength).
+  A pre-W5 clip (no Wire Mode saved) now opens with Wire Mode Off: its W1 wire (Wireframe Mix > 0) is gone until Wire Mode is set to
+  Over Surface; a W5 clip keeps its saved mode and mix (W25: a moved default changes no saved value); Wire Back Hidden / X-Ray; Wire Edges All Triangles / Feature Edges; Wire Color
   (HSBA picker; its alpha "Wire Color Mix" = picked colour vs the surface colour); Wire Glow; Wire Bloom + Wire Bloom Size; Wire Fade.
 - ZERO-COST OFF: Over Surface with Color Mix / Glow / Bloom / Fade 0, Back Hidden, Edges All = `fs.wireMix` on the PLAIN programs (the
   W1 path; regress r2_wireframe50 max 0). Anything else sets `fs.wire.on` and the main draws go through the WIRE twins: Link() gives
@@ -952,8 +959,8 @@ Colours: every "<X> Color" row starts a HUE / SAT / BRI / ALPHA quartet = ONE pi
 | 270 | 270 | 167 | 167 | Deform | Mirror Fold | OPT | Off / X / X+Y / X+Y+Z | 0 |
 | 271 | 271 | 168 | 168 | Deform | Jelly | STD | 0..2 | 0 |
 | 272 | 272 | 169 | 169 | Deform | Audio > Deform | STD | 0..4 | 0 |
-| 273 | 273 | 170 | 170 | Wireframe | Wire Mode | OPT | Off / Over Surface / Wire Only / Wire + Dark Fill | 1 |
-| 274 | 274 | 171 | 171 | Wireframe | Wireframe Mix | STD | 0..1 | 0 |
+| 273 | 273 | 170 | 170 | Wireframe | Wire Mode | OPT | Off / Over Surface / Wire Only / Wire + Dark Fill | 0 |
+| 274 | 274 | 171 | 171 | Wireframe | Wireframe Mix | STD | 0..1 | 1 |
 | 275 | 275 | 172 | 172 | Wireframe | Wire Thickness | STD | 0.2..8 | 1 |
 | 276 | 276 | 173 | 173 | Wireframe | Wire Back | OPT | Hidden / X-Ray | 0 |
 | 277 | 277 | 174 | 174 | Wireframe | Wire Edges | OPT | All Triangles / Feature Edges | 0 |

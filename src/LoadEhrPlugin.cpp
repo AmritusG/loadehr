@@ -2979,7 +2979,11 @@ private:
 		const double fd  = video->FrameDuration();
 		const int n      = std::max( 1, video->Frames() );
 		const double len = std::max( video->Duration(), fd );
-		const int mode   = std::clamp( Opt( P_VIDEO_LOOP ), 0, 3 );
+		int mode         = std::clamp( Opt( P_VIDEO_LOOP ), 0, 3 );
+		// W6 (Amrit: Scrub "Limited."): Scrub needs a codec whose every frame decodes on its own (DXV, HAP); any other plays it as Loop
+		videoScrubRefused = mode == 3 && !video->Intra();
+		if( videoScrubRefused )
+			mode = 0;
 		const double spd = values[ P_VIDEO_SPEED ];
 		auto at          = [ & ]( float p ) { return int( std::lround( std::clamp( p, 0.0f, 1.0f ) * ( n - 1 ) ) ); }; // position -> frame
 		if( mode == 3 )
@@ -3055,7 +3059,7 @@ private:
 				const long t = std::lround( s * 10.0 ); // tenths
 				return Fmt( "%02ld:%02ld.%ld", t / 600, t / 10 % 60, t % 10 );
 			};
-			SetVideoTime( mmss( i * fd ) + " / " + mmss( n * fd ) + Fmt( "  frame %d / %d  ", i + 1, n ) + video->Codec() );
+			SetVideoTime( ( videoScrubRefused ? "Scrub: DXV / HAP only  " : "" ) + mmss( i * fd ) + " / " + mmss( n * fd ) + Fmt( "  frame %d / %d  ", i + 1, n ) + video->Codec() );
 		}
 		// Debug Log: one VIDEO line per second (frames shown late = the last decoded frame stood in; the drops are only logged here)
 		videoStatT += dt;
@@ -3961,6 +3965,7 @@ private:
 	int videoCueHold = -1;         // the cued frame the clock waits on until it is shown (-1 = none)
 	float videoCueWait = 0.0f;
 	int videoScrubLast = 0;        // the frame shown last (the scrub direction)
+	bool videoScrubRefused = false; // W6: Scrub picked on a codec that cannot scrub (plays as Loop; Video Time says so)
 	float videoPushT = 0.0f, videoTimeT = 1.0f;
 	float videoPushed[ 8 ] = { -1, -1, -1, -1, -1, -1, -1, -1 }; // the last pushed playhead values (echo filter)
 	unsigned videoPushN = 0;

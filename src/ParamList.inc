@@ -333,8 +333,10 @@ X( P_AUDIO_DEFORM, "Audio > Deform", STD, 0, 4, 0, "Deform", "", 0 )     // the 
 // WIREFRAME (W5, every bundle; Wireframe Mix / Wire Thickness moved here from the classic FX group, names kept). Over Surface with
 // Color Mix / Glow / Bloom / Fade 0, Back Hidden, Edges All = the W1 look on the plain programs; anything else draws through the WIRE
 // program twins (lines from the triangle-soup barycentrics; Feature Edges from per-triangle edge flags built off-thread).
-X( P_WIRE_MODE, "Wire Mode", OPT, 0, 3, 1, "Wireframe", "Off|Over Surface|Wire Only|Wire + Dark Fill", 0 )
-X( P_WIRE_MIX, "Wireframe Mix", STD, 0, 1, 0, "Wireframe", "", 0 )      // the wire's strength (W1: also fades the fill)
+// LoadEhr W6 (Amrit: "At full."): Wire Mode defaults to Off and Wireframe Mix to 1, so a fresh clip shows no wire and any mode picked
+// draws at full strength.
+X( P_WIRE_MODE, "Wire Mode", OPT, 0, 3, 0, "Wireframe", "Off|Over Surface|Wire Only|Wire + Dark Fill", 0 )
+X( P_WIRE_MIX, "Wireframe Mix", STD, 0, 1, 1, "Wireframe", "", 0 )      // the wire's strength (W1: also fades the fill)
 X( P_WIRE_THICKNESS, "Wire Thickness", STD, 0.2f, 8, 1, "Wireframe", "", 0 ) // px, constant on screen
 X( P_WIRE_BACK, "Wire Back", OPT, 0, 1, 0, "Wireframe", "Hidden|X-Ray", 0 ) // Hidden: the solid's own back lines are hidden
 X( P_WIRE_EDGES, "Wire Edges", OPT, 0, 1, 0, "Wireframe", "All Triangles|Feature Edges", 0 ) // Feature: creases > 20 deg + open edges

@@ -54,6 +54,9 @@ public:
 	// W4 hold 1 (Scrub) / 2 (a cue waiting): the frame at `pos` exactly; until it is decoded the last frame shown stays (Scrub: from
 	// the 3rd render waiting, the decoded frame nearest to it on the way). The direction = the way it moved.
 	std::shared_ptr< const VideoFrame > Frame( double pos, bool forward, bool loop, int hold = 0 );
+	// W6 (Amrit: Scrub "Limited."): every frame is a key frame and decodes on its own (DXV, HAP / HAP Alpha / HAP Q / HAP Q Alpha /
+	// HAP Alpha-Only): Video Loop Scrub works only on these; any other codec plays Scrub as Loop
+	bool Intra() const { return intra.load(); }
 	// stats (Debug Log): frames decoded, decode ms (worker), frames shown late
 	uint64_t decoded = 0, late = 0;
 	double decodeMs = 0;
@@ -73,7 +76,7 @@ private:
 	bool RunDxv();                          // false: not a DXV file (AVFoundation reads it)
 	int Window( std::vector< int >& need ); // mtx held: the frames wanted around the request; the first missing one (-1 = none)
 	std::string path, info, codec;
-	std::atomic< bool > ready{ false }, failed{ false }, stop{ false };
+	std::atomic< bool > ready{ false }, failed{ false }, stop{ false }, intra{ false };
 	double duration = 0, frameDur = 1.0 / 30.0;
 	int frames = 0;
 	int behind = 6;         // frames kept in the play direction when it runs backward (AVFoundation: more, by a memory budget)

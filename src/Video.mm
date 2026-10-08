@@ -309,8 +309,9 @@ std::shared_ptr< const VideoFrame > VideoPlayer::Frame( double pos, bool forward
 	else if( scrub )
 	{
 		// never a black frame: until the wanted one is decoded, the decoded frame nearest to it on the way from the last one shown
-		// (from the 3rd render waiting: a fast drag on a long-GOP file moves on through what the reader delivers instead of freezing),
-		// else the last one stays
+		// (from the 3rd render waiting: a fast drag moves on through what the reader delivers instead of freezing), else the last one
+		// stays. W6: Scrub runs only on all-intra codecs now, and this still fires there: HAP / HAP Q 4K drags (W6 sweep: 25 / 63
+		// pictures on the way), so it stays
 		pick = last;
 		if( last && hold == 1 && scrubHeld >= 2 )
 			for( const auto& kv : cache )
@@ -397,6 +398,7 @@ bool VideoPlayer::RunDxv()
 		info  = b;
 		codec = std::string( "DXV " ) + dxvk_variant_name( variant );
 	}
+	intra.store( true ); // every DXV packet is a whole frame
 	ready.store( true );
 	while( !stop.load() )
 	{
@@ -485,6 +487,7 @@ void VideoPlayer::Run()
 			behind = hap ? 24 : std::clamp( int( ( 256ull << 20 ) / ( size_t( std::max( 1, W ) ) * std::max( 1, H ) * 4 ) ) - kAhead, kAhead, 30 );
 			if( cc == "Hap7" || cc == "HapH" )
 				info = cc + ": BC7 / BC6 HAP is not supported (GL 4.1 on this Mac has no BPTC)", failed.store( true );
+			intra.store( hap ); // HAP: every frame is a key frame of raw blocks
 		}
 		if( failed.load() )
 			return;
@@ -589,8 +592,8 @@ void VideoPlayer::Run()
 				std::lock_guard< std::mutex > lock( mtx );
 				fwd = wantForward, scrub = wantScrub;
 			}
-			// where a new reader would start: the frame (forward); backward a chunk before it read forward, all kept (scrub: no
-			// earlier than its key frame, so the wanted frame is not delayed by frames that are not decoded anyway)
+			// where a new reader would start: the frame (forward); backward a chunk before it read forward, all kept (a held frame,
+			// Scrub or a cue: no earlier than its key frame, so the wanted frame is not delayed by frames that are not decoded anyway)
 			int start = fwd ? first : std::max( 0, first - behind );
 			if( !fwd && scrub ) // no earlier than the key frame, but at least kAhead frames (all-intra: a backward drag is not one reader per frame)
 				start = std::max( start, first - std::max( keyCost( first ), kAhead ) );

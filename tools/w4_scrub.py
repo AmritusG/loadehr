@@ -14,7 +14,10 @@ usage: tools/w4_scrub.py make                       the coded clips -> test_medi
        tools/w4_scrub.py latency <out> [file ...]    Scrub latency per codec: jumps (random positions 0.4 s apart) and drags (a new
                                                     position every frame, 0 -> 1 and back over 2 s each) -> <out>/latency.md
        tools/w4_scrub.py longshow <out> [file]       Loop on a 5 s clip for 180 min at speed 1 and -1 (harness advance): the frame shown
-                                                    at 60 / 120 / 180 min = the exact frame -> <out>/longshow.md"""
+                                                    at 60 / 120 / 180 min = the exact frame -> <out>/longshow.md
+       tools/w4_scrub.py refuse <out> [file ...]     W6: Video Loop Scrub on every codec: DXV / HAP scrub (a Video Position change shows
+                                                    that frame and the clock waits); anything else plays as Loop (a change cues, then it
+                                                    counts on) and Video Time starts "Scrub: DXV / HAP only" -> <out>/refuse.md"""
 import os, random, re, statistics, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -259,9 +262,29 @@ def longshow(out, args):
     open(os.path.join(out, 'longshow.md'), 'w').write('\n'.join(rows) + '\n')
 
 
+def refuse(out, args):
+    os.makedirs(out, exist_ok=True)
+    rows = ['| file | Video Time | codes after Video Position 0.5 (first 8, collapsed) | plays as | ok |', '|---|---|---|---|---|']
+    for path in files(args):
+        dump = os.path.join(out, 'dump_' + tag(path))
+        L = scene(path, [('Video Loop', 3), ('Video Position', 0)]) + ['realtime 0.6', 'set Video Position 0.5', 'realtime 1.0', 'get Video Time']
+        r, log = harness(L, out, 'refuse_' + tag(path), dump)
+        vt = re.findall(r"get Video Time = '([^']*)'", r.stdout)
+        vt = vt[-1] if vt else '?'
+        codes = collapse([g[0] for g in shown(dump)])
+        k = next((i for i, c in enumerate(codes) if c >= 70), None)
+        after = codes[k:k + 8] if k is not None else []
+        intra = any(c in tag(path) for c in ('dxv', 'hap'))
+        scrubbed = bool(after) and after[-1] == 75  # Scrub: the frame stays on 75
+        ok = (scrubbed and 'Scrub:' not in vt) if intra else (not scrubbed and len(after) > 3 and vt.startswith('Scrub: DXV / HAP only'))
+        rows.append('| %s | %s | %s | %s | %s |' % (tag(path), vt, after, 'Scrub' if scrubbed else 'Loop', 'yes' if ok else 'NO'))
+        print(rows[-1], flush=True)
+    open(os.path.join(out, 'refuse.md'), 'w').write('\n'.join(rows) + '\n')
+
+
 if __name__ == '__main__':
     c, a = sys.argv[1], sys.argv[2:]
     if c == 'make':
         make()
     else:
-        {'sweep': sweep, 'cue': cue, 'reverse': reverse, 'latency': latency, 'longshow': longshow}[c](a[0], a[1:])
+        {'sweep': sweep, 'cue': cue, 'reverse': reverse, 'latency': latency, 'longshow': longshow, 'refuse': refuse}[c](a[0], a[1:])

@@ -13,10 +13,11 @@ stats 1080p default MSAA4
 shot verify/@OUT@/r1_mask_front.png
 set Rotate Y -35
 set Rotate X 8
+set Wire Mode 1
 set Wireframe Mix 0.5
 frames 60
 shot verify/@OUT@/r2_wireframe50.png
-set Wireframe Mix 0
+set Wire Mode 0
 set Explode 0.5
 frames 60
 shot verify/@OUT@/r3_explode.png
