@@ -74,6 +74,8 @@ tools/w6_points.py renders|follow|cost|wire_same <out>  # W6: Points Only / + Wi
 tools/w6_trans.py strips|chain|cost|waits|smoke <out>  # W6: the transition pack: scrub strips + ends, D -> A hops, cost, frame waits, Smoke
 tools/arena_w6.py points|trans <layer> [col]  # W6: dial the W6 clips by param name (never triggers)
 tools/arena_w5.py <layer> [col]          # W5: dial the W5 wire clips by param name (never triggers)
+tools/w7_trans.py scrub|spikes|realtime|strip|cost ...  # W7: per-step change along a hop (the swap vs the hop's own motion), Arena's dials played, strips, cost
+tools/arena_w7.py <layer> [col]          # W7: dial the W7 clips (Twist / Melt / Lava / Sparkle / Cycle 21) by param name (never triggers)
 git submodule update --init               # W3: third_party/dxvkit (DXVKit, pinned) must be checked out before cmake
 ```
 Log: `~/Library/Logs/LoadEhr/LoadEhr.log` (per-material texture resolution, load/upload/swap times per slot, shader compile
