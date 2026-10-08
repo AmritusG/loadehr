@@ -99,6 +99,11 @@ TESTS = [
     ('Light paint swirl', 'speed 4 (2 turns/s)', [('Line Look', 2), ('Line Speed', 4), ('Line Amount', 0.6)], {'after': (1000 / 2, 1, 120)}),
     ('Light paint stamps', 'speed 1', [('Line Look', 2), ('Line Speed', 1), ('Line Amount', 0.6), ('Spin Y', 30)], {'after': (3600, 1, 120)}),
     ('Neon flicker + flow', 'speed 4 (48 steps/s)', [('Line Look', 3), ('Line Speed', 4)], {'after': (1000 / 48, 1, 120)}),
+    # LoadEhr W9 Build: Build Speed's cycle wraps at 1 (out and back: the same progress on both sides of it); the slit-scan waves read the
+    # same clock; the slit history's ticks wrap at 3600 s (a tick is just the next sample)
+    ('Build Speed (print on)', '30 cycles/min', [('Build Look', 2), ('Build Amount', 1), ('Build Speed', 30)], {'after': (2, 0.5, 60)}),
+    ('Build Speed (slit waves)', '30 cycles/min', [('Build Look', 1), ('Build Amount', 1), ('Build Speed', 30), ('Spin Y', 30)], {'after': (2, 0.5, 60)}),
+    ('Slit history ticks', 'spin 30', [('Build Look', 1), ('Build Amount', 1), ('Spin Y', 30)], {'after': (3600, 1, 120)}),
 ]
 # W26 / W28 features live in the Wow bundles only (Resolume's 512-param cap)
 # extra commands before the clocks are fast-forwarded (a second model)

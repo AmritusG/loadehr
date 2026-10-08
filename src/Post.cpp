@@ -294,7 +294,7 @@ void Renderer::RenderSilhouetteBlur( const FrameState& fs, int w, int h )
 
 bool Renderer::PostActive( const FrameState& fs ) const
 {
-	return fs.post.bloom > 0.0f || fs.post.ghosts > 0.0f || fs.post.streak > 0.0f;
+	return fs.post.bloom > 0.0f || fs.post.ghosts > 0.0f || fs.post.streak > 0.0f || LensOn( fs ); // W9: the black hole's lens is in the post pass
 }
 
 void Renderer::EnsurePostTarget( int w, int h )
@@ -379,10 +379,13 @@ void Renderer::RenderPost( const FrameState& fs, int w, int h )
 
 	glBindFramebuffer( GL_FRAMEBUFFER, fs.hostFBO );
 	glViewport( 0, 0, w, h );
+	const GLuint progPost = LensOn( fs ) ? progPostLens : this->progPost; // W9: the lens variant (the plain post program is unchanged)
 	glUseProgram( progPost );
 	glUniform1f( U( progPost, "uBloomAmt" ), p.bloom );
 	glUniform1f( U( progPost, "uGhostAmt" ), p.ghosts );
 	glUniform1f( U( progPost, "uStreakAmt" ), p.streak );
+	if( LensOn( fs ) )
+		SetLensUniforms( progPost, fs, w, h );
 	GLuint tex[ 4 ] = { postTex, upTex[ 0 ], p.ghosts > 0.0f ? ghostTex : whiteTex, p.streak > 0.0f ? streakTex[ 1 ] : whiteTex };
 	for( int i = 3; i >= 0; --i )
 	{
@@ -417,6 +420,8 @@ void Renderer::WarmPost( const FrameState& fs, GpuModel* model, int w, int h )
 	trailLive = echoOk = false;
 	EnsurePostTarget( w, h );
 	t.hostFBO = mirrorFBO; // an RGBA8 target of our own, not the host's (and not postTex, which it reads)
+	RenderPost( t, w, h );
+	t.x.lens = true, t.x.lensAmt = 0.5f; // W9: the black hole's lens variant
 	RenderPost( t, w, h );
 	glDisable( GL_SCISSOR_TEST );
 	keyShadowOk = mirrorOk = silOk = false;

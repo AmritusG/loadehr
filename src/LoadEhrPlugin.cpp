@@ -20,6 +20,8 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
+#include <array>
+#include <deque>
 #include <map>
 #include <thread>
 #include "stb_image.h"
@@ -1368,6 +1370,7 @@ private:
 		BuildSurface( fs, pulse, dt );
 		StepJelly( anchor, dt ); // W2: before BuildShape reads it
 		BuildShape( fs, pulse, dt );
+		BuildBuild( fs, anchor, pulse, dt ); // W9 Stage B (after the shape: it switches the DEFORM twins on)
 		BuildLetters( fs, dt );
 		BuildLava( fs, anchor, dt );
 		SmokeStyle( dt ); // W6: before the volume / sim read it
@@ -3064,6 +3067,74 @@ private:
 		fs.wireMix       = w.mode == 1 && !w5 ? w.mix : 0.0f;
 		fs.wireThickness = values[ P_WIRE_THICKNESS ];
 	}
+	// W9 Stage B: the Build looks. Progress = Build Amount; Build Speed runs it out and back on its own (cycles / min, eased; the clock
+	// wraps at 1 cycle); Build On Beat snaps it back on the beat and eases it out again over most of the beat cycle. Slit-Scan: Amount =
+	// the delay, Speed = waves of delay along the axis (the same clock, wraps at 1). The slit history: the pose + the deform phases + the
+	// jelly, one entry per 1/60 s of show time, the last 2 s, newest first.
+	void BuildBuild( FrameState& fs, const Mat4& anchor, float pulse, float dt )
+	{
+		XState& x     = fs.x;
+		x.axis        = std::clamp( Opt( P_BUILD_AXIS ), 0, 2 );
+		x.look        = LOADEHR_WOW ? 0 : std::clamp( Opt( P_BUILD_LOOK ), 0, 4 );
+		const float A = values[ P_BUILD_AMOUNT ], sp = values[ P_BUILD_SPEED ];
+		clk.build     = Wrap( clk.build + dt * sp / 60.0, 1.0 );
+		const int every = Opt( P_BUILD_BEAT ) == 0 ? 0 : 1 << ( Opt( P_BUILD_BEAT ) - 1 );
+		if( every > 0 && beatCount != lastBuildBeat && beatCount % every == 0 )
+			lastBuildBeat = beatCount, buildBeatT = 0.0f;
+		buildBeatT = std::min( buildBeatT + dt, 1000.0f );
+		float p = A;
+		if( sp > 0.0f && x.look != 1 )
+		{
+			const float tri = 1.0f - std::fabs( 2.0f * float( clk.build ) - 1.0f );
+			p *= SmoothStep( 0.0f, 1.0f, tri );
+		}
+		if( every > 0 )
+		{
+			const float u = buildBeatT / ( 0.9f * every * std::max( 0.1f, beatPeriod ) );
+			p *= u < 0.12f ? 1.0f - SmoothStep( 0.0f, 0.12f, u ) : SmoothStep( 0.12f, 1.0f, u ); // snaps back in, eases out again
+		}
+		x.amt = p;
+		Colour( P_WIRE_COL_H, x.color );
+		x.glow = 1.5f + values[ P_WIRE_GLOW ];
+		x.cut = 0, x.lens = false, x.lensAmt = 0;
+		x.slitPhase = -1.0f;
+		x.hist.clear();
+		// the slit-scan history (kept while the look is off too, so switching it on shows the past at once)
+		const int64_t tick = int64_t( std::floor( clk.slitTime * 60.0 ) );
+		clk.slitTime = Wrap( clk.slitTime + dt, 3600.0 );
+		if( tick != slitTick || slitHist.empty() )
+		{
+			slitTick = tick;
+			std::array< float, 32 > e{};
+			std::memcpy( e.data(), anchor.m, sizeof( anchor.m ) );
+			const ShapeState& s = fs.shape;
+			e[ 16 ] = s.warpPhase, e[ 17 ] = s.ripplePhase, e[ 18 ] = s.glitchStep, e[ 19 ] = s.squash;
+			e[ 20 ] = s.jellyLin[ 0 ], e[ 21 ] = s.jellyLin[ 1 ], e[ 22 ] = s.jellyLin[ 2 ], e[ 23 ] = s.jellyScale;
+			e[ 24 ] = s.jellyAng[ 0 ], e[ 25 ] = s.jellyAng[ 1 ], e[ 26 ] = s.jellyAng[ 2 ];
+			slitHist.push_front( e );
+			if( slitHist.size() > 121 )
+				slitHist.pop_back();
+		}
+		if( x.look == 0 )
+			return;
+		if( x.look == 1 )
+		{
+			x.slitPhase = sp > 0.0f ? float( clk.build ) : -1.0f;
+			x.amt       = A * ( every > 0 ? 1.0f + 0.6f * BeatPulse( std::min( 1.0f, buildBeatT / std::max( 0.1f, beatPeriod ) ) ) : 1.0f );
+			// the anchor of the history = the pose the model is drawn with (the fit is the same then and now)
+			const Mat4 inv = anchor.Inverse();
+			std::memcpy( x.poseInv, inv.m, sizeof( inv.m ) );
+			x.hist.reserve( slitHist.size() * 32 );
+			for( const auto& e : slitHist )
+				x.hist.insert( x.hist.end(), e.begin(), e.end() );
+		}
+		else if( x.look == 2 )
+			x.cut = 1, x.cutPos = p, x.layers = true, x.cap = true, x.capLook = 0;
+		else if( x.look == 4 )
+			x.lens = true, x.lensAmt = p, x.swirl = 1.5f;
+		fs.shape.on = fs.shape.deform = true; // the looks draw in the DEFORM twins
+		(void)pulse;
+	}
 	// W9 Stage A: the line looks. Clocks (W14): the pulses' and the swirl's phases wrap at 1000 (whole cycles / turns per 1000 in the
 	// shaders), the ring's time stamps at 3600 s (ages are read mod 3600), the neon flicker steps at 1000.
 	void BuildLines( FrameState& fs, float dt )
@@ -4077,6 +4148,7 @@ private:
 		double warp = 0, glitch = 0; // W2 Deform: Noise Warp drift (lattice cells, wraps at 256), Glitch steps (wraps at 1000)
 		double pointTwinkle = 0;     // W6 Point Twinkle: twinkles (wraps at 1000)
 		double lineFlow = 0, lineSwirl = 0, linePaint = 0, lineFlicker = 0; // W9 Lines: cycles, turns (1000), seconds (3600), steps (1000)
+		double build = 0, slitTime = 0; // W9 Build: Build Speed cycles (1); the slit history's ticks, seconds (3600)
 	} clk;
 	// W2 Jelly: a damped spring per instance (fitted / mask space), driven by the mask's own acceleration (move, spin, bounce)
 	struct Jelly
@@ -4202,6 +4274,10 @@ private:
 	Renderer renderer;
 	float audio[ 3 ]   = { 0, 0, 0 };
 	float audio16[ 16 ] = {}; // W9: 16 bands
+	std::deque< std::array< float, 32 > > slitHist; // W9 slit-scan: newest first, 1/60 s apart, 2 s
+	int64_t slitTick = -1;
+	uint32_t lastBuildBeat = 0;
+	float buildBeatT = 1000.0f;
 	double lastHostTime = 0;
 	bool hostTimeSeen = false, hostTimeValid = false;
 	std::vector< float > perfIv, perfCpu; // W29: this second's frame intervals and ProcessOpenGL wall ms

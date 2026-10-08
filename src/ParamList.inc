@@ -370,6 +370,21 @@ X( P_LINE_AMOUNT, "Line Amount", STD, 0, 1, 0.35f, "Lines", "", 0 )
 X( P_LINE_REACH, "Line Reach", STD, 0, 1, 0.3f, "Lines", "", 0 )
 X( P_LINE_SPEED, "Line Speed", STD, 0, 4, 0.5f, "Lines", "", 0 )
 X( P_LINE_AUDIO, "Line Audio", STD, 0, 4, 0, "Lines", "", 0 )
+// W9 Stage B: BUILD (classic; Build Axis in every bundle: the Cut group's axis too). Slit-Scan = each slice along the axis shows the model
+// as it was up to Build Amount x 2 s ago (Build Speed: waves of delay run along it); Print On = printed layer by layer from the bottom
+// of the axis up to Build Amount (a glowing head in Wire Color, the cut face capped; the unprinted part in the Wire Mode's look, or
+// nothing); Exploded = letters / parts / islands slide out from the centre by Build Amount; Black Hole = the model spirals into its
+// centre (Build Amount = how far in; back = spat out) and the picture bends round the hole. Build Speed: runs it on its own (cycles
+// per minute, out and back); Build On Beat: snaps back on the beat and eases out again
+X( P_BUILD_LOOK, "Build Look", OPT, 0, 4, 0, "Build", "Off|Slit-Scan|Print On|Exploded|Black Hole", 0 )
+X( P_BUILD_AMOUNT, "Build Amount", STD, 0, 1, 0.5f, "Build", "", 0 )
+#undef MEHR_REGION
+#define MEHR_REGION 0
+X( P_BUILD_AXIS, "Build Axis", OPT, 0, 2, 1, "Build", "X|Y|Z", 0 )
+#undef MEHR_REGION
+#define MEHR_REGION MEHR_CLASSIC
+X( P_BUILD_SPEED, "Build Speed", STD, 0, 30, 0, "Build", "", 0 )
+X( P_BUILD_BEAT, "Build On Beat", OPT, 0, 4, 0, "Build", "Off|Every Beat|Every 2|Every 4|Every 8", 0 )
 #undef MEHR_REGION
 #define MEHR_REGION MEHR_CLASSIC
 // COPIES: instanced clones (LODs by screen size), echo trails, ghost poses

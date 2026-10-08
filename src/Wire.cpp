@@ -337,10 +337,10 @@ void Renderer::RenderWireGlow( const FrameState& fs, int w, int h )
 		if( !wireDepth )
 			glGenRenderbuffers( 1, &wireDepth );
 		glBindRenderbuffer( GL_RENDERBUFFER, wireDepth );
-		glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, w, h );
+		glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h ); // W9: the main depth's format (the line glow blits it in)
 		glBindRenderbuffer( GL_RENDERBUFFER, 0 );
 		glBindFramebuffer( GL_FRAMEBUFFER, wireFBO );
-		glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, wireDepth );
+		glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, wireDepth );
 		for( int i = 0; i < 2; ++i )
 			target( wireBlur[ i ], wireBlurFBO[ i ], std::max( 1, w / 2 ), std::max( 1, h / 2 ) );
 		wireW = w, wireH = h;

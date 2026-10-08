@@ -52,3 +52,16 @@ tube's light on nearby surfaces.
 - Mid-hop: both models capture their own points (through their MORPH programs); the outgoing model's lines fade out and the incoming
   one's fade in across the hop's middle (t 0.35 .. 0.65).
 - Text in Shatter Mode Pieces: the lines stay on the whole letters (the points sit on the whole mesh; the pieces are a separate copy).
+
+## Stage B: Build (group "Build": Build Look Off / Slit-Scan / Print On / Exploded / Black Hole, Build Amount, Build Axis (every bundle),
+## Build Speed, Build On Beat)
+Reading: slit-scan / time displacement (Golan Levin, An Informal Catalogue of Slit-Scan Video Artworks): each slice of the image from a
+different moment; here each slice of the MODEL (along the Build Axis) from a different moment, by its pose history, not pixels. Stencil
+capping (SGI OpenGL course notes, "capping clipped solids"): count the clipped solid's faces along each ray in the stencil buffer; where
+the count is odd the plane is inside the solid; draw a polygon in the plane there. Gravitational lens: point-mass thin lens,
+beta = theta - theta_E^2 / theta (screen-space approximations: Flax / Minecraft-mod posts use the same offset).
+- Slit-scan: the pose history in a texture buffer, read per vertex at its own delay (smooth in the height: no tearing). Print On: a world
+  plane cut in the FS + stencil cap + head band + layer ridges; the unprinted part in the Wire Mode's look. Exploded: per-triangle group
+  centres (letters / part slots / islands / clusters) built on a worker. Black hole: a deform (spiral in, the near points first) + the lens
+  in the post pass (the plain post program untouched).
+- Build Speed / On Beat drive the progress; the looks are slider-driven (scrub back = the same path back).

@@ -334,11 +334,11 @@ bool Renderer::EnsureSceneDepth( int w, int h )
 {
 	if( sceneDepthTex && depthW == w && depthH == h )
 		return true;
-	MakeTarget2D( sceneDepthTex, GL_DEPTH_COMPONENT24, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, w, h, GL_NEAREST );
+	MakeTarget2D( sceneDepthTex, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, w, h, GL_NEAREST ); // W9: the main depth has stencil (a blit needs the same format)
 	if( !depthFBO )
 		glGenFramebuffers( 1, &depthFBO );
 	glBindFramebuffer( GL_FRAMEBUFFER, depthFBO );
-	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, sceneDepthTex, 0 );
+	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, sceneDepthTex, 0 );
 	glDrawBuffer( GL_NONE );
 	glReadBuffer( GL_NONE );
 	bool ok = glCheckFramebufferStatus( GL_FRAMEBUFFER ) == GL_FRAMEBUFFER_COMPLETE;

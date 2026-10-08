@@ -976,6 +976,7 @@ void Renderer::SetShapeUniforms( GLuint p, const FrameState& fs, GpuModel* model
 		glUniform3fv( U( p, "uJellyLin" ), 1, s.jellyLin );
 		glUniform3fv( U( p, "uJellyAng" ), 1, s.jellyAng );
 		glUniform1f( U( p, "uJellyScale" ), s.jellyScale );
+		SetXUniforms( p, fs, model ); // W9: the Build / Cut looks
 	}
 }
 

@@ -61,7 +61,7 @@ GLuint Link( const std::string& vs, const std::string& fs, std::string& error )
 	const GLuint p   = LinkPlain( vs, fs, error );
 	const bool soup  = vs.find( "uniform usamplerBuffer uIdxBuf; // R32UI view of the index buffer" ) != std::string::npos;
 	if( p && g_deformSink && soup )
-		if( const GLuint d = LinkPlain( "#define DEFORM\n" + vs, fs, error ) )
+		if( const GLuint d = LinkPlain( "#define DEFORM\n" + vs, "#define DEFORM\n" + fs, error ) )
 			g_deformSink->push_back( { p, d } );
 	const bool mainFS = fs.find( "uniform float uWireMix;" ) != std::string::npos;
 	bool pass         = false;
@@ -72,7 +72,7 @@ GLuint Link( const std::string& vs, const std::string& fs, std::string& error )
 		{
 			g_wireSink->push_back( { p, w } );
 			if( g_deformSink )
-				if( const GLuint d = LinkPlain( "#define WIRE\n#define DEFORM\n" + vs, "#define WIRE\n" + fs, error ) )
+				if( const GLuint d = LinkPlain( "#define WIRE\n#define DEFORM\n" + vs, "#define WIRE\n#define DEFORM\n" + fs, error ) )
 					g_deformSink->push_back( { w, d } );
 		}
 	if( p && g_pointSink && soup && mainFS && !pass )
@@ -80,7 +80,7 @@ GLuint Link( const std::string& vs, const std::string& fs, std::string& error )
 		{
 			g_pointSink->push_back( { p, q } );
 			if( g_deformSink )
-				if( const GLuint d = LinkPlain( "#define WIRE\n#define POINTS\n#define DEFORM\n" + vs, "#define WIRE\n#define POINTS\n" + fs, error ) )
+				if( const GLuint d = LinkPlain( "#define WIRE\n#define POINTS\n#define DEFORM\n" + vs, "#define WIRE\n#define POINTS\n#define DEFORM\n" + fs, error ) )
 					g_deformSink->push_back( { q, d } );
 		}
 	if( p && g_captureSink && soup && mainFS && !pass && vs.find( "#define INSTANCED" ) == std::string::npos )
@@ -256,7 +256,7 @@ bool Renderer::Init( std::string& error )
 	if( ok )
 		Log( "DEFORM %zu soup programs have their DEFORM twin, %zu their WIRE twin, %zu their POINTS twin, %zu their CAPTURE twin (%.0f ms)", deformTwins.size(), wireTwins.size(),
 		     pointTwins.size(), captureTwins.size(), std::chrono::duration< double, std::milli >( std::chrono::steady_clock::now() - t0 ).count() );
-	return ok && InitWire( error ) && InitPoints( error ) && InitLines( error );
+	return ok && InitWire( error ) && InitPoints( error ) && InitLines( error ) && InitBuild( error );
 }
 
 GLuint Renderer::DeformTwin( GLuint p ) const
@@ -344,6 +344,7 @@ void Renderer::Release()
 		glDeleteProgram( t.second );
 	captureTwins.clear();
 	ReleaseLines();
+	ReleaseBuild();
 	ReleaseWire();
 	ReleasePoints();
 	ReleaseTargets();
@@ -407,8 +408,8 @@ bool Renderer::EnsureTargets( int w, int h, int samples )
 	{
 		glGenRenderbuffers( 1, &resolveDepth );
 		glBindRenderbuffer( GL_RENDERBUFFER, resolveDepth );
-		glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, w, h );
-		glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, resolveDepth );
+		glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, w, h ); // W9: + stencil (the cut's cap)
+		glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, resolveDepth );
 	}
 	bool ok = glCheckFramebufferStatus( GL_FRAMEBUFFER ) == GL_FRAMEBUFFER_COMPLETE;
 
@@ -419,11 +420,11 @@ bool Renderer::EnsureTargets( int w, int h, int samples )
 		glRenderbufferStorageMultisample( GL_RENDERBUFFER, samples, GL_RGBA8, w, h );
 		glGenRenderbuffers( 1, &msDepth );
 		glBindRenderbuffer( GL_RENDERBUFFER, msDepth );
-		glRenderbufferStorageMultisample( GL_RENDERBUFFER, samples, GL_DEPTH_COMPONENT24, w, h );
+		glRenderbufferStorageMultisample( GL_RENDERBUFFER, samples, GL_DEPTH24_STENCIL8, w, h ); // W9: + stencil (the cut's cap)
 		glGenFramebuffers( 1, &msFBO );
 		glBindFramebuffer( GL_FRAMEBUFFER, msFBO );
 		glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, msColor );
-		glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, msDepth );
+		glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, msDepth );
 		ok = ok && glCheckFramebufferStatus( GL_FRAMEBUFFER ) == GL_FRAMEBUFFER_COMPLETE;
 	}
 	glBindRenderbuffer( GL_RENDERBUFFER, 0 );
@@ -810,7 +811,7 @@ void Renderer::DrawModel( GLuint p, const FrameState& fs, GpuModel* model, bool 
 	if( instanced )
 	{
 		const int maxLod    = model->LodsReady() - 1;
-		const bool needL0   = soup && ( fs.shape.shatterT > 0.0f || pointsNow ); // shard ids (and the points) exist for the full mesh only
+		const bool needL0   = soup && ( fs.shape.shatterT > 0.0f || pointsNow || fs.x.look == 3 ); // shard ids (the points, W9 the exploded groups) exist for the full mesh only
 		const int n         = std::min( (int)inst->size(), 64 );
 		float mats[ 64 * 16 ], nexts[ 64 * 16 ], ha[ 64 * 2 ], xa[ 64 * 4 ];
 		int k = 0;
@@ -1349,6 +1350,19 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 	}
 	GpuModel* dom         = domB ? bReady : ready;
 	const FrameState& fsD = domB ? fsB : fs;
+	lensModel = dom, lensFs = &fsD; // W9 black hole: the hole sits in the dominant model
+	if( fs.x.look == 1 && !fs.x.hist.empty() )
+	{
+		// W9 slit-scan: the pose history (newest first) for the DEFORM twins (unit 32)
+		if( !xHistBuf )
+			glGenBuffers( 1, &xHistBuf ), glGenTextures( 1, &xHistTex );
+		glBindBuffer( GL_TEXTURE_BUFFER, xHistBuf );
+		glBufferData( GL_TEXTURE_BUFFER, fs.x.hist.size() * sizeof( float ), fs.x.hist.data(), GL_STREAM_DRAW );
+		glBindTexture( GL_TEXTURE_BUFFER, xHistTex );
+		glTexBuffer( GL_TEXTURE_BUFFER, GL_RGBA32F, xHistBuf ); // re-attach after glBufferData (Apple GL)
+		glBindTexture( GL_TEXTURE_BUFFER, 0 );
+		glBindBuffer( GL_TEXTURE_BUFFER, 0 );
+	}
 	{
 		const int keep = activeSide;
 		activeSide     = domSide;
@@ -1471,6 +1485,7 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 				glDisable( GL_BLEND );
 			}
 			WarmMorph( fs, model ); // W6 Stage 2: the pack's MORPH programs + the cloud
+			WarmLooks( fs, model ); // W9: the CAPTURE twins, the line programs, the cut's stencil pass + cap
 			glDisable( GL_SCISSOR_TEST );
 			WarmVolume( fs, model, w, h );
 			WarmPost( fs, model, w, h );
@@ -1513,10 +1528,8 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 				if( m == 1 )
 					EnsureVAO( g );
 				const GLuint soupP = f.morph.On() ? progSoupM : f.shape.transSide > 0 && !f.shape.dustTrans ? progSoupT : progSoup;
-				if( f.wire.on ) // W5
-					DrawWired( soupP, f, g, f.inst.empty() ? nullptr : &f.inst );
-				else
-					DrawModel( sp ? soupP : progMain, f, g, false, sp, 0, nullptr, nullptr, f.inst.empty() ? nullptr : &f.inst );
+				(void)sp;
+				DrawSide( soupP, f, g, f.inst.empty() ? nullptr : &f.inst ); // W5 wire / W9 cut inside
 				DrawDust( f, g, h );
 				if( f.lava.on && f.transitionStyle == kStyleLava )
 					DrawCracks( f, g ); // W6 Lava style: the cracks glow (W7: on both models)
@@ -1566,10 +1579,7 @@ void Renderer::Render( const FrameState& fsIn, GpuModel* a, GpuModel* b, int slo
 		}
 		else
 		{
-			if( fs.wire.on ) // W5
-				DrawWired( progSoup, fs, model, fs.inst.empty() ? nullptr : &fs.inst );
-			else
-				DrawModel( soup ? progSoup : progMain, fs, model, false, soup, 0, nullptr, nullptr, fs.inst.empty() ? nullptr : &fs.inst );
+			DrawSide( progSoup, fs, model, fs.inst.empty() ? nullptr : &fs.inst ); // W5 wire / W9 cut inside
 			if( !fs.wire.on || ( fs.wire.mode != 2 && fs.wire.mode < 4 ) ) // Wire Only / the points: no surface for the picture / the cracks
 			{
 				DrawProjSurface( fs, model ); // W26: the projected picture on the mask

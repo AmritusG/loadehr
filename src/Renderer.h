@@ -379,6 +379,27 @@ struct LinesState
 	float color[ 3 ] = { 0, 1, 1 }, colorMix = 0, glow = 0, bloom = 0;
 };
 
+// W9 Stage B (Build group) + Stage C (Cut group): the looks drawn by the DEFORM twins (vertex + fragment side), the cut's cap, the lens
+struct XState
+{
+	int look = 0;            // Build Look: 1 slit-scan, 2 print on, 3 exploded, 4 black hole
+	int axis = 1;            // Build Axis
+	float amt = 0;           // the Build look's progress / strength
+	float swirl = 1.5f;      // black hole turns at the full fall
+	float slitPhase = -1;    // slit-scan waves (Build Speed), cycles; < 0 = none
+	std::vector< float > hist; // slit-scan: newest first, one entry per 1/60 s (8 texels: pose columns, phases, jelly x 2, -)
+	float poseInv[ 16 ] = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 }; // slit-scan: the pose now, inverted (world)
+	int cut = 0;             // 1 = a plane cut (print on; Stage C: cross-section)
+	float cutPos = 0.5f;     // where the plane sits along the axis over the model's extent (0..1); kept below it
+	float color[ 3 ] = { 0, 1, 1 }, glow = 1.5f; // Wire Color, the band's light
+	bool layers = false;     // print on: printed layer ridges
+	bool cap = true;         // the cut face is capped (stencil)
+	int capLook = 0;         // 0 print on (hot fresh top), 1 cross-section (scan)
+	float capPhase = 0;      // the cap's scan lines, cycles (wrapped at 1)
+	bool lens = false;       // black hole: the screen-space lens + event horizon
+	float lensAmt = 0;
+};
+
 struct FrameState
 {
 	// target
@@ -472,6 +493,7 @@ struct FrameState
 	// empty = the letters are at rest (the plain programs draw)
 	std::vector< float > letterXf;
 	LinesState lines; // W9 Stage A
+	XState x;         // W9 Stage B / C
 };
 
 // W6 Stage 2: a slot's point cloud for the Points / Swarm styles, built on a worker (Morph.cpp)
@@ -630,6 +652,30 @@ private:
 	void RenderLines( const FrameState& fsA, GpuModel* a, GLuint progA, const FrameState* fsB, GpuModel* b, GLuint progB, float t );
 	void DrawLines( const LineDraw& d, bool glow ); // the bound target: main (light, alpha kept) or the HDR wire buffer
 	void AddLineLight( const FrameState& fs, int w, int h ); // neon: the tubes' wide light on the model
+	// W9 Stage B (Build.cpp): the looks in the DEFORM twins, exploded groups, the slit-scan history, the cut + cap, the black hole's lens
+	bool InitBuild( std::string& error );
+	void ReleaseBuild();
+	void SetXUniforms( GLuint prog, const FrameState& fs, GpuModel* model ); // DEFORM twins (binds units 31 / 32)
+	GLuint XGroupTex( GpuModel* model, bool want );
+	void XPlanes( const FrameState& fs, GpuModel* model, float* world, float* fitted, float& worldPerFitted ) const;
+	void DrawSide( GLuint prog, const FrameState& fs, GpuModel* model, const std::vector< Instance >* inst ); // the main draw of one model
+	void DrawCap( GLuint prog, const FrameState& fs, GpuModel* model );
+	bool LensOn( const FrameState& fs ) const { return fs.x.lens && fs.x.lensAmt > 0.0f; }
+	void SetLensUniforms( GLuint prog, const FrameState& fs, int w, int h );
+	void WarmLooks( const FrameState& fs, GpuModel* model ); // at model swap, through the 1-pixel scissor
+	struct XGroups
+	{
+		uint64_t serial = 0;
+		std::shared_ptr< std::vector< float > > job;
+		std::shared_ptr< std::atomic< bool > > done;
+		GLuint buf = 0, tex = 0;
+		bool ready = false;
+	} xGroups[ 4 ];
+	GLuint xDummy = 0, xDummyBuf = 0, xHistBuf = 0, xHistTex = 0, progCap = 0, progPostLens = 0;
+	size_t xHistCap = 0;
+	int xCutNow = 0;               // DrawSide: 1 = this draw keeps the kept side of the cut, 2 = the removed side
+	GpuModel* lensModel = nullptr; // the model the hole sits in (the dominant one)
+	const FrameState* lensFs = nullptr;
 	void ReleasePoints();
 	const PointSet* PointsFor( GpuModel* model, int source );
 	void RenderWireGlow( const FrameState& fs, int w, int h ); // the wired draws of this frame, again, into the HDR wire buffer

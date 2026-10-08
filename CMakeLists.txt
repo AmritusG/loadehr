@@ -47,6 +47,7 @@ add_library(loadehr_core STATIC
     src/Wire.cpp
     src/Points.cpp
     src/Lines.cpp
+    src/Build.cpp
     src/Morph.cpp
     src/Lightning.cpp
     src/Swarm.cpp

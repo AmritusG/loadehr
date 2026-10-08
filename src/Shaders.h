@@ -401,6 +401,40 @@ uniform vec3 uFoldAxes;                           // 1 = folded across that fitt
 uniform float uFoldK;                             // 0..1: how far folded (Deform Amount)
 uniform vec3 uJellyLin, uJellyAng;                // the jelly's lag: offset and rotation (axis x angle) at a fitted radius of 1
 uniform float uJellyScale;
+// W9: the deform state that changes with time, as globals: main() sets them from the uniforms, or (Slit-Scan) from the history at this
+// vertex's delay
+float gWarpPhase = 0.0, gRipplePhase = 0.0, gGlitchStep = 0.0, gSquash = 0.0, gJellyScale = 0.0;
+vec3 gJellyLin = vec3( 0.0 ), gJellyAng = vec3( 0.0 );
+// W9 Build (the looks in the DEFORM twins; uXLook 0 = none of them)
+uniform int uXLook;            // 1 slit-scan, 2 print on, 3 exploded, 4 black hole
+uniform int uXAxis;            // Build Axis
+uniform float uXAmt;           // the look's progress / strength (Build Amount, run by Build Speed / On Beat)
+uniform float uXSwirl;         // black hole: turns round the axis at the full fall
+uniform samplerBuffer uXGroup; // exploded: per triangle its group's centre (fitted), unit 31
+uniform samplerBuffer uXHist;  // slit-scan: newest first, one entry per 1/60 s: pose (4 texels, columns), phases, jelly (2), unit 32
+uniform mat4 uXPoseInv;        // slit-scan: the pose now, inverted
+uniform float uXHistN;         // entries in the history
+uniform float uXSlitPhase;     // slit-scan waves (Build Speed), cycles, wrapped at 1 (< 0: no waves, the delay grows along the axis)
+out float vXFall;              // black hole: how far this point has fallen (0..1)
+float gXFall = 0.0;
+mat3 gXRot = mat3( 1.0 );      // slit-scan: the past pose's turn (normals, tangents)
+// BLACK HOLE: every point spirals into the centre round the Build Axis, the near points first (so the model stretches as it falls),
+// shrinking to nothing; slider-driven (scrubbing back spits it out along the same path)
+vec3 BlackHole( vec3 f )
+{
+	vec3 q   = ToAxis( f, uXAxis );
+	float r  = length( f );
+	float u  = clamp( uXAmt * 2.2 - r / 1.6, 0.0, 1.0 );
+	u        = u * u * ( 3.0 - 2.0 * u );
+	gXFall   = max( gXFall, u );
+	float rr = pow( 1.0 - u, 1.6 );
+	float a  = 6.2831853 * uXSwirl * u * u * ( 1.0 + 0.6 / ( r * rr + 0.15 ) );
+	float c = cos( a ), s = sin( a );
+	q.xy = vec2( c * q.x - s * q.y, s * q.x + c * q.y );
+	q *= rr;
+	q.z *= 1.0 - 0.6 * u * ( 1.0 - u ) * 4.0 * 0.5; // flattened toward the disc on the way in
+	return FromAxis( q, uXAxis );
+}
 vec3 gFoldS = vec3( 1.0 );                        // this copy's side per folded axis (+1 / -1)
 bool gFoldFlip = false;                           // this triangle is reflected an odd number of times (winding reversed)
 bool gNormalPass = false;                         // the normal's finite differences: no Glitch (a band's jump is a translation)
@@ -431,7 +465,7 @@ vec3 DeformPre( vec3 f, vec3 n )
 		float th = uBend * q.z;
 		q        = vec3( R - ( R - q.x ) * cos( th ), q.y, ( R - q.x ) * sin( th ) );
 	}
-	float sa = exp( -uSquash ); // squash: shorter along the axis, wider across it (volume kept)
+	float sa = exp( -gSquash ); // squash: shorter along the axis, wider across it (volume kept)
 	q.z *= sa;
 	q.xy *= inversesqrt( sa );
 	q.x += uShear * q.z * 0.5;
@@ -441,11 +475,11 @@ vec3 DeformPre( vec3 f, vec3 n )
 		f = mix( f, normalize( f + vec3( 1e-6 ) ) * 0.8, uSpherize );
 	if( uWarp > 0.0 )
 	{
-		vec3 p = f * uWarpScale + uWarpPhase * vec3( 1.0, 0.5, 0.25 );
+		vec3 p = f * uWarpScale + gWarpPhase * vec3( 1.0, 0.5, 0.25 );
 		f += uWarp * 0.5 * ( vec3( DNoise( p ), DNoise( p + vec3( 17.3, 9.1, 31.7 ) ), DNoise( p + vec3( 41.9, 23.3, 7.7 ) ) ) - 0.5 );
 	}
 	if( uRipple > 0.0 )
-		f += n * uRipple * sin( uRippleFreq * length( f ) - uRipplePhase );
+		f += n * uRipple * sin( uRippleFreq * length( f ) - gRipplePhase );
 	if( uMelt > 0.0 )
 	{
 		float h    = f.y + 1.0;
@@ -462,8 +496,8 @@ vec3 DeformPre( vec3 f, vec3 n )
 		// bands across the axis jump sideways on a stepped clock (a hash per band and step: still while the clock is paused)
 		vec3 g     = ToAxis( f, uDeformAxis );
 		float band = floor( ( g.z + 1.0 ) * 0.5 * uGlitchBands );
-		float h    = fract( sin( band * 91.7 + uGlitchStep * 7.13 ) * 43758.5453 );
-		float h2   = fract( sin( band * 17.3 + uGlitchStep * 3.71 + 5.0 ) * 24634.6345 );
+		float h    = fract( sin( band * 91.7 + gGlitchStep * 7.13 ) * 43758.5453 );
+		float h2   = fract( sin( band * 17.3 + gGlitchStep * 3.71 + 5.0 ) * 24634.6345 );
 		if( h > 0.55 )
 			g.x += ( h2 - 0.5 ) * uGlitchShift;
 		f = FromAxis( g, uDeformAxis );
@@ -475,10 +509,11 @@ vec3 DeformPost( vec3 f )
 	if( uFoldK > 0.0 ) // kaleidoscope: this copy keeps its own side of each folded centre plane
 		f = mix( f, mix( f, gFoldS * abs( f ), uFoldAxes ), uFoldK );
 	float w = min( length( f ), 1.5 ); // the jelly: the far parts lag the most
-	float a = length( uJellyAng );
+	float a = length( gJellyAng );
 	if( a > 1e-6 )
-		f = RotAxis( uJellyAng / a, a * w ) * f;
-	return f * ( 1.0 + uJellyScale * w ) + uJellyLin * w;
+		f = RotAxis( gJellyAng / a, a * w ) * f;
+	f = f * ( 1.0 + gJellyScale * w ) + gJellyLin * w;
+	return uXLook == 4 ? BlackHole( f ) : f;
 }
 #endif
 // smooth deforms of one corner (fitted space)
@@ -659,6 +694,35 @@ void main()
 	vec3 wn = normalize( uNormalMat * n );
 	vec3 nObj = n;
 	vec3 opos = ( p - uFitCenter ) * uFitScale;
+#ifdef DEFORM
+	gWarpPhase = uWarpPhase, gRipplePhase = uRipplePhase, gGlitchStep = uGlitchStep, gSquash = uSquash;
+	gJellyLin = uJellyLin, gJellyAng = uJellyAng, gJellyScale = uJellyScale;
+	vXFall = 0.0;
+	mat4 xPast = mat4( 1.0 );
+	if( uXLook == 1 && uXHistN > 1.5 )
+	{
+		// SLIT-SCAN: this point shows the model as it was Build Amount x up to 2 s ago, the delay growing along the Build Axis (Build Speed:
+		// waves of delay travel along it); smooth in the height, so no tearing between slices
+		float h  = clamp( ( ToAxis( opos, uXAxis ).z + 1.0 ) * 0.5, 0.0, 1.0 );
+		float k  = uXSlitPhase >= 0.0 ? 0.5 - 0.5 * cos( 6.2831853 * ( h - uXSlitPhase ) ) : h;
+		float e  = clamp( uXAmt * 2.0 * k * 60.0, 0.0, uXHistN - 1.001 );
+		int i0   = int( floor( e ) ), i1 = i0 + 1;
+		float fr = e - float( i0 );
+		for( int c = 0; c < 4; ++c )
+			xPast[ c ] = mix( texelFetch( uXHist, i0 * 8 + c ), texelFetch( uXHist, i1 * 8 + c ), fr );
+		vec4 ph = mix( texelFetch( uXHist, i0 * 8 + 4 ), texelFetch( uXHist, i1 * 8 + 4 ), fr );
+		vec4 j0 = mix( texelFetch( uXHist, i0 * 8 + 5 ), texelFetch( uXHist, i1 * 8 + 5 ), fr );
+		vec4 j1 = mix( texelFetch( uXHist, i0 * 8 + 6 ), texelFetch( uXHist, i1 * 8 + 6 ), fr );
+		// a phase that wrapped between the two samples is taken from the nearer one (no blend across the wrap)
+		vec4 pn = texelFetch( uXHist, ( fr < 0.5 ? i0 : i1 ) * 8 + 4 );
+		gWarpPhase = abs( texelFetch( uXHist, i0 * 8 + 4 ).x - texelFetch( uXHist, i1 * 8 + 4 ).x ) > 1.0 ? pn.x : ph.x;
+		gRipplePhase = abs( texelFetch( uXHist, i0 * 8 + 4 ).y - texelFetch( uXHist, i1 * 8 + 4 ).y ) > 1.0 ? pn.y : ph.y;
+		gGlitchStep = pn.z, gSquash = ph.w;
+		gJellyLin = j0.xyz, gJellyScale = j0.w, gJellyAng = j1.xyz;
+		xPast = xPast * uXPoseInv; // world now -> world then
+		gXRot = mat3( xPast );
+	}
+#endif
 #ifdef LETTERS
 	vec3 lopos = opos; // patterns / dissolve stay stuck to the letter
 	{
@@ -738,6 +802,15 @@ void main()
 			vec3 side = uSliceAxis == 0 ? vec3( 0.0, 1.0, 0.0 ) : vec3( 1.0, 0.0, 0.0 );
 			f += side * ( sin( idx * 0.9 + uSlicePhase ) * uSliceWave * 0.25 + uSlide * 3.2 * ( 0.6 + 0.8 * fract( idx * 0.618 ) ) );
 		}
+#ifdef DEFORM
+		if( uXLook == 3 )
+		{
+			// EXPLODED VIEW: every group (letter / part / island) slides out from the centre along its own direction, as one piece
+			vec4 g  = texelFetch( uXGroup, base / 3 );
+			vec3 mv = g.xyz * uXAmt * 1.4;
+			f += mv, f0 += mv, f1 += mv, f2 += mv;
+		}
+#endif
 		// shatter: whole shards fly, spin and fall, and retrace the path when they come back
 		if( uShatterT > 0.0 && uShardsReady == 1 )
 		{
@@ -897,6 +970,15 @@ void main()
 	vec3 w0 = ( M * vec4( o0, 1.0 ) ).xyz;
 	vec3 w1 = ( M * vec4( o1, 1.0 ) ).xyz;
 	vec3 w2 = ( M * vec4( o2, 1.0 ) ).xyz;
+#ifdef DEFORM
+	if( uXLook == 1 )
+	{
+		w  = ( xPast * vec4( w, 1.0 ) ).xyz;
+		w0 = ( xPast * vec4( w0, 1.0 ) ).xyz, w1 = ( xPast * vec4( w1, 1.0 ) ).xyz, w2 = ( xPast * vec4( w2, 1.0 ) ).xyz;
+		wn = normalize( gXRot * wn );
+	}
+	vXFall = gXFall;
+#endif
 	vec3 fn   = cross( w1 - w0, w2 - w0 );
 	float len = length( fn );
 	fn        = len > 1e-20 ? fn / len : wn;
@@ -921,7 +1003,11 @@ void main()
 		w = Glitch( w );
 	vo.wpos     = w;
 	vo.wnrm     = wn;
+#ifdef DEFORM
+	vo.wtan     = vec4( normalize( gXRot * mat3( M ) * t.xyz ), t.w < 0.0 ? -1.0 : 1.0 );
+#else
 	vo.wtan     = vec4( normalize( mat3( M ) * t.xyz ), t.w < 0.0 ? -1.0 : 1.0 );
+#endif
 	vo.uv       = uv;
 #ifdef LETTERS
 	vo.opos     = lopos;
@@ -1169,6 +1255,18 @@ uniform int uMorphSide;
 uniform float uMorphK, uMorphE, uMorphStep, uMorphFreq, uMorphBand, uMorphGlow, uMorphTemp, uMorphFlame;
 uniform vec3 uMorphColor, uMorphSeed;
 uniform int uDeformAxis;
+#endif
+#ifdef DEFORM
+// W9 (the DEFORM twins' fragment side): the Build / Cut looks' region, band and shading
+uniform int uXLook;      // 1 slit-scan, 2 print on, 3 exploded, 4 black hole
+uniform int uXCut;       // 0 no cut; 1 keep the kept side (the solid), 2 keep the removed side (drawn in the Wire Mode)
+uniform vec4 uXPlane;    // world plane (n, d): kept where dot( n, p ) + d <= 0
+uniform vec4 uXPlaneO;   // the same plane in fitted rest space (clones: their own pose)
+uniform vec3 uXColor;    // Wire Color: the print head / the cut's band
+uniform float uXGlow;    // the band's light
+uniform float uXBand;    // the band's half width, world units
+uniform float uXLayer;   // print on: the layer lines' spacing (fitted), 0 = none
+in float vXFall;
 #endif
 #ifdef SHADOW_PASS
 uniform vec3 uShadowLightPos;
@@ -1500,6 +1598,24 @@ void main()
 #endif
 		edgeGlow = uDissolveInvert == 1 ? smoothstep( th - 0.03, th, n ) : 1.0 - smoothstep( th, th + 0.03, n );
 	}
+#ifdef DEFORM
+	// W9: which side of the cut this fragment is on (kept: the solid; removed: the Wire Mode's look, or nothing)
+	float xKeep = 1.0, xEdge = 1e9;
+	if( uXCut > 0 )
+	{
+#ifdef INSTANCED
+		float sd = dot( uXPlaneO.xyz, vi.opos ) + uXPlaneO.w;
+#else
+		float sd = dot( uXPlane.xyz, vi.wpos ) + uXPlane.w;
+#endif
+		xKeep = ( sd <= 0.0 ) == ( uXCut == 1 ) ? 1.0 : 0.0;
+		xEdge = abs( sd );
+	}
+#ifdef SHADOW_PASS
+	if( xKeep < 0.5 )
+		discard; // the removed part casts no shadow (a small pass: the end-of-shader rule is for the big variants)
+#endif
+#endif
 #ifdef INSTANCED
 	// W15: a tunnel ring fading in / out (the W1 dissolve noise; the shadow maps fade with it, fog keep included), and
 	// a ghost turning to dust with age: a grain hash on its own surface (the grains travel with the ghost's drift)
@@ -1825,6 +1941,18 @@ void main()
 	}
 
 #endif
+#if defined( DEFORM ) && !defined( SHADOW_PASS ) && !defined( PHOTON_PASS )
+	if( uXCut == 1 && uXGlow > 0.0 )
+		color += uXColor * exp( -xEdge * xEdge / max( uXBand * uXBand, 1e-10 ) ) * uXGlow; // the print head / the cut's glowing band
+	if( uXLayer > 0.0 && uXCut == 1 )
+	{
+		// printed layers: a fine ridge every layer
+		float y = fract( ( dot( uXPlaneO.xyz, vi.opos ) ) / uXLayer );
+		color *= 0.82 + 0.18 * smoothstep( 0.0, 0.25, y ) * ( 1.0 - smoothstep( 0.75, 1.0, y ) );
+	}
+	if( uXLook == 4 )
+		color = color * ( 1.0 - 0.85 * vXFall ) + Blackbody( 1500.0 + 3000.0 * vXFall ) * vXFall * vXFall * 2.5; // infalling matter heats up
+#endif
 #ifdef MORPH
 	if( uMorphMask == 1 || uMorphMask == 3 )
 		color = mix( color, uMorphColor * ( 1.5 + uMorphGlow ), morphEdge ); // scan's wire band / ripple's front, in Wire Color
@@ -1873,6 +2001,9 @@ void main()
 	float alpha = mix( 1.0, wire, uWireMix ) * surfAlpha * vInstHA.y;
 #endif
 
+#ifdef DEFORM
+	alpha *= xKeep;
+#endif
 	vec4 result = vec4( outc * alpha, alpha );
 	if( uFogDensity > 0.0 )
 	{
