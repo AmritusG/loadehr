@@ -170,9 +170,11 @@ void main()
 
 // Light Paint: one instance per head, a strip through its live position and its ring of past positions
 const char* kRibbonVS = R"GLSL(
-uniform samplerBuffer uCapPos, uCapCol, uRing;
+uniform samplerBuffer uCapPos, uCapNrm, uCapCol, uRing;
 uniform int uRows, uHeads, uHeadRow, uFilled;
 uniform float uNow, uTrail;
+uniform float uBands[ 16 ]; // W10: Line Audio, as the pairs: the band of the head's rest height pulses its light and its length
+uniform float uAudio;
 uniform vec3 uLineColor;
 uniform float uColorMix, uWeight;
 out vec2 vAcross;
@@ -190,10 +192,12 @@ void main()
 	int k      = gl_VertexID >> 1;
 	int kk     = min( k, uFilled );
 	vec4 p     = P( kk ), p0 = P( max( kk - 1, 0 ) ), p1 = P( min( kk + 1, uFilled ) );
+	float h    = clamp( ( texelFetch( uCapNrm, gl_InstanceID ).w + 1.0 ) * 0.5, 0.0, 1.0 ); // rest height 0 (base) .. 1 (top)
+	float band = uAudio * uBands[ int( h * 15.99 ) ];
 	float age  = mod( uNow - p.w + 7200.0, 3600.0 );
-	float fade = k > uFilled ? 0.0 : clamp( 1.0 - age / max( uTrail, 1e-3 ), 0.0, 1.0 );
+	float fade = k > uFilled ? 0.0 : clamp( 1.0 - age / max( uTrail * ( 1.0 + 0.5 * band ), 1e-3 ), 0.0, 1.0 );
 	vec4 col   = texelFetch( uCapCol, gl_InstanceID );
-	vColor     = mix( min( pow( max( col.rgb, 0.0 ), vec3( 1.0 / 2.2 ) ) * 1.6 + 0.08, vec3( 1.0 ) ), uLineColor, uColorMix );
+	vColor     = mix( min( pow( max( col.rgb, 0.0 ), vec3( 1.0 / 2.2 ) ) * 1.6 + 0.08, vec3( 1.0 ) ), uLineColor, uColorMix ) * ( 1.0 + band * 1.5 );
 	vFade      = fade * col.a * uWeight;
 	// the strip's direction on screen from its neighbours
 	vec4 c   = uViewProj * vec4( p.xyz, 1.0 );
@@ -715,9 +719,14 @@ void Renderer::DrawLines( const LineDraw& d, bool glow )
 		glUniform1i( U( progLineRibbon, "uFilled" ), c.ringFilled );
 		glUniform1f( U( progLineRibbon, "uNow" ), L.time );
 		glUniform1f( U( progLineRibbon, "uTrail" ), L.reach );
+		glUniform1fv( U( progLineRibbon, "uBands" ), 16, L.bands );
+		glUniform1f( U( progLineRibbon, "uAudio" ), L.audio );
 		glActiveTexture( GL_TEXTURE3 );
 		glBindTexture( GL_TEXTURE_BUFFER, c.ringTex );
-		const int verts = 2 * ( std::min( c.ringFilled, int( std::ceil( L.reach * 60.0f ) ) + 2 ) + 1 );
+		float loud = 0.0f; // the longest a band can stretch a ribbon this frame
+		for( float b : L.bands )
+			loud = std::max( loud, b );
+		const int verts = 2 * ( std::min( c.ringFilled, int( std::ceil( L.reach * ( 1.0f + 0.5f * L.audio * loud ) * 60.0f ) ) + 2 ) + 1 );
 		glDrawArraysInstanced( GL_TRIANGLE_STRIP, 0, verts, GLsizei( c.ringHeads ) );
 	}
 	(void)glow;

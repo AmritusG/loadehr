@@ -674,6 +674,22 @@ void Renderer::WarmLooks( const FrameState& fs, GpuModel* model )
 		d.lines.look = look;
 		DrawLines( { &d, &dummy, 0, 1.0f, 1.0f }, false );
 	}
+	// W10: the light-paint ribbon (DrawLines draws it only once a ring has filled, so it is drawn here directly: one strip, one head)
+	glUseProgram( progLineRibbon );
+	glUniform1i( U( progLineRibbon, "uFilled" ), 1 );
+	for( int k = 0; k < 4; ++k )
+	{
+		glActiveTexture( GL_TEXTURE0 + k );
+		glBindTexture( GL_TEXTURE_BUFFER, k < 3 ? c.tex[ k ] : xDummy );
+	}
+	glBindVertexArray( quadVAO );
+	glDrawArraysInstanced( GL_TRIANGLE_STRIP, 0, 4, 1 );
+	for( int k = 3; k >= 0; --k )
+	{
+		glActiveTexture( GL_TEXTURE0 + k );
+		glBindTexture( GL_TEXTURE_BUFFER, 0 );
+	}
+	glBindVertexArray( 0 );
 	glDisable( GL_BLEND );
 	glBlendFunc( GL_ONE, GL_ZERO );
 	// the cut: the stencil pass + the cap (DrawCap), the kept / removed sides' draws

@@ -1396,6 +1396,8 @@ private:
 		fs.explodeRandom = values[ P_EXPLODE_RANDOM ];
 		fs.explodeSeed   = 0.37f;
 		fs.dissolve      = values[ P_DISSOLVE ];
+		if( fs.sl.look == 2 && fs.sl.amount > 1.0f ) // W9 Skin Of Copies: Surf Amount 1..2 dissolves the model under its copies (W10: was set
+			fs.dissolve = std::max( fs.dissolve, std::min( 1.0f, fs.sl.amount - 1.0f ) ); // in BuildSurfLook, then overwritten here)
 		fs.dissolveEdge  = values[ P_DISSOLVE_EDGE ];
 		fs.toonSteps     = std::floor( values[ P_TOON_STEPS ] + 0.5f );
 		fs.outline       = values[ P_OUTLINE ];
@@ -3246,7 +3248,8 @@ private:
 				x.winModel = src ? src : slots[ ws ].current.get();
 			}
 		}
-		fs.shape.on = fs.shape.deform = fs.shape.deform || x.cut > 0; // the cut draws in the DEFORM twins
+		fs.shape.deform = fs.shape.deform || x.cut > 0; // the cut draws in the DEFORM twins
+		fs.shape.on     = fs.shape.on || fs.shape.deform;  // W10: keep what Shape / Letters / Lava switched on (Window cleared it)
 	}
 	// the model Surf Source names (classic): Slot B / C / D (when filled), or the text; nullptr = none
 	GpuModel* SourceModel() const
@@ -3297,8 +3300,6 @@ private:
 				const int ws = WindowSlot();
 				S.copy = ws >= 0 ? slots[ ws ].current.get() : nullptr;
 			}
-			if( S.amount > 1.0f )
-				fs.dissolve = std::max( fs.dissolve, std::min( 1.0f, S.amount - 1.0f ) );
 		}
 		else
 			fs.shape.on = fs.shape.deform = true; // the camera looks shade in the DEFORM twins

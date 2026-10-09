@@ -62,6 +62,7 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <map>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -199,6 +200,7 @@ struct SavedParam
 	std::string s;
 };
 std::vector< SavedParam > savedState;
+std::map< std::string, std::vector< uint8_t > > refFrames; // W10: ref_save / ref_cmp
 
 // input_seq: preloaded frames (RGBA, bottom-up), advanced once per rendered frame
 std::vector< std::vector< uint8_t > > seqFrames;
@@ -897,6 +899,43 @@ int main( int argc, char** argv )
 				printf( "scrub %.4f change %.4f max %d big %zu\n", v, sum / cur.size(), mx, big );
 				prev.swap( cur );
 			}
+		}
+		else if( cmd == "ref_save" ) // W10: ref_save <name> = keep the current host frame (raw premultiplied RGBA) in memory
+		{
+			std::string n;
+			ss >> n;
+			refFrames[ n ] = ReadFrame();
+		}
+		else if( cmd == "ref_cmp" ) // W10: ref_cmp <label> <name> = the current frame vs a kept one: mean |d| over RGBA (0..255),
+		{                           // pixels whose largest channel change is > 8, coverage (alpha > 8) of both
+			std::string l, n;
+			ss >> l >> n;
+			auto it = refFrames.find( n );
+			std::vector< uint8_t > cur = ReadFrame();
+			if( it == refFrames.end() || it->second.size() != cur.size() )
+			{
+				printf( "ref_cmp %s: NO REF %s\n", l.c_str(), n.c_str() );
+				continue;
+			}
+			const std::vector< uint8_t >& a = it->second;
+			double sum = 0, sd[ 4 ] = {}; // sd: the signed mean change per channel (a chaotic sim moves its smoke around but keeps
+			size_t changed = 0, covA = 0, covB = 0; // its colour and amount; a look that changes them moves these)
+			int mx = 0;
+			for( size_t k = 0; k < cur.size(); k += 4 )
+			{
+				int pm = 0;
+				for( int c = 0; c < 4; ++c )
+				{
+					const int d = std::abs( int( cur[ k + c ] ) - int( a[ k + c ] ) );
+					sum += d, pm = std::max( pm, d ), sd[ c ] += int( cur[ k + c ] ) - int( a[ k + c ] );
+				}
+				mx = std::max( mx, pm );
+				changed += pm > 8;
+				covA += a[ k + 3 ] > 8, covB += cur[ k + 3 ] > 8;
+			}
+			const double np = double( cur.size() / 4 );
+			printf( "ref_cmp %s mean %.4f max %d changed %zu cover %zu %zu of %zu shift %.3f %.3f %.3f %.3f\n", l.c_str(), sum / cur.size(), mx, changed, covA,
+			        covB, cur.size() / 4, sd[ 0 ] / np, sd[ 1 ] / np, sd[ 2 ] / np, sd[ 3 ] / np );
 		}
 		else if( cmd == "means" )
 		{
