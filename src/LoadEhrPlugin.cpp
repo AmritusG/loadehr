@@ -1103,7 +1103,8 @@ private:
 	// together. Each model keeps its fit (the dials while it was the placed one, hand edits included); a revisit writes it back, a model
 	// not placed yet is predicted with the placement's own formula from the dials, so the dials written at the midpoint ARE the glide's
 	// end and nothing steps. A jump of the chain (a new hop before arrival, a restart, a fast drag) glides on from the values shown
-	// (a carry that fades over 0.3 x Transition Time, the glide's own share of a hop). Other modes: the dials as they are.
+	// (a carry that fades over 0.3 x Transition Time, the glide's own share of a hop). W13: Once Per Model glides the same way, toward
+	// each model's own depth / cone shift (SlotEyeFit). Off / Position Only: the dials as they are.
 	struct LcFit
 	{
 		std::string key; // the model + eye query it was placed for (EyeSlot::key; empty = none)
@@ -1120,41 +1121,52 @@ private:
 		double age = 0;                         // s since the last jump (stops at the fade's end)
 	} lcGlide;
 
-	// the cone / Behind Depth slot i rests with
-	void SlotEyeFit( int i, float* out ) const
+	// the cone / Behind Depth slot i rests with. Every Model Swap: its own fit (what the placement writes for it). W13 Once Per Model
+	// (Amrit on W12's C2: "just looks off, incorrect, flawed": the skull's Behind Depth put the lights behind the helmet's back wall):
+	// the dials stay the anchor's, each other model keeps the lights in front of ITS back wall (the placement's rule, from the dials)
+	// and its cone moves by its fit minus the anchor's, as its openings move by its eyes minus the anchor's (hand-set dials kept)
+	void SlotEyeFit( int i, int mode, float* out ) const
 	{
 		out[ 0 ] = values[ P_LC_CONE ], out[ 1 ] = values[ P_LC_BEHIND ];
 		const EyeSlot& e = eyeSlot[ i ];
 		if( i == placedSlot || !e.found )
 			return; // the dials (a model without eyes changes nothing: the placement leaves the params untouched)
-		if( !lcFit[ i ].key.empty() && lcFit[ i ].key == e.key )
+		if( mode == AutoEvery && !lcFit[ i ].key.empty() && lcFit[ i ].key == e.key )
 		{
 			out[ 0 ] = lcFit[ i ].cone, out[ 1 ] = lcFit[ i ].behind;
 			return;
 		}
 		if( e.wall < 1e8f && out[ 1 ] > 0.6f * e.wall ) // what UpdateEyePlacement will write
 			out[ 1 ] = Clamped( P_LC_BEHIND, 0.6f * e.wall );
-		out[ 0 ] = Clamped( P_LC_CONE, EyeCone( e.radius, out[ 1 ] ) );
+		if( mode == AutoEvery )
+			out[ 0 ] = Clamped( P_LC_CONE, EyeCone( e.radius, out[ 1 ] ) );
+		else if( eyeSlot[ placedSlot ].found )
+			out[ 0 ] = Clamped( P_LC_CONE, out[ 0 ] + EyeCone( e.radius, out[ 1 ] ) - EyeCone( eyeSlot[ placedSlot ].radius, values[ P_LC_BEHIND ] ) );
 	}
 
 	void GlideEyeFit( int mode, float dt )
 	{
 		lcShow[ 0 ] = values[ P_LC_CONE ], lcShow[ 1 ] = values[ P_LC_BEHIND ];
 		if( mode != AutoEvery )
-		{
 			for( LcFit& f : lcFit )
 				f.key.clear();
+		if( mode != AutoEvery && mode != AutoOnce )
+		{
 			lcGlide.valid = false;
 			return;
 		}
 		const bool chained = chain.n >= 2 && WantEyes() && chain.cur >= 0; // UpdateChainEyes ran: the slot keys are this frame's
-		if( chained && eyeSlot[ placedSlot ].found )
+		if( mode == AutoEvery && chained && eyeSlot[ placedSlot ].found )
 			lcFit[ placedSlot ] = { eyeSlot[ placedSlot ].key, values[ P_LC_CONE ], values[ P_LC_BEHIND ] };
-		if( chained && chain.next >= 0 )
+		if( chained )
 		{
+			// resting (no next hop, e.g. the end of an open chain) = the model it rests on (Once: not the anchor's dials)
 			float a[ 2 ], b[ 2 ];
-			SlotEyeFit( chain.cur, a ), SlotEyeFit( chain.next, b );
-			const float w = SmoothStep( 0.35f, 0.65f, chain.t ); // the openings' glide (UpdateChainEyes)
+			SlotEyeFit( chain.cur, mode, a );
+			std::memcpy( b, a, sizeof( b ) );
+			if( chain.next >= 0 )
+				SlotEyeFit( chain.next, mode, b );
+			const float w = chain.next >= 0 ? SmoothStep( 0.35f, 0.65f, chain.t ) : 0.0f; // the openings' glide (UpdateChainEyes)
 			for( int k = 0; k < 2; ++k )
 				lcShow[ k ] = a[ k ] + ( b[ k ] - a[ k ] ) * w;
 		}

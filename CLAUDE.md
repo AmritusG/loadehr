@@ -90,6 +90,8 @@ tools/w11_decisions.py defaults|lightc|window <out> [<ref build>]  # W11: the ne
 tools/arena_w11.py <layer> [col]          # W11: dial the W11 decision clips by param name (never triggers)
 tools/w12_glide.py hop|interrupt|same <out> <ref build>  # W12: Light C's cone / depth glide (Every Model Swap) vs a reference build
 tools/arena_w12.py <layer> [col]          # W12: dial the Light Glide clips (C1 Every Model Swap, C2 Once Per Model) by param name (never triggers)
+tools/w13_once.py hop|arrive|same <out> <ref build>  # W13: Once Per Model follows each model's depth / cone
+tools/arena_w13.py <layer> [col]          # W13: dial the Once Follows clips (skull -> Goat Skull: C1 Once, C2 Every) (never triggers)
 ```
 Log: `~/Library/Logs/LoadEhr/LoadEhr.log` (per-material texture resolution, load/upload/swap times per slot, shader compile
 logs; with Debug Log: PERF + MEM (GPU MB per slot) lines every second, CHAIN hops). `LOADEHR_LOG_STDERR=1` mirrors it to stderr.
@@ -759,7 +761,15 @@ d) W17: KHR_materials_pbrSpecularGlossiness -> diffuse = BaseColor, its spec/glo
   Depth only ever went down, so skull -> helmet -> skull came back at the helmet's 0.035 instead of the skull's 0.157). A jump of the
   chain (new hop before arrival, restart, fast drag) glides on from what was shown: a carry on cone, depth and the openings (dials +
   shift, so a re-place in the same frame cannot snap them) fading over 0.3 x Transition Time. Aim / anchor / Mirror X are switches the
-  placement sets: they do not glide. Off / Once Per Model / Position Only: the dials as they are (renders max 0 vs W11).
+  placement sets: they do not glide. Off / Position Only: the dials as they are (renders max 0 vs W11).
+- W13 (Amrit on W12's C2, Once Per Model: "just looks off, incorrect, flawed"; picked "1" = fix Once itself): Once kept the skull's
+  Behind Depth 0.157 on the Damaged Helmet, whose back wall is 0.058 behind the opening, so the lights sat behind the wall. Now Once's
+  dials stay the anchor's (never written after the first placement, hand edits kept) and every other model gets, like its openings,
+  its own shift: depth = min(dials, 0.6 x its back wall) (the placement's rule), cone = dials + its fit's cone - the anchor's fit's cone
+  (`SlotEyeFit`, mode-aware), gliding on the openings' glide, also while RESTING on a model (an open chain's last model has no next hop:
+  W13's first cut showed the anchor's dials there). The carry (jumps) covers Once too. Measured (`tools/w13_once.py`, `w12_glide.py
+  interrupt`): resting on B, Once vs Every = the run-to-run floor (W12: mean 10.4, max 134 with haze); hop max step Once 0.284 / 0.229
+  (W12 Once 0.299 / 0.386, damaged / goat); interrupted hop 0.142 per frame (W12 Once 7.65); Off / Position / Every max 0 vs W12.
 - Measured (`tools/w12_glide.py`, beam only, 100 slider steps each way): skull -> Damaged Helmet max step 0.284 (W11 0.861 at the swap;
   Once 0.294), skull -> Goat Skull (cone 40 -> 24) 0.219 (W11 5.00; Once 0.383); interrupted hop (skull -> goat -> damaged, 0.35 -> 0.8)
   max per frame 0.138 (W11 6.54, Once 7.65). Volume renders are not run-to-run exact (a series' first run is a cold outlier, later runs

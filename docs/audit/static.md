@@ -18,29 +18,29 @@ Bundles carry: LoadEhr 487, LoadEhrFX 508, LoadEhrWow 497, LoadEhrWowFX 510
 | P_MODEL_D | Model D | Model | 10 | 10 | 10 | 10 | LoadEhrPlugin.cpp:SetTextId 454,455 | WIRED |
 | P_STATUS_D | Status D | Model | 11 | 11 | 11 | 11 | LoadEhrPlugin.cpp:SetTextId 456; LoadEhrPlugin.cpp:SetStatus 756 | WIRED |
 | P_RELOAD_D | Reload D | Model | 12 | 12 | 12 | 12 | LoadEhrPlugin.cpp:SetFloatId 374 | WIRED |
-| P_AUTO_FIT | Auto Fit | Model | 13 | 13 | 13 | 13 | LoadEhrPlugin.cpp:UpdateChainEyes 1064; LoadEhrPlugin.cpp:UpdateEyePlacement 1256; LoadEhrPlugin.cpp:BuildFrame 1421; LoadEhrPlugin.cpp:BuildCut 3370 | WIRED |
-| P_FIT_TO | Fit To | Model | 14 | 14 | 14 | 14 | LoadEhrPlugin.cpp:TargetFit 1839 | WIRED |
-| P_NORMAL_FLIP_Y | Normal Flip Y | Model | 15 | 15 | 15 | 15 | LoadEhrPlugin.cpp:BuildFrame 1523 | WIRED |
+| P_AUTO_FIT | Auto Fit | Model | 13 | 13 | 13 | 13 | LoadEhrPlugin.cpp:UpdateChainEyes 1064; LoadEhrPlugin.cpp:UpdateEyePlacement 1268; LoadEhrPlugin.cpp:BuildFrame 1433; LoadEhrPlugin.cpp:BuildCut 3382 | WIRED |
+| P_FIT_TO | Fit To | Model | 14 | 14 | 14 | 14 | LoadEhrPlugin.cpp:TargetFit 1851 | WIRED |
+| P_NORMAL_FLIP_Y | Normal Flip Y | Model | 15 | 15 | 15 | 15 | LoadEhrPlugin.cpp:BuildFrame 1535 | WIRED |
 | P_MAX_TEX | Max Texture Size | Model | 16 | 16 | 16 | 16 | LoadEhrPlugin.cpp:UpdateSlot 867 | WIRED |
-| P_TRANSITION | Transition | Model | 17 | 17 | 17 | 17 | LoadEhrPlugin.cpp:ChainPosition 2361 | WIRED |
-| P_CHAIN_LOOP | Chain Loop | Model | 18 | 18 | 18 | 18 | LoadEhrPlugin.cpp:ChainPosition 2386; LoadEhrPlugin.cpp:EvalChain 2413 | WIRED |
-| P_TRANSITION_STYLE | Transition Style | Model | 19 | 19 | 19 | 19 | LoadEhrPlugin.cpp:HopStyle 2308,2309; LoadEhrPlugin.cpp:ChainUses 2334; LoadEhrPlugin.cpp:ChainPosition 2402; LoadEhrPlugin.cpp:EvalChain 2434 | WIRED |
-| P_STYLE_ORDER | Style Order | Model | 20 | 20 | 20 | 20 | LoadEhrPlugin.cpp:HopStyle 2309; LoadEhrPlugin.cpp:ChainUses 2333 | WIRED |
-| P_TRANS_PLAY | Transition Play | Model | 21 | 21 | 21 | 21 | LoadEhrPlugin.cpp:ChainPosition 2353 | WIRED |
-| P_TRANS_TIME | Transition Time | Model | 22 | 22 | 22 | 22 | LoadEhrPlugin.cpp:GlideEyeFit 1166; LoadEhrPlugin.cpp:ChainPosition 2363 | WIRED |
-| P_HOLD_TIME | Hold Time | Model | 23 | 23 | 23 | 23 | LoadEhrPlugin.cpp:ChainPosition 2363 | WIRED |
-| P_TRANS_EASE | Trans Ease | Model | 24 | 24 | 24 | 24 | LoadEhrPlugin.cpp:BuildFrame 1500; LoadEhrPlugin.cpp:SmokeStyle 2477 | WIRED |
-| P_TRANS_STAGGER | Trans Stagger | Model | 25 | 25 | 25 | 25 | LoadEhrPlugin.cpp:BuildFrame 1501 | WIRED |
-| P_TRANS_SPREAD | Trans Spread | Model | 26 | 26 | 26 | 26 | LoadEhrPlugin.cpp:BuildFrame 1502 | WIRED |
-| P_TRANS_SPARKLE | Trans Sparkle | Model | 27 | 27 | 27 | 27 | LoadEhrPlugin.cpp:ProcessOpenGL 572; LoadEhrPlugin.cpp:BuildMorph 2452 | WIRED |
-| P_LIQUID_GOO | Liquid Goo | Model | — | — | 28 | 28 | LoadEhrPlugin.cpp:BuildFrame 1506 | WIRED |
-| P_LIQUID_LOOK | Liquid Look | Model | — | — | 29 | 29 | LoadEhrPlugin.cpp:BuildFrame 1507 | WIRED |
-| P_LIQUID_COL_H | Liquid Color | Model | — | — | 30 | 30 | LoadEhrPlugin.cpp:BuildFrame 1510,1511 | WIRED |
-| P_LIQUID_COL_S | Liquid Sat | Model | — | — | 31 | 31 | LoadEhrPlugin.cpp:BuildFrame 1510,1511 | WIRED |
-| P_LIQUID_COL_V | Liquid Bri | Model | — | — | 32 | 32 | LoadEhrPlugin.cpp:BuildFrame 1510,1511 | WIRED |
-| P_LIQUID_COL_A | Liquid Tint Mix | Model | — | — | 33 | 33 | LoadEhrPlugin.cpp:BuildFrame 1510,1511 | WIRED |
-| P_LIQUID_WOBBLE | Liquid Wobble | Model | — | — | 34 | 34 | LoadEhrPlugin.cpp:BuildFrame 1508 | WIRED |
-| P_LIQUID_SPEED | Liquid Speed | Model | — | — | 35 | 35 | LoadEhrPlugin.cpp:BuildFrame 1505 | WIRED |
+| P_TRANSITION | Transition | Model | 17 | 17 | 17 | 17 | LoadEhrPlugin.cpp:ChainPosition 2373 | WIRED |
+| P_CHAIN_LOOP | Chain Loop | Model | 18 | 18 | 18 | 18 | LoadEhrPlugin.cpp:ChainPosition 2398; LoadEhrPlugin.cpp:EvalChain 2425 | WIRED |
+| P_TRANSITION_STYLE | Transition Style | Model | 19 | 19 | 19 | 19 | LoadEhrPlugin.cpp:HopStyle 2320,2321; LoadEhrPlugin.cpp:ChainUses 2346; LoadEhrPlugin.cpp:ChainPosition 2414; LoadEhrPlugin.cpp:EvalChain 2446 | WIRED |
+| P_STYLE_ORDER | Style Order | Model | 20 | 20 | 20 | 20 | LoadEhrPlugin.cpp:HopStyle 2321; LoadEhrPlugin.cpp:ChainUses 2345 | WIRED |
+| P_TRANS_PLAY | Transition Play | Model | 21 | 21 | 21 | 21 | LoadEhrPlugin.cpp:ChainPosition 2365 | WIRED |
+| P_TRANS_TIME | Transition Time | Model | 22 | 22 | 22 | 22 | LoadEhrPlugin.cpp:GlideEyeFit 1178; LoadEhrPlugin.cpp:ChainPosition 2375 | WIRED |
+| P_HOLD_TIME | Hold Time | Model | 23 | 23 | 23 | 23 | LoadEhrPlugin.cpp:ChainPosition 2375 | WIRED |
+| P_TRANS_EASE | Trans Ease | Model | 24 | 24 | 24 | 24 | LoadEhrPlugin.cpp:BuildFrame 1512; LoadEhrPlugin.cpp:SmokeStyle 2489 | WIRED |
+| P_TRANS_STAGGER | Trans Stagger | Model | 25 | 25 | 25 | 25 | LoadEhrPlugin.cpp:BuildFrame 1513 | WIRED |
+| P_TRANS_SPREAD | Trans Spread | Model | 26 | 26 | 26 | 26 | LoadEhrPlugin.cpp:BuildFrame 1514 | WIRED |
+| P_TRANS_SPARKLE | Trans Sparkle | Model | 27 | 27 | 27 | 27 | LoadEhrPlugin.cpp:ProcessOpenGL 572; LoadEhrPlugin.cpp:BuildMorph 2464 | WIRED |
+| P_LIQUID_GOO | Liquid Goo | Model | — | — | 28 | 28 | LoadEhrPlugin.cpp:BuildFrame 1518 | WIRED |
+| P_LIQUID_LOOK | Liquid Look | Model | — | — | 29 | 29 | LoadEhrPlugin.cpp:BuildFrame 1519 | WIRED |
+| P_LIQUID_COL_H | Liquid Color | Model | — | — | 30 | 30 | LoadEhrPlugin.cpp:BuildFrame 1522,1523 | WIRED |
+| P_LIQUID_COL_S | Liquid Sat | Model | — | — | 31 | 31 | LoadEhrPlugin.cpp:BuildFrame 1522,1523 | WIRED |
+| P_LIQUID_COL_V | Liquid Bri | Model | — | — | 32 | 32 | LoadEhrPlugin.cpp:BuildFrame 1522,1523 | WIRED |
+| P_LIQUID_COL_A | Liquid Tint Mix | Model | — | — | 33 | 33 | LoadEhrPlugin.cpp:BuildFrame 1522,1523 | WIRED |
+| P_LIQUID_WOBBLE | Liquid Wobble | Model | — | — | 34 | 34 | LoadEhrPlugin.cpp:BuildFrame 1520 | WIRED |
+| P_LIQUID_SPEED | Liquid Speed | Model | — | — | 35 | 35 | LoadEhrPlugin.cpp:BuildFrame 1517 | WIRED |
 | P_TEXT | Text | Text | 28 | 28 | 36 | 36 | LoadEhrPlugin.cpp:SetTextId 466; LoadEhrPlugin.cpp:SetModelFile 723; LoadEhrPlugin.cpp:TextLogoSpec 795 | WIRED |
 | P_FONT | Font | Text | 29 | 29 | 37 | 37 | LoadEhrPlugin.cpp:LoopFade 261; LoadEhrPlugin.cpp:SetFloatId 417,421; LoadEhrPlugin.cpp:SetFontName 738,740,741 | WIRED |
 | P_FONT_NAME | Font Name | Text | 30 | 30 | 38 | 38 | LoadEhrPlugin.cpp:LoopFade 271; LoadEhrPlugin.cpp:SetFloatId 422,425; LoadEhrPlugin.cpp:SetTextId 462; LoadEhrPlugin.cpp:SetModelFile 723 | WIRED |
@@ -62,38 +62,38 @@ Bundles carry: LoadEhr 487, LoadEhrFX 508, LoadEhrWow 497, LoadEhrWowFX 510
 | P_BACK_CAP | Back Cap | Extrude | 46 | 46 | — | — | LoadEhrPlugin.cpp:TextLogoSpec 806 | WIRED |
 | P_OUTLINE_ONLY | Outline Only | Extrude | 47 | 47 | — | — | LoadEhrPlugin.cpp:TextLogoSpec 806 | WIRED |
 | P_WALL | Wall Thickness | Extrude | 48 | 48 | — | — | LoadEhrPlugin.cpp:TextLogoSpec 806 | WIRED |
-| P_TYPE_ON | Type On | Letters | 49 | 49 | — | — | LoadEhrPlugin.cpp:BuildLetters 4157 | WIRED |
-| P_TYPE_SPEED | Type Speed | Letters | 50 | 50 | — | — | LoadEhrPlugin.cpp:BuildLetters 4145 | WIRED |
-| P_LETTER_STAGGER | Letter Stagger | Letters | 51 | 51 | — | — | LoadEhrPlugin.cpp:BuildLetters 4146 | WIRED |
-| P_LETTER_WAVE | Letter Wave | Letters | 52 | 52 | — | — | LoadEhrPlugin.cpp:BuildLetters 4145 | WIRED |
-| P_WAVE_SPEED | Wave Speed | Letters | 53 | 53 | — | — | LoadEhrPlugin.cpp:BuildLetters 4150 | WIRED |
-| P_LETTER_SPIN | Letter Spin | Letters | 54 | 54 | — | — | LoadEhrPlugin.cpp:BuildLetters 4145 | WIRED |
-| P_SPIN_MODE | Spin Mode | Letters | 55 | 55 | — | — | LoadEhrPlugin.cpp:BuildLetters 4181 | WIRED |
-| P_LETTER_HOP | Letter Hop | Letters | 56 | 56 | — | — | LoadEhrPlugin.cpp:BuildLetters 4152,4152 | WIRED |
-| P_HOP_HEIGHT | Hop Height | Letters | 57 | 57 | — | — | LoadEhrPlugin.cpp:BuildLetters 4178 | WIRED |
-| P_ROT_X | Rotate X | Transform | 58 | 58 | 45 | 45 | LoadEhrPlugin.cpp:BuildFrame 1401; LoadEhrPlugin.cpp:BuildFaces 1756,1757 | WIRED |
-| P_ROT_Y | Rotate Y | Transform | 59 | 59 | 46 | 46 | LoadEhrPlugin.cpp:BuildFrame 1401; LoadEhrPlugin.cpp:BuildFaces 1756,1757 | WIRED |
-| P_ROT_Z | Rotate Z | Transform | 60 | 60 | 47 | 47 | LoadEhrPlugin.cpp:BuildFrame 1401; LoadEhrPlugin.cpp:BuildFaces 1756,1757 | WIRED |
-| P_SPIN_X | Spin X | Transform | 61 | 61 | 48 | 48 | LoadEhrPlugin.cpp:BuildFrame 1382 | WIRED |
-| P_SPIN_Y | Spin Y | Transform | 62 | 62 | 49 | 49 | LoadEhrPlugin.cpp:BuildFrame 1382 | WIRED |
-| P_SPIN_Z | Spin Z | Transform | 63 | 63 | 50 | 50 | LoadEhrPlugin.cpp:BuildFrame 1382 | WIRED |
+| P_TYPE_ON | Type On | Letters | 49 | 49 | — | — | LoadEhrPlugin.cpp:BuildLetters 4169 | WIRED |
+| P_TYPE_SPEED | Type Speed | Letters | 50 | 50 | — | — | LoadEhrPlugin.cpp:BuildLetters 4157 | WIRED |
+| P_LETTER_STAGGER | Letter Stagger | Letters | 51 | 51 | — | — | LoadEhrPlugin.cpp:BuildLetters 4158 | WIRED |
+| P_LETTER_WAVE | Letter Wave | Letters | 52 | 52 | — | — | LoadEhrPlugin.cpp:BuildLetters 4157 | WIRED |
+| P_WAVE_SPEED | Wave Speed | Letters | 53 | 53 | — | — | LoadEhrPlugin.cpp:BuildLetters 4162 | WIRED |
+| P_LETTER_SPIN | Letter Spin | Letters | 54 | 54 | — | — | LoadEhrPlugin.cpp:BuildLetters 4157 | WIRED |
+| P_SPIN_MODE | Spin Mode | Letters | 55 | 55 | — | — | LoadEhrPlugin.cpp:BuildLetters 4193 | WIRED |
+| P_LETTER_HOP | Letter Hop | Letters | 56 | 56 | — | — | LoadEhrPlugin.cpp:BuildLetters 4164,4164 | WIRED |
+| P_HOP_HEIGHT | Hop Height | Letters | 57 | 57 | — | — | LoadEhrPlugin.cpp:BuildLetters 4190 | WIRED |
+| P_ROT_X | Rotate X | Transform | 58 | 58 | 45 | 45 | LoadEhrPlugin.cpp:BuildFrame 1413; LoadEhrPlugin.cpp:BuildFaces 1768,1769 | WIRED |
+| P_ROT_Y | Rotate Y | Transform | 59 | 59 | 46 | 46 | LoadEhrPlugin.cpp:BuildFrame 1413; LoadEhrPlugin.cpp:BuildFaces 1768,1769 | WIRED |
+| P_ROT_Z | Rotate Z | Transform | 60 | 60 | 47 | 47 | LoadEhrPlugin.cpp:BuildFrame 1413; LoadEhrPlugin.cpp:BuildFaces 1768,1769 | WIRED |
+| P_SPIN_X | Spin X | Transform | 61 | 61 | 48 | 48 | LoadEhrPlugin.cpp:BuildFrame 1394 | WIRED |
+| P_SPIN_Y | Spin Y | Transform | 62 | 62 | 49 | 49 | LoadEhrPlugin.cpp:BuildFrame 1394 | WIRED |
+| P_SPIN_Z | Spin Z | Transform | 63 | 63 | 50 | 50 | LoadEhrPlugin.cpp:BuildFrame 1394 | WIRED |
 | P_RESET_SPIN | Reset Spin | Transform | 64 | 64 | 51 | 51 | LoadEhrPlugin.cpp:SetFloatId 376 | WIRED |
-| P_POS_X | Pos X | Transform | 65 | 65 | 52 | 52 | LoadEhrPlugin.cpp:BuildFrame 1405; LoadEhrPlugin.cpp:BuildFaces 1756 | WIRED |
-| P_POS_Y | Pos Y | Transform | 66 | 66 | 53 | 53 | LoadEhrPlugin.cpp:BuildFrame 1405; LoadEhrPlugin.cpp:BuildFaces 1756; LoadEhrPlugin.cpp:MakeStrike 2888; LoadEhrPlugin.cpp:BuildPost 4362 | WIRED |
-| P_POS_Z | Pos Z | Transform | 67 | 67 | 54 | 54 | LoadEhrPlugin.cpp:BuildFrame 1405; LoadEhrPlugin.cpp:BuildPost 4365 | WIRED |
-| P_SCALE | Scale | Transform | 68 | 68 | 55 | 55 | LoadEhrPlugin.cpp:BuildFrame 1406,1458; LoadEhrPlugin.cpp:BuildCut 3405 | WIRED |
-| P_FOV | FOV | Camera | 69 | 69 | 56 | 56 | LoadEhrPlugin.cpp:BuildFrame 1447; LoadEhrPlugin.cpp:BuildFaces 1756; LoadEhrPlugin.cpp:BuildCopies 3785 | WIRED |
-| P_DISTANCE | Distance | Camera | 70 | 70 | 57 | 57 | LoadEhrPlugin.cpp:BuildFrame 1447; LoadEhrPlugin.cpp:BuildFaces 1756; LoadEhrPlugin.cpp:BuildCopies 3785 | WIRED |
-| P_ORBIT_YAW | Orbit Yaw | Camera | 71 | 71 | 58 | 58 | LoadEhrPlugin.cpp:BuildFrame 1447; LoadEhrPlugin.cpp:BuildFaces 1756,1757 | WIRED |
-| P_ORBIT_PITCH | Orbit Pitch | Camera | 72 | 72 | 59 | 59 | LoadEhrPlugin.cpp:BuildFrame 1447; LoadEhrPlugin.cpp:BuildFaces 1756 | WIRED |
-| P_CUT_EVERY | Cut Every | Camera Live | 73 | 73 | — | — | LoadEhrPlugin.cpp:UpdateCameraLive 1946,1946 | WIRED |
-| P_CUT_ANGLES | Cut Angles | Camera Live | 74 | 74 | — | — | LoadEhrPlugin.cpp:UpdateCameraLive 1947 | WIRED |
-| P_ANGLE_SPREAD | Angle Spread | Camera Live | 75 | 75 | — | — | LoadEhrPlugin.cpp:UpdateCameraLive 1963 | WIRED |
-| P_CUT_ORDER | Cut Order | Camera Live | 76 | 76 | — | — | LoadEhrPlugin.cpp:UpdateCameraLive 1953 | WIRED |
-| P_BEAT_SHAKE | Beat Shake | Camera Live | 77 | 77 | — | — | LoadEhrPlugin.cpp:UpdateCameraLive 1969 | WIRED |
-| P_SHAKE_DECAY | Shake Decay | Camera Live | 78 | 78 | — | — | LoadEhrPlugin.cpp:UpdateCameraLive 1970 | WIRED |
-| P_VERTIGO | Vertigo | Camera Live | 79 | 79 | — | — | LoadEhrPlugin.cpp:BuildFrame 1454 | WIRED |
-| P_POSE_GLIDE | Pose Glide | Camera Live | 80 | 80 | — | — | LoadEhrPlugin.cpp:UpdateGlide 1915 | WIRED |
+| P_POS_X | Pos X | Transform | 65 | 65 | 52 | 52 | LoadEhrPlugin.cpp:BuildFrame 1417; LoadEhrPlugin.cpp:BuildFaces 1768 | WIRED |
+| P_POS_Y | Pos Y | Transform | 66 | 66 | 53 | 53 | LoadEhrPlugin.cpp:BuildFrame 1417; LoadEhrPlugin.cpp:BuildFaces 1768; LoadEhrPlugin.cpp:MakeStrike 2900; LoadEhrPlugin.cpp:BuildPost 4374 | WIRED |
+| P_POS_Z | Pos Z | Transform | 67 | 67 | 54 | 54 | LoadEhrPlugin.cpp:BuildFrame 1417; LoadEhrPlugin.cpp:BuildPost 4377 | WIRED |
+| P_SCALE | Scale | Transform | 68 | 68 | 55 | 55 | LoadEhrPlugin.cpp:BuildFrame 1418,1470; LoadEhrPlugin.cpp:BuildCut 3417 | WIRED |
+| P_FOV | FOV | Camera | 69 | 69 | 56 | 56 | LoadEhrPlugin.cpp:BuildFrame 1459; LoadEhrPlugin.cpp:BuildFaces 1768; LoadEhrPlugin.cpp:BuildCopies 3797 | WIRED |
+| P_DISTANCE | Distance | Camera | 70 | 70 | 57 | 57 | LoadEhrPlugin.cpp:BuildFrame 1459; LoadEhrPlugin.cpp:BuildFaces 1768; LoadEhrPlugin.cpp:BuildCopies 3797 | WIRED |
+| P_ORBIT_YAW | Orbit Yaw | Camera | 71 | 71 | 58 | 58 | LoadEhrPlugin.cpp:BuildFrame 1459; LoadEhrPlugin.cpp:BuildFaces 1768,1769 | WIRED |
+| P_ORBIT_PITCH | Orbit Pitch | Camera | 72 | 72 | 59 | 59 | LoadEhrPlugin.cpp:BuildFrame 1459; LoadEhrPlugin.cpp:BuildFaces 1768 | WIRED |
+| P_CUT_EVERY | Cut Every | Camera Live | 73 | 73 | — | — | LoadEhrPlugin.cpp:UpdateCameraLive 1958,1958 | WIRED |
+| P_CUT_ANGLES | Cut Angles | Camera Live | 74 | 74 | — | — | LoadEhrPlugin.cpp:UpdateCameraLive 1959 | WIRED |
+| P_ANGLE_SPREAD | Angle Spread | Camera Live | 75 | 75 | — | — | LoadEhrPlugin.cpp:UpdateCameraLive 1975 | WIRED |
+| P_CUT_ORDER | Cut Order | Camera Live | 76 | 76 | — | — | LoadEhrPlugin.cpp:UpdateCameraLive 1965 | WIRED |
+| P_BEAT_SHAKE | Beat Shake | Camera Live | 77 | 77 | — | — | LoadEhrPlugin.cpp:UpdateCameraLive 1981 | WIRED |
+| P_SHAKE_DECAY | Shake Decay | Camera Live | 78 | 78 | — | — | LoadEhrPlugin.cpp:UpdateCameraLive 1982 | WIRED |
+| P_VERTIGO | Vertigo | Camera Live | 79 | 79 | — | — | LoadEhrPlugin.cpp:BuildFrame 1466 | WIRED |
+| P_POSE_GLIDE | Pose Glide | Camera Live | 80 | 80 | — | — | LoadEhrPlugin.cpp:UpdateGlide 1927 | WIRED |
 | P_STORE_POSE1 | Store Pose 1 | Camera Live | 81 | 81 | — | — | LoadEhrPlugin.cpp:SetFloatId 391,392 | WIRED |
 | P_STORE_POSE2 | Store Pose 2 | Camera Live | 82 | 82 | — | — | LoadEhrPlugin.cpp:SetFloatId 391 | WIRED |
 | P_STORE_POSE3 | Store Pose 3 | Camera Live | 83 | 83 | — | — | LoadEhrPlugin.cpp:SetFloatId 391 | WIRED |
@@ -102,614 +102,614 @@ Bundles carry: LoadEhr 487, LoadEhrFX 508, LoadEhrWow 497, LoadEhrWowFX 510
 | P_GO_POSE2 | Go Pose 2 | Camera Live | 86 | 86 | — | — | LoadEhrPlugin.cpp:SetFloatId 393 | WIRED |
 | P_GO_POSE3 | Go Pose 3 | Camera Live | 87 | 87 | — | — | LoadEhrPlugin.cpp:SetFloatId 393 | WIRED |
 | P_GO_POSE4 | Go Pose 4 | Camera Live | 88 | 88 | — | — | LoadEhrPlugin.cpp:SetFloatId 393 | WIRED |
-| P_POSE_DATA | Pose Data | Camera Live | 89 | 89 | — | — | LoadEhrPlugin.cpp:SetTextId 458; LoadEhrPlugin.cpp:StorePose 1795 | WIRED |
-| P_WOBBLE_AMOUNT | Wobble Amount | Motion | 90 | 90 | 60 | 60 | LoadEhrPlugin.cpp:BuildFrame 1396 | WIRED |
-| P_WOBBLE_SPEED | Wobble Speed | Motion | 91 | 91 | 61 | 61 | LoadEhrPlugin.cpp:BuildFrame 1383 | WIRED |
-| P_BEAT_BOUNCE | Beat Bounce | Motion | 92 | 92 | 62 | 62 | LoadEhrPlugin.cpp:BuildFrame 1406 | WIRED |
-| P_BEAT_NOD | Beat Nod | Motion | 93 | 93 | 63 | 63 | LoadEhrPlugin.cpp:BuildFrame 1402 | WIRED |
-| P_AUDIO_GAIN | Audio Gain | Motion | 94 | 94 | 64 | 64 | LoadEhrPlugin.cpp:UpdateAudio 1353 | WIRED |
-| P_AUDIO_SCALE | Audio > Scale | Motion | 95 | 95 | 65 | 65 | LoadEhrPlugin.cpp:BuildFrame 1406 | WIRED |
-| P_AUDIO_GLOW | Audio > Glow | Motion | 96 | 96 | 66 | 66 | LoadEhrPlugin.cpp:BuildFrame 1527 | WIRED |
-| P_AUDIO_EXPLODE | Audio > Explode | Motion | 97 | 97 | 67 | 67 | LoadEhrPlugin.cpp:BuildFrame 1578 | WIRED |
-| P_TINT_H | Tint Color | Material | 98 | 98 | 68 | 68 | LoadEhrPlugin.cpp:BuildFrame 1513,1515 | WIRED |
-| P_TINT_S | Tint Sat | Material | 99 | 99 | 69 | 69 | LoadEhrPlugin.cpp:BuildFrame 1513 | WIRED |
-| P_TINT_V | Tint Bri | Material | 100 | 100 | 70 | 70 | LoadEhrPlugin.cpp:BuildFrame 1513 | WIRED |
-| P_TINT_A | Tint Mix | Material | 101 | 101 | 71 | 71 | LoadEhrPlugin.cpp:BuildFrame 1513,1515 | WIRED |
-| P_HUE_SHIFT | Hue Shift | Material | 102 | 102 | 72 | 72 | LoadEhrPlugin.cpp:BuildFrame 1516 | WIRED |
-| P_SATURATION | Saturation | Material | 103 | 103 | 73 | 73 | LoadEhrPlugin.cpp:BuildFrame 1517 | WIRED |
-| P_BRIGHTNESS | Brightness | Material | 104 | 104 | 74 | 74 | LoadEhrPlugin.cpp:BuildFrame 1518 | WIRED |
-| P_METAL_OVERRIDE | Metal Override | Material | 105 | 105 | 75 | 75 | LoadEhrPlugin.cpp:BuildFrame 1519 | WIRED |
-| P_METAL_VALUE | Metallic Value | Material | 106 | 106 | 76 | 76 | LoadEhrPlugin.cpp:BuildFrame 1520 | WIRED |
-| P_ROUGH_SCALE | Roughness Scale | Material | 107 | 107 | 77 | 77 | LoadEhrPlugin.cpp:BuildFrame 1521 | WIRED |
-| P_NORMAL_STRENGTH | Normal Strength | Material | 108 | 108 | 78 | 78 | LoadEhrPlugin.cpp:BuildFrame 1522 | WIRED |
-| P_HEIGHT_DISPLACE | Height Displace | Material | 109 | 109 | 79 | 79 | LoadEhrPlugin.cpp:BuildFrame 1524 | WIRED |
-| P_EMISSIVE_GLOW | Emissive Glow | Material | 110 | 110 | 80 | 80 | LoadEhrPlugin.cpp:BuildFrame 1525 | WIRED |
-| P_RIM_GLOW | Rim Glow | Material | 111 | 111 | 81 | 81 | LoadEhrPlugin.cpp:BuildFrame 1526 | WIRED |
-| P_RIM_H | Rim Color | Material | 112 | 112 | 82 | 82 | LoadEhrPlugin.cpp:BuildFrame 1514,1526 | WIRED |
-| P_RIM_S | Rim Sat | Material | 113 | 113 | 83 | 83 | LoadEhrPlugin.cpp:BuildFrame 1514 | WIRED |
-| P_RIM_V | Rim Bri | Material | 114 | 114 | 84 | 84 | LoadEhrPlugin.cpp:BuildFrame 1514 | WIRED |
-| P_RIM_A | Rim Alpha | Material | 115 | 115 | 85 | 85 | LoadEhrPlugin.cpp:BuildFrame 1514,1526 | WIRED |
-| P_FILM | Oil Film | Surface | 116 | 116 | — | — | LoadEhrPlugin.cpp:BuildSurface 4329 | WIRED |
-| P_FILM_THICK | Film Thickness | Surface | 117 | 117 | — | — | LoadEhrPlugin.cpp:BuildSurface 4329 | WIRED |
-| P_FILM_SHIFT | Film Angle Shift | Surface | 118 | 118 | — | — | LoadEhrPlugin.cpp:BuildSurface 4329 | WIRED |
-| P_FILM_SWIRL | Film Swirl | Surface | 119 | 119 | — | — | LoadEhrPlugin.cpp:BuildSurface 4329 | WIRED |
-| P_GLITTER | Glitter | Surface | 120 | 120 | — | — | LoadEhrPlugin.cpp:BuildSurface 4330 | WIRED |
-| P_GLITTER_DENSITY | Glitter Density | Surface | 121 | 121 | — | — | LoadEhrPlugin.cpp:BuildSurface 4330 | WIRED |
-| P_GLITTER_SIZE | Glitter Size | Surface | 122 | 122 | — | — | LoadEhrPlugin.cpp:BuildSurface 4330 | WIRED |
-| P_GLITTER_TWINKLE | Glitter Twinkle | Surface | 123 | 123 | — | — | LoadEhrPlugin.cpp:BuildSurface 4316 | WIRED |
-| P_GLITTER_METAL | Glitter On Metal | Surface | 124 | 124 | — | — | LoadEhrPlugin.cpp:BuildSurface 4331 | WIRED |
-| P_CHROME | Liquid Chrome | Surface | 125 | 125 | — | — | LoadEhrPlugin.cpp:BuildSurface 4332 | WIRED |
-| P_CHROME_RIPPLE | Chrome Ripple | Surface | 126 | 126 | — | — | LoadEhrPlugin.cpp:BuildSurface 4332 | WIRED |
-| P_GLASS | Glass | Surface | 127 | 127 | 86 | 86 | LoadEhrPlugin.cpp:BuildSurface 4333 | WIRED |
-| P_GLASS_IOR | Glass IOR | Surface | 128 | 128 | 87 | 87 | LoadEhrPlugin.cpp:BuildSurface 4333 | WIRED |
-| P_GLASS_DISP | Glass Dispersion | Surface | 129 | 129 | 88 | 88 | LoadEhrPlugin.cpp:BuildSurface 4333 | WIRED |
-| P_GLASS_TINT_H | Glass Color | Surface | 130 | 130 | 89 | 89 | LoadEhrPlugin.cpp:BuildSurface 4334,4336 | WIRED |
-| P_GLASS_TINT_S | Glass Sat | Surface | 131 | 131 | 90 | 90 | LoadEhrPlugin.cpp:BuildSurface 4334,4336 | WIRED |
-| P_GLASS_TINT_V | Glass Bri | Surface | 132 | 132 | 91 | 91 | LoadEhrPlugin.cpp:BuildSurface 4334,4336 | WIRED |
-| P_GLASS_TINT_A | Glass Alpha | Surface | 133 | 133 | 92 | 92 | LoadEhrPlugin.cpp:BuildSurface 4334,4336 | WIRED |
-| P_HOLO | Hologram | Surface | 134 | 134 | — | — | LoadEhrPlugin.cpp:BuildSurface 4338 | WIRED |
-| P_HOLO_SCAN | Holo Scanlines | Surface | 135 | 135 | — | — | LoadEhrPlugin.cpp:BuildSurface 4338 | WIRED |
-| P_HOLO_FLICKER | Holo Flicker | Surface | 136 | 136 | — | — | LoadEhrPlugin.cpp:BuildSurface 4338 | WIRED |
-| P_HOLO_SPLIT | Holo Split | Surface | 137 | 137 | — | — | LoadEhrPlugin.cpp:BuildSurface 4338 | WIRED |
-| P_HOLO_GLITCH | Holo Glitch | Surface | 138 | 138 | — | — | LoadEhrPlugin.cpp:BuildSurface 4339 | WIRED |
-| P_HOLO_COL_H | Holo Color | Surface | 139 | 139 | — | — | LoadEhrPlugin.cpp:BuildSurface 4340,4342 | WIRED |
-| P_HOLO_COL_S | Holo Sat | Surface | 140 | 140 | — | — | LoadEhrPlugin.cpp:BuildSurface 4340 | WIRED |
-| P_HOLO_COL_V | Holo Bri | Surface | 141 | 141 | — | — | LoadEhrPlugin.cpp:BuildSurface 4340 | WIRED |
-| P_HOLO_COL_A | Holo Alpha | Surface | 142 | 142 | — | — | LoadEhrPlugin.cpp:BuildSurface 4340,4342 | WIRED |
-| P_HEAT | Heat Glow | Surface | 143 | 143 | — | — | LoadEhrPlugin.cpp:BuildSurface 4343 | WIRED |
-| P_HEAT_TEMP | Heat Temp | Surface | 144 | 144 | — | — | LoadEhrPlugin.cpp:BuildSurface 4343 | WIRED |
-| P_HEAT_SPREAD | Heat Spread | Surface | 145 | 145 | — | — | LoadEhrPlugin.cpp:BuildSurface 4343 | WIRED |
-| P_PATTERN | Pattern | Surface | 146 | 146 | — | — | LoadEhrPlugin.cpp:BuildSurface 4344 | WIRED |
-| P_PAT_AMOUNT | Pattern Amount | Surface | 147 | 147 | — | — | LoadEhrPlugin.cpp:BuildSurface 4344 | WIRED |
-| P_PAT_SCALE | Pattern Scale | Surface | 148 | 148 | — | — | LoadEhrPlugin.cpp:BuildSurface 4344 | WIRED |
-| P_PAT_SPEED | Pattern Speed | Surface | 149 | 149 | — | — | LoadEhrPlugin.cpp:BuildSurface 4324 | WIRED |
-| P_PAT_COL_H | Pattern Color | Surface | 150 | 150 | — | — | LoadEhrPlugin.cpp:BuildSurface 4337,4344 | WIRED |
-| P_PAT_COL_S | Pattern Sat | Surface | 151 | 151 | — | — | LoadEhrPlugin.cpp:BuildSurface 4337 | WIRED |
-| P_PAT_COL_V | Pattern Bri | Surface | 152 | 152 | — | — | LoadEhrPlugin.cpp:BuildSurface 4337 | WIRED |
-| P_PAT_COL_A | Pattern Alpha | Surface | 153 | 153 | — | — | LoadEhrPlugin.cpp:BuildSurface 4337,4344 | WIRED |
-| P_PAT_BEAT | Pattern Beat | Surface | 154 | 154 | — | — | LoadEhrPlugin.cpp:BuildSurface 4345 | WIRED |
-| P_PAT_AUDIO | Pattern Audio | Surface | 155 | 155 | — | — | LoadEhrPlugin.cpp:BuildSurface 4345 | WIRED |
-| P_PART1_VISIBLE | Part 1 Visible | Parts | 156 | 156 | 93 | 93 | LoadEhrPlugin.cpp:BuildFrame 1530; LoadEhrPlugin.cpp:TargetFit 1849 | WIRED |
-| P_PART1_HUE | Part 1 Hue Shift | Parts | 157 | 157 | 94 | 94 | LoadEhrPlugin.cpp:BuildFrame 1531 | WIRED |
-| P_PART1_GLOW | Part 1 Glow | Parts | 158 | 158 | 95 | 95 | LoadEhrPlugin.cpp:BuildFrame 1532 | WIRED |
-| P_PART1_SKIN | Part 1 Skin | Parts | — | 159 | — | 96 | LoadEhrPlugin.cpp:BuildFrame 1533 | WIRED |
-| P_PART1_SURFACE | Part 1 Surface | Parts | 159 | 160 | 96 | 97 | LoadEhrPlugin.cpp:BuildFrame 1534 | WIRED |
-| P_PART2_VISIBLE | Part 2 Visible | Parts | 160 | 161 | 97 | 98 | LoadEhrPlugin.cpp:BuildFrame 1530; LoadEhrPlugin.cpp:TargetFit 1849 | WIRED |
-| P_PART2_HUE | Part 2 Hue Shift | Parts | 161 | 162 | 98 | 99 | LoadEhrPlugin.cpp:BuildFrame 1531 | WIRED |
-| P_PART2_GLOW | Part 2 Glow | Parts | 162 | 163 | 99 | 100 | LoadEhrPlugin.cpp:BuildFrame 1532 | WIRED |
-| P_PART2_SKIN | Part 2 Skin | Parts | — | 164 | — | 101 | LoadEhrPlugin.cpp:BuildFrame 1533 | WIRED |
-| P_PART2_SURFACE | Part 2 Surface | Parts | 163 | 165 | 100 | 102 | LoadEhrPlugin.cpp:BuildFrame 1534 | WIRED |
-| P_PART3_VISIBLE | Part 3 Visible | Parts | 164 | 166 | 101 | 103 | LoadEhrPlugin.cpp:BuildFrame 1530; LoadEhrPlugin.cpp:TargetFit 1849 | WIRED |
-| P_PART3_HUE | Part 3 Hue Shift | Parts | 165 | 167 | 102 | 104 | LoadEhrPlugin.cpp:BuildFrame 1531 | WIRED |
-| P_PART3_GLOW | Part 3 Glow | Parts | 166 | 168 | 103 | 105 | LoadEhrPlugin.cpp:BuildFrame 1532 | WIRED |
-| P_PART3_SKIN | Part 3 Skin | Parts | — | 169 | — | 106 | LoadEhrPlugin.cpp:BuildFrame 1533 | WIRED |
-| P_PART3_SURFACE | Part 3 Surface | Parts | 167 | 170 | 104 | 107 | LoadEhrPlugin.cpp:BuildFrame 1534 | WIRED |
-| P_PART4_VISIBLE | Part 4 Visible | Parts | 168 | 171 | 105 | 108 | LoadEhrPlugin.cpp:BuildFrame 1530; LoadEhrPlugin.cpp:TargetFit 1849 | WIRED |
-| P_PART4_HUE | Part 4 Hue Shift | Parts | 169 | 172 | 106 | 109 | LoadEhrPlugin.cpp:BuildFrame 1531 | WIRED |
-| P_PART4_GLOW | Part 4 Glow | Parts | 170 | 173 | 107 | 110 | LoadEhrPlugin.cpp:BuildFrame 1532 | WIRED |
-| P_PART4_SKIN | Part 4 Skin | Parts | — | 174 | — | 111 | LoadEhrPlugin.cpp:BuildFrame 1533 | WIRED |
-| P_PART4_SURFACE | Part 4 Surface | Parts | 171 | 175 | 108 | 112 | LoadEhrPlugin.cpp:BuildFrame 1534 | WIRED |
-| P_PART5_VISIBLE | Part 5 Visible | Parts | 172 | 176 | 109 | 113 | LoadEhrPlugin.cpp:BuildFrame 1530; LoadEhrPlugin.cpp:TargetFit 1849 | WIRED |
-| P_PART5_HUE | Part 5 Hue Shift | Parts | 173 | 177 | 110 | 114 | LoadEhrPlugin.cpp:BuildFrame 1531 | WIRED |
-| P_PART5_GLOW | Part 5 Glow | Parts | 174 | 178 | 111 | 115 | LoadEhrPlugin.cpp:BuildFrame 1532 | WIRED |
-| P_PART5_SKIN | Part 5 Skin | Parts | — | 179 | — | 116 | LoadEhrPlugin.cpp:BuildFrame 1533 | WIRED |
-| P_PART5_SURFACE | Part 5 Surface | Parts | 175 | 180 | 112 | 117 | LoadEhrPlugin.cpp:BuildFrame 1534 | WIRED |
-| P_PART6_VISIBLE | Part 6 Visible | Parts | 176 | 181 | 113 | 118 | LoadEhrPlugin.cpp:BuildFrame 1530; LoadEhrPlugin.cpp:TargetFit 1849 | WIRED |
-| P_PART6_HUE | Part 6 Hue Shift | Parts | 177 | 182 | 114 | 119 | LoadEhrPlugin.cpp:BuildFrame 1531 | WIRED |
-| P_PART6_GLOW | Part 6 Glow | Parts | 178 | 183 | 115 | 120 | LoadEhrPlugin.cpp:BuildFrame 1532 | WIRED |
-| P_PART6_SKIN | Part 6 Skin | Parts | — | 184 | — | 121 | LoadEhrPlugin.cpp:BuildFrame 1533 | WIRED |
-| P_PART6_SURFACE | Part 6 Surface | Parts | 179 | 185 | 116 | 122 | LoadEhrPlugin.cpp:BuildFrame 1534 | WIRED |
-| P_PART7_VISIBLE | Part 7 Visible | Parts | 180 | 186 | 117 | 123 | LoadEhrPlugin.cpp:BuildFrame 1530; LoadEhrPlugin.cpp:TargetFit 1849 | WIRED |
-| P_PART7_HUE | Part 7 Hue Shift | Parts | 181 | 187 | 118 | 124 | LoadEhrPlugin.cpp:BuildFrame 1531 | WIRED |
-| P_PART7_GLOW | Part 7 Glow | Parts | 182 | 188 | 119 | 125 | LoadEhrPlugin.cpp:BuildFrame 1532 | WIRED |
-| P_PART7_SKIN | Part 7 Skin | Parts | — | 189 | — | 126 | LoadEhrPlugin.cpp:BuildFrame 1533 | WIRED |
-| P_PART7_SURFACE | Part 7 Surface | Parts | 183 | 190 | 120 | 127 | LoadEhrPlugin.cpp:BuildFrame 1534 | WIRED |
-| P_PART8_VISIBLE | Part 8 Visible | Parts | 184 | 191 | 121 | 128 | LoadEhrPlugin.cpp:BuildFrame 1530; LoadEhrPlugin.cpp:TargetFit 1849 | WIRED |
-| P_PART8_HUE | Part 8 Hue Shift | Parts | 185 | 192 | 122 | 129 | LoadEhrPlugin.cpp:BuildFrame 1531 | WIRED |
-| P_PART8_GLOW | Part 8 Glow | Parts | 186 | 193 | 123 | 130 | LoadEhrPlugin.cpp:BuildFrame 1532 | WIRED |
-| P_PART8_SKIN | Part 8 Skin | Parts | — | 194 | — | 131 | LoadEhrPlugin.cpp:BuildFrame 1533 | WIRED |
-| P_PART8_SURFACE | Part 8 Surface | Parts | 187 | 195 | 124 | 132 | LoadEhrPlugin.cpp:BuildFrame 1534 | WIRED |
+| P_POSE_DATA | Pose Data | Camera Live | 89 | 89 | — | — | LoadEhrPlugin.cpp:SetTextId 458; LoadEhrPlugin.cpp:StorePose 1807 | WIRED |
+| P_WOBBLE_AMOUNT | Wobble Amount | Motion | 90 | 90 | 60 | 60 | LoadEhrPlugin.cpp:BuildFrame 1408 | WIRED |
+| P_WOBBLE_SPEED | Wobble Speed | Motion | 91 | 91 | 61 | 61 | LoadEhrPlugin.cpp:BuildFrame 1395 | WIRED |
+| P_BEAT_BOUNCE | Beat Bounce | Motion | 92 | 92 | 62 | 62 | LoadEhrPlugin.cpp:BuildFrame 1418 | WIRED |
+| P_BEAT_NOD | Beat Nod | Motion | 93 | 93 | 63 | 63 | LoadEhrPlugin.cpp:BuildFrame 1414 | WIRED |
+| P_AUDIO_GAIN | Audio Gain | Motion | 94 | 94 | 64 | 64 | LoadEhrPlugin.cpp:UpdateAudio 1365 | WIRED |
+| P_AUDIO_SCALE | Audio > Scale | Motion | 95 | 95 | 65 | 65 | LoadEhrPlugin.cpp:BuildFrame 1418 | WIRED |
+| P_AUDIO_GLOW | Audio > Glow | Motion | 96 | 96 | 66 | 66 | LoadEhrPlugin.cpp:BuildFrame 1539 | WIRED |
+| P_AUDIO_EXPLODE | Audio > Explode | Motion | 97 | 97 | 67 | 67 | LoadEhrPlugin.cpp:BuildFrame 1590 | WIRED |
+| P_TINT_H | Tint Color | Material | 98 | 98 | 68 | 68 | LoadEhrPlugin.cpp:BuildFrame 1525,1527 | WIRED |
+| P_TINT_S | Tint Sat | Material | 99 | 99 | 69 | 69 | LoadEhrPlugin.cpp:BuildFrame 1525 | WIRED |
+| P_TINT_V | Tint Bri | Material | 100 | 100 | 70 | 70 | LoadEhrPlugin.cpp:BuildFrame 1525 | WIRED |
+| P_TINT_A | Tint Mix | Material | 101 | 101 | 71 | 71 | LoadEhrPlugin.cpp:BuildFrame 1525,1527 | WIRED |
+| P_HUE_SHIFT | Hue Shift | Material | 102 | 102 | 72 | 72 | LoadEhrPlugin.cpp:BuildFrame 1528 | WIRED |
+| P_SATURATION | Saturation | Material | 103 | 103 | 73 | 73 | LoadEhrPlugin.cpp:BuildFrame 1529 | WIRED |
+| P_BRIGHTNESS | Brightness | Material | 104 | 104 | 74 | 74 | LoadEhrPlugin.cpp:BuildFrame 1530 | WIRED |
+| P_METAL_OVERRIDE | Metal Override | Material | 105 | 105 | 75 | 75 | LoadEhrPlugin.cpp:BuildFrame 1531 | WIRED |
+| P_METAL_VALUE | Metallic Value | Material | 106 | 106 | 76 | 76 | LoadEhrPlugin.cpp:BuildFrame 1532 | WIRED |
+| P_ROUGH_SCALE | Roughness Scale | Material | 107 | 107 | 77 | 77 | LoadEhrPlugin.cpp:BuildFrame 1533 | WIRED |
+| P_NORMAL_STRENGTH | Normal Strength | Material | 108 | 108 | 78 | 78 | LoadEhrPlugin.cpp:BuildFrame 1534 | WIRED |
+| P_HEIGHT_DISPLACE | Height Displace | Material | 109 | 109 | 79 | 79 | LoadEhrPlugin.cpp:BuildFrame 1536 | WIRED |
+| P_EMISSIVE_GLOW | Emissive Glow | Material | 110 | 110 | 80 | 80 | LoadEhrPlugin.cpp:BuildFrame 1537 | WIRED |
+| P_RIM_GLOW | Rim Glow | Material | 111 | 111 | 81 | 81 | LoadEhrPlugin.cpp:BuildFrame 1538 | WIRED |
+| P_RIM_H | Rim Color | Material | 112 | 112 | 82 | 82 | LoadEhrPlugin.cpp:BuildFrame 1526,1538 | WIRED |
+| P_RIM_S | Rim Sat | Material | 113 | 113 | 83 | 83 | LoadEhrPlugin.cpp:BuildFrame 1526 | WIRED |
+| P_RIM_V | Rim Bri | Material | 114 | 114 | 84 | 84 | LoadEhrPlugin.cpp:BuildFrame 1526 | WIRED |
+| P_RIM_A | Rim Alpha | Material | 115 | 115 | 85 | 85 | LoadEhrPlugin.cpp:BuildFrame 1526,1538 | WIRED |
+| P_FILM | Oil Film | Surface | 116 | 116 | — | — | LoadEhrPlugin.cpp:BuildSurface 4341 | WIRED |
+| P_FILM_THICK | Film Thickness | Surface | 117 | 117 | — | — | LoadEhrPlugin.cpp:BuildSurface 4341 | WIRED |
+| P_FILM_SHIFT | Film Angle Shift | Surface | 118 | 118 | — | — | LoadEhrPlugin.cpp:BuildSurface 4341 | WIRED |
+| P_FILM_SWIRL | Film Swirl | Surface | 119 | 119 | — | — | LoadEhrPlugin.cpp:BuildSurface 4341 | WIRED |
+| P_GLITTER | Glitter | Surface | 120 | 120 | — | — | LoadEhrPlugin.cpp:BuildSurface 4342 | WIRED |
+| P_GLITTER_DENSITY | Glitter Density | Surface | 121 | 121 | — | — | LoadEhrPlugin.cpp:BuildSurface 4342 | WIRED |
+| P_GLITTER_SIZE | Glitter Size | Surface | 122 | 122 | — | — | LoadEhrPlugin.cpp:BuildSurface 4342 | WIRED |
+| P_GLITTER_TWINKLE | Glitter Twinkle | Surface | 123 | 123 | — | — | LoadEhrPlugin.cpp:BuildSurface 4328 | WIRED |
+| P_GLITTER_METAL | Glitter On Metal | Surface | 124 | 124 | — | — | LoadEhrPlugin.cpp:BuildSurface 4343 | WIRED |
+| P_CHROME | Liquid Chrome | Surface | 125 | 125 | — | — | LoadEhrPlugin.cpp:BuildSurface 4344 | WIRED |
+| P_CHROME_RIPPLE | Chrome Ripple | Surface | 126 | 126 | — | — | LoadEhrPlugin.cpp:BuildSurface 4344 | WIRED |
+| P_GLASS | Glass | Surface | 127 | 127 | 86 | 86 | LoadEhrPlugin.cpp:BuildSurface 4345 | WIRED |
+| P_GLASS_IOR | Glass IOR | Surface | 128 | 128 | 87 | 87 | LoadEhrPlugin.cpp:BuildSurface 4345 | WIRED |
+| P_GLASS_DISP | Glass Dispersion | Surface | 129 | 129 | 88 | 88 | LoadEhrPlugin.cpp:BuildSurface 4345 | WIRED |
+| P_GLASS_TINT_H | Glass Color | Surface | 130 | 130 | 89 | 89 | LoadEhrPlugin.cpp:BuildSurface 4346,4348 | WIRED |
+| P_GLASS_TINT_S | Glass Sat | Surface | 131 | 131 | 90 | 90 | LoadEhrPlugin.cpp:BuildSurface 4346,4348 | WIRED |
+| P_GLASS_TINT_V | Glass Bri | Surface | 132 | 132 | 91 | 91 | LoadEhrPlugin.cpp:BuildSurface 4346,4348 | WIRED |
+| P_GLASS_TINT_A | Glass Alpha | Surface | 133 | 133 | 92 | 92 | LoadEhrPlugin.cpp:BuildSurface 4346,4348 | WIRED |
+| P_HOLO | Hologram | Surface | 134 | 134 | — | — | LoadEhrPlugin.cpp:BuildSurface 4350 | WIRED |
+| P_HOLO_SCAN | Holo Scanlines | Surface | 135 | 135 | — | — | LoadEhrPlugin.cpp:BuildSurface 4350 | WIRED |
+| P_HOLO_FLICKER | Holo Flicker | Surface | 136 | 136 | — | — | LoadEhrPlugin.cpp:BuildSurface 4350 | WIRED |
+| P_HOLO_SPLIT | Holo Split | Surface | 137 | 137 | — | — | LoadEhrPlugin.cpp:BuildSurface 4350 | WIRED |
+| P_HOLO_GLITCH | Holo Glitch | Surface | 138 | 138 | — | — | LoadEhrPlugin.cpp:BuildSurface 4351 | WIRED |
+| P_HOLO_COL_H | Holo Color | Surface | 139 | 139 | — | — | LoadEhrPlugin.cpp:BuildSurface 4352,4354 | WIRED |
+| P_HOLO_COL_S | Holo Sat | Surface | 140 | 140 | — | — | LoadEhrPlugin.cpp:BuildSurface 4352 | WIRED |
+| P_HOLO_COL_V | Holo Bri | Surface | 141 | 141 | — | — | LoadEhrPlugin.cpp:BuildSurface 4352 | WIRED |
+| P_HOLO_COL_A | Holo Alpha | Surface | 142 | 142 | — | — | LoadEhrPlugin.cpp:BuildSurface 4352,4354 | WIRED |
+| P_HEAT | Heat Glow | Surface | 143 | 143 | — | — | LoadEhrPlugin.cpp:BuildSurface 4355 | WIRED |
+| P_HEAT_TEMP | Heat Temp | Surface | 144 | 144 | — | — | LoadEhrPlugin.cpp:BuildSurface 4355 | WIRED |
+| P_HEAT_SPREAD | Heat Spread | Surface | 145 | 145 | — | — | LoadEhrPlugin.cpp:BuildSurface 4355 | WIRED |
+| P_PATTERN | Pattern | Surface | 146 | 146 | — | — | LoadEhrPlugin.cpp:BuildSurface 4356 | WIRED |
+| P_PAT_AMOUNT | Pattern Amount | Surface | 147 | 147 | — | — | LoadEhrPlugin.cpp:BuildSurface 4356 | WIRED |
+| P_PAT_SCALE | Pattern Scale | Surface | 148 | 148 | — | — | LoadEhrPlugin.cpp:BuildSurface 4356 | WIRED |
+| P_PAT_SPEED | Pattern Speed | Surface | 149 | 149 | — | — | LoadEhrPlugin.cpp:BuildSurface 4336 | WIRED |
+| P_PAT_COL_H | Pattern Color | Surface | 150 | 150 | — | — | LoadEhrPlugin.cpp:BuildSurface 4349,4356 | WIRED |
+| P_PAT_COL_S | Pattern Sat | Surface | 151 | 151 | — | — | LoadEhrPlugin.cpp:BuildSurface 4349 | WIRED |
+| P_PAT_COL_V | Pattern Bri | Surface | 152 | 152 | — | — | LoadEhrPlugin.cpp:BuildSurface 4349 | WIRED |
+| P_PAT_COL_A | Pattern Alpha | Surface | 153 | 153 | — | — | LoadEhrPlugin.cpp:BuildSurface 4349,4356 | WIRED |
+| P_PAT_BEAT | Pattern Beat | Surface | 154 | 154 | — | — | LoadEhrPlugin.cpp:BuildSurface 4357 | WIRED |
+| P_PAT_AUDIO | Pattern Audio | Surface | 155 | 155 | — | — | LoadEhrPlugin.cpp:BuildSurface 4357 | WIRED |
+| P_PART1_VISIBLE | Part 1 Visible | Parts | 156 | 156 | 93 | 93 | LoadEhrPlugin.cpp:BuildFrame 1542; LoadEhrPlugin.cpp:TargetFit 1861 | WIRED |
+| P_PART1_HUE | Part 1 Hue Shift | Parts | 157 | 157 | 94 | 94 | LoadEhrPlugin.cpp:BuildFrame 1543 | WIRED |
+| P_PART1_GLOW | Part 1 Glow | Parts | 158 | 158 | 95 | 95 | LoadEhrPlugin.cpp:BuildFrame 1544 | WIRED |
+| P_PART1_SKIN | Part 1 Skin | Parts | — | 159 | — | 96 | LoadEhrPlugin.cpp:BuildFrame 1545 | WIRED |
+| P_PART1_SURFACE | Part 1 Surface | Parts | 159 | 160 | 96 | 97 | LoadEhrPlugin.cpp:BuildFrame 1546 | WIRED |
+| P_PART2_VISIBLE | Part 2 Visible | Parts | 160 | 161 | 97 | 98 | LoadEhrPlugin.cpp:BuildFrame 1542; LoadEhrPlugin.cpp:TargetFit 1861 | WIRED |
+| P_PART2_HUE | Part 2 Hue Shift | Parts | 161 | 162 | 98 | 99 | LoadEhrPlugin.cpp:BuildFrame 1543 | WIRED |
+| P_PART2_GLOW | Part 2 Glow | Parts | 162 | 163 | 99 | 100 | LoadEhrPlugin.cpp:BuildFrame 1544 | WIRED |
+| P_PART2_SKIN | Part 2 Skin | Parts | — | 164 | — | 101 | LoadEhrPlugin.cpp:BuildFrame 1545 | WIRED |
+| P_PART2_SURFACE | Part 2 Surface | Parts | 163 | 165 | 100 | 102 | LoadEhrPlugin.cpp:BuildFrame 1546 | WIRED |
+| P_PART3_VISIBLE | Part 3 Visible | Parts | 164 | 166 | 101 | 103 | LoadEhrPlugin.cpp:BuildFrame 1542; LoadEhrPlugin.cpp:TargetFit 1861 | WIRED |
+| P_PART3_HUE | Part 3 Hue Shift | Parts | 165 | 167 | 102 | 104 | LoadEhrPlugin.cpp:BuildFrame 1543 | WIRED |
+| P_PART3_GLOW | Part 3 Glow | Parts | 166 | 168 | 103 | 105 | LoadEhrPlugin.cpp:BuildFrame 1544 | WIRED |
+| P_PART3_SKIN | Part 3 Skin | Parts | — | 169 | — | 106 | LoadEhrPlugin.cpp:BuildFrame 1545 | WIRED |
+| P_PART3_SURFACE | Part 3 Surface | Parts | 167 | 170 | 104 | 107 | LoadEhrPlugin.cpp:BuildFrame 1546 | WIRED |
+| P_PART4_VISIBLE | Part 4 Visible | Parts | 168 | 171 | 105 | 108 | LoadEhrPlugin.cpp:BuildFrame 1542; LoadEhrPlugin.cpp:TargetFit 1861 | WIRED |
+| P_PART4_HUE | Part 4 Hue Shift | Parts | 169 | 172 | 106 | 109 | LoadEhrPlugin.cpp:BuildFrame 1543 | WIRED |
+| P_PART4_GLOW | Part 4 Glow | Parts | 170 | 173 | 107 | 110 | LoadEhrPlugin.cpp:BuildFrame 1544 | WIRED |
+| P_PART4_SKIN | Part 4 Skin | Parts | — | 174 | — | 111 | LoadEhrPlugin.cpp:BuildFrame 1545 | WIRED |
+| P_PART4_SURFACE | Part 4 Surface | Parts | 171 | 175 | 108 | 112 | LoadEhrPlugin.cpp:BuildFrame 1546 | WIRED |
+| P_PART5_VISIBLE | Part 5 Visible | Parts | 172 | 176 | 109 | 113 | LoadEhrPlugin.cpp:BuildFrame 1542; LoadEhrPlugin.cpp:TargetFit 1861 | WIRED |
+| P_PART5_HUE | Part 5 Hue Shift | Parts | 173 | 177 | 110 | 114 | LoadEhrPlugin.cpp:BuildFrame 1543 | WIRED |
+| P_PART5_GLOW | Part 5 Glow | Parts | 174 | 178 | 111 | 115 | LoadEhrPlugin.cpp:BuildFrame 1544 | WIRED |
+| P_PART5_SKIN | Part 5 Skin | Parts | — | 179 | — | 116 | LoadEhrPlugin.cpp:BuildFrame 1545 | WIRED |
+| P_PART5_SURFACE | Part 5 Surface | Parts | 175 | 180 | 112 | 117 | LoadEhrPlugin.cpp:BuildFrame 1546 | WIRED |
+| P_PART6_VISIBLE | Part 6 Visible | Parts | 176 | 181 | 113 | 118 | LoadEhrPlugin.cpp:BuildFrame 1542; LoadEhrPlugin.cpp:TargetFit 1861 | WIRED |
+| P_PART6_HUE | Part 6 Hue Shift | Parts | 177 | 182 | 114 | 119 | LoadEhrPlugin.cpp:BuildFrame 1543 | WIRED |
+| P_PART6_GLOW | Part 6 Glow | Parts | 178 | 183 | 115 | 120 | LoadEhrPlugin.cpp:BuildFrame 1544 | WIRED |
+| P_PART6_SKIN | Part 6 Skin | Parts | — | 184 | — | 121 | LoadEhrPlugin.cpp:BuildFrame 1545 | WIRED |
+| P_PART6_SURFACE | Part 6 Surface | Parts | 179 | 185 | 116 | 122 | LoadEhrPlugin.cpp:BuildFrame 1546 | WIRED |
+| P_PART7_VISIBLE | Part 7 Visible | Parts | 180 | 186 | 117 | 123 | LoadEhrPlugin.cpp:BuildFrame 1542; LoadEhrPlugin.cpp:TargetFit 1861 | WIRED |
+| P_PART7_HUE | Part 7 Hue Shift | Parts | 181 | 187 | 118 | 124 | LoadEhrPlugin.cpp:BuildFrame 1543 | WIRED |
+| P_PART7_GLOW | Part 7 Glow | Parts | 182 | 188 | 119 | 125 | LoadEhrPlugin.cpp:BuildFrame 1544 | WIRED |
+| P_PART7_SKIN | Part 7 Skin | Parts | — | 189 | — | 126 | LoadEhrPlugin.cpp:BuildFrame 1545 | WIRED |
+| P_PART7_SURFACE | Part 7 Surface | Parts | 183 | 190 | 120 | 127 | LoadEhrPlugin.cpp:BuildFrame 1546 | WIRED |
+| P_PART8_VISIBLE | Part 8 Visible | Parts | 184 | 191 | 121 | 128 | LoadEhrPlugin.cpp:BuildFrame 1542; LoadEhrPlugin.cpp:TargetFit 1861 | WIRED |
+| P_PART8_HUE | Part 8 Hue Shift | Parts | 185 | 192 | 122 | 129 | LoadEhrPlugin.cpp:BuildFrame 1543 | WIRED |
+| P_PART8_GLOW | Part 8 Glow | Parts | 186 | 193 | 123 | 130 | LoadEhrPlugin.cpp:BuildFrame 1544 | WIRED |
+| P_PART8_SKIN | Part 8 Skin | Parts | — | 194 | — | 131 | LoadEhrPlugin.cpp:BuildFrame 1545 | WIRED |
+| P_PART8_SURFACE | Part 8 Surface | Parts | 187 | 195 | 124 | 132 | LoadEhrPlugin.cpp:BuildFrame 1546 | WIRED |
 | P_SHATTER | Shatter | Shape | 188 | 196 | 125 | 133 | LoadEhrPlugin.cpp:SetFloatId 379 | WIRED |
 | P_REFORM | Reform | Shape | 189 | 197 | 126 | 134 | LoadEhrPlugin.cpp:SetFloatId 381 | WIRED |
-| P_SHATTER_BEAT | Shatter On Beat | Shape | 190 | 198 | 127 | 135 | LoadEhrPlugin.cpp:BuildShape 3963,3963 | WIRED |
-| P_SHARD_COUNT | Shard Count | Shape | 191 | 199 | 128 | 136 | LoadEhrPlugin.cpp:TextLogoSpec 809; LoadEhrPlugin.cpp:BuildShape 3961 | WIRED |
-| P_SHATTER_MODE | Shatter Mode | Shape | 192 | 200 | 129 | 137 | LoadEhrPlugin.cpp:TextLogoSpec 808; LoadEhrPlugin.cpp:BuildShape 3962 | WIRED |
-| P_SHATTER_FORCE | Shatter Force | Shape | 193 | 201 | 130 | 138 | LoadEhrPlugin.cpp:BuildShape 3999 | WIRED |
-| P_SHATTER_GRAVITY | Shatter Gravity | Shape | 194 | 202 | 131 | 139 | LoadEhrPlugin.cpp:BuildShape 4000 | WIRED |
-| P_SHARD_SPIN | Shard Spin | Shape | 195 | 203 | 132 | 140 | LoadEhrPlugin.cpp:BuildShape 4001 | WIRED |
-| P_REFORM_TIME | Reform Time | Shape | 196 | 204 | 133 | 141 | LoadEhrPlugin.cpp:BuildShape 3960 | WIRED |
-| P_SHATTER_PHYSICS | Shatter Physics | Shape | 197 | 205 | 134 | 142 | LoadEhrPlugin.cpp:BuildShape 4002 | WIRED |
-| P_BOUNCINESS | Bounciness | Shape | 198 | 206 | 135 | 143 | LoadEhrPlugin.cpp:BuildShape 4003 | WIRED |
-| P_FLOOR_FRICTION | Floor Friction | Shape | 199 | 207 | 136 | 144 | LoadEhrPlugin.cpp:BuildShape 4004 | WIRED |
-| P_PHYSICS_SPEED | Physics Speed | Shape | — | — | 137 | 145 | LoadEhrPlugin.cpp:BuildShape 3979 | WIRED |
-| P_SLICE_COUNT | Slice Count | Shape | 200 | 208 | — | — | LoadEhrPlugin.cpp:BuildShape 4006 | WIRED |
-| P_SLICE_GAP | Slice Gap | Shape | 201 | 209 | — | — | LoadEhrPlugin.cpp:BuildShape 4006 | WIRED |
-| P_SLICE_AXIS | Slice Axis | Shape | 202 | 210 | — | — | LoadEhrPlugin.cpp:BuildShape 4007 | WIRED |
-| P_SLICE_WAVE | Slice Wave | Shape | 203 | 211 | — | — | LoadEhrPlugin.cpp:BuildShape 4007 | WIRED |
-| P_VOXEL | Voxel | Shape | 204 | 212 | — | — | LoadEhrPlugin.cpp:BuildShape 4008 | WIRED |
-| P_VOXEL_SIZE | Voxel Size | Shape | 205 | 213 | — | — | LoadEhrPlugin.cpp:BuildShape 4008 | WIRED |
-| P_LOW_POLY | Low Poly | Shape | 206 | 214 | — | — | LoadEhrPlugin.cpp:BuildShape 4008 | WIRED |
-| P_LOW_POLY_SIZE | Low Poly Size | Shape | 207 | 215 | — | — | LoadEhrPlugin.cpp:BuildShape 4008 | WIRED |
-| P_LP_ROT_X | LowPoly Rot X | Shape | 208 | 216 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4249 | WIRED |
-| P_LP_ROT_Y | LowPoly Rot Y | Shape | 209 | 217 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4248 | WIRED |
-| P_LP_ROT_Z | LowPoly Rot Z | Shape | 210 | 218 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4248 | WIRED |
-| P_LP_SPIN_X | LowPoly Spin X | Shape | 211 | 219 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4246 | WIRED |
-| P_LP_SPIN_Y | LowPoly Spin Y | Shape | 212 | 220 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4246 | WIRED |
-| P_LP_SPIN_Z | LowPoly Spin Z | Shape | 213 | 221 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4246 | WIRED |
-| P_TUMBLE | Facet Tumble | Shape | 214 | 222 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4259 | WIRED |
-| P_TUMBLE_X | Tumble X | Shape | 215 | 223 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4269,4270 | WIRED |
-| P_TUMBLE_Y | Tumble Y | Shape | 216 | 224 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4269,4270 | WIRED |
-| P_TUMBLE_Z | Tumble Z | Shape | 217 | 225 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4269,4270 | WIRED |
-| P_TUMBLE_RANDOM | Tumble Random | Shape | 218 | 226 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4260 | WIRED |
-| P_TUMBLE_SWAY | Tumble Sway | Shape | 219 | 227 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4261 | WIRED |
-| P_TUMBLE_BEAT | Tumble On Beat | Shape | 220 | 228 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4273,4273 | WIRED |
-| P_TUMBLE_FLIP | Tumble Beat Flip | Shape | 221 | 229 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4278 | WIRED |
-| P_FACET_GAP | Facet Gap | Shape | 222 | 230 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4262 | WIRED |
+| P_SHATTER_BEAT | Shatter On Beat | Shape | 190 | 198 | 127 | 135 | LoadEhrPlugin.cpp:BuildShape 3975,3975 | WIRED |
+| P_SHARD_COUNT | Shard Count | Shape | 191 | 199 | 128 | 136 | LoadEhrPlugin.cpp:TextLogoSpec 809; LoadEhrPlugin.cpp:BuildShape 3973 | WIRED |
+| P_SHATTER_MODE | Shatter Mode | Shape | 192 | 200 | 129 | 137 | LoadEhrPlugin.cpp:TextLogoSpec 808; LoadEhrPlugin.cpp:BuildShape 3974 | WIRED |
+| P_SHATTER_FORCE | Shatter Force | Shape | 193 | 201 | 130 | 138 | LoadEhrPlugin.cpp:BuildShape 4011 | WIRED |
+| P_SHATTER_GRAVITY | Shatter Gravity | Shape | 194 | 202 | 131 | 139 | LoadEhrPlugin.cpp:BuildShape 4012 | WIRED |
+| P_SHARD_SPIN | Shard Spin | Shape | 195 | 203 | 132 | 140 | LoadEhrPlugin.cpp:BuildShape 4013 | WIRED |
+| P_REFORM_TIME | Reform Time | Shape | 196 | 204 | 133 | 141 | LoadEhrPlugin.cpp:BuildShape 3972 | WIRED |
+| P_SHATTER_PHYSICS | Shatter Physics | Shape | 197 | 205 | 134 | 142 | LoadEhrPlugin.cpp:BuildShape 4014 | WIRED |
+| P_BOUNCINESS | Bounciness | Shape | 198 | 206 | 135 | 143 | LoadEhrPlugin.cpp:BuildShape 4015 | WIRED |
+| P_FLOOR_FRICTION | Floor Friction | Shape | 199 | 207 | 136 | 144 | LoadEhrPlugin.cpp:BuildShape 4016 | WIRED |
+| P_PHYSICS_SPEED | Physics Speed | Shape | — | — | 137 | 145 | LoadEhrPlugin.cpp:BuildShape 3991 | WIRED |
+| P_SLICE_COUNT | Slice Count | Shape | 200 | 208 | — | — | LoadEhrPlugin.cpp:BuildShape 4018 | WIRED |
+| P_SLICE_GAP | Slice Gap | Shape | 201 | 209 | — | — | LoadEhrPlugin.cpp:BuildShape 4018 | WIRED |
+| P_SLICE_AXIS | Slice Axis | Shape | 202 | 210 | — | — | LoadEhrPlugin.cpp:BuildShape 4019 | WIRED |
+| P_SLICE_WAVE | Slice Wave | Shape | 203 | 211 | — | — | LoadEhrPlugin.cpp:BuildShape 4019 | WIRED |
+| P_VOXEL | Voxel | Shape | 204 | 212 | — | — | LoadEhrPlugin.cpp:BuildShape 4020 | WIRED |
+| P_VOXEL_SIZE | Voxel Size | Shape | 205 | 213 | — | — | LoadEhrPlugin.cpp:BuildShape 4020 | WIRED |
+| P_LOW_POLY | Low Poly | Shape | 206 | 214 | — | — | LoadEhrPlugin.cpp:BuildShape 4020 | WIRED |
+| P_LOW_POLY_SIZE | Low Poly Size | Shape | 207 | 215 | — | — | LoadEhrPlugin.cpp:BuildShape 4020 | WIRED |
+| P_LP_ROT_X | LowPoly Rot X | Shape | 208 | 216 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4261 | WIRED |
+| P_LP_ROT_Y | LowPoly Rot Y | Shape | 209 | 217 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4260 | WIRED |
+| P_LP_ROT_Z | LowPoly Rot Z | Shape | 210 | 218 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4260 | WIRED |
+| P_LP_SPIN_X | LowPoly Spin X | Shape | 211 | 219 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4258 | WIRED |
+| P_LP_SPIN_Y | LowPoly Spin Y | Shape | 212 | 220 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4258 | WIRED |
+| P_LP_SPIN_Z | LowPoly Spin Z | Shape | 213 | 221 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4258 | WIRED |
+| P_TUMBLE | Facet Tumble | Shape | 214 | 222 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4271 | WIRED |
+| P_TUMBLE_X | Tumble X | Shape | 215 | 223 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4281,4282 | WIRED |
+| P_TUMBLE_Y | Tumble Y | Shape | 216 | 224 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4281,4282 | WIRED |
+| P_TUMBLE_Z | Tumble Z | Shape | 217 | 225 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4281,4282 | WIRED |
+| P_TUMBLE_RANDOM | Tumble Random | Shape | 218 | 226 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4272 | WIRED |
+| P_TUMBLE_SWAY | Tumble Sway | Shape | 219 | 227 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4273 | WIRED |
+| P_TUMBLE_BEAT | Tumble On Beat | Shape | 220 | 228 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4285,4285 | WIRED |
+| P_TUMBLE_FLIP | Tumble Beat Flip | Shape | 221 | 229 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4290 | WIRED |
+| P_FACET_GAP | Facet Gap | Shape | 222 | 230 | — | — | LoadEhrPlugin.cpp:BuildLowPoly 4274 | WIRED |
 | P_TUMBLE_RESET | Tumble Reset | Shape | 223 | 231 | — | — | LoadEhrPlugin.cpp:SetFloatId 389 | WIRED |
 | P_BLOW_DUST | Blow To Dust | Shape | 224 | 232 | — | — | LoadEhrPlugin.cpp:SetFloatId 383 | WIRED |
 | P_DUST_REFORM | Dust Reform | Shape | 225 | 233 | — | — | LoadEhrPlugin.cpp:SetFloatId 385 | WIRED |
-| P_DUST_BEAT | Dust On Beat | Shape | 226 | 234 | — | — | LoadEhrPlugin.cpp:BuildDust 4201,4201 | WIRED |
-| P_DUST_HOLD | Dust Hold | Shape | 227 | 235 | — | — | LoadEhrPlugin.cpp:BuildDust 4231 | WIRED |
-| P_DUST | Dust | Shape | 228 | 236 | — | — | LoadEhrPlugin.cpp:SetFloatId 387; LoadEhrPlugin.cpp:BuildDust 4208,4211,4221 | WIRED |
-| P_DUST_COUNT | Dust Count | Shape | 229 | 237 | — | — | LoadEhrPlugin.cpp:BuildShape 4013 | WIRED |
-| P_DUST_WIND | Dust Wind | Shape | 230 | 238 | — | — | LoadEhrPlugin.cpp:BuildShape 4014 | WIRED |
-| P_DUST_SIZE | Dust Size | Shape | 231 | 239 | — | — | LoadEhrPlugin.cpp:BuildShape 4015 | WIRED |
-| P_CONTOURS | Contours | Shape | 232 | 240 | — | — | LoadEhrPlugin.cpp:BuildShape 4016 | WIRED |
-| P_CONTOUR_MODE | Contour Mode | Shape | 233 | 241 | — | — | LoadEhrPlugin.cpp:BuildShape 4017 | WIRED |
-| P_CONTOUR_SPACING | Contour Spacing | Shape | 234 | 242 | — | — | LoadEhrPlugin.cpp:BuildShape 4018 | WIRED |
-| P_CONTOUR_WIDTH | Contour Width | Shape | 235 | 243 | — | — | LoadEhrPlugin.cpp:BuildShape 4019 | WIRED |
-| P_CONTOUR_SPEED | Contour Speed | Shape | 236 | 244 | — | — | LoadEhrPlugin.cpp:BuildShape 4020 | WIRED |
-| P_CONTOUR_COL_H | Contour Color | Shape | 237 | 245 | — | — | LoadEhrPlugin.cpp:BuildShape 4022,4023 | WIRED |
-| P_CONTOUR_COL_S | Contour Sat | Shape | 238 | 246 | — | — | LoadEhrPlugin.cpp:BuildShape 4022,4023 | WIRED |
-| P_CONTOUR_COL_V | Contour Bri | Shape | 239 | 247 | — | — | LoadEhrPlugin.cpp:BuildShape 4022,4023 | WIRED |
-| P_CONTOUR_COL_A | Contour Alpha | Shape | 240 | 248 | — | — | LoadEhrPlugin.cpp:BuildShape 4022 | WIRED |
-| P_DEFORM_AMOUNT | Deform Amount | Deform | 241 | 249 | 138 | 146 | LoadEhrPlugin.cpp:BuildDeform 4033 | WIRED |
-| P_DEFORM_AXIS | Deform Axis | Deform | 242 | 250 | 139 | 147 | LoadEhrPlugin.cpp:BuildLines 3500; LoadEhrPlugin.cpp:BuildDeform 4034 | WIRED |
-| P_TAPER | Taper | Deform | 243 | 251 | 140 | 148 | LoadEhrPlugin.cpp:BuildDeform 4041 | WIRED |
-| P_TWIST | Twist | Deform | 244 | 252 | 141 | 149 | LoadEhrPlugin.cpp:BuildDeform 4035 | WIRED |
-| P_BEND | Bend | Deform | 245 | 253 | 142 | 150 | LoadEhrPlugin.cpp:BuildDeform 4035 | WIRED |
-| P_SQUASH | Squash | Deform | 246 | 254 | 143 | 151 | LoadEhrPlugin.cpp:BuildDeform 4042 | WIRED |
-| P_SQUASH_BEAT | Squash Beat | Deform | 247 | 255 | 144 | 152 | LoadEhrPlugin.cpp:BuildDeform 4042 | WIRED |
-| P_SHEAR | Shear | Deform | 248 | 256 | 145 | 153 | LoadEhrPlugin.cpp:BuildDeform 4043 | WIRED |
-| P_BULGE | Bulge | Deform | 249 | 257 | 146 | 154 | LoadEhrPlugin.cpp:BuildDeform 4044 | WIRED |
-| P_SPHERIZE | Spherize | Deform | 250 | 258 | 147 | 155 | LoadEhrPlugin.cpp:BuildDeform 4045 | WIRED |
-| P_SHAPE_TARGET | Shape Target | Deform | 251 | 259 | 148 | 156 | LoadEhrPlugin.cpp:BuildDeform 4046 | WIRED |
-| P_NOISE_WARP | Noise Warp | Deform | 252 | 260 | 149 | 157 | LoadEhrPlugin.cpp:BuildDeform 4047 | WIRED |
-| P_WARP_SCALE | Warp Scale | Deform | 253 | 261 | 150 | 158 | LoadEhrPlugin.cpp:BuildDeform 4048 | WIRED |
-| P_WARP_SPEED | Warp Speed | Deform | 254 | 262 | 151 | 159 | LoadEhrPlugin.cpp:BuildDeform 4049 | WIRED |
-| P_RIPPLE | Ripple | Deform | 255 | 263 | 152 | 160 | LoadEhrPlugin.cpp:BuildDeform 4037 | WIRED |
-| P_RIPPLE_FREQ | Ripple Freq | Deform | 256 | 264 | 153 | 161 | LoadEhrPlugin.cpp:BuildMorph 2446; LoadEhrPlugin.cpp:BuildDeform 4038 | WIRED |
-| P_RIPPLE_SPEED | Ripple Speed | Deform | 257 | 265 | 154 | 162 | LoadEhrPlugin.cpp:BuildDeform 4039 | WIRED |
-| P_RIPPLE_BEAT | Ripple Beat | Deform | 258 | 266 | 155 | 163 | LoadEhrPlugin.cpp:BuildDeform 4037 | WIRED |
-| P_MELT | Melt | Deform | 259 | 267 | 156 | 164 | LoadEhrPlugin.cpp:BuildDeform 4036 | WIRED |
-| P_DRIP | Drip | Deform | 260 | 268 | 157 | 165 | LoadEhrPlugin.cpp:BuildDeform 4036 | WIRED |
-| P_GLITCH_SHIFT | Glitch Shift | Deform | 261 | 269 | 158 | 166 | LoadEhrPlugin.cpp:BuildDeform 4051 | WIRED |
-| P_GLITCH_BANDS | Glitch Bands | Deform | 262 | 270 | 159 | 167 | LoadEhrPlugin.cpp:BuildMorph 2446; LoadEhrPlugin.cpp:BuildDeform 4052 | WIRED |
-| P_GLITCH_RATE | Glitch Rate | Deform | 263 | 271 | 160 | 168 | LoadEhrPlugin.cpp:BuildDeform 4053 | WIRED |
-| P_MIRROR_FOLD | Mirror Fold | Deform | 264 | 272 | 161 | 169 | LoadEhrPlugin.cpp:BuildDeform 4055 | WIRED |
-| P_JELLY | Jelly | Deform | 265 | 273 | 162 | 170 | LoadEhrPlugin.cpp:BuildDeform 4060 | WIRED |
-| P_AUDIO_DEFORM | Audio > Deform | Deform | 266 | 274 | 163 | 171 | LoadEhrPlugin.cpp:BuildDeform 4033 | WIRED |
-| P_WIRE_MODE | Wire Mode | Wireframe | 267 | 275 | 164 | 172 | LoadEhrPlugin.cpp:BuildWire 3229 | WIRED |
-| P_WIRE_MIX | Wireframe Mix | Wireframe | 268 | 276 | 165 | 173 | LoadEhrPlugin.cpp:BuildWire 3232 | WIRED |
-| P_WIRE_THICKNESS | Wire Thickness | Wireframe | 269 | 277 | 166 | 174 | LoadEhrPlugin.cpp:BuildMorph 2466; LoadEhrPlugin.cpp:BuildWire 3245; LoadEhrPlugin.cpp:BuildLines 3501 | WIRED |
-| P_WIRE_BACK | Wire Back | Wireframe | 270 | 278 | 167 | 175 | LoadEhrPlugin.cpp:BuildWire 3230 | WIRED |
-| P_WIRE_EDGES | Wire Edges | Wireframe | 271 | 279 | 168 | 176 | LoadEhrPlugin.cpp:BuildWire 3231 | WIRED |
-| P_WIRE_COL_H | Wire Color | Wireframe | 272 | 280 | 169 | 177 | LoadEhrPlugin.cpp:BuildMorph 2444,2465; LoadEhrPlugin.cpp:BuildWire 3233,3234; LoadEhrPlugin.cpp:BuildBuild 3274; LoadEhrPlugin.cpp:BuildCut 3333 | WIRED |
-| P_WIRE_COL_S | Wire Sat | Wireframe | 273 | 281 | 170 | 178 | LoadEhrPlugin.cpp:BuildMorph 2444; LoadEhrPlugin.cpp:BuildWire 3233; LoadEhrPlugin.cpp:BuildBuild 3274; LoadEhrPlugin.cpp:BuildCut 3333 | WIRED |
-| P_WIRE_COL_V | Wire Bri | Wireframe | 274 | 282 | 171 | 179 | LoadEhrPlugin.cpp:BuildMorph 2444; LoadEhrPlugin.cpp:BuildWire 3233; LoadEhrPlugin.cpp:BuildBuild 3274; LoadEhrPlugin.cpp:BuildCut 3333 | WIRED |
-| P_WIRE_COL_A | Wire Color Mix | Wireframe | 275 | 283 | 172 | 180 | LoadEhrPlugin.cpp:BuildMorph 2465; LoadEhrPlugin.cpp:BuildWire 3233,3234; LoadEhrPlugin.cpp:BuildSurfLook 3447,3448; LoadEhrPlugin.cpp:BuildLines 3502,3503 | WIRED |
-| P_WIRE_GLOW | Wire Glow | Wireframe | 276 | 284 | 173 | 181 | LoadEhrPlugin.cpp:BuildMorph 2445,2467; LoadEhrPlugin.cpp:BuildWire 3235; LoadEhrPlugin.cpp:BuildBuild 3275; LoadEhrPlugin.cpp:BuildCut 3334 | WIRED |
-| P_WIRE_BLOOM | Wire Bloom | Wireframe | 277 | 285 | 174 | 182 | LoadEhrPlugin.cpp:BuildWire 3236 | WIRED |
-| P_WIRE_BLOOM_SIZE | Wire Bloom Size | Wireframe | 278 | 286 | 175 | 183 | LoadEhrPlugin.cpp:BuildWire 3237 | WIRED |
-| P_WIRE_FADE | Wire Fade | Wireframe | 279 | 287 | 176 | 184 | LoadEhrPlugin.cpp:BuildWire 3238 | WIRED |
-| P_POINT_SOURCE | Point Source | Wireframe | 280 | 288 | 177 | 185 | LoadEhrPlugin.cpp:BuildWire 3239; LoadEhrPlugin.cpp:BuildLines 3485 | WIRED |
-| P_POINT_TWINKLE | Point Twinkle | Wireframe | 281 | 289 | 178 | 186 | LoadEhrPlugin.cpp:BuildMorph 2468; LoadEhrPlugin.cpp:BuildWire 3240 | WIRED |
-| P_LINE_LOOK | Line Look | Lines | 282 | 290 | — | — | LoadEhrPlugin.cpp:BuildLines 3476 | WIRED |
-| P_LINE_AMOUNT | Line Amount | Lines | 283 | 291 | — | — | LoadEhrPlugin.cpp:BuildLines 3477 | WIRED |
-| P_LINE_REACH | Line Reach | Lines | 284 | 292 | — | — | LoadEhrPlugin.cpp:BuildLines 3477 | WIRED |
-| P_LINE_SPEED | Line Speed | Lines | 285 | 293 | — | — | LoadEhrPlugin.cpp:BuildLines 3477 | WIRED |
-| P_LINE_AUDIO | Line Audio | Lines | 286 | 294 | — | — | LoadEhrPlugin.cpp:BuildLines 3484 | WIRED |
-| P_BUILD_LOOK | Build Look | Build | 287 | 295 | — | — | LoadEhrPlugin.cpp:BuildBuild 3255 | WIRED |
-| P_BUILD_AMOUNT | Build Amount | Build | 288 | 296 | — | — | LoadEhrPlugin.cpp:BuildBuild 3256 | WIRED |
-| P_BUILD_AXIS | Build Axis | Build | 289 | 297 | 179 | 187 | LoadEhrPlugin.cpp:BuildBuild 3254 | WIRED |
-| P_BUILD_SPEED | Build Speed | Build | 290 | 298 | — | — | LoadEhrPlugin.cpp:BuildBuild 3256 | WIRED |
-| P_BUILD_BEAT | Build On Beat | Build | 291 | 299 | — | — | LoadEhrPlugin.cpp:BuildBuild 3258,3258; LoadEhrPlugin.cpp:BuildCut 3323,3323 | WIRED |
-| P_CUT_LOOK | Cut Look | Cut | 292 | 300 | 180 | 188 | LoadEhrPlugin.cpp:UpdateModel 855; LoadEhrPlugin.cpp:WantEyes 986; LoadEhrPlugin.cpp:UpdateEyePlacement 1218; LoadEhrPlugin.cpp:BuildCut 3321 | WIRED |
-| P_CUT_POS | Cut Position | Cut | 293 | 301 | 181 | 189 | LoadEhrPlugin.cpp:BuildCut 3322 | WIRED |
-| P_CUT_SIZE | Cut Size | Cut | 294 | 302 | 182 | 190 | LoadEhrPlugin.cpp:BuildCut 3322 | WIRED |
-| P_CUT_SPEED | Cut Speed | Cut | 295 | 303 | 183 | 191 | LoadEhrPlugin.cpp:BuildCut 3322 | WIRED |
-| P_SURF_LOOK | Surf Look | Surface Look | 296 | 304 | — | — | LoadEhrPlugin.cpp:UpdateModel 855; LoadEhrPlugin.cpp:BuildSurfLook 3441 | WIRED |
-| P_SURF_AMOUNT | Surf Amount | Surface Look | 297 | 305 | — | — | LoadEhrPlugin.cpp:BuildSurfLook 3445 | WIRED |
-| P_SURF_SCALE | Surf Scale | Surface Look | 298 | 306 | — | — | LoadEhrPlugin.cpp:BuildSurfLook 3445 | WIRED |
-| P_SURF_SPEED | Surf Speed | Surface Look | 299 | 307 | — | — | LoadEhrPlugin.cpp:BuildSurfLook 3442,3445 | WIRED |
-| P_SURF_SOURCE | Surf Source | Surface Look | 300 | 308 | — | — | LoadEhrPlugin.cpp:UpdateModel 855; LoadEhrPlugin.cpp:SourceModel 3423 | WIRED |
-| P_CLONE_LAYOUT | Clone Layout | Copies | 301 | 309 | — | — | LoadEhrPlugin.cpp:BuildCopies 3772 | WIRED |
-| P_CLONE_COUNT | Clone Count | Copies | 302 | 310 | — | — | LoadEhrPlugin.cpp:BuildCopies 3800 | WIRED |
-| P_CLONE_SPACING | Clone Spacing | Copies | 303 | 311 | — | — | LoadEhrPlugin.cpp:BuildCopies 3801 | WIRED |
-| P_CLONE_SPIN_STEP | Clone Spin Step | Copies | 304 | 312 | — | — | LoadEhrPlugin.cpp:BuildCopies 3802 | WIRED |
-| P_CLONE_HUE | Clone Hue Spread | Copies | 305 | 313 | — | — | LoadEhrPlugin.cpp:BuildCopies 3802 | WIRED |
-| P_CLONE_ORBIT | Clone Orbit | Copies | 306 | 314 | — | — | LoadEhrPlugin.cpp:BuildCopies 3774,3778,3781 | WIRED |
-| P_CLONE_SCALE | Clone Scale | Copies | 307 | 315 | — | — | LoadEhrPlugin.cpp:BuildCopies 3801 | WIRED |
-| P_TUNNEL_FADE | Tunnel Fade | Copies | 308 | 316 | — | — | LoadEhrPlugin.cpp:BuildCopies 3834 | WIRED |
-| P_KEEP_ORIGINAL | Keep Original | Copies | 309 | 317 | — | — | LoadEhrPlugin.cpp:BuildCopies 3804 | WIRED |
-| P_LOD_BIAS | LOD Bias | Copies | 310 | 318 | — | — | LoadEhrPlugin.cpp:BuildCopies 3786 | WIRED |
-| P_TRAIL_ECHOES | Trail Echoes | Copies | 311 | 319 | — | — | LoadEhrPlugin.cpp:BuildCopies 3903 | WIRED |
-| P_TRAIL_DELAY | Trail Delay | Copies | 312 | 320 | — | — | LoadEhrPlugin.cpp:BuildCopies 3904 | WIRED |
-| P_TRAIL_DECAY | Trail Decay | Copies | 313 | 321 | — | — | LoadEhrPlugin.cpp:BuildCopies 3905 | WIRED |
-| P_TRAIL_OFFSET_X | Trail Offset X | Copies | 314 | 322 | — | — | LoadEhrPlugin.cpp:BuildCopies 3906 | WIRED |
-| P_TRAIL_OFFSET_Y | Trail Offset Y | Copies | 315 | 323 | — | — | LoadEhrPlugin.cpp:BuildCopies 3907 | WIRED |
-| P_GHOSTS | Ghosts | Copies | 316 | 324 | — | — | LoadEhrPlugin.cpp:BuildCopies 3881 | WIRED |
-| P_GHOST_SPACING | Ghost Spacing | Copies | 317 | 325 | — | — | LoadEhrPlugin.cpp:BuildCopies 3882 | WIRED |
-| P_GHOST_FADE | Ghost Fade | Copies | 318 | 326 | — | — | LoadEhrPlugin.cpp:BuildCopies 3897 | WIRED |
-| P_TRAIL_SMEAR | Trail Smear | Copies | 319 | 327 | — | — | LoadEhrPlugin.cpp:BuildCopies 3884 | WIRED |
-| P_TRAIL_BLUR | Trail Blur | Copies | 320 | 328 | — | — | LoadEhrPlugin.cpp:BuildCopies 3910 | WIRED |
-| P_TRAIL_DUST | Trail Dust | Copies | 321 | 329 | — | — | LoadEhrPlugin.cpp:BuildCopies 3911 | WIRED |
-| P_TRAIL_GRAIN | Trail Grain | Copies | 322 | 330 | — | — | LoadEhrPlugin.cpp:BuildCopies 3918 | WIRED |
-| P_TRAIL_DRIFT | Trail Drift | Copies | 323 | 331 | — | — | LoadEhrPlugin.cpp:BuildCopies 3919 | WIRED |
-| P_TRAIL_DRIFT_DIR | Trail Drift Dir | Copies | 324 | 332 | — | — | LoadEhrPlugin.cpp:BuildCopies 3919 | WIRED |
-| P_TRAIL_CURVE | Trail Fade Curve | Copies | 325 | 333 | — | — | LoadEhrPlugin.cpp:BuildCopies 3883 | WIRED |
-| P_TRAIL_GLOW | Trail Glow | Copies | 326 | 334 | — | — | LoadEhrPlugin.cpp:BuildCopies 3913 | WIRED |
-| P_TRAIL_COL_H | Trail Color | Copies | 327 | 335 | — | — | LoadEhrPlugin.cpp:BuildCopies 3913,3914,3915 | WIRED |
-| P_TRAIL_COL_S | Trail Sat | Copies | 328 | 336 | — | — | LoadEhrPlugin.cpp:BuildCopies 3913,3914,3915 | WIRED |
-| P_TRAIL_COL_V | Trail Bri | Copies | 329 | 337 | — | — | LoadEhrPlugin.cpp:BuildCopies 3913,3914,3915 | WIRED |
-| P_TRAIL_COL_A | Trail Alpha | Copies | 330 | 338 | — | — | LoadEhrPlugin.cpp:BuildCopies 3913,3914 | WIRED |
-| P_TRAIL_COL_MIX | Trail Color Mix | Copies | 331 | 339 | — | — | LoadEhrPlugin.cpp:BuildCopies 3914 | WIRED |
-| P_KEY_AZIMUTH | Key Azimuth | Lighting | 332 | 340 | 184 | 192 | LoadEhrPlugin.cpp:BuildFrame 1537 | WIRED |
-| P_KEY_ELEVATION | Key Elevation | Lighting | 333 | 341 | 185 | 193 | LoadEhrPlugin.cpp:BuildFrame 1537 | WIRED |
-| P_KEY_INTENSITY | Key Intensity | Lighting | 334 | 342 | 186 | 194 | LoadEhrPlugin.cpp:BuildFrame 1541 | WIRED |
-| P_KEY_COL_H | Key Color | Lighting | 335 | 343 | 187 | 195 | LoadEhrPlugin.cpp:BuildFrame 1541,1544; LoadEhrPlugin.cpp:BuildPost 4359 | WIRED |
-| P_KEY_COL_S | Key Sat | Lighting | 336 | 344 | 188 | 196 | LoadEhrPlugin.cpp:BuildFrame 1541,1544; LoadEhrPlugin.cpp:BuildPost 4359 | WIRED |
-| P_KEY_COL_V | Key Bri | Lighting | 337 | 345 | 189 | 197 | LoadEhrPlugin.cpp:BuildFrame 1541,1544; LoadEhrPlugin.cpp:BuildPost 4359 | WIRED |
-| P_KEY_COL_A | Key Alpha | Lighting | 338 | 346 | 190 | 198 | LoadEhrPlugin.cpp:BuildFrame 1541 | WIRED |
-| P_AMBIENT | Ambient | Lighting | 339 | 347 | 191 | 199 | LoadEhrPlugin.cpp:BuildFrame 1550 | WIRED |
-| P_ENV_INTENSITY | Env Intensity | Lighting | 340 | 348 | 192 | 200 | LoadEhrPlugin.cpp:BuildFrame 1551 | WIRED |
-| P_ENV_SOURCE | Env Source | Lighting | 341 | 349 | 193 | 201 | LoadEhrPlugin.cpp:BuildFrame 1552 | WIRED |
-| P_ENV_ROTATE | Env Rotate | Lighting | 342 | 350 | 194 | 202 | LoadEhrPlugin.cpp:BuildFrame 1555 | WIRED |
-| P_EXPOSURE | Exposure | Lighting | 343 | 351 | 195 | 203 | LoadEhrPlugin.cpp:BuildFrame 1556 | WIRED |
-| P_TONEMAP | Tonemap | Lighting | 344 | 352 | 196 | 204 | LoadEhrPlugin.cpp:BuildFrame 1557 | WIRED |
-| P_VOL_METHOD | Vol Method | Volume | 345 | 353 | 197 | 205 | LoadEhrPlugin.cpp:BuildVolume 2100 | WIRED |
-| P_HAZE | Haze | Volume | 346 | 354 | 198 | 206 | LoadEhrPlugin.cpp:BuildVolume 2101 | WIRED |
-| P_SMOKE_AMOUNT | Smoke Amount | Volume | 347 | 355 | 199 | 207 | LoadEhrPlugin.cpp:BuildVolume 2099,2102; LoadEhrPlugin.cpp:BuildLightning 2984 | WIRED |
-| P_SMOKE_SCALE | Smoke Scale | Volume | 348 | 356 | 200 | 208 | LoadEhrPlugin.cpp:BuildVolume 2103 | WIRED |
-| P_SMOKE_SPEED | Smoke Speed | Volume | 349 | 357 | 201 | 209 | LoadEhrPlugin.cpp:BuildVolume 2107 | WIRED |
-| P_SMOKE_TURB | Smoke Turbulence | Volume | 350 | 358 | 202 | 210 | LoadEhrPlugin.cpp:BuildVolume 2104 | WIRED |
-| P_SMOKE_RISE | Smoke Rise | Volume | 351 | 359 | 203 | 211 | LoadEhrPlugin.cpp:BuildVolume 2107 | WIRED |
-| P_GLOW_CLOUD | Glow Cloud | Volume | 352 | 360 | 204 | 212 | LoadEhrPlugin.cpp:BuildVolume 2105 | WIRED |
-| P_SMOKE_AMBIENT | Smoke Ambient | Volume | 353 | 361 | 205 | 213 | LoadEhrPlugin.cpp:BuildVolume 2092 | WIRED |
-| P_SMOKE_KEY | Smoke Key Light | Volume | 354 | 362 | 206 | 214 | LoadEhrPlugin.cpp:BuildVolume 2095 | WIRED |
-| P_VOLUME_SIZE | Volume Size | Volume | 355 | 363 | 207 | 215 | LoadEhrPlugin.cpp:BuildVolume 2119 | WIRED |
-| P_SCATTER_G | Scatter G | Volume | 356 | 364 | 208 | 216 | LoadEhrPlugin.cpp:BuildVolume 2120 | WIRED |
-| P_SHAFT_LENGTH | Shaft Length | Volume | 357 | 365 | 209 | 217 | LoadEhrPlugin.cpp:BuildVolume 2121 | WIRED |
-| P_MOTES | Motes | Volume | 358 | 366 | 210 | 218 | LoadEhrPlugin.cpp:BuildVolume 2122 | WIRED |
-| P_VOL_QUALITY | Vol Quality | Volume | 359 | 367 | 211 | 219 | LoadEhrPlugin.cpp:BuildVolume 2124 | WIRED |
-| P_VOL_RES | Vol Res | Volume | 360 | 368 | 212 | 220 | LoadEhrPlugin.cpp:BuildVolume 2125 | WIRED |
-| P_FOG_BLEND | Fog Blend | Volume | 361 | 369 | 213 | 221 | LoadEhrPlugin.cpp:BuildVolume 2126 | WIRED |
-| P_DRIFT_RETURN | Drift Return | Volume | 362 | 370 | 214 | 222 | LoadEhrPlugin.cpp:Drift 2000 | WIRED |
-| P_SMOKE_ENGINE | Smoke Engine | Smoke Sim | — | — | 215 | 223 | LoadEhrPlugin.cpp:WantEyes 986; LoadEhrPlugin.cpp:BuildSim 2134 | WIRED |
-| P_SIM_RES | Sim Res | Smoke Sim | — | — | 216 | 224 | LoadEhrPlugin.cpp:BuildSim 2145 | WIRED |
-| P_SIM_BOX | Sim Box | Smoke Sim | — | — | 217 | 225 | LoadEhrPlugin.cpp:BuildSim 2151 | WIRED |
-| P_SIM_ITER | Sim Iterations | Smoke Sim | — | — | 218 | 226 | LoadEhrPlugin.cpp:BuildSim 2163 | WIRED |
-| P_BUOYANCY | Buoyancy | Smoke Sim | — | — | 219 | 227 | LoadEhrPlugin.cpp:BuildSim 2164 | WIRED |
-| P_HEAT_DECAY | Heat Decay | Smoke Sim | — | — | 220 | 228 | LoadEhrPlugin.cpp:BuildSim 2166 | WIRED |
-| P_VORTICITY | Vorticity | Smoke Sim | — | — | 221 | 229 | LoadEhrPlugin.cpp:BuildSim 2167 | WIRED |
-| P_SMOKE_FADE | Smoke Fade | Smoke Sim | — | — | 222 | 230 | LoadEhrPlugin.cpp:BuildSim 2168 | WIRED |
-| P_WIND_X | Wind X | Smoke Sim | — | — | 223 | 231 | LoadEhrPlugin.cpp:BuildSim 2171 | WIRED |
-| P_WIND_Y | Wind Y | Smoke Sim | — | — | 224 | 232 | LoadEhrPlugin.cpp:BuildSim 2171 | WIRED |
-| P_WIND_Z | Wind Z | Smoke Sim | — | — | 225 | 233 | LoadEhrPlugin.cpp:BuildSim 2171 | WIRED |
-| P_SIM_TURB | Sim Turbulence | Smoke Sim | — | — | 226 | 234 | LoadEhrPlugin.cpp:BuildSim 2169 | WIRED |
-| P_EMIT_EYES | Emit Eyes | Smoke Sim | — | — | 227 | 235 | LoadEhrPlugin.cpp:WantEyes 986; LoadEhrPlugin.cpp:BuildSim 2193 | WIRED |
-| P_EYES_HEAT | Eyes Heat | Smoke Sim | — | — | 228 | 236 | LoadEhrPlugin.cpp:BuildSim 2194 | WIRED |
-| P_EMIT_BEHIND | Emit Behind | Smoke Sim | — | — | 229 | 237 | LoadEhrPlugin.cpp:BuildSim 2198 | WIRED |
-| P_BEHIND_HEAT | Behind Heat | Smoke Sim | — | — | 230 | 238 | LoadEhrPlugin.cpp:BuildSim 2199 | WIRED |
-| P_EMIT_RIM | Emit Rim | Smoke Sim | — | — | 231 | 239 | LoadEhrPlugin.cpp:BuildSim 2200 | WIRED |
-| P_RIM_HEAT | Rim Heat | Smoke Sim | — | — | 232 | 240 | LoadEhrPlugin.cpp:BuildSim 2201 | WIRED |
-| P_EMIT_INSIDE | Emit Inside | Smoke Sim | — | — | 233 | 241 | LoadEhrPlugin.cpp:BuildSim 2202 | WIRED |
-| P_INSIDE_HEAT | Inside Heat | Smoke Sim | — | — | 234 | 242 | LoadEhrPlugin.cpp:BuildSim 2204 | WIRED |
-| P_EMIT_OFFSET | Emit Offset | Smoke Sim | — | — | 235 | 243 | LoadEhrPlugin.cpp:BuildSim 2187 | WIRED |
-| P_BEAT_PUFF | Beat Puff | Smoke Sim | — | — | 236 | 244 | LoadEhrPlugin.cpp:BuildSim 2206,2206 | WIRED |
-| P_PUFF_AMOUNT | Puff Amount | Smoke Sim | — | — | 237 | 245 | LoadEhrPlugin.cpp:BuildSim 2210 | WIRED |
-| P_AUDIO_EMIT | Audio > Emit | Smoke Sim | — | — | 238 | 246 | LoadEhrPlugin.cpp:BuildSim 2210 | WIRED |
+| P_DUST_BEAT | Dust On Beat | Shape | 226 | 234 | — | — | LoadEhrPlugin.cpp:BuildDust 4213,4213 | WIRED |
+| P_DUST_HOLD | Dust Hold | Shape | 227 | 235 | — | — | LoadEhrPlugin.cpp:BuildDust 4243 | WIRED |
+| P_DUST | Dust | Shape | 228 | 236 | — | — | LoadEhrPlugin.cpp:SetFloatId 387; LoadEhrPlugin.cpp:BuildDust 4220,4223,4233 | WIRED |
+| P_DUST_COUNT | Dust Count | Shape | 229 | 237 | — | — | LoadEhrPlugin.cpp:BuildShape 4025 | WIRED |
+| P_DUST_WIND | Dust Wind | Shape | 230 | 238 | — | — | LoadEhrPlugin.cpp:BuildShape 4026 | WIRED |
+| P_DUST_SIZE | Dust Size | Shape | 231 | 239 | — | — | LoadEhrPlugin.cpp:BuildShape 4027 | WIRED |
+| P_CONTOURS | Contours | Shape | 232 | 240 | — | — | LoadEhrPlugin.cpp:BuildShape 4028 | WIRED |
+| P_CONTOUR_MODE | Contour Mode | Shape | 233 | 241 | — | — | LoadEhrPlugin.cpp:BuildShape 4029 | WIRED |
+| P_CONTOUR_SPACING | Contour Spacing | Shape | 234 | 242 | — | — | LoadEhrPlugin.cpp:BuildShape 4030 | WIRED |
+| P_CONTOUR_WIDTH | Contour Width | Shape | 235 | 243 | — | — | LoadEhrPlugin.cpp:BuildShape 4031 | WIRED |
+| P_CONTOUR_SPEED | Contour Speed | Shape | 236 | 244 | — | — | LoadEhrPlugin.cpp:BuildShape 4032 | WIRED |
+| P_CONTOUR_COL_H | Contour Color | Shape | 237 | 245 | — | — | LoadEhrPlugin.cpp:BuildShape 4034,4035 | WIRED |
+| P_CONTOUR_COL_S | Contour Sat | Shape | 238 | 246 | — | — | LoadEhrPlugin.cpp:BuildShape 4034,4035 | WIRED |
+| P_CONTOUR_COL_V | Contour Bri | Shape | 239 | 247 | — | — | LoadEhrPlugin.cpp:BuildShape 4034,4035 | WIRED |
+| P_CONTOUR_COL_A | Contour Alpha | Shape | 240 | 248 | — | — | LoadEhrPlugin.cpp:BuildShape 4034 | WIRED |
+| P_DEFORM_AMOUNT | Deform Amount | Deform | 241 | 249 | 138 | 146 | LoadEhrPlugin.cpp:BuildDeform 4045 | WIRED |
+| P_DEFORM_AXIS | Deform Axis | Deform | 242 | 250 | 139 | 147 | LoadEhrPlugin.cpp:BuildLines 3512; LoadEhrPlugin.cpp:BuildDeform 4046 | WIRED |
+| P_TAPER | Taper | Deform | 243 | 251 | 140 | 148 | LoadEhrPlugin.cpp:BuildDeform 4053 | WIRED |
+| P_TWIST | Twist | Deform | 244 | 252 | 141 | 149 | LoadEhrPlugin.cpp:BuildDeform 4047 | WIRED |
+| P_BEND | Bend | Deform | 245 | 253 | 142 | 150 | LoadEhrPlugin.cpp:BuildDeform 4047 | WIRED |
+| P_SQUASH | Squash | Deform | 246 | 254 | 143 | 151 | LoadEhrPlugin.cpp:BuildDeform 4054 | WIRED |
+| P_SQUASH_BEAT | Squash Beat | Deform | 247 | 255 | 144 | 152 | LoadEhrPlugin.cpp:BuildDeform 4054 | WIRED |
+| P_SHEAR | Shear | Deform | 248 | 256 | 145 | 153 | LoadEhrPlugin.cpp:BuildDeform 4055 | WIRED |
+| P_BULGE | Bulge | Deform | 249 | 257 | 146 | 154 | LoadEhrPlugin.cpp:BuildDeform 4056 | WIRED |
+| P_SPHERIZE | Spherize | Deform | 250 | 258 | 147 | 155 | LoadEhrPlugin.cpp:BuildDeform 4057 | WIRED |
+| P_SHAPE_TARGET | Shape Target | Deform | 251 | 259 | 148 | 156 | LoadEhrPlugin.cpp:BuildDeform 4058 | WIRED |
+| P_NOISE_WARP | Noise Warp | Deform | 252 | 260 | 149 | 157 | LoadEhrPlugin.cpp:BuildDeform 4059 | WIRED |
+| P_WARP_SCALE | Warp Scale | Deform | 253 | 261 | 150 | 158 | LoadEhrPlugin.cpp:BuildDeform 4060 | WIRED |
+| P_WARP_SPEED | Warp Speed | Deform | 254 | 262 | 151 | 159 | LoadEhrPlugin.cpp:BuildDeform 4061 | WIRED |
+| P_RIPPLE | Ripple | Deform | 255 | 263 | 152 | 160 | LoadEhrPlugin.cpp:BuildDeform 4049 | WIRED |
+| P_RIPPLE_FREQ | Ripple Freq | Deform | 256 | 264 | 153 | 161 | LoadEhrPlugin.cpp:BuildMorph 2458; LoadEhrPlugin.cpp:BuildDeform 4050 | WIRED |
+| P_RIPPLE_SPEED | Ripple Speed | Deform | 257 | 265 | 154 | 162 | LoadEhrPlugin.cpp:BuildDeform 4051 | WIRED |
+| P_RIPPLE_BEAT | Ripple Beat | Deform | 258 | 266 | 155 | 163 | LoadEhrPlugin.cpp:BuildDeform 4049 | WIRED |
+| P_MELT | Melt | Deform | 259 | 267 | 156 | 164 | LoadEhrPlugin.cpp:BuildDeform 4048 | WIRED |
+| P_DRIP | Drip | Deform | 260 | 268 | 157 | 165 | LoadEhrPlugin.cpp:BuildDeform 4048 | WIRED |
+| P_GLITCH_SHIFT | Glitch Shift | Deform | 261 | 269 | 158 | 166 | LoadEhrPlugin.cpp:BuildDeform 4063 | WIRED |
+| P_GLITCH_BANDS | Glitch Bands | Deform | 262 | 270 | 159 | 167 | LoadEhrPlugin.cpp:BuildMorph 2458; LoadEhrPlugin.cpp:BuildDeform 4064 | WIRED |
+| P_GLITCH_RATE | Glitch Rate | Deform | 263 | 271 | 160 | 168 | LoadEhrPlugin.cpp:BuildDeform 4065 | WIRED |
+| P_MIRROR_FOLD | Mirror Fold | Deform | 264 | 272 | 161 | 169 | LoadEhrPlugin.cpp:BuildDeform 4067 | WIRED |
+| P_JELLY | Jelly | Deform | 265 | 273 | 162 | 170 | LoadEhrPlugin.cpp:BuildDeform 4072 | WIRED |
+| P_AUDIO_DEFORM | Audio > Deform | Deform | 266 | 274 | 163 | 171 | LoadEhrPlugin.cpp:BuildDeform 4045 | WIRED |
+| P_WIRE_MODE | Wire Mode | Wireframe | 267 | 275 | 164 | 172 | LoadEhrPlugin.cpp:BuildWire 3241 | WIRED |
+| P_WIRE_MIX | Wireframe Mix | Wireframe | 268 | 276 | 165 | 173 | LoadEhrPlugin.cpp:BuildWire 3244 | WIRED |
+| P_WIRE_THICKNESS | Wire Thickness | Wireframe | 269 | 277 | 166 | 174 | LoadEhrPlugin.cpp:BuildMorph 2478; LoadEhrPlugin.cpp:BuildWire 3257; LoadEhrPlugin.cpp:BuildLines 3513 | WIRED |
+| P_WIRE_BACK | Wire Back | Wireframe | 270 | 278 | 167 | 175 | LoadEhrPlugin.cpp:BuildWire 3242 | WIRED |
+| P_WIRE_EDGES | Wire Edges | Wireframe | 271 | 279 | 168 | 176 | LoadEhrPlugin.cpp:BuildWire 3243 | WIRED |
+| P_WIRE_COL_H | Wire Color | Wireframe | 272 | 280 | 169 | 177 | LoadEhrPlugin.cpp:BuildMorph 2456,2477; LoadEhrPlugin.cpp:BuildWire 3245,3246; LoadEhrPlugin.cpp:BuildBuild 3286; LoadEhrPlugin.cpp:BuildCut 3345 | WIRED |
+| P_WIRE_COL_S | Wire Sat | Wireframe | 273 | 281 | 170 | 178 | LoadEhrPlugin.cpp:BuildMorph 2456; LoadEhrPlugin.cpp:BuildWire 3245; LoadEhrPlugin.cpp:BuildBuild 3286; LoadEhrPlugin.cpp:BuildCut 3345 | WIRED |
+| P_WIRE_COL_V | Wire Bri | Wireframe | 274 | 282 | 171 | 179 | LoadEhrPlugin.cpp:BuildMorph 2456; LoadEhrPlugin.cpp:BuildWire 3245; LoadEhrPlugin.cpp:BuildBuild 3286; LoadEhrPlugin.cpp:BuildCut 3345 | WIRED |
+| P_WIRE_COL_A | Wire Color Mix | Wireframe | 275 | 283 | 172 | 180 | LoadEhrPlugin.cpp:BuildMorph 2477; LoadEhrPlugin.cpp:BuildWire 3245,3246; LoadEhrPlugin.cpp:BuildSurfLook 3459,3460; LoadEhrPlugin.cpp:BuildLines 3514,3515 | WIRED |
+| P_WIRE_GLOW | Wire Glow | Wireframe | 276 | 284 | 173 | 181 | LoadEhrPlugin.cpp:BuildMorph 2457,2479; LoadEhrPlugin.cpp:BuildWire 3247; LoadEhrPlugin.cpp:BuildBuild 3287; LoadEhrPlugin.cpp:BuildCut 3346 | WIRED |
+| P_WIRE_BLOOM | Wire Bloom | Wireframe | 277 | 285 | 174 | 182 | LoadEhrPlugin.cpp:BuildWire 3248 | WIRED |
+| P_WIRE_BLOOM_SIZE | Wire Bloom Size | Wireframe | 278 | 286 | 175 | 183 | LoadEhrPlugin.cpp:BuildWire 3249 | WIRED |
+| P_WIRE_FADE | Wire Fade | Wireframe | 279 | 287 | 176 | 184 | LoadEhrPlugin.cpp:BuildWire 3250 | WIRED |
+| P_POINT_SOURCE | Point Source | Wireframe | 280 | 288 | 177 | 185 | LoadEhrPlugin.cpp:BuildWire 3251; LoadEhrPlugin.cpp:BuildLines 3497 | WIRED |
+| P_POINT_TWINKLE | Point Twinkle | Wireframe | 281 | 289 | 178 | 186 | LoadEhrPlugin.cpp:BuildMorph 2480; LoadEhrPlugin.cpp:BuildWire 3252 | WIRED |
+| P_LINE_LOOK | Line Look | Lines | 282 | 290 | — | — | LoadEhrPlugin.cpp:BuildLines 3488 | WIRED |
+| P_LINE_AMOUNT | Line Amount | Lines | 283 | 291 | — | — | LoadEhrPlugin.cpp:BuildLines 3489 | WIRED |
+| P_LINE_REACH | Line Reach | Lines | 284 | 292 | — | — | LoadEhrPlugin.cpp:BuildLines 3489 | WIRED |
+| P_LINE_SPEED | Line Speed | Lines | 285 | 293 | — | — | LoadEhrPlugin.cpp:BuildLines 3489 | WIRED |
+| P_LINE_AUDIO | Line Audio | Lines | 286 | 294 | — | — | LoadEhrPlugin.cpp:BuildLines 3496 | WIRED |
+| P_BUILD_LOOK | Build Look | Build | 287 | 295 | — | — | LoadEhrPlugin.cpp:BuildBuild 3267 | WIRED |
+| P_BUILD_AMOUNT | Build Amount | Build | 288 | 296 | — | — | LoadEhrPlugin.cpp:BuildBuild 3268 | WIRED |
+| P_BUILD_AXIS | Build Axis | Build | 289 | 297 | 179 | 187 | LoadEhrPlugin.cpp:BuildBuild 3266 | WIRED |
+| P_BUILD_SPEED | Build Speed | Build | 290 | 298 | — | — | LoadEhrPlugin.cpp:BuildBuild 3268 | WIRED |
+| P_BUILD_BEAT | Build On Beat | Build | 291 | 299 | — | — | LoadEhrPlugin.cpp:BuildBuild 3270,3270; LoadEhrPlugin.cpp:BuildCut 3335,3335 | WIRED |
+| P_CUT_LOOK | Cut Look | Cut | 292 | 300 | 180 | 188 | LoadEhrPlugin.cpp:UpdateModel 855; LoadEhrPlugin.cpp:WantEyes 986; LoadEhrPlugin.cpp:UpdateEyePlacement 1230; LoadEhrPlugin.cpp:BuildCut 3333 | WIRED |
+| P_CUT_POS | Cut Position | Cut | 293 | 301 | 181 | 189 | LoadEhrPlugin.cpp:BuildCut 3334 | WIRED |
+| P_CUT_SIZE | Cut Size | Cut | 294 | 302 | 182 | 190 | LoadEhrPlugin.cpp:BuildCut 3334 | WIRED |
+| P_CUT_SPEED | Cut Speed | Cut | 295 | 303 | 183 | 191 | LoadEhrPlugin.cpp:BuildCut 3334 | WIRED |
+| P_SURF_LOOK | Surf Look | Surface Look | 296 | 304 | — | — | LoadEhrPlugin.cpp:UpdateModel 855; LoadEhrPlugin.cpp:BuildSurfLook 3453 | WIRED |
+| P_SURF_AMOUNT | Surf Amount | Surface Look | 297 | 305 | — | — | LoadEhrPlugin.cpp:BuildSurfLook 3457 | WIRED |
+| P_SURF_SCALE | Surf Scale | Surface Look | 298 | 306 | — | — | LoadEhrPlugin.cpp:BuildSurfLook 3457 | WIRED |
+| P_SURF_SPEED | Surf Speed | Surface Look | 299 | 307 | — | — | LoadEhrPlugin.cpp:BuildSurfLook 3454,3457 | WIRED |
+| P_SURF_SOURCE | Surf Source | Surface Look | 300 | 308 | — | — | LoadEhrPlugin.cpp:UpdateModel 855; LoadEhrPlugin.cpp:SourceModel 3435 | WIRED |
+| P_CLONE_LAYOUT | Clone Layout | Copies | 301 | 309 | — | — | LoadEhrPlugin.cpp:BuildCopies 3784 | WIRED |
+| P_CLONE_COUNT | Clone Count | Copies | 302 | 310 | — | — | LoadEhrPlugin.cpp:BuildCopies 3812 | WIRED |
+| P_CLONE_SPACING | Clone Spacing | Copies | 303 | 311 | — | — | LoadEhrPlugin.cpp:BuildCopies 3813 | WIRED |
+| P_CLONE_SPIN_STEP | Clone Spin Step | Copies | 304 | 312 | — | — | LoadEhrPlugin.cpp:BuildCopies 3814 | WIRED |
+| P_CLONE_HUE | Clone Hue Spread | Copies | 305 | 313 | — | — | LoadEhrPlugin.cpp:BuildCopies 3814 | WIRED |
+| P_CLONE_ORBIT | Clone Orbit | Copies | 306 | 314 | — | — | LoadEhrPlugin.cpp:BuildCopies 3786,3790,3793 | WIRED |
+| P_CLONE_SCALE | Clone Scale | Copies | 307 | 315 | — | — | LoadEhrPlugin.cpp:BuildCopies 3813 | WIRED |
+| P_TUNNEL_FADE | Tunnel Fade | Copies | 308 | 316 | — | — | LoadEhrPlugin.cpp:BuildCopies 3846 | WIRED |
+| P_KEEP_ORIGINAL | Keep Original | Copies | 309 | 317 | — | — | LoadEhrPlugin.cpp:BuildCopies 3816 | WIRED |
+| P_LOD_BIAS | LOD Bias | Copies | 310 | 318 | — | — | LoadEhrPlugin.cpp:BuildCopies 3798 | WIRED |
+| P_TRAIL_ECHOES | Trail Echoes | Copies | 311 | 319 | — | — | LoadEhrPlugin.cpp:BuildCopies 3915 | WIRED |
+| P_TRAIL_DELAY | Trail Delay | Copies | 312 | 320 | — | — | LoadEhrPlugin.cpp:BuildCopies 3916 | WIRED |
+| P_TRAIL_DECAY | Trail Decay | Copies | 313 | 321 | — | — | LoadEhrPlugin.cpp:BuildCopies 3917 | WIRED |
+| P_TRAIL_OFFSET_X | Trail Offset X | Copies | 314 | 322 | — | — | LoadEhrPlugin.cpp:BuildCopies 3918 | WIRED |
+| P_TRAIL_OFFSET_Y | Trail Offset Y | Copies | 315 | 323 | — | — | LoadEhrPlugin.cpp:BuildCopies 3919 | WIRED |
+| P_GHOSTS | Ghosts | Copies | 316 | 324 | — | — | LoadEhrPlugin.cpp:BuildCopies 3893 | WIRED |
+| P_GHOST_SPACING | Ghost Spacing | Copies | 317 | 325 | — | — | LoadEhrPlugin.cpp:BuildCopies 3894 | WIRED |
+| P_GHOST_FADE | Ghost Fade | Copies | 318 | 326 | — | — | LoadEhrPlugin.cpp:BuildCopies 3909 | WIRED |
+| P_TRAIL_SMEAR | Trail Smear | Copies | 319 | 327 | — | — | LoadEhrPlugin.cpp:BuildCopies 3896 | WIRED |
+| P_TRAIL_BLUR | Trail Blur | Copies | 320 | 328 | — | — | LoadEhrPlugin.cpp:BuildCopies 3922 | WIRED |
+| P_TRAIL_DUST | Trail Dust | Copies | 321 | 329 | — | — | LoadEhrPlugin.cpp:BuildCopies 3923 | WIRED |
+| P_TRAIL_GRAIN | Trail Grain | Copies | 322 | 330 | — | — | LoadEhrPlugin.cpp:BuildCopies 3930 | WIRED |
+| P_TRAIL_DRIFT | Trail Drift | Copies | 323 | 331 | — | — | LoadEhrPlugin.cpp:BuildCopies 3931 | WIRED |
+| P_TRAIL_DRIFT_DIR | Trail Drift Dir | Copies | 324 | 332 | — | — | LoadEhrPlugin.cpp:BuildCopies 3931 | WIRED |
+| P_TRAIL_CURVE | Trail Fade Curve | Copies | 325 | 333 | — | — | LoadEhrPlugin.cpp:BuildCopies 3895 | WIRED |
+| P_TRAIL_GLOW | Trail Glow | Copies | 326 | 334 | — | — | LoadEhrPlugin.cpp:BuildCopies 3925 | WIRED |
+| P_TRAIL_COL_H | Trail Color | Copies | 327 | 335 | — | — | LoadEhrPlugin.cpp:BuildCopies 3925,3926,3927 | WIRED |
+| P_TRAIL_COL_S | Trail Sat | Copies | 328 | 336 | — | — | LoadEhrPlugin.cpp:BuildCopies 3925,3926,3927 | WIRED |
+| P_TRAIL_COL_V | Trail Bri | Copies | 329 | 337 | — | — | LoadEhrPlugin.cpp:BuildCopies 3925,3926,3927 | WIRED |
+| P_TRAIL_COL_A | Trail Alpha | Copies | 330 | 338 | — | — | LoadEhrPlugin.cpp:BuildCopies 3925,3926 | WIRED |
+| P_TRAIL_COL_MIX | Trail Color Mix | Copies | 331 | 339 | — | — | LoadEhrPlugin.cpp:BuildCopies 3926 | WIRED |
+| P_KEY_AZIMUTH | Key Azimuth | Lighting | 332 | 340 | 184 | 192 | LoadEhrPlugin.cpp:BuildFrame 1549 | WIRED |
+| P_KEY_ELEVATION | Key Elevation | Lighting | 333 | 341 | 185 | 193 | LoadEhrPlugin.cpp:BuildFrame 1549 | WIRED |
+| P_KEY_INTENSITY | Key Intensity | Lighting | 334 | 342 | 186 | 194 | LoadEhrPlugin.cpp:BuildFrame 1553 | WIRED |
+| P_KEY_COL_H | Key Color | Lighting | 335 | 343 | 187 | 195 | LoadEhrPlugin.cpp:BuildFrame 1553,1556; LoadEhrPlugin.cpp:BuildPost 4371 | WIRED |
+| P_KEY_COL_S | Key Sat | Lighting | 336 | 344 | 188 | 196 | LoadEhrPlugin.cpp:BuildFrame 1553,1556; LoadEhrPlugin.cpp:BuildPost 4371 | WIRED |
+| P_KEY_COL_V | Key Bri | Lighting | 337 | 345 | 189 | 197 | LoadEhrPlugin.cpp:BuildFrame 1553,1556; LoadEhrPlugin.cpp:BuildPost 4371 | WIRED |
+| P_KEY_COL_A | Key Alpha | Lighting | 338 | 346 | 190 | 198 | LoadEhrPlugin.cpp:BuildFrame 1553 | WIRED |
+| P_AMBIENT | Ambient | Lighting | 339 | 347 | 191 | 199 | LoadEhrPlugin.cpp:BuildFrame 1562 | WIRED |
+| P_ENV_INTENSITY | Env Intensity | Lighting | 340 | 348 | 192 | 200 | LoadEhrPlugin.cpp:BuildFrame 1563 | WIRED |
+| P_ENV_SOURCE | Env Source | Lighting | 341 | 349 | 193 | 201 | LoadEhrPlugin.cpp:BuildFrame 1564 | WIRED |
+| P_ENV_ROTATE | Env Rotate | Lighting | 342 | 350 | 194 | 202 | LoadEhrPlugin.cpp:BuildFrame 1567 | WIRED |
+| P_EXPOSURE | Exposure | Lighting | 343 | 351 | 195 | 203 | LoadEhrPlugin.cpp:BuildFrame 1568 | WIRED |
+| P_TONEMAP | Tonemap | Lighting | 344 | 352 | 196 | 204 | LoadEhrPlugin.cpp:BuildFrame 1569 | WIRED |
+| P_VOL_METHOD | Vol Method | Volume | 345 | 353 | 197 | 205 | LoadEhrPlugin.cpp:BuildVolume 2112 | WIRED |
+| P_HAZE | Haze | Volume | 346 | 354 | 198 | 206 | LoadEhrPlugin.cpp:BuildVolume 2113 | WIRED |
+| P_SMOKE_AMOUNT | Smoke Amount | Volume | 347 | 355 | 199 | 207 | LoadEhrPlugin.cpp:BuildVolume 2111,2114; LoadEhrPlugin.cpp:BuildLightning 2996 | WIRED |
+| P_SMOKE_SCALE | Smoke Scale | Volume | 348 | 356 | 200 | 208 | LoadEhrPlugin.cpp:BuildVolume 2115 | WIRED |
+| P_SMOKE_SPEED | Smoke Speed | Volume | 349 | 357 | 201 | 209 | LoadEhrPlugin.cpp:BuildVolume 2119 | WIRED |
+| P_SMOKE_TURB | Smoke Turbulence | Volume | 350 | 358 | 202 | 210 | LoadEhrPlugin.cpp:BuildVolume 2116 | WIRED |
+| P_SMOKE_RISE | Smoke Rise | Volume | 351 | 359 | 203 | 211 | LoadEhrPlugin.cpp:BuildVolume 2119 | WIRED |
+| P_GLOW_CLOUD | Glow Cloud | Volume | 352 | 360 | 204 | 212 | LoadEhrPlugin.cpp:BuildVolume 2117 | WIRED |
+| P_SMOKE_AMBIENT | Smoke Ambient | Volume | 353 | 361 | 205 | 213 | LoadEhrPlugin.cpp:BuildVolume 2104 | WIRED |
+| P_SMOKE_KEY | Smoke Key Light | Volume | 354 | 362 | 206 | 214 | LoadEhrPlugin.cpp:BuildVolume 2107 | WIRED |
+| P_VOLUME_SIZE | Volume Size | Volume | 355 | 363 | 207 | 215 | LoadEhrPlugin.cpp:BuildVolume 2131 | WIRED |
+| P_SCATTER_G | Scatter G | Volume | 356 | 364 | 208 | 216 | LoadEhrPlugin.cpp:BuildVolume 2132 | WIRED |
+| P_SHAFT_LENGTH | Shaft Length | Volume | 357 | 365 | 209 | 217 | LoadEhrPlugin.cpp:BuildVolume 2133 | WIRED |
+| P_MOTES | Motes | Volume | 358 | 366 | 210 | 218 | LoadEhrPlugin.cpp:BuildVolume 2134 | WIRED |
+| P_VOL_QUALITY | Vol Quality | Volume | 359 | 367 | 211 | 219 | LoadEhrPlugin.cpp:BuildVolume 2136 | WIRED |
+| P_VOL_RES | Vol Res | Volume | 360 | 368 | 212 | 220 | LoadEhrPlugin.cpp:BuildVolume 2137 | WIRED |
+| P_FOG_BLEND | Fog Blend | Volume | 361 | 369 | 213 | 221 | LoadEhrPlugin.cpp:BuildVolume 2138 | WIRED |
+| P_DRIFT_RETURN | Drift Return | Volume | 362 | 370 | 214 | 222 | LoadEhrPlugin.cpp:Drift 2012 | WIRED |
+| P_SMOKE_ENGINE | Smoke Engine | Smoke Sim | — | — | 215 | 223 | LoadEhrPlugin.cpp:WantEyes 986; LoadEhrPlugin.cpp:BuildSim 2146 | WIRED |
+| P_SIM_RES | Sim Res | Smoke Sim | — | — | 216 | 224 | LoadEhrPlugin.cpp:BuildSim 2157 | WIRED |
+| P_SIM_BOX | Sim Box | Smoke Sim | — | — | 217 | 225 | LoadEhrPlugin.cpp:BuildSim 2163 | WIRED |
+| P_SIM_ITER | Sim Iterations | Smoke Sim | — | — | 218 | 226 | LoadEhrPlugin.cpp:BuildSim 2175 | WIRED |
+| P_BUOYANCY | Buoyancy | Smoke Sim | — | — | 219 | 227 | LoadEhrPlugin.cpp:BuildSim 2176 | WIRED |
+| P_HEAT_DECAY | Heat Decay | Smoke Sim | — | — | 220 | 228 | LoadEhrPlugin.cpp:BuildSim 2178 | WIRED |
+| P_VORTICITY | Vorticity | Smoke Sim | — | — | 221 | 229 | LoadEhrPlugin.cpp:BuildSim 2179 | WIRED |
+| P_SMOKE_FADE | Smoke Fade | Smoke Sim | — | — | 222 | 230 | LoadEhrPlugin.cpp:BuildSim 2180 | WIRED |
+| P_WIND_X | Wind X | Smoke Sim | — | — | 223 | 231 | LoadEhrPlugin.cpp:BuildSim 2183 | WIRED |
+| P_WIND_Y | Wind Y | Smoke Sim | — | — | 224 | 232 | LoadEhrPlugin.cpp:BuildSim 2183 | WIRED |
+| P_WIND_Z | Wind Z | Smoke Sim | — | — | 225 | 233 | LoadEhrPlugin.cpp:BuildSim 2183 | WIRED |
+| P_SIM_TURB | Sim Turbulence | Smoke Sim | — | — | 226 | 234 | LoadEhrPlugin.cpp:BuildSim 2181 | WIRED |
+| P_EMIT_EYES | Emit Eyes | Smoke Sim | — | — | 227 | 235 | LoadEhrPlugin.cpp:WantEyes 986; LoadEhrPlugin.cpp:BuildSim 2205 | WIRED |
+| P_EYES_HEAT | Eyes Heat | Smoke Sim | — | — | 228 | 236 | LoadEhrPlugin.cpp:BuildSim 2206 | WIRED |
+| P_EMIT_BEHIND | Emit Behind | Smoke Sim | — | — | 229 | 237 | LoadEhrPlugin.cpp:BuildSim 2210 | WIRED |
+| P_BEHIND_HEAT | Behind Heat | Smoke Sim | — | — | 230 | 238 | LoadEhrPlugin.cpp:BuildSim 2211 | WIRED |
+| P_EMIT_RIM | Emit Rim | Smoke Sim | — | — | 231 | 239 | LoadEhrPlugin.cpp:BuildSim 2212 | WIRED |
+| P_RIM_HEAT | Rim Heat | Smoke Sim | — | — | 232 | 240 | LoadEhrPlugin.cpp:BuildSim 2213 | WIRED |
+| P_EMIT_INSIDE | Emit Inside | Smoke Sim | — | — | 233 | 241 | LoadEhrPlugin.cpp:BuildSim 2214 | WIRED |
+| P_INSIDE_HEAT | Inside Heat | Smoke Sim | — | — | 234 | 242 | LoadEhrPlugin.cpp:BuildSim 2216 | WIRED |
+| P_EMIT_OFFSET | Emit Offset | Smoke Sim | — | — | 235 | 243 | LoadEhrPlugin.cpp:BuildSim 2199 | WIRED |
+| P_BEAT_PUFF | Beat Puff | Smoke Sim | — | — | 236 | 244 | LoadEhrPlugin.cpp:BuildSim 2218,2218 | WIRED |
+| P_PUFF_AMOUNT | Puff Amount | Smoke Sim | — | — | 237 | 245 | LoadEhrPlugin.cpp:BuildSim 2222 | WIRED |
+| P_AUDIO_EMIT | Audio > Emit | Smoke Sim | — | — | 238 | 246 | LoadEhrPlugin.cpp:BuildSim 2222 | WIRED |
 | P_SIM_RESET | Sim Reset | Smoke Sim | — | — | 239 | 247 | LoadEhrPlugin.cpp:SetFloatId 397 | WIRED |
-| P_SMOKE_COL_H | Smoke Color | Smoke Sim | — | — | 240 | 248 | LoadEhrPlugin.cpp:BuildSim 2214,2215 | WIRED |
-| P_SMOKE_COL_S | Smoke Sat | Smoke Sim | — | — | 241 | 249 | LoadEhrPlugin.cpp:BuildSim 2214 | WIRED |
-| P_SMOKE_COL_V | Smoke Bri | Smoke Sim | — | — | 242 | 250 | LoadEhrPlugin.cpp:BuildSim 2214 | WIRED |
-| P_SMOKE_COL_A | Smoke Alpha | Smoke Sim | — | — | 243 | 251 | LoadEhrPlugin.cpp:BuildSim 2214,2215 | WIRED |
-| P_SMOKE_CONFINE | Smoke Confine | Smoke Sim | — | — | 244 | 252 | LoadEhrPlugin.cpp:BuildSim 2211 | WIRED |
-| P_SIM_PROJECT | Project Input | Smoke Sim | — | — | — | 253 | LoadEhrPlugin.cpp:BuildSim 2217 | WIRED |
-| P_TRIP_MASTER | Trip Master | Trip | — | — | 245 | 254 | LoadEhrPlugin.cpp:BuildTrip 2501; LoadEhrPlugin.cpp:BuildSimTrip 2577 | WIRED |
-| P_COLOUR_BY | Colour By | Trip | — | — | 246 | 255 | LoadEhrPlugin.cpp:BuildTrip 2514 | WIRED |
-| P_TRIP_PALETTE | Trip Palette | Trip | — | — | 247 | 256 | LoadEhrPlugin.cpp:BuildTrip 2515 | WIRED |
-| P_PALETTE_SHIFT | Palette Shift | Trip | — | — | 248 | 257 | LoadEhrPlugin.cpp:BuildTrip 2510 | WIRED |
-| P_PALETTE_SPREAD | Palette Spread | Trip | — | — | 249 | 258 | LoadEhrPlugin.cpp:BuildTrip 2518 | WIRED |
-| P_TRIP_A_H | Trip A Color | Trip | — | — | 250 | 259 | LoadEhrPlugin.cpp:BuildTrip 2519,2522 | WIRED |
-| P_TRIP_A_S | Trip A Sat | Trip | — | — | 251 | 260 | LoadEhrPlugin.cpp:BuildTrip 2519 | WIRED |
-| P_TRIP_A_V | Trip A Bri | Trip | — | — | 252 | 261 | LoadEhrPlugin.cpp:BuildTrip 2519 | WIRED |
-| P_TRIP_A_A | Trip A Alpha | Trip | — | — | 253 | 262 | LoadEhrPlugin.cpp:BuildTrip 2519,2522 | WIRED |
-| P_TRIP_B_H | Trip B Color | Trip | — | — | 254 | 263 | LoadEhrPlugin.cpp:BuildTrip 2520,2522 | WIRED |
-| P_TRIP_B_S | Trip B Sat | Trip | — | — | 255 | 264 | LoadEhrPlugin.cpp:BuildTrip 2520 | WIRED |
-| P_TRIP_B_V | Trip B Bri | Trip | — | — | 256 | 265 | LoadEhrPlugin.cpp:BuildTrip 2520 | WIRED |
-| P_TRIP_B_A | Trip B Alpha | Trip | — | — | 257 | 266 | LoadEhrPlugin.cpp:BuildTrip 2520,2522 | WIRED |
-| P_THIN_FILM | Thin Film | Trip | — | — | 258 | 267 | LoadEhrPlugin.cpp:BuildTrip 2523 | WIRED |
-| P_THIN_FILM_THICK | Thin Film Thick | Trip | — | — | 259 | 268 | LoadEhrPlugin.cpp:BuildTrip 2524 | WIRED |
-| P_PRISM | Prism | Trip | — | — | 260 | 269 | LoadEhrPlugin.cpp:BuildTrip 2525 | WIRED |
-| P_PRISM_ANGLE | Prism Angle | Trip | — | — | 261 | 270 | LoadEhrPlugin.cpp:BuildTrip 2526 | WIRED |
-| P_KALEIDO | Kaleido Smoke | Trip | — | — | 262 | 271 | LoadEhrPlugin.cpp:BuildTrip 2527 | WIRED |
-| P_KALEIDO_TWIST | Kaleido Twist | Trip | — | — | 263 | 272 | LoadEhrPlugin.cpp:BuildTrip 2528 | WIRED |
-| P_KALEIDO_SPIN | Kaleido Spin | Trip | — | — | 264 | 273 | LoadEhrPlugin.cpp:BuildTrip 2511 | WIRED |
-| P_FRACTAL_FOG | Fractal Fog | Trip | — | — | 265 | 274 | LoadEhrPlugin.cpp:BuildTrip 2530 | WIRED |
-| P_FRACTAL_SCALE | Fractal Scale | Trip | — | — | 266 | 275 | LoadEhrPlugin.cpp:BuildTrip 2531 | WIRED |
-| P_FRACTAL_ITER | Fractal Iter | Trip | — | — | 267 | 276 | LoadEhrPlugin.cpp:BuildTrip 2532 | WIRED |
-| P_FRACTAL_MORPH | Fractal Morph | Trip | — | — | 268 | 277 | LoadEhrPlugin.cpp:BuildTrip 2512 | WIRED |
-| P_NEON_VEINS | Neon Veins | Trip | — | — | 269 | 278 | LoadEhrPlugin.cpp:BuildTrip 2548 | WIRED |
-| P_VEIN_WIDTH | Vein Width | Trip | — | — | 270 | 279 | LoadEhrPlugin.cpp:BuildTrip 2549 | WIRED |
-| P_VEIN_COL_H | Vein Color | Trip | — | — | 271 | 280 | LoadEhrPlugin.cpp:BuildTrip 2550,2563 | WIRED |
-| P_VEIN_COL_S | Vein Sat | Trip | — | — | 272 | 281 | LoadEhrPlugin.cpp:BuildTrip 2550 | WIRED |
-| P_VEIN_COL_V | Vein Bri | Trip | — | — | 273 | 282 | LoadEhrPlugin.cpp:BuildTrip 2550 | WIRED |
-| P_VEIN_COL_A | Vein Alpha | Trip | — | — | 274 | 283 | LoadEhrPlugin.cpp:BuildTrip 2563 | WIRED |
-| P_SMOKE_CONTOURS | Smoke Contours | Trip | — | — | 275 | 284 | LoadEhrPlugin.cpp:BuildTrip 2551 | WIRED |
-| P_CONTOUR_BANDS | Contour Bands | Trip | — | — | 276 | 285 | LoadEhrPlugin.cpp:BuildTrip 2556 | WIRED |
-| P_BAND_SHARP | Band Sharpness | Trip | — | — | 277 | 286 | LoadEhrPlugin.cpp:BuildTrip 2557 | WIRED |
-| P_BAND_SCROLL | Band Scroll | Trip | — | — | 278 | 287 | LoadEhrPlugin.cpp:BuildTrip 2513 | WIRED |
-| P_CONTOUR_STYLE | Contour Style | Trip | — | — | 279 | 288 | LoadEhrPlugin.cpp:BuildTrip 2552 | WIRED |
-| P_LINE_WIDTH | Line Width | Trip | — | — | 280 | 289 | LoadEhrPlugin.cpp:BuildTrip 2554 | WIRED |
-| P_LINE_GLOW | Line Glow | Trip | — | — | 281 | 290 | LoadEhrPlugin.cpp:BuildTrip 2555 | WIRED |
-| P_BLACKLIGHT | Blacklight | Trip | — | — | 282 | 291 | LoadEhrPlugin.cpp:BuildTrip 2559 | WIRED |
-| P_BLACKLIGHT_BY | Blacklight By | Trip | — | — | 283 | 292 | LoadEhrPlugin.cpp:BuildTrip 2560 | WIRED |
-| P_BL_COL_H | Blacklight Color | Trip | — | — | 284 | 293 | LoadEhrPlugin.cpp:BuildTrip 2561,2563 | WIRED |
-| P_BL_COL_S | Blacklight Sat | Trip | — | — | 285 | 294 | LoadEhrPlugin.cpp:BuildTrip 2561 | WIRED |
-| P_BL_COL_V | Blacklight Bri | Trip | — | — | 286 | 295 | LoadEhrPlugin.cpp:BuildTrip 2561 | WIRED |
-| P_BL_COL_A | Blacklight Alpha | Trip | — | — | 287 | 296 | LoadEhrPlugin.cpp:BuildTrip 2561,2563 | WIRED |
+| P_SMOKE_COL_H | Smoke Color | Smoke Sim | — | — | 240 | 248 | LoadEhrPlugin.cpp:BuildSim 2226,2227 | WIRED |
+| P_SMOKE_COL_S | Smoke Sat | Smoke Sim | — | — | 241 | 249 | LoadEhrPlugin.cpp:BuildSim 2226 | WIRED |
+| P_SMOKE_COL_V | Smoke Bri | Smoke Sim | — | — | 242 | 250 | LoadEhrPlugin.cpp:BuildSim 2226 | WIRED |
+| P_SMOKE_COL_A | Smoke Alpha | Smoke Sim | — | — | 243 | 251 | LoadEhrPlugin.cpp:BuildSim 2226,2227 | WIRED |
+| P_SMOKE_CONFINE | Smoke Confine | Smoke Sim | — | — | 244 | 252 | LoadEhrPlugin.cpp:BuildSim 2223 | WIRED |
+| P_SIM_PROJECT | Project Input | Smoke Sim | — | — | — | 253 | LoadEhrPlugin.cpp:BuildSim 2229 | WIRED |
+| P_TRIP_MASTER | Trip Master | Trip | — | — | 245 | 254 | LoadEhrPlugin.cpp:BuildTrip 2513; LoadEhrPlugin.cpp:BuildSimTrip 2589 | WIRED |
+| P_COLOUR_BY | Colour By | Trip | — | — | 246 | 255 | LoadEhrPlugin.cpp:BuildTrip 2526 | WIRED |
+| P_TRIP_PALETTE | Trip Palette | Trip | — | — | 247 | 256 | LoadEhrPlugin.cpp:BuildTrip 2527 | WIRED |
+| P_PALETTE_SHIFT | Palette Shift | Trip | — | — | 248 | 257 | LoadEhrPlugin.cpp:BuildTrip 2522 | WIRED |
+| P_PALETTE_SPREAD | Palette Spread | Trip | — | — | 249 | 258 | LoadEhrPlugin.cpp:BuildTrip 2530 | WIRED |
+| P_TRIP_A_H | Trip A Color | Trip | — | — | 250 | 259 | LoadEhrPlugin.cpp:BuildTrip 2531,2534 | WIRED |
+| P_TRIP_A_S | Trip A Sat | Trip | — | — | 251 | 260 | LoadEhrPlugin.cpp:BuildTrip 2531 | WIRED |
+| P_TRIP_A_V | Trip A Bri | Trip | — | — | 252 | 261 | LoadEhrPlugin.cpp:BuildTrip 2531 | WIRED |
+| P_TRIP_A_A | Trip A Alpha | Trip | — | — | 253 | 262 | LoadEhrPlugin.cpp:BuildTrip 2531,2534 | WIRED |
+| P_TRIP_B_H | Trip B Color | Trip | — | — | 254 | 263 | LoadEhrPlugin.cpp:BuildTrip 2532,2534 | WIRED |
+| P_TRIP_B_S | Trip B Sat | Trip | — | — | 255 | 264 | LoadEhrPlugin.cpp:BuildTrip 2532 | WIRED |
+| P_TRIP_B_V | Trip B Bri | Trip | — | — | 256 | 265 | LoadEhrPlugin.cpp:BuildTrip 2532 | WIRED |
+| P_TRIP_B_A | Trip B Alpha | Trip | — | — | 257 | 266 | LoadEhrPlugin.cpp:BuildTrip 2532,2534 | WIRED |
+| P_THIN_FILM | Thin Film | Trip | — | — | 258 | 267 | LoadEhrPlugin.cpp:BuildTrip 2535 | WIRED |
+| P_THIN_FILM_THICK | Thin Film Thick | Trip | — | — | 259 | 268 | LoadEhrPlugin.cpp:BuildTrip 2536 | WIRED |
+| P_PRISM | Prism | Trip | — | — | 260 | 269 | LoadEhrPlugin.cpp:BuildTrip 2537 | WIRED |
+| P_PRISM_ANGLE | Prism Angle | Trip | — | — | 261 | 270 | LoadEhrPlugin.cpp:BuildTrip 2538 | WIRED |
+| P_KALEIDO | Kaleido Smoke | Trip | — | — | 262 | 271 | LoadEhrPlugin.cpp:BuildTrip 2539 | WIRED |
+| P_KALEIDO_TWIST | Kaleido Twist | Trip | — | — | 263 | 272 | LoadEhrPlugin.cpp:BuildTrip 2540 | WIRED |
+| P_KALEIDO_SPIN | Kaleido Spin | Trip | — | — | 264 | 273 | LoadEhrPlugin.cpp:BuildTrip 2523 | WIRED |
+| P_FRACTAL_FOG | Fractal Fog | Trip | — | — | 265 | 274 | LoadEhrPlugin.cpp:BuildTrip 2542 | WIRED |
+| P_FRACTAL_SCALE | Fractal Scale | Trip | — | — | 266 | 275 | LoadEhrPlugin.cpp:BuildTrip 2543 | WIRED |
+| P_FRACTAL_ITER | Fractal Iter | Trip | — | — | 267 | 276 | LoadEhrPlugin.cpp:BuildTrip 2544 | WIRED |
+| P_FRACTAL_MORPH | Fractal Morph | Trip | — | — | 268 | 277 | LoadEhrPlugin.cpp:BuildTrip 2524 | WIRED |
+| P_NEON_VEINS | Neon Veins | Trip | — | — | 269 | 278 | LoadEhrPlugin.cpp:BuildTrip 2560 | WIRED |
+| P_VEIN_WIDTH | Vein Width | Trip | — | — | 270 | 279 | LoadEhrPlugin.cpp:BuildTrip 2561 | WIRED |
+| P_VEIN_COL_H | Vein Color | Trip | — | — | 271 | 280 | LoadEhrPlugin.cpp:BuildTrip 2562,2575 | WIRED |
+| P_VEIN_COL_S | Vein Sat | Trip | — | — | 272 | 281 | LoadEhrPlugin.cpp:BuildTrip 2562 | WIRED |
+| P_VEIN_COL_V | Vein Bri | Trip | — | — | 273 | 282 | LoadEhrPlugin.cpp:BuildTrip 2562 | WIRED |
+| P_VEIN_COL_A | Vein Alpha | Trip | — | — | 274 | 283 | LoadEhrPlugin.cpp:BuildTrip 2575 | WIRED |
+| P_SMOKE_CONTOURS | Smoke Contours | Trip | — | — | 275 | 284 | LoadEhrPlugin.cpp:BuildTrip 2563 | WIRED |
+| P_CONTOUR_BANDS | Contour Bands | Trip | — | — | 276 | 285 | LoadEhrPlugin.cpp:BuildTrip 2568 | WIRED |
+| P_BAND_SHARP | Band Sharpness | Trip | — | — | 277 | 286 | LoadEhrPlugin.cpp:BuildTrip 2569 | WIRED |
+| P_BAND_SCROLL | Band Scroll | Trip | — | — | 278 | 287 | LoadEhrPlugin.cpp:BuildTrip 2525 | WIRED |
+| P_CONTOUR_STYLE | Contour Style | Trip | — | — | 279 | 288 | LoadEhrPlugin.cpp:BuildTrip 2564 | WIRED |
+| P_LINE_WIDTH | Line Width | Trip | — | — | 280 | 289 | LoadEhrPlugin.cpp:BuildTrip 2566 | WIRED |
+| P_LINE_GLOW | Line Glow | Trip | — | — | 281 | 290 | LoadEhrPlugin.cpp:BuildTrip 2567 | WIRED |
+| P_BLACKLIGHT | Blacklight | Trip | — | — | 282 | 291 | LoadEhrPlugin.cpp:BuildTrip 2571 | WIRED |
+| P_BLACKLIGHT_BY | Blacklight By | Trip | — | — | 283 | 292 | LoadEhrPlugin.cpp:BuildTrip 2572 | WIRED |
+| P_BL_COL_H | Blacklight Color | Trip | — | — | 284 | 293 | LoadEhrPlugin.cpp:BuildTrip 2573,2575 | WIRED |
+| P_BL_COL_S | Blacklight Sat | Trip | — | — | 285 | 294 | LoadEhrPlugin.cpp:BuildTrip 2573 | WIRED |
+| P_BL_COL_V | Blacklight Bri | Trip | — | — | 286 | 295 | LoadEhrPlugin.cpp:BuildTrip 2573 | WIRED |
+| P_BL_COL_A | Blacklight Alpha | Trip | — | — | 287 | 296 | LoadEhrPlugin.cpp:BuildTrip 2573,2575 | WIRED |
 | P_FIRE_RING | Fire Ring | Trip | — | — | 288 | 297 | LoadEhrPlugin.cpp:SetFloatId 413 | WIRED |
-| P_RING_ON_BEAT | Ring On Beat | Trip | — | — | 289 | 298 | LoadEhrPlugin.cpp:BuildSimTrip 2593,2593 | WIRED |
-| P_RING_FROM | Ring From | Trip | — | — | 290 | 299 | LoadEhrPlugin.cpp:BuildSimTrip 2602 | WIRED |
-| P_RING_SIZE | Ring Size | Trip | — | — | 291 | 300 | LoadEhrPlugin.cpp:BuildSimTrip 2630 | WIRED |
-| P_RING_SPEED | Ring Speed | Trip | — | — | 292 | 301 | LoadEhrPlugin.cpp:BuildSimTrip 2616 | WIRED |
-| P_RING_SPIN | Ring Spin | Trip | — | — | 293 | 302 | LoadEhrPlugin.cpp:BuildSimTrip 2617 | WIRED |
-| P_RING_SMOKE | Ring Smoke | Trip | — | — | 294 | 303 | LoadEhrPlugin.cpp:BuildSimTrip 2618 | WIRED |
-| P_SMOKE_GHOSTS | Smoke Ghosts | Trip | — | — | 295 | 304 | LoadEhrPlugin.cpp:BuildSimTrip 2638 | WIRED |
-| P_GHOST_OFFSET | Ghost Offset | Trip | — | — | 296 | 305 | LoadEhrPlugin.cpp:BuildSimTrip 2669 | WIRED |
-| P_GHOST_SCALE | Ghost Scale | Trip | — | — | 297 | 306 | LoadEhrPlugin.cpp:BuildSimTrip 2668 | WIRED |
-| P_GHOST_LIFE | Ghost Fade Time | Trip | — | — | 298 | 307 | LoadEhrPlugin.cpp:BuildSimTrip 2638 | WIRED |
-| P_WHIRLPOOL | Whirlpool | Trip | — | — | 299 | 308 | LoadEhrPlugin.cpp:BuildSimTrip 2586 | WIRED |
-| P_HYPERSPACE | Hyperspace | Trip | — | — | 300 | 309 | LoadEhrPlugin.cpp:BuildSimTrip 2587 | WIRED |
-| P_HUE_ECHO | Hue Echo | Trip | — | — | 301 | 310 | LoadEhrPlugin.cpp:BuildTrip 2565 | WIRED |
-| P_ECHO_HUE_STEP | Echo Hue Step | Trip | — | — | 302 | 311 | LoadEhrPlugin.cpp:BuildTrip 2567 | WIRED |
-| P_TIME_WARP | Time Warp | Trip | — | — | 303 | 312 | LoadEhrPlugin.cpp:Blackbody 2496 | WIRED |
-| P_FREEZE | Freeze | Trip | — | — | 304 | 313 | LoadEhrPlugin.cpp:Blackbody 2496 | WIRED |
-| P_FIRE | Fire | Fire | — | — | 305 | 314 | LoadEhrPlugin.cpp:BuildVolume 2098; LoadEhrPlugin.cpp:BuildSim 2135; LoadEhrPlugin.cpp:BuildFire 2237; LoadEhrPlugin.cpp:BuildSimTrip 2580 | WIRED |
-| P_FIRE_SPEED | Fire Speed | Fire | — | — | 306 | 315 | LoadEhrPlugin.cpp:BuildFire 2241; LoadEhrPlugin.cpp:BuildSimTrip 2581,2581 | WIRED |
-| P_BURN_RATE | Burn Rate | Fire | — | — | 307 | 316 | LoadEhrPlugin.cpp:BuildFire 2251 | WIRED |
-| P_FLAME_TEMP | Flame Temp | Fire | — | — | 308 | 317 | LoadEhrPlugin.cpp:BuildFire 2257; LoadEhrPlugin.cpp:BuildMorph 2447 | WIRED |
-| P_FLAME_HEIGHT | Flame Height | Fire | — | — | 309 | 318 | LoadEhrPlugin.cpp:BuildFire 2248 | WIRED |
-| P_FLAME_GLOW | Flame Glow | Fire | — | — | 310 | 319 | LoadEhrPlugin.cpp:BuildFire 2258; LoadEhrPlugin.cpp:BuildMorph 2448 | WIRED |
-| P_FIRE_SMOKE | Fire Smoke | Fire | — | — | 311 | 320 | LoadEhrPlugin.cpp:BuildFire 2253 | WIRED |
-| P_FLAME_TINT_H | Flame Tint Color | Fire | — | — | 312 | 321 | LoadEhrPlugin.cpp:BuildFire 2259,2261 | WIRED |
-| P_FLAME_TINT_S | Flame Tint Sat | Fire | — | — | 313 | 322 | LoadEhrPlugin.cpp:BuildFire 2259,2261 | WIRED |
-| P_FLAME_TINT_V | Flame Tint Bri | Fire | — | — | 314 | 323 | LoadEhrPlugin.cpp:BuildFire 2259,2261 | WIRED |
-| P_FLAME_TINT_A | Flame Tint Mix | Fire | — | — | 315 | 324 | LoadEhrPlugin.cpp:BuildFire 2259 | WIRED |
-| P_FIRE_BURST | Fire Burst | Fire | — | — | 316 | 325 | LoadEhrPlugin.cpp:BuildFire 2238,2238 | WIRED |
-| P_BURST_AMOUNT | Burst Amount | Fire | — | — | 317 | 326 | LoadEhrPlugin.cpp:BuildFire 2247 | WIRED |
-| P_FIRE_LIGHT | Fire Light | Fire | — | — | 318 | 327 | LoadEhrPlugin.cpp:BuildFire 2271 | WIRED |
+| P_RING_ON_BEAT | Ring On Beat | Trip | — | — | 289 | 298 | LoadEhrPlugin.cpp:BuildSimTrip 2605,2605 | WIRED |
+| P_RING_FROM | Ring From | Trip | — | — | 290 | 299 | LoadEhrPlugin.cpp:BuildSimTrip 2614 | WIRED |
+| P_RING_SIZE | Ring Size | Trip | — | — | 291 | 300 | LoadEhrPlugin.cpp:BuildSimTrip 2642 | WIRED |
+| P_RING_SPEED | Ring Speed | Trip | — | — | 292 | 301 | LoadEhrPlugin.cpp:BuildSimTrip 2628 | WIRED |
+| P_RING_SPIN | Ring Spin | Trip | — | — | 293 | 302 | LoadEhrPlugin.cpp:BuildSimTrip 2629 | WIRED |
+| P_RING_SMOKE | Ring Smoke | Trip | — | — | 294 | 303 | LoadEhrPlugin.cpp:BuildSimTrip 2630 | WIRED |
+| P_SMOKE_GHOSTS | Smoke Ghosts | Trip | — | — | 295 | 304 | LoadEhrPlugin.cpp:BuildSimTrip 2650 | WIRED |
+| P_GHOST_OFFSET | Ghost Offset | Trip | — | — | 296 | 305 | LoadEhrPlugin.cpp:BuildSimTrip 2681 | WIRED |
+| P_GHOST_SCALE | Ghost Scale | Trip | — | — | 297 | 306 | LoadEhrPlugin.cpp:BuildSimTrip 2680 | WIRED |
+| P_GHOST_LIFE | Ghost Fade Time | Trip | — | — | 298 | 307 | LoadEhrPlugin.cpp:BuildSimTrip 2650 | WIRED |
+| P_WHIRLPOOL | Whirlpool | Trip | — | — | 299 | 308 | LoadEhrPlugin.cpp:BuildSimTrip 2598 | WIRED |
+| P_HYPERSPACE | Hyperspace | Trip | — | — | 300 | 309 | LoadEhrPlugin.cpp:BuildSimTrip 2599 | WIRED |
+| P_HUE_ECHO | Hue Echo | Trip | — | — | 301 | 310 | LoadEhrPlugin.cpp:BuildTrip 2577 | WIRED |
+| P_ECHO_HUE_STEP | Echo Hue Step | Trip | — | — | 302 | 311 | LoadEhrPlugin.cpp:BuildTrip 2579 | WIRED |
+| P_TIME_WARP | Time Warp | Trip | — | — | 303 | 312 | LoadEhrPlugin.cpp:Blackbody 2508 | WIRED |
+| P_FREEZE | Freeze | Trip | — | — | 304 | 313 | LoadEhrPlugin.cpp:Blackbody 2508 | WIRED |
+| P_FIRE | Fire | Fire | — | — | 305 | 314 | LoadEhrPlugin.cpp:BuildVolume 2110; LoadEhrPlugin.cpp:BuildSim 2147; LoadEhrPlugin.cpp:BuildFire 2249; LoadEhrPlugin.cpp:BuildSimTrip 2592 | WIRED |
+| P_FIRE_SPEED | Fire Speed | Fire | — | — | 306 | 315 | LoadEhrPlugin.cpp:BuildFire 2253; LoadEhrPlugin.cpp:BuildSimTrip 2593,2593 | WIRED |
+| P_BURN_RATE | Burn Rate | Fire | — | — | 307 | 316 | LoadEhrPlugin.cpp:BuildFire 2263 | WIRED |
+| P_FLAME_TEMP | Flame Temp | Fire | — | — | 308 | 317 | LoadEhrPlugin.cpp:BuildFire 2269; LoadEhrPlugin.cpp:BuildMorph 2459 | WIRED |
+| P_FLAME_HEIGHT | Flame Height | Fire | — | — | 309 | 318 | LoadEhrPlugin.cpp:BuildFire 2260 | WIRED |
+| P_FLAME_GLOW | Flame Glow | Fire | — | — | 310 | 319 | LoadEhrPlugin.cpp:BuildFire 2270; LoadEhrPlugin.cpp:BuildMorph 2460 | WIRED |
+| P_FIRE_SMOKE | Fire Smoke | Fire | — | — | 311 | 320 | LoadEhrPlugin.cpp:BuildFire 2265 | WIRED |
+| P_FLAME_TINT_H | Flame Tint Color | Fire | — | — | 312 | 321 | LoadEhrPlugin.cpp:BuildFire 2271,2273 | WIRED |
+| P_FLAME_TINT_S | Flame Tint Sat | Fire | — | — | 313 | 322 | LoadEhrPlugin.cpp:BuildFire 2271,2273 | WIRED |
+| P_FLAME_TINT_V | Flame Tint Bri | Fire | — | — | 314 | 323 | LoadEhrPlugin.cpp:BuildFire 2271,2273 | WIRED |
+| P_FLAME_TINT_A | Flame Tint Mix | Fire | — | — | 315 | 324 | LoadEhrPlugin.cpp:BuildFire 2271 | WIRED |
+| P_FIRE_BURST | Fire Burst | Fire | — | — | 316 | 325 | LoadEhrPlugin.cpp:BuildFire 2250,2250 | WIRED |
+| P_BURST_AMOUNT | Burst Amount | Fire | — | — | 317 | 326 | LoadEhrPlugin.cpp:BuildFire 2259 | WIRED |
+| P_FIRE_LIGHT | Fire Light | Fire | — | — | 318 | 327 | LoadEhrPlugin.cpp:BuildFire 2283 | WIRED |
 | P_STRIKE | Lightning Strike | Lightning | — | — | 319 | 328 | LoadEhrPlugin.cpp:SetFloatId 411 | WIRED |
-| P_STRIKE_BEAT | Strike On Beat | Lightning | — | — | 320 | 329 | LoadEhrPlugin.cpp:WantEyes 987; LoadEhrPlugin.cpp:BuildLightning 2917,2917 | WIRED |
-| P_STRIKE_RATE | Strike Rate | Lightning | — | — | 321 | 330 | LoadEhrPlugin.cpp:WantEyes 987; LoadEhrPlugin.cpp:BuildLightning 2923 | WIRED |
-| P_BOLT_PATH | Bolt Path | Lightning | — | — | 322 | 331 | LoadEhrPlugin.cpp:WantEyes 987; LoadEhrPlugin.cpp:MakeStrike 2832 | WIRED |
-| P_BOLT_COUNT | Bolt Count | Lightning | — | — | 323 | 332 | LoadEhrPlugin.cpp:MakeStrike 2831 | WIRED |
-| P_BRANCHING | Branching | Lightning | — | — | 324 | 333 | LoadEhrPlugin.cpp:BoltPath 2719 | WIRED |
-| P_JAGGEDNESS | Jaggedness | Lightning | — | — | 325 | 334 | LoadEhrPlugin.cpp:BoltPath 2719 | WIRED |
-| P_BOLT_LIFE | Bolt Life | Lightning | — | — | 326 | 335 | LoadEhrPlugin.cpp:MakeStrike 2817 | WIRED |
-| P_BOLT_WIDTH | Bolt Width | Lightning | — | — | 327 | 336 | LoadEhrPlugin.cpp:BuildLightning 2970 | WIRED |
-| P_BOLT_GLOW | Bolt Glow | Lightning | — | — | 328 | 337 | LoadEhrPlugin.cpp:BuildLightning 2976 | WIRED |
-| P_BOLT_COL_H | Bolt Color | Lightning | — | — | 329 | 338 | LoadEhrPlugin.cpp:BuildLightning 2967 | WIRED |
-| P_BOLT_COL_S | Bolt Sat | Lightning | — | — | 330 | 339 | LoadEhrPlugin.cpp:BuildLightning 2967 | WIRED |
-| P_BOLT_COL_V | Bolt Bri | Lightning | — | — | 331 | 340 | LoadEhrPlugin.cpp:BuildLightning 2967 | WIRED |
-| P_BOLT_COL_A | Bolt Alpha | Lightning | — | — | 332 | 341 | LoadEhrPlugin.cpp:BuildLightning 2932,2969 | WIRED |
-| P_BOLT_FLASH | Bolt Flash | Lightning | — | — | 333 | 342 | LoadEhrPlugin.cpp:BuildLightning 2978 | WIRED |
-| P_SWARM_COUNT | Swarm Count | Swarm | — | — | 334 | 343 | LoadEhrPlugin.cpp:BuildSwarm 3109 | WIRED |
+| P_STRIKE_BEAT | Strike On Beat | Lightning | — | — | 320 | 329 | LoadEhrPlugin.cpp:WantEyes 987; LoadEhrPlugin.cpp:BuildLightning 2929,2929 | WIRED |
+| P_STRIKE_RATE | Strike Rate | Lightning | — | — | 321 | 330 | LoadEhrPlugin.cpp:WantEyes 987; LoadEhrPlugin.cpp:BuildLightning 2935 | WIRED |
+| P_BOLT_PATH | Bolt Path | Lightning | — | — | 322 | 331 | LoadEhrPlugin.cpp:WantEyes 987; LoadEhrPlugin.cpp:MakeStrike 2844 | WIRED |
+| P_BOLT_COUNT | Bolt Count | Lightning | — | — | 323 | 332 | LoadEhrPlugin.cpp:MakeStrike 2843 | WIRED |
+| P_BRANCHING | Branching | Lightning | — | — | 324 | 333 | LoadEhrPlugin.cpp:BoltPath 2731 | WIRED |
+| P_JAGGEDNESS | Jaggedness | Lightning | — | — | 325 | 334 | LoadEhrPlugin.cpp:BoltPath 2731 | WIRED |
+| P_BOLT_LIFE | Bolt Life | Lightning | — | — | 326 | 335 | LoadEhrPlugin.cpp:MakeStrike 2829 | WIRED |
+| P_BOLT_WIDTH | Bolt Width | Lightning | — | — | 327 | 336 | LoadEhrPlugin.cpp:BuildLightning 2982 | WIRED |
+| P_BOLT_GLOW | Bolt Glow | Lightning | — | — | 328 | 337 | LoadEhrPlugin.cpp:BuildLightning 2988 | WIRED |
+| P_BOLT_COL_H | Bolt Color | Lightning | — | — | 329 | 338 | LoadEhrPlugin.cpp:BuildLightning 2979 | WIRED |
+| P_BOLT_COL_S | Bolt Sat | Lightning | — | — | 330 | 339 | LoadEhrPlugin.cpp:BuildLightning 2979 | WIRED |
+| P_BOLT_COL_V | Bolt Bri | Lightning | — | — | 331 | 340 | LoadEhrPlugin.cpp:BuildLightning 2979 | WIRED |
+| P_BOLT_COL_A | Bolt Alpha | Lightning | — | — | 332 | 341 | LoadEhrPlugin.cpp:BuildLightning 2944,2981 | WIRED |
+| P_BOLT_FLASH | Bolt Flash | Lightning | — | — | 333 | 342 | LoadEhrPlugin.cpp:BuildLightning 2990 | WIRED |
+| P_SWARM_COUNT | Swarm Count | Swarm | — | — | 334 | 343 | LoadEhrPlugin.cpp:BuildSwarm 3121 | WIRED |
 | P_SWARM_RELEASE | Swarm Release | Swarm | — | — | 335 | 344 | LoadEhrPlugin.cpp:SetFloatId 409 | WIRED |
-| P_RELEASE_BEAT | Release On Beat | Swarm | — | — | 336 | 345 | LoadEhrPlugin.cpp:BuildSwarm 3110,3110 | WIRED |
-| P_RELEASE_TIME | Release Time | Swarm | — | — | 337 | 346 | LoadEhrPlugin.cpp:BuildSwarm 3118,3118 | WIRED |
-| P_ATTRACTION | Attraction | Swarm | — | — | 338 | 347 | LoadEhrPlugin.cpp:BuildSwarm 3119 | WIRED |
-| P_FLOCK | Flock | Swarm | — | — | 339 | 348 | LoadEhrPlugin.cpp:BuildSwarm 3120 | WIRED |
-| P_SWARM_SPEED | Swarm Speed | Swarm | — | — | 340 | 349 | LoadEhrPlugin.cpp:BuildSwarm 3121 | WIRED |
-| P_SWARM_OFFSET | Swarm Offset | Swarm | — | — | 341 | 350 | LoadEhrPlugin.cpp:BuildSwarm 3122 | WIRED |
-| P_FIREFLY_SIZE | Firefly Size | Swarm | — | — | 342 | 351 | LoadEhrPlugin.cpp:BuildMorph 2458; LoadEhrPlugin.cpp:BuildSwarm 3123 | WIRED |
-| P_FIREFLY_GLOW | Firefly Glow | Swarm | — | — | 343 | 352 | LoadEhrPlugin.cpp:BuildMorph 2459; LoadEhrPlugin.cpp:BuildSwarm 3135 | WIRED |
-| P_TWINKLE | Twinkle | Swarm | — | — | 344 | 353 | LoadEhrPlugin.cpp:BuildMorph 2460; LoadEhrPlugin.cpp:BuildSwarm 3124 | WIRED |
-| P_FIREFLY_COL_H | Firefly Color | Swarm | — | — | 345 | 354 | LoadEhrPlugin.cpp:BuildMorph 2456,2459; LoadEhrPlugin.cpp:BuildSwarm 3133,3135 | WIRED |
-| P_FIREFLY_COL_S | Firefly Sat | Swarm | — | — | 346 | 355 | LoadEhrPlugin.cpp:BuildMorph 2456; LoadEhrPlugin.cpp:BuildSwarm 3133 | WIRED |
-| P_FIREFLY_COL_V | Firefly Bri | Swarm | — | — | 347 | 356 | LoadEhrPlugin.cpp:BuildMorph 2456; LoadEhrPlugin.cpp:BuildSwarm 3133 | WIRED |
-| P_FIREFLY_COL_A | Firefly Alpha | Swarm | — | — | 348 | 357 | LoadEhrPlugin.cpp:BuildMorph 2456,2459; LoadEhrPlugin.cpp:BuildSwarm 3109,3133,3135 | WIRED |
-| P_MASK_VISIBLE | Mask Visible | Swarm | — | — | 349 | 358 | LoadEhrPlugin.cpp:BuildSwarm 3136 | WIRED |
-| P_LAVA | Lava Cracks | Lava | — | — | 350 | 359 | LoadEhrPlugin.cpp:BuildLava 3054,3083,3088 | WIRED |
-| P_CRACK_SPREAD | Crack Spread | Lava | — | — | 351 | 360 | LoadEhrPlugin.cpp:SetFloatId 403; LoadEhrPlugin.cpp:BuildLava 3076,3082 | WIRED |
+| P_RELEASE_BEAT | Release On Beat | Swarm | — | — | 336 | 345 | LoadEhrPlugin.cpp:BuildSwarm 3122,3122 | WIRED |
+| P_RELEASE_TIME | Release Time | Swarm | — | — | 337 | 346 | LoadEhrPlugin.cpp:BuildSwarm 3130,3130 | WIRED |
+| P_ATTRACTION | Attraction | Swarm | — | — | 338 | 347 | LoadEhrPlugin.cpp:BuildSwarm 3131 | WIRED |
+| P_FLOCK | Flock | Swarm | — | — | 339 | 348 | LoadEhrPlugin.cpp:BuildSwarm 3132 | WIRED |
+| P_SWARM_SPEED | Swarm Speed | Swarm | — | — | 340 | 349 | LoadEhrPlugin.cpp:BuildSwarm 3133 | WIRED |
+| P_SWARM_OFFSET | Swarm Offset | Swarm | — | — | 341 | 350 | LoadEhrPlugin.cpp:BuildSwarm 3134 | WIRED |
+| P_FIREFLY_SIZE | Firefly Size | Swarm | — | — | 342 | 351 | LoadEhrPlugin.cpp:BuildMorph 2470; LoadEhrPlugin.cpp:BuildSwarm 3135 | WIRED |
+| P_FIREFLY_GLOW | Firefly Glow | Swarm | — | — | 343 | 352 | LoadEhrPlugin.cpp:BuildMorph 2471; LoadEhrPlugin.cpp:BuildSwarm 3147 | WIRED |
+| P_TWINKLE | Twinkle | Swarm | — | — | 344 | 353 | LoadEhrPlugin.cpp:BuildMorph 2472; LoadEhrPlugin.cpp:BuildSwarm 3136 | WIRED |
+| P_FIREFLY_COL_H | Firefly Color | Swarm | — | — | 345 | 354 | LoadEhrPlugin.cpp:BuildMorph 2468,2471; LoadEhrPlugin.cpp:BuildSwarm 3145,3147 | WIRED |
+| P_FIREFLY_COL_S | Firefly Sat | Swarm | — | — | 346 | 355 | LoadEhrPlugin.cpp:BuildMorph 2468; LoadEhrPlugin.cpp:BuildSwarm 3145 | WIRED |
+| P_FIREFLY_COL_V | Firefly Bri | Swarm | — | — | 347 | 356 | LoadEhrPlugin.cpp:BuildMorph 2468; LoadEhrPlugin.cpp:BuildSwarm 3145 | WIRED |
+| P_FIREFLY_COL_A | Firefly Alpha | Swarm | — | — | 348 | 357 | LoadEhrPlugin.cpp:BuildMorph 2468,2471; LoadEhrPlugin.cpp:BuildSwarm 3121,3145,3147 | WIRED |
+| P_MASK_VISIBLE | Mask Visible | Swarm | — | — | 349 | 358 | LoadEhrPlugin.cpp:BuildSwarm 3148 | WIRED |
+| P_LAVA | Lava Cracks | Lava | — | — | 350 | 359 | LoadEhrPlugin.cpp:BuildLava 3066,3095,3100 | WIRED |
+| P_CRACK_SPREAD | Crack Spread | Lava | — | — | 351 | 360 | LoadEhrPlugin.cpp:SetFloatId 403; LoadEhrPlugin.cpp:BuildLava 3088,3094 | WIRED |
 | P_CRACK_START | Crack Start | Lava | — | — | 352 | 361 | LoadEhrPlugin.cpp:SetFloatId 399 | WIRED |
 | P_CRACK_REVERSE | Crack Reverse | Lava | — | — | 353 | 362 | LoadEhrPlugin.cpp:SetFloatId 401 | WIRED |
-| P_CRACK_BEAT | Crack On Beat | Lava | — | — | 354 | 363 | LoadEhrPlugin.cpp:BuildLava 3041,3041 | WIRED |
-| P_CRACK_TIME | Crack Time | Lava | — | — | 355 | 364 | LoadEhrPlugin.cpp:BuildLava 3080,3080 | WIRED |
-| P_CRACK_SCALE | Crack Scale | Lava | — | — | 356 | 365 | LoadEhrPlugin.cpp:BuildLava 3086 | WIRED |
-| P_CRACK_WIDTH | Crack Width | Lava | — | — | 357 | 366 | LoadEhrPlugin.cpp:BuildLava 3090 | WIRED |
-| P_LAVA_TEMP | Lava Temp | Lava | — | — | 358 | 367 | LoadEhrPlugin.cpp:BuildLava 3089 | WIRED |
-| P_LAVA_GLOW | Lava Glow | Lava | — | — | 359 | 368 | LoadEhrPlugin.cpp:BuildMorph 2449; LoadEhrPlugin.cpp:BuildLava 3088 | WIRED |
-| P_LAVA_TINT_H | Lava Tint Color | Lava | — | — | 360 | 369 | LoadEhrPlugin.cpp:BuildLava 3091,3092 | WIRED |
-| P_LAVA_TINT_S | Lava Tint Sat | Lava | — | — | 361 | 370 | LoadEhrPlugin.cpp:BuildLava 3091,3092 | WIRED |
-| P_LAVA_TINT_V | Lava Tint Bri | Lava | — | — | 362 | 371 | LoadEhrPlugin.cpp:BuildLava 3091,3092 | WIRED |
-| P_LAVA_TINT_A | Lava Tint Mix | Lava | — | — | 363 | 372 | LoadEhrPlugin.cpp:BuildLava 3091 | WIRED |
-| P_HEAT_HAZE | Heat Haze | Lava | — | — | 364 | 373 | LoadEhrPlugin.cpp:BuildLava 3095 | WIRED |
-| P_LAVA_SPLIT | Lava Split | Lava | — | — | 365 | 374 | LoadEhrPlugin.cpp:BuildLava 3087 | WIRED |
-| P_LAVA_LIGHT | Lava Light | Lava | — | — | 366 | 375 | LoadEhrPlugin.cpp:BuildVolume 2073,2080 | WIRED |
-| P_CAUSTICS | Caustics | Caustics | — | — | 367 | 376 | LoadEhrPlugin.cpp:BuildCaustics 3001 | WIRED |
-| P_CAUSTIC_SOURCE | Caustic Source | Caustics | — | — | 368 | 377 | LoadEhrPlugin.cpp:BuildCaustics 3016 | WIRED |
-| P_CAUSTIC_IOR | Caustic IOR | Caustics | — | — | 369 | 378 | LoadEhrPlugin.cpp:BuildCaustics 3017 | WIRED |
-| P_CAUSTIC_RAINBOW | Caustic Rainbow | Caustics | — | — | 370 | 379 | LoadEhrPlugin.cpp:BuildCaustics 3018 | WIRED |
-| P_CAUSTIC_SHARP | Caustic Sharp | Caustics | — | — | 371 | 380 | LoadEhrPlugin.cpp:BuildCaustics 3019 | WIRED |
-| P_CAUSTIC_RIPPLE | Caustic Ripple | Caustics | — | — | 372 | 381 | LoadEhrPlugin.cpp:BuildCaustics 3020 | WIRED |
-| P_CAUSTIC_FLOOR | Caustic Floor | Caustics | — | — | 373 | 382 | LoadEhrPlugin.cpp:BuildCaustics 3002,3022 | WIRED |
-| P_CAUSTIC_SMOKE | Caustic Smoke | Caustics | — | — | 374 | 383 | LoadEhrPlugin.cpp:BuildCaustics 3002,3023 | WIRED |
-| P_CAUSTIC_SURFACE | Caustic Surface | Caustics | — | — | 375 | 384 | LoadEhrPlugin.cpp:BuildCaustics 3002,3024 | WIRED |
-| P_CAUSTIC_COL_H | Caustic Color | Caustics | — | — | 376 | 385 | LoadEhrPlugin.cpp:BuildCaustics 3001,3025 | WIRED |
-| P_CAUSTIC_COL_S | Caustic Sat | Caustics | — | — | 377 | 386 | LoadEhrPlugin.cpp:BuildCaustics 3025 | WIRED |
-| P_CAUSTIC_COL_V | Caustic Bri | Caustics | — | — | 378 | 387 | LoadEhrPlugin.cpp:BuildCaustics 3025 | WIRED |
-| P_CAUSTIC_COL_A | Caustic Alpha | Caustics | — | — | 379 | 388 | LoadEhrPlugin.cpp:BuildCaustics 3001 | WIRED |
-| P_LA_ENABLE | A Enable | Light A | 363 | 371 | 380 | 389 | LoadEhrPlugin.cpp:BuildVolume 2021,2022,2030 | WIRED |
-| P_LA_TYPE | A Type | Light A | 364 | 372 | 381 | 390 | LoadEhrPlugin.cpp:BuildVolume 2033 | WIRED |
-| P_LA_ANCHOR | A Anchor To Mask | Light A | 365 | 373 | 382 | 391 | LoadEhrPlugin.cpp:BuildVolume 2034 | WIRED |
-| P_LA_POS_X | A Pos X | Light A | 366 | 374 | 383 | 392 | LoadEhrPlugin.cpp:BuildVolume 2035 | WIRED |
-| P_LA_POS_Y | A Pos Y | Light A | 367 | 375 | 384 | 393 | LoadEhrPlugin.cpp:BuildVolume 2035 | WIRED |
-| P_LA_POS_Z | A Pos Z | Light A | 368 | 376 | 385 | 394 | LoadEhrPlugin.cpp:BuildVolume 2035 | WIRED |
-| P_LA_AIM_MODE | A Aim Mode | Light A | 369 | 377 | 386 | 395 | LoadEhrPlugin.cpp:BuildVolume 2041 | WIRED |
-| P_LA_AIM_YAW | A Aim Yaw | Light A | 370 | 378 | 387 | 396 | LoadEhrPlugin.cpp:BuildVolume 2050 | WIRED |
-| P_LA_AIM_PITCH | A Aim Pitch | Light A | 371 | 379 | 388 | 397 | LoadEhrPlugin.cpp:BuildVolume 2050 | WIRED |
-| P_LA_CONE | A Cone Angle | Light A | 372 | 380 | 389 | 398 | LoadEhrPlugin.cpp:BuildVolume 2067 | WIRED |
-| P_LA_CONE_SOFT | A Cone Soft | Light A | 373 | 381 | 390 | 399 | LoadEhrPlugin.cpp:BuildVolume 2068 | WIRED |
-| P_LA_INTENSITY | A Intensity | Light A | 374 | 382 | 391 | 400 | LoadEhrPlugin.cpp:BuildVolume 2064 | WIRED |
-| P_LA_COL_H | A Color | Light A | 375 | 383 | 392 | 401 | LoadEhrPlugin.cpp:BuildVolume 2063,2064 | WIRED |
-| P_LA_COL_S | A Sat | Light A | 376 | 384 | 393 | 402 | LoadEhrPlugin.cpp:BuildVolume 2063 | WIRED |
-| P_LA_COL_V | A Bri | Light A | 377 | 385 | 394 | 403 | LoadEhrPlugin.cpp:BuildVolume 2063 | WIRED |
-| P_LA_COL_A | A Alpha | Light A | 378 | 386 | 395 | 404 | LoadEhrPlugin.cpp:BuildVolume 2063,2064 | WIRED |
-| P_LA_HUE_DRIFT | A Hue Drift | Light A | 379 | 387 | 396 | 405 | LoadEhrPlugin.cpp:BuildVolume 2029 | WIRED |
-| P_LA_BEAT | A Beat Pulse | Light A | 380 | 388 | 397 | 406 | LoadEhrPlugin.cpp:BuildVolume 2064 | WIRED |
-| P_LA_AUDIO | A Audio > Light | Light A | 381 | 389 | 398 | 407 | LoadEhrPlugin.cpp:BuildVolume 2064 | WIRED |
-| P_LB_ENABLE | B Enable | Light B | 382 | 390 | 399 | 408 | LoadEhrPlugin.cpp:BuildVolume 2021,2030 | WIRED |
-| P_LB_TYPE | B Type | Light B | 383 | 391 | 400 | 409 | LoadEhrPlugin.cpp:BuildVolume 2033 | WIRED |
-| P_LB_ANCHOR | B Anchor To Mask | Light B | 384 | 392 | 401 | 410 | LoadEhrPlugin.cpp:BuildVolume 2034 | WIRED |
-| P_LB_POS_X | B Pos X | Light B | 385 | 393 | 402 | 411 | LoadEhrPlugin.cpp:BuildVolume 2035 | WIRED |
-| P_LB_POS_Y | B Pos Y | Light B | 386 | 394 | 403 | 412 | LoadEhrPlugin.cpp:BuildVolume 2035 | WIRED |
-| P_LB_POS_Z | B Pos Z | Light B | 387 | 395 | 404 | 413 | LoadEhrPlugin.cpp:BuildVolume 2035 | WIRED |
-| P_LB_AIM_MODE | B Aim Mode | Light B | 388 | 396 | 405 | 414 | LoadEhrPlugin.cpp:BuildVolume 2041 | WIRED |
-| P_LB_AIM_YAW | B Aim Yaw | Light B | 389 | 397 | 406 | 415 | LoadEhrPlugin.cpp:BuildVolume 2050 | WIRED |
-| P_LB_AIM_PITCH | B Aim Pitch | Light B | 390 | 398 | 407 | 416 | LoadEhrPlugin.cpp:BuildVolume 2050 | WIRED |
-| P_LB_CONE | B Cone Angle | Light B | 391 | 399 | 408 | 417 | LoadEhrPlugin.cpp:BuildVolume 2067 | WIRED |
-| P_LB_CONE_SOFT | B Cone Soft | Light B | 392 | 400 | 409 | 418 | LoadEhrPlugin.cpp:BuildVolume 2068 | WIRED |
-| P_LB_INTENSITY | B Intensity | Light B | 393 | 401 | 410 | 419 | LoadEhrPlugin.cpp:BuildVolume 2064 | WIRED |
-| P_LB_COL_H | B Color | Light B | 394 | 402 | 411 | 420 | LoadEhrPlugin.cpp:BuildVolume 2063,2064 | WIRED |
-| P_LB_COL_S | B Sat | Light B | 395 | 403 | 412 | 421 | LoadEhrPlugin.cpp:BuildVolume 2063 | WIRED |
-| P_LB_COL_V | B Bri | Light B | 396 | 404 | 413 | 422 | LoadEhrPlugin.cpp:BuildVolume 2063 | WIRED |
-| P_LB_COL_A | B Alpha | Light B | 397 | 405 | 414 | 423 | LoadEhrPlugin.cpp:BuildVolume 2063,2064 | WIRED |
-| P_LB_HUE_DRIFT | B Hue Drift | Light B | 398 | 406 | 415 | 424 | LoadEhrPlugin.cpp:BuildVolume 2029 | WIRED |
-| P_LB_BEAT | B Beat Pulse | Light B | 399 | 407 | 416 | 425 | LoadEhrPlugin.cpp:BuildVolume 2064 | WIRED |
-| P_LB_AUDIO | B Audio > Light | Light B | 400 | 408 | 417 | 426 | LoadEhrPlugin.cpp:BuildVolume 2064 | WIRED |
-| P_LC_ENABLE | C Enable | Light C | 401 | 409 | 418 | 427 | LoadEhrPlugin.cpp:WantEyes 986; LoadEhrPlugin.cpp:BuildEyeLights 3692 | WIRED |
+| P_CRACK_BEAT | Crack On Beat | Lava | — | — | 354 | 363 | LoadEhrPlugin.cpp:BuildLava 3053,3053 | WIRED |
+| P_CRACK_TIME | Crack Time | Lava | — | — | 355 | 364 | LoadEhrPlugin.cpp:BuildLava 3092,3092 | WIRED |
+| P_CRACK_SCALE | Crack Scale | Lava | — | — | 356 | 365 | LoadEhrPlugin.cpp:BuildLava 3098 | WIRED |
+| P_CRACK_WIDTH | Crack Width | Lava | — | — | 357 | 366 | LoadEhrPlugin.cpp:BuildLava 3102 | WIRED |
+| P_LAVA_TEMP | Lava Temp | Lava | — | — | 358 | 367 | LoadEhrPlugin.cpp:BuildLava 3101 | WIRED |
+| P_LAVA_GLOW | Lava Glow | Lava | — | — | 359 | 368 | LoadEhrPlugin.cpp:BuildMorph 2461; LoadEhrPlugin.cpp:BuildLava 3100 | WIRED |
+| P_LAVA_TINT_H | Lava Tint Color | Lava | — | — | 360 | 369 | LoadEhrPlugin.cpp:BuildLava 3103,3104 | WIRED |
+| P_LAVA_TINT_S | Lava Tint Sat | Lava | — | — | 361 | 370 | LoadEhrPlugin.cpp:BuildLava 3103,3104 | WIRED |
+| P_LAVA_TINT_V | Lava Tint Bri | Lava | — | — | 362 | 371 | LoadEhrPlugin.cpp:BuildLava 3103,3104 | WIRED |
+| P_LAVA_TINT_A | Lava Tint Mix | Lava | — | — | 363 | 372 | LoadEhrPlugin.cpp:BuildLava 3103 | WIRED |
+| P_HEAT_HAZE | Heat Haze | Lava | — | — | 364 | 373 | LoadEhrPlugin.cpp:BuildLava 3107 | WIRED |
+| P_LAVA_SPLIT | Lava Split | Lava | — | — | 365 | 374 | LoadEhrPlugin.cpp:BuildLava 3099 | WIRED |
+| P_LAVA_LIGHT | Lava Light | Lava | — | — | 366 | 375 | LoadEhrPlugin.cpp:BuildVolume 2085,2092 | WIRED |
+| P_CAUSTICS | Caustics | Caustics | — | — | 367 | 376 | LoadEhrPlugin.cpp:BuildCaustics 3013 | WIRED |
+| P_CAUSTIC_SOURCE | Caustic Source | Caustics | — | — | 368 | 377 | LoadEhrPlugin.cpp:BuildCaustics 3028 | WIRED |
+| P_CAUSTIC_IOR | Caustic IOR | Caustics | — | — | 369 | 378 | LoadEhrPlugin.cpp:BuildCaustics 3029 | WIRED |
+| P_CAUSTIC_RAINBOW | Caustic Rainbow | Caustics | — | — | 370 | 379 | LoadEhrPlugin.cpp:BuildCaustics 3030 | WIRED |
+| P_CAUSTIC_SHARP | Caustic Sharp | Caustics | — | — | 371 | 380 | LoadEhrPlugin.cpp:BuildCaustics 3031 | WIRED |
+| P_CAUSTIC_RIPPLE | Caustic Ripple | Caustics | — | — | 372 | 381 | LoadEhrPlugin.cpp:BuildCaustics 3032 | WIRED |
+| P_CAUSTIC_FLOOR | Caustic Floor | Caustics | — | — | 373 | 382 | LoadEhrPlugin.cpp:BuildCaustics 3014,3034 | WIRED |
+| P_CAUSTIC_SMOKE | Caustic Smoke | Caustics | — | — | 374 | 383 | LoadEhrPlugin.cpp:BuildCaustics 3014,3035 | WIRED |
+| P_CAUSTIC_SURFACE | Caustic Surface | Caustics | — | — | 375 | 384 | LoadEhrPlugin.cpp:BuildCaustics 3014,3036 | WIRED |
+| P_CAUSTIC_COL_H | Caustic Color | Caustics | — | — | 376 | 385 | LoadEhrPlugin.cpp:BuildCaustics 3013,3037 | WIRED |
+| P_CAUSTIC_COL_S | Caustic Sat | Caustics | — | — | 377 | 386 | LoadEhrPlugin.cpp:BuildCaustics 3037 | WIRED |
+| P_CAUSTIC_COL_V | Caustic Bri | Caustics | — | — | 378 | 387 | LoadEhrPlugin.cpp:BuildCaustics 3037 | WIRED |
+| P_CAUSTIC_COL_A | Caustic Alpha | Caustics | — | — | 379 | 388 | LoadEhrPlugin.cpp:BuildCaustics 3013 | WIRED |
+| P_LA_ENABLE | A Enable | Light A | 363 | 371 | 380 | 389 | LoadEhrPlugin.cpp:BuildVolume 2033,2034,2042 | WIRED |
+| P_LA_TYPE | A Type | Light A | 364 | 372 | 381 | 390 | LoadEhrPlugin.cpp:BuildVolume 2045 | WIRED |
+| P_LA_ANCHOR | A Anchor To Mask | Light A | 365 | 373 | 382 | 391 | LoadEhrPlugin.cpp:BuildVolume 2046 | WIRED |
+| P_LA_POS_X | A Pos X | Light A | 366 | 374 | 383 | 392 | LoadEhrPlugin.cpp:BuildVolume 2047 | WIRED |
+| P_LA_POS_Y | A Pos Y | Light A | 367 | 375 | 384 | 393 | LoadEhrPlugin.cpp:BuildVolume 2047 | WIRED |
+| P_LA_POS_Z | A Pos Z | Light A | 368 | 376 | 385 | 394 | LoadEhrPlugin.cpp:BuildVolume 2047 | WIRED |
+| P_LA_AIM_MODE | A Aim Mode | Light A | 369 | 377 | 386 | 395 | LoadEhrPlugin.cpp:BuildVolume 2053 | WIRED |
+| P_LA_AIM_YAW | A Aim Yaw | Light A | 370 | 378 | 387 | 396 | LoadEhrPlugin.cpp:BuildVolume 2062 | WIRED |
+| P_LA_AIM_PITCH | A Aim Pitch | Light A | 371 | 379 | 388 | 397 | LoadEhrPlugin.cpp:BuildVolume 2062 | WIRED |
+| P_LA_CONE | A Cone Angle | Light A | 372 | 380 | 389 | 398 | LoadEhrPlugin.cpp:BuildVolume 2079 | WIRED |
+| P_LA_CONE_SOFT | A Cone Soft | Light A | 373 | 381 | 390 | 399 | LoadEhrPlugin.cpp:BuildVolume 2080 | WIRED |
+| P_LA_INTENSITY | A Intensity | Light A | 374 | 382 | 391 | 400 | LoadEhrPlugin.cpp:BuildVolume 2076 | WIRED |
+| P_LA_COL_H | A Color | Light A | 375 | 383 | 392 | 401 | LoadEhrPlugin.cpp:BuildVolume 2075,2076 | WIRED |
+| P_LA_COL_S | A Sat | Light A | 376 | 384 | 393 | 402 | LoadEhrPlugin.cpp:BuildVolume 2075 | WIRED |
+| P_LA_COL_V | A Bri | Light A | 377 | 385 | 394 | 403 | LoadEhrPlugin.cpp:BuildVolume 2075 | WIRED |
+| P_LA_COL_A | A Alpha | Light A | 378 | 386 | 395 | 404 | LoadEhrPlugin.cpp:BuildVolume 2075,2076 | WIRED |
+| P_LA_HUE_DRIFT | A Hue Drift | Light A | 379 | 387 | 396 | 405 | LoadEhrPlugin.cpp:BuildVolume 2041 | WIRED |
+| P_LA_BEAT | A Beat Pulse | Light A | 380 | 388 | 397 | 406 | LoadEhrPlugin.cpp:BuildVolume 2076 | WIRED |
+| P_LA_AUDIO | A Audio > Light | Light A | 381 | 389 | 398 | 407 | LoadEhrPlugin.cpp:BuildVolume 2076 | WIRED |
+| P_LB_ENABLE | B Enable | Light B | 382 | 390 | 399 | 408 | LoadEhrPlugin.cpp:BuildVolume 2033,2042 | WIRED |
+| P_LB_TYPE | B Type | Light B | 383 | 391 | 400 | 409 | LoadEhrPlugin.cpp:BuildVolume 2045 | WIRED |
+| P_LB_ANCHOR | B Anchor To Mask | Light B | 384 | 392 | 401 | 410 | LoadEhrPlugin.cpp:BuildVolume 2046 | WIRED |
+| P_LB_POS_X | B Pos X | Light B | 385 | 393 | 402 | 411 | LoadEhrPlugin.cpp:BuildVolume 2047 | WIRED |
+| P_LB_POS_Y | B Pos Y | Light B | 386 | 394 | 403 | 412 | LoadEhrPlugin.cpp:BuildVolume 2047 | WIRED |
+| P_LB_POS_Z | B Pos Z | Light B | 387 | 395 | 404 | 413 | LoadEhrPlugin.cpp:BuildVolume 2047 | WIRED |
+| P_LB_AIM_MODE | B Aim Mode | Light B | 388 | 396 | 405 | 414 | LoadEhrPlugin.cpp:BuildVolume 2053 | WIRED |
+| P_LB_AIM_YAW | B Aim Yaw | Light B | 389 | 397 | 406 | 415 | LoadEhrPlugin.cpp:BuildVolume 2062 | WIRED |
+| P_LB_AIM_PITCH | B Aim Pitch | Light B | 390 | 398 | 407 | 416 | LoadEhrPlugin.cpp:BuildVolume 2062 | WIRED |
+| P_LB_CONE | B Cone Angle | Light B | 391 | 399 | 408 | 417 | LoadEhrPlugin.cpp:BuildVolume 2079 | WIRED |
+| P_LB_CONE_SOFT | B Cone Soft | Light B | 392 | 400 | 409 | 418 | LoadEhrPlugin.cpp:BuildVolume 2080 | WIRED |
+| P_LB_INTENSITY | B Intensity | Light B | 393 | 401 | 410 | 419 | LoadEhrPlugin.cpp:BuildVolume 2076 | WIRED |
+| P_LB_COL_H | B Color | Light B | 394 | 402 | 411 | 420 | LoadEhrPlugin.cpp:BuildVolume 2075,2076 | WIRED |
+| P_LB_COL_S | B Sat | Light B | 395 | 403 | 412 | 421 | LoadEhrPlugin.cpp:BuildVolume 2075 | WIRED |
+| P_LB_COL_V | B Bri | Light B | 396 | 404 | 413 | 422 | LoadEhrPlugin.cpp:BuildVolume 2075 | WIRED |
+| P_LB_COL_A | B Alpha | Light B | 397 | 405 | 414 | 423 | LoadEhrPlugin.cpp:BuildVolume 2075,2076 | WIRED |
+| P_LB_HUE_DRIFT | B Hue Drift | Light B | 398 | 406 | 415 | 424 | LoadEhrPlugin.cpp:BuildVolume 2041 | WIRED |
+| P_LB_BEAT | B Beat Pulse | Light B | 399 | 407 | 416 | 425 | LoadEhrPlugin.cpp:BuildVolume 2076 | WIRED |
+| P_LB_AUDIO | B Audio > Light | Light B | 400 | 408 | 417 | 426 | LoadEhrPlugin.cpp:BuildVolume 2076 | WIRED |
+| P_LC_ENABLE | C Enable | Light C | 401 | 409 | 418 | 427 | LoadEhrPlugin.cpp:WantEyes 986; LoadEhrPlugin.cpp:BuildEyeLights 3704 | WIRED |
 | P_LC_PLACE | C Place At Eyes | Light C | 402 | 410 | 419 | 428 | LoadEhrPlugin.cpp:SetFloatId 395 | WIRED |
 | P_LC_FIT_CONE | C Fit Cone | Light C | 403 | 411 | 420 | 429 | LoadEhrPlugin.cpp:SetFloatId 415 | WIRED |
-| P_LC_AUTO | C Auto Place | Light C | 404 | 412 | 421 | 430 | LoadEhrPlugin.cpp:UpdateEyes 997; LoadEhrPlugin.cpp:BuildCut 3365 | WIRED |
-| P_LC_FRONT_ONLY | C Front Only | Light C | 405 | 413 | 422 | 431 | LoadEhrPlugin.cpp:BuildEyeLights 3754 | WIRED |
-| P_LC_BEHIND | C Behind Depth | Light C | 406 | 414 | 423 | 432 | LoadEhrPlugin.cpp:SlotEyeFit 1126,1136; LoadEhrPlugin.cpp:GlideEyeFit 1142,1152; LoadEhrPlugin.cpp:UpdateEyePlacement 1298,1299,1304 | WIRED |
-| P_LC_ANCHOR | C Anchor To Mask | Light C | 407 | 415 | 424 | 433 | LoadEhrPlugin.cpp:UpdateEyePlacement 1321; LoadEhrPlugin.cpp:BuildSim 2173; LoadEhrPlugin.cpp:BuildCut 3381; LoadEhrPlugin.cpp:BuildEyeLights 3694 | WIRED |
-| P_LC_MIRROR | C Mirror X | Light C | 408 | 416 | 425 | 434 | LoadEhrPlugin.cpp:EyeOpen 1189; LoadEhrPlugin.cpp:UpdateEyePlacement 1324,1326; LoadEhrPlugin.cpp:BuildEyeLights 3694 | WIRED |
-| P_LC_L_POS_X | C Left Pos X | Light C | 409 | 417 | 426 | 435 | LoadEhrPlugin.cpp:EyesSetByHand 977; LoadEhrPlugin.cpp:GlideEyeFit 1164,1181; LoadEhrPlugin.cpp:EyeOpen 1192; LoadEhrPlugin.cpp:UpdateEyePlacement 1279,1279,1282 | WIRED |
-| P_LC_L_POS_Y | C Left Pos Y | Light C | 410 | 418 | 427 | 436 | LoadEhrPlugin.cpp:GlideEyeFit 1164,1181; LoadEhrPlugin.cpp:UpdateEyePlacement 1279,1279,1282 | WIRED |
-| P_LC_L_POS_Z | C Left Pos Z | Light C | 411 | 419 | 428 | 437 | LoadEhrPlugin.cpp:GlideEyeFit 1164,1181; LoadEhrPlugin.cpp:UpdateEyePlacement 1279,1279,1283 | WIRED |
-| P_LC_R_POS_X | C Right Pos X | Light C | 412 | 420 | 429 | 438 | LoadEhrPlugin.cpp:GlideEyeFit 1164,1181; LoadEhrPlugin.cpp:EyeOpen 1192; LoadEhrPlugin.cpp:UpdateEyePlacement 1280,1280,1283 | WIRED |
-| P_LC_R_POS_Y | C Right Pos Y | Light C | 413 | 421 | 430 | 439 | LoadEhrPlugin.cpp:GlideEyeFit 1164,1181; LoadEhrPlugin.cpp:UpdateEyePlacement 1280,1280,1283 | WIRED |
-| P_LC_R_POS_Z | C Right Pos Z | Light C | 414 | 422 | 431 | 440 | LoadEhrPlugin.cpp:EyesSetByHand 977; LoadEhrPlugin.cpp:GlideEyeFit 1164,1181; LoadEhrPlugin.cpp:UpdateEyePlacement 1280,1280,1283 | WIRED |
-| P_LC_AIM_MODE | C Aim Mode | Light C | 415 | 423 | 432 | 441 | LoadEhrPlugin.cpp:UpdateEyePlacement 1320; LoadEhrPlugin.cpp:BuildEyeLights 3695 | WIRED |
-| P_LC_AIM_YAW | C Aim Yaw | Light C | 416 | 424 | 433 | 442 | LoadEhrPlugin.cpp:BuildEyeLights 3729 | WIRED |
-| P_LC_AIM_PITCH | C Aim Pitch | Light C | 417 | 425 | 434 | 443 | LoadEhrPlugin.cpp:BuildEyeLights 3729 | WIRED |
-| P_LC_CONE | C Cone Angle | Light C | 418 | 426 | 435 | 444 | LoadEhrPlugin.cpp:SlotEyeFit 1126,1137; LoadEhrPlugin.cpp:GlideEyeFit 1142,1152; LoadEhrPlugin.cpp:UpdateEyePlacement 1312,1330 | WIRED |
-| P_LC_CONE_SOFT | C Cone Soft | Light C | 419 | 427 | 436 | 445 | LoadEhrPlugin.cpp:BuildEyeLights 3762 | WIRED |
-| P_LC_INTENSITY | C Intensity | Light C | 420 | 428 | 437 | 446 | LoadEhrPlugin.cpp:BuildEyeLights 3697 | WIRED |
-| P_LC_LCOL_H | C Left Color | Light C | 421 | 429 | 438 | 447 | LoadEhrPlugin.cpp:BuildEyeLights 3756 | WIRED |
-| P_LC_LCOL_S | C Left Sat | Light C | 422 | 430 | 439 | 448 | LoadEhrPlugin.cpp:BuildEyeLights 3756 | WIRED |
-| P_LC_LCOL_V | C Left Bri | Light C | 423 | 431 | 440 | 449 | LoadEhrPlugin.cpp:BuildEyeLights 3756 | WIRED |
-| P_LC_LCOL_A | C Left Alpha | Light C | 424 | 432 | 441 | 450 | LoadEhrPlugin.cpp:BuildEyeLights 3756 | WIRED |
-| P_LC_LINK | C Link Colors | Light C | 425 | 433 | 442 | 451 | LoadEhrPlugin.cpp:BuildEyeLights 3756 | WIRED |
-| P_LC_RCOL_H | C Right Color | Light C | 426 | 434 | 443 | 452 | LoadEhrPlugin.cpp:BuildEyeLights 3756 | WIRED |
-| P_LC_RCOL_S | C Right Sat | Light C | 427 | 435 | 444 | 453 | LoadEhrPlugin.cpp:BuildEyeLights 3756 | WIRED |
-| P_LC_RCOL_V | C Right Bri | Light C | 428 | 436 | 445 | 454 | LoadEhrPlugin.cpp:BuildEyeLights 3756 | WIRED |
-| P_LC_RCOL_A | C Right Alpha | Light C | 429 | 437 | 446 | 455 | LoadEhrPlugin.cpp:BuildEyeLights 3756 | WIRED |
-| P_LC_HUE_DRIFT | C Hue Drift | Light C | 430 | 438 | 447 | 456 | LoadEhrPlugin.cpp:BuildEyeLights 3691 | WIRED |
-| P_LC_BEAT | C Beat Pulse | Light C | 431 | 439 | 448 | 457 | LoadEhrPlugin.cpp:BuildEyeLights 3697 | WIRED |
-| P_LC_AUDIO | C Audio > Light | Light C | 432 | 440 | 449 | 458 | LoadEhrPlugin.cpp:BuildEyeLights 3697 | WIRED |
-| P_LC_PLACED | C Placed For | Light C | 433 | 441 | 450 | 459 | LoadEhrPlugin.cpp:SetTextId 460; LoadEhrPlugin.cpp:UpdateEyePlacement 1251 | WIRED |
-| P_SPOT_COUNT | Spot Count | Spots | 434 | 442 | — | — | LoadEhrPlugin.cpp:BuildSpots 4392 | WIRED |
-| P_SPOT_INTENSITY | Spot Intensity | Spots | 435 | 443 | — | — | LoadEhrPlugin.cpp:BuildSpots 4452 | WIRED |
-| P_SPOT_CONE | Spot Cone | Spots | 436 | 444 | — | — | LoadEhrPlugin.cpp:BuildSpots 4409 | WIRED |
-| P_SPOT_SPEED | Spot Speed | Spots | 437 | 445 | — | — | LoadEhrPlugin.cpp:BuildSpots 4398,4441 | WIRED |
-| P_SPOT_PATTERN | Spot Pattern | Spots | 438 | 446 | — | — | LoadEhrPlugin.cpp:BuildSpots 4403 | WIRED |
-| P_SPOT_WIDTH | Spot Width | Spots | 439 | 447 | — | — | LoadEhrPlugin.cpp:BuildSpots 4402 | WIRED |
-| P_SPOT_HEIGHT | Spot Rig Height | Spots | 440 | 448 | — | — | LoadEhrPlugin.cpp:BuildSpots 4412 | WIRED |
-| P_SPOT_DIST | Spot Rig Dist | Spots | 441 | 449 | — | — | LoadEhrPlugin.cpp:BuildSpots 4413 | WIRED |
-| P_SPOT_COL_H | Spot Color | Spots | 442 | 450 | — | — | LoadEhrPlugin.cpp:BuildSpots 4451,4452 | WIRED |
-| P_SPOT_COL_S | Spot Sat | Spots | 443 | 451 | — | — | LoadEhrPlugin.cpp:BuildSpots 4451 | WIRED |
-| P_SPOT_COL_V | Spot Bri | Spots | 444 | 452 | — | — | LoadEhrPlugin.cpp:BuildSpots 4449,4451 | WIRED |
-| P_SPOT_COL_A | Spot Alpha | Spots | 445 | 453 | — | — | LoadEhrPlugin.cpp:BuildSpots 4451,4452 | WIRED |
-| P_SPOT_COLOR_MODE | Spot Color Mode | Spots | 446 | 454 | — | — | LoadEhrPlugin.cpp:BuildSpots 4403 | WIRED |
-| P_SPOT_STROBE | Spot Beat Strobe | Spots | 447 | 455 | — | — | LoadEhrPlugin.cpp:BuildSpots 4396,4396,4402 | WIRED |
-| P_SPOT_BEAMS | Spot Beams | Spots | 448 | 456 | — | — | LoadEhrPlugin.cpp:BuildVolume 2090 | WIRED |
-| P_PROJ_ENABLE | Proj Enable | Projector | — | — | 451 | 460 | LoadEhrPlugin.cpp:BuildProjector 3151 | WIRED |
-| P_PROJ_SOURCE | Proj Source | Projector | — | — | — | 461 | LoadEhrPlugin.cpp:BuildProjector 3153 | WIRED |
-| P_PROJ_FILE | Proj File | Projector | — | — | 452 | 462 | LoadEhrPlugin.cpp:LoopFade 247; LoadEhrPlugin.cpp:BuildProjector 3157 | WIRED |
-| P_VIDEO_SPEED | Video Speed | Projector | — | — | 453 | 463 | LoadEhrPlugin.cpp:VideoClock 3532 | WIRED |
-| P_VIDEO_LOOP | Video Loop | Projector | — | — | 454 | 464 | LoadEhrPlugin.cpp:VideoClock 3527 | WIRED |
-| P_VIDEO_POS | Video Position | Projector | — | — | 455 | 465 | LoadEhrPlugin.cpp:SetFloatId 407; LoadEhrPlugin.cpp:VideoClock 3537,3571,3574 | WIRED |
-| P_VIDEO_TIME | Video Time | Projector | — | — | 456 | 466 | LoadEhrPlugin.cpp:SetTextId 456; LoadEhrPlugin.cpp:SetVideoTime 3591,3593,3594 | WIRED |
+| P_LC_AUTO | C Auto Place | Light C | 404 | 412 | 421 | 430 | LoadEhrPlugin.cpp:UpdateEyes 997; LoadEhrPlugin.cpp:BuildCut 3377 | WIRED |
+| P_LC_FRONT_ONLY | C Front Only | Light C | 405 | 413 | 422 | 431 | LoadEhrPlugin.cpp:BuildEyeLights 3766 | WIRED |
+| P_LC_BEHIND | C Behind Depth | Light C | 406 | 414 | 423 | 432 | LoadEhrPlugin.cpp:SlotEyeFit 1130,1140,1144; LoadEhrPlugin.cpp:GlideEyeFit 1149,1160; LoadEhrPlugin.cpp:UpdateEyePlacement 1310,1311,1316 | WIRED |
+| P_LC_ANCHOR | C Anchor To Mask | Light C | 407 | 415 | 424 | 433 | LoadEhrPlugin.cpp:UpdateEyePlacement 1333; LoadEhrPlugin.cpp:BuildSim 2185; LoadEhrPlugin.cpp:BuildCut 3393; LoadEhrPlugin.cpp:BuildEyeLights 3706 | WIRED |
+| P_LC_MIRROR | C Mirror X | Light C | 408 | 416 | 425 | 434 | LoadEhrPlugin.cpp:EyeOpen 1201; LoadEhrPlugin.cpp:UpdateEyePlacement 1336,1338; LoadEhrPlugin.cpp:BuildEyeLights 3706 | WIRED |
+| P_LC_L_POS_X | C Left Pos X | Light C | 409 | 417 | 426 | 435 | LoadEhrPlugin.cpp:EyesSetByHand 977; LoadEhrPlugin.cpp:GlideEyeFit 1176,1193; LoadEhrPlugin.cpp:EyeOpen 1204; LoadEhrPlugin.cpp:UpdateEyePlacement 1291,1291,1294 | WIRED |
+| P_LC_L_POS_Y | C Left Pos Y | Light C | 410 | 418 | 427 | 436 | LoadEhrPlugin.cpp:GlideEyeFit 1176,1193; LoadEhrPlugin.cpp:UpdateEyePlacement 1291,1291,1294 | WIRED |
+| P_LC_L_POS_Z | C Left Pos Z | Light C | 411 | 419 | 428 | 437 | LoadEhrPlugin.cpp:GlideEyeFit 1176,1193; LoadEhrPlugin.cpp:UpdateEyePlacement 1291,1291,1295 | WIRED |
+| P_LC_R_POS_X | C Right Pos X | Light C | 412 | 420 | 429 | 438 | LoadEhrPlugin.cpp:GlideEyeFit 1176,1193; LoadEhrPlugin.cpp:EyeOpen 1204; LoadEhrPlugin.cpp:UpdateEyePlacement 1292,1292,1295 | WIRED |
+| P_LC_R_POS_Y | C Right Pos Y | Light C | 413 | 421 | 430 | 439 | LoadEhrPlugin.cpp:GlideEyeFit 1176,1193; LoadEhrPlugin.cpp:UpdateEyePlacement 1292,1292,1295 | WIRED |
+| P_LC_R_POS_Z | C Right Pos Z | Light C | 414 | 422 | 431 | 440 | LoadEhrPlugin.cpp:EyesSetByHand 977; LoadEhrPlugin.cpp:GlideEyeFit 1176,1193; LoadEhrPlugin.cpp:UpdateEyePlacement 1292,1292,1295 | WIRED |
+| P_LC_AIM_MODE | C Aim Mode | Light C | 415 | 423 | 432 | 441 | LoadEhrPlugin.cpp:UpdateEyePlacement 1332; LoadEhrPlugin.cpp:BuildEyeLights 3707 | WIRED |
+| P_LC_AIM_YAW | C Aim Yaw | Light C | 416 | 424 | 433 | 442 | LoadEhrPlugin.cpp:BuildEyeLights 3741 | WIRED |
+| P_LC_AIM_PITCH | C Aim Pitch | Light C | 417 | 425 | 434 | 443 | LoadEhrPlugin.cpp:BuildEyeLights 3741 | WIRED |
+| P_LC_CONE | C Cone Angle | Light C | 418 | 426 | 435 | 444 | LoadEhrPlugin.cpp:SlotEyeFit 1130,1142,1144; LoadEhrPlugin.cpp:GlideEyeFit 1149,1160; LoadEhrPlugin.cpp:UpdateEyePlacement 1324,1342 | WIRED |
+| P_LC_CONE_SOFT | C Cone Soft | Light C | 419 | 427 | 436 | 445 | LoadEhrPlugin.cpp:BuildEyeLights 3774 | WIRED |
+| P_LC_INTENSITY | C Intensity | Light C | 420 | 428 | 437 | 446 | LoadEhrPlugin.cpp:BuildEyeLights 3709 | WIRED |
+| P_LC_LCOL_H | C Left Color | Light C | 421 | 429 | 438 | 447 | LoadEhrPlugin.cpp:BuildEyeLights 3768 | WIRED |
+| P_LC_LCOL_S | C Left Sat | Light C | 422 | 430 | 439 | 448 | LoadEhrPlugin.cpp:BuildEyeLights 3768 | WIRED |
+| P_LC_LCOL_V | C Left Bri | Light C | 423 | 431 | 440 | 449 | LoadEhrPlugin.cpp:BuildEyeLights 3768 | WIRED |
+| P_LC_LCOL_A | C Left Alpha | Light C | 424 | 432 | 441 | 450 | LoadEhrPlugin.cpp:BuildEyeLights 3768 | WIRED |
+| P_LC_LINK | C Link Colors | Light C | 425 | 433 | 442 | 451 | LoadEhrPlugin.cpp:BuildEyeLights 3768 | WIRED |
+| P_LC_RCOL_H | C Right Color | Light C | 426 | 434 | 443 | 452 | LoadEhrPlugin.cpp:BuildEyeLights 3768 | WIRED |
+| P_LC_RCOL_S | C Right Sat | Light C | 427 | 435 | 444 | 453 | LoadEhrPlugin.cpp:BuildEyeLights 3768 | WIRED |
+| P_LC_RCOL_V | C Right Bri | Light C | 428 | 436 | 445 | 454 | LoadEhrPlugin.cpp:BuildEyeLights 3768 | WIRED |
+| P_LC_RCOL_A | C Right Alpha | Light C | 429 | 437 | 446 | 455 | LoadEhrPlugin.cpp:BuildEyeLights 3768 | WIRED |
+| P_LC_HUE_DRIFT | C Hue Drift | Light C | 430 | 438 | 447 | 456 | LoadEhrPlugin.cpp:BuildEyeLights 3703 | WIRED |
+| P_LC_BEAT | C Beat Pulse | Light C | 431 | 439 | 448 | 457 | LoadEhrPlugin.cpp:BuildEyeLights 3709 | WIRED |
+| P_LC_AUDIO | C Audio > Light | Light C | 432 | 440 | 449 | 458 | LoadEhrPlugin.cpp:BuildEyeLights 3709 | WIRED |
+| P_LC_PLACED | C Placed For | Light C | 433 | 441 | 450 | 459 | LoadEhrPlugin.cpp:SetTextId 460; LoadEhrPlugin.cpp:UpdateEyePlacement 1263 | WIRED |
+| P_SPOT_COUNT | Spot Count | Spots | 434 | 442 | — | — | LoadEhrPlugin.cpp:BuildSpots 4404 | WIRED |
+| P_SPOT_INTENSITY | Spot Intensity | Spots | 435 | 443 | — | — | LoadEhrPlugin.cpp:BuildSpots 4464 | WIRED |
+| P_SPOT_CONE | Spot Cone | Spots | 436 | 444 | — | — | LoadEhrPlugin.cpp:BuildSpots 4421 | WIRED |
+| P_SPOT_SPEED | Spot Speed | Spots | 437 | 445 | — | — | LoadEhrPlugin.cpp:BuildSpots 4410,4453 | WIRED |
+| P_SPOT_PATTERN | Spot Pattern | Spots | 438 | 446 | — | — | LoadEhrPlugin.cpp:BuildSpots 4415 | WIRED |
+| P_SPOT_WIDTH | Spot Width | Spots | 439 | 447 | — | — | LoadEhrPlugin.cpp:BuildSpots 4414 | WIRED |
+| P_SPOT_HEIGHT | Spot Rig Height | Spots | 440 | 448 | — | — | LoadEhrPlugin.cpp:BuildSpots 4424 | WIRED |
+| P_SPOT_DIST | Spot Rig Dist | Spots | 441 | 449 | — | — | LoadEhrPlugin.cpp:BuildSpots 4425 | WIRED |
+| P_SPOT_COL_H | Spot Color | Spots | 442 | 450 | — | — | LoadEhrPlugin.cpp:BuildSpots 4463,4464 | WIRED |
+| P_SPOT_COL_S | Spot Sat | Spots | 443 | 451 | — | — | LoadEhrPlugin.cpp:BuildSpots 4463 | WIRED |
+| P_SPOT_COL_V | Spot Bri | Spots | 444 | 452 | — | — | LoadEhrPlugin.cpp:BuildSpots 4461,4463 | WIRED |
+| P_SPOT_COL_A | Spot Alpha | Spots | 445 | 453 | — | — | LoadEhrPlugin.cpp:BuildSpots 4463,4464 | WIRED |
+| P_SPOT_COLOR_MODE | Spot Color Mode | Spots | 446 | 454 | — | — | LoadEhrPlugin.cpp:BuildSpots 4415 | WIRED |
+| P_SPOT_STROBE | Spot Beat Strobe | Spots | 447 | 455 | — | — | LoadEhrPlugin.cpp:BuildSpots 4408,4408,4414 | WIRED |
+| P_SPOT_BEAMS | Spot Beams | Spots | 448 | 456 | — | — | LoadEhrPlugin.cpp:BuildVolume 2102 | WIRED |
+| P_PROJ_ENABLE | Proj Enable | Projector | — | — | 451 | 460 | LoadEhrPlugin.cpp:BuildProjector 3163 | WIRED |
+| P_PROJ_SOURCE | Proj Source | Projector | — | — | — | 461 | LoadEhrPlugin.cpp:BuildProjector 3165 | WIRED |
+| P_PROJ_FILE | Proj File | Projector | — | — | 452 | 462 | LoadEhrPlugin.cpp:LoopFade 247; LoadEhrPlugin.cpp:BuildProjector 3169 | WIRED |
+| P_VIDEO_SPEED | Video Speed | Projector | — | — | 453 | 463 | LoadEhrPlugin.cpp:VideoClock 3544 | WIRED |
+| P_VIDEO_LOOP | Video Loop | Projector | — | — | 454 | 464 | LoadEhrPlugin.cpp:VideoClock 3539 | WIRED |
+| P_VIDEO_POS | Video Position | Projector | — | — | 455 | 465 | LoadEhrPlugin.cpp:SetFloatId 407; LoadEhrPlugin.cpp:VideoClock 3549,3583,3586 | WIRED |
+| P_VIDEO_TIME | Video Time | Projector | — | — | 456 | 466 | LoadEhrPlugin.cpp:SetTextId 456; LoadEhrPlugin.cpp:SetVideoTime 3603,3605,3606 | WIRED |
 | P_VIDEO_RESTART | Video Restart | Projector | — | — | 457 | 467 | LoadEhrPlugin.cpp:SetFloatId 405 | WIRED |
-| P_VIDEO_ALPHA | Video Alpha | Projector | — | — | 458 | 468 | LoadEhrPlugin.cpp:BuildProjector 3176 | WIRED |
-| P_PROJ_ANCHOR | Proj Anchor | Projector | — | — | 459 | 469 | LoadEhrPlugin.cpp:BuildProjector 3190 | WIRED |
-| P_PROJ_POS_X | Proj Pos X | Projector | — | — | 460 | 470 | LoadEhrPlugin.cpp:BuildProjector 3191 | WIRED |
-| P_PROJ_POS_Y | Proj Pos Y | Projector | — | — | 461 | 471 | LoadEhrPlugin.cpp:BuildProjector 3191 | WIRED |
-| P_PROJ_POS_Z | Proj Pos Z | Projector | — | — | 462 | 472 | LoadEhrPlugin.cpp:BuildProjector 3191 | WIRED |
-| P_PROJ_AIM_MODE | Proj Aim Mode | Projector | — | — | 463 | 473 | LoadEhrPlugin.cpp:BuildProjector 3197 | WIRED |
-| P_PROJ_AIM_YAW | Proj Aim Yaw | Projector | — | — | 464 | 474 | LoadEhrPlugin.cpp:BuildProjector 3202 | WIRED |
-| P_PROJ_AIM_PITCH | Proj Aim Pitch | Projector | — | — | 465 | 475 | LoadEhrPlugin.cpp:BuildProjector 3202 | WIRED |
-| P_PROJ_THROW | Proj Throw | Projector | — | — | 466 | 476 | LoadEhrPlugin.cpp:BuildProjector 3213 | WIRED |
-| P_PROJ_FOCUS | Proj Focus | Projector | — | — | 467 | 477 | LoadEhrPlugin.cpp:BuildProjector 3214; LoadEhrPlugin.cpp:VideoStats 3623 | WIRED |
-| P_PROJ_INTENSITY | Proj Intensity | Projector | — | — | 468 | 478 | LoadEhrPlugin.cpp:BuildProjector 3150 | WIRED |
-| P_PROJ_COL_H | Proj Color | Projector | — | — | 469 | 479 | LoadEhrPlugin.cpp:BuildProjector 3150,3218 | WIRED |
-| P_PROJ_COL_S | Proj Sat | Projector | — | — | 470 | 480 | LoadEhrPlugin.cpp:BuildProjector 3218 | WIRED |
-| P_PROJ_COL_V | Proj Bri | Projector | — | — | 471 | 481 | LoadEhrPlugin.cpp:BuildProjector 3218 | WIRED |
-| P_PROJ_COL_A | Proj Alpha | Projector | — | — | 472 | 482 | LoadEhrPlugin.cpp:BuildProjector 3150 | WIRED |
-| P_PROJ_BEAM | Proj Beam | Projector | — | — | 473 | 483 | LoadEhrPlugin.cpp:BuildProjector 3151,3215 | WIRED |
-| P_PROJ_SURFACE | Proj Surface | Projector | — | — | 474 | 484 | LoadEhrPlugin.cpp:BuildProjector 3151,3216 | WIRED |
-| P_BLOOM | Bloom | Post | 449 | 457 | 475 | 485 | LoadEhrPlugin.cpp:BuildPost 4382 | WIRED |
-| P_BLOOM_THRESHOLD | Bloom Threshold | Post | 450 | 458 | 476 | 486 | LoadEhrPlugin.cpp:BuildPost 4383 | WIRED |
-| P_BLOOM_RADIUS | Bloom Radius | Post | 451 | 459 | 477 | 487 | LoadEhrPlugin.cpp:BuildPost 4384 | WIRED |
-| P_FLARE_GHOSTS | Flare Ghosts | Post | 452 | 460 | 478 | 488 | LoadEhrPlugin.cpp:BuildPost 4385 | WIRED |
-| P_FLARE_STREAK | Flare Streak | Post | 453 | 461 | 479 | 489 | LoadEhrPlugin.cpp:BuildPost 4386 | WIRED |
-| P_SHADOW_CATCHER | Shadow Catcher | Floor | 454 | 462 | 480 | 490 | LoadEhrPlugin.cpp:BuildFrame 1451; LoadEhrPlugin.cpp:BuildPost 4356 | WIRED |
-| P_CATCHER_PLANE | Catcher Plane | Floor | 455 | 463 | 481 | 491 | LoadEhrPlugin.cpp:BuildPost 4363 | WIRED |
-| P_FLOOR_HEIGHT | Floor Height | Floor | 456 | 464 | 482 | 492 | LoadEhrPlugin.cpp:MakeStrike 2888; LoadEhrPlugin.cpp:BuildPost 4362 | WIRED |
-| P_WALL_DIST | Wall Distance | Floor | 457 | 465 | 483 | 493 | LoadEhrPlugin.cpp:BuildPost 4365 | WIRED |
-| P_SHADOW_SOFT | Shadow Soft | Floor | 458 | 466 | 484 | 494 | LoadEhrPlugin.cpp:BuildPost 4357 | WIRED |
-| P_MIRROR | Mirror Floor | Floor | 459 | 467 | 485 | 495 | LoadEhrPlugin.cpp:BuildFrame 1451; LoadEhrPlugin.cpp:BuildPost 4374 | WIRED |
-| P_MIRROR_BLUR | Mirror Blur | Floor | 460 | 468 | 486 | 496 | LoadEhrPlugin.cpp:BuildPost 4375 | WIRED |
-| P_MIRROR_FADE | Mirror Fade | Floor | 461 | 469 | 487 | 497 | LoadEhrPlugin.cpp:BuildPost 4376 | WIRED |
-| P_FLOOR_LIGHT | Floor Light | Floor | 462 | 470 | 488 | 498 | LoadEhrPlugin.cpp:BuildPost 4358 | WIRED |
-| P_FLOOR_CAMERA | Floor Camera | Floor | 463 | 471 | 489 | 499 | LoadEhrPlugin.cpp:BuildFrame 1451 | WIRED |
-| P_SILHOUETTE | Silhouette | Silhouette | 464 | 472 | — | — | LoadEhrPlugin.cpp:BuildPost 4377 | WIRED |
-| P_SIL_FILL | Sil Fill | Silhouette | 465 | 473 | — | — | LoadEhrPlugin.cpp:BuildPost 4378 | WIRED |
-| P_SIL_GLOW | Sil Glow | Silhouette | 466 | 474 | — | — | LoadEhrPlugin.cpp:BuildPost 4379 | WIRED |
-| P_SIL_WIDTH | Sil Width | Silhouette | 467 | 475 | — | — | LoadEhrPlugin.cpp:BuildPost 4380 | WIRED |
-| P_SIL_COL_H | Sil Color | Silhouette | 468 | 476 | — | — | LoadEhrPlugin.cpp:BuildPost 4379,4381 | WIRED |
-| P_SIL_COL_S | Sil Sat | Silhouette | 469 | 477 | — | — | LoadEhrPlugin.cpp:BuildPost 4379,4381 | WIRED |
-| P_SIL_COL_V | Sil Bri | Silhouette | 470 | 478 | — | — | LoadEhrPlugin.cpp:BuildPost 4379,4381 | WIRED |
-| P_SIL_COL_A | Sil Alpha | Silhouette | 471 | 479 | — | — | LoadEhrPlugin.cpp:BuildPost 4379 | WIRED |
-| P_EXPLODE | Explode | FX | 472 | 480 | — | — | LoadEhrPlugin.cpp:BuildFrame 1578 | WIRED |
-| P_EXPLODE_RANDOM | Explode Random | FX | 473 | 481 | — | — | LoadEhrPlugin.cpp:BuildFrame 1579 | WIRED |
-| P_DISSOLVE | Dissolve | FX | 474 | 482 | — | — | LoadEhrPlugin.cpp:BuildFrame 1581 | WIRED |
-| P_DISSOLVE_EDGE | Dissolve Glow | FX | 475 | 483 | — | — | LoadEhrPlugin.cpp:BuildFrame 1584 | WIRED |
-| P_TOON_STEPS | Toon Steps | FX | 476 | 484 | — | — | LoadEhrPlugin.cpp:BuildFrame 1585 | WIRED |
-| P_OUTLINE | Outline | FX | 477 | 485 | — | — | LoadEhrPlugin.cpp:BuildFrame 1586 | WIRED |
-| P_DEPTH_FOG | Depth Fog | FX | 478 | 486 | — | — | LoadEhrPlugin.cpp:BuildFrame 1587; LoadEhrPlugin.cpp:BuildCopies 3838,3839 | WIRED |
-| P_BG_H | Background Color | Output | 479 | 487 | 490 | 500 | LoadEhrPlugin.cpp:BuildFrame 1590,1591 | WIRED |
-| P_BG_S | Background Sat | Output | 480 | 488 | 491 | 501 | LoadEhrPlugin.cpp:BuildFrame 1590 | WIRED |
-| P_BG_V | Background Bri | Output | 481 | 489 | 492 | 502 | LoadEhrPlugin.cpp:BuildFrame 1590 | WIRED |
-| P_BG_A | Background Alpha | Output | 482 | 490 | 493 | 503 | LoadEhrPlugin.cpp:BuildFrame 1590,1591 | WIRED |
-| P_MSAA | MSAA | Output | 483 | 491 | 494 | 504 | LoadEhrPlugin.cpp:BuildFrame 1593 | WIRED |
-| P_INPUT_USE | Input Use | Input | — | 492 | — | 505 | LoadEhrPlugin.cpp:BuildFrame 1595 | WIRED |
-| P_INPUT_PROJECTION | Input Projection | Input | — | 493 | — | 506 | LoadEhrPlugin.cpp:BuildFrame 1596 | WIRED |
-| P_INPUT_MIX | Input Mix | Input | — | 494 | — | 507 | LoadEhrPlugin.cpp:BuildFrame 1597 | WIRED |
-| P_FACE_TRACK | Face Track | Face | — | 495 | — | — | LoadEhrPlugin.cpp:ProcessOpenGL 589; LoadEhrPlugin.cpp:BuildFaces 1632 | WIRED |
-| P_MAX_FACES | Max Faces | Face | — | 496 | — | — | LoadEhrPlugin.cpp:BuildFaces 1690 | WIRED |
-| P_FACE_SCALE | Face Scale | Face | — | 497 | — | — | LoadEhrPlugin.cpp:BuildFaces 1745 | WIRED |
-| P_FACE_OFFSET_X | Face Offset X | Face | — | 498 | — | — | LoadEhrPlugin.cpp:BuildFaces 1742 | WIRED |
-| P_FACE_OFFSET_Y | Face Offset Y | Face | — | 499 | — | — | LoadEhrPlugin.cpp:BuildFaces 1742 | WIRED |
-| P_FOLLOW_ROLL | Follow Roll | Face | — | 500 | — | — | LoadEhrPlugin.cpp:BuildFaces 1743 | WIRED |
-| P_FOLLOW_YAW | Follow Yaw | Face | — | 501 | — | — | LoadEhrPlugin.cpp:BuildFaces 1743 | WIRED |
-| P_FOLLOW_PITCH | Follow Pitch | Face | — | 502 | — | — | LoadEhrPlugin.cpp:BuildFaces 1744 | WIRED |
-| P_FACE_SMOOTH | Face Smooth | Face | — | 503 | — | — | LoadEhrPlugin.cpp:BuildFaces 1647 | WIRED |
-| P_HIDE_NO_FACE | Hide No Face | Face | — | 504 | — | — | LoadEhrPlugin.cpp:BuildFaces 1692 | WIRED |
-| P_FFT | Audio FFT | Audio | 484 | 505 | 495 | 508 | LoadEhrPlugin.cpp:UpdateAudio 1338 | WIRED |
-| P_DEBUG_VIEW | Debug View | Debug | 485 | 506 | — | — | LoadEhrPlugin.cpp:BuildFrame 1599 | WIRED |
-| P_DEBUG_LOG | Debug Log | Debug | 486 | 507 | 496 | 509 | LoadEhrPlugin.cpp:LoopFade 314; LoadEhrPlugin.cpp:SetFloatId 438; LoadEhrPlugin.cpp:ProcessOpenGL 567; LoadEhrPlugin.cpp:UpdateFit 1897 | WIRED |
+| P_VIDEO_ALPHA | Video Alpha | Projector | — | — | 458 | 468 | LoadEhrPlugin.cpp:BuildProjector 3188 | WIRED |
+| P_PROJ_ANCHOR | Proj Anchor | Projector | — | — | 459 | 469 | LoadEhrPlugin.cpp:BuildProjector 3202 | WIRED |
+| P_PROJ_POS_X | Proj Pos X | Projector | — | — | 460 | 470 | LoadEhrPlugin.cpp:BuildProjector 3203 | WIRED |
+| P_PROJ_POS_Y | Proj Pos Y | Projector | — | — | 461 | 471 | LoadEhrPlugin.cpp:BuildProjector 3203 | WIRED |
+| P_PROJ_POS_Z | Proj Pos Z | Projector | — | — | 462 | 472 | LoadEhrPlugin.cpp:BuildProjector 3203 | WIRED |
+| P_PROJ_AIM_MODE | Proj Aim Mode | Projector | — | — | 463 | 473 | LoadEhrPlugin.cpp:BuildProjector 3209 | WIRED |
+| P_PROJ_AIM_YAW | Proj Aim Yaw | Projector | — | — | 464 | 474 | LoadEhrPlugin.cpp:BuildProjector 3214 | WIRED |
+| P_PROJ_AIM_PITCH | Proj Aim Pitch | Projector | — | — | 465 | 475 | LoadEhrPlugin.cpp:BuildProjector 3214 | WIRED |
+| P_PROJ_THROW | Proj Throw | Projector | — | — | 466 | 476 | LoadEhrPlugin.cpp:BuildProjector 3225 | WIRED |
+| P_PROJ_FOCUS | Proj Focus | Projector | — | — | 467 | 477 | LoadEhrPlugin.cpp:BuildProjector 3226; LoadEhrPlugin.cpp:VideoStats 3635 | WIRED |
+| P_PROJ_INTENSITY | Proj Intensity | Projector | — | — | 468 | 478 | LoadEhrPlugin.cpp:BuildProjector 3162 | WIRED |
+| P_PROJ_COL_H | Proj Color | Projector | — | — | 469 | 479 | LoadEhrPlugin.cpp:BuildProjector 3162,3230 | WIRED |
+| P_PROJ_COL_S | Proj Sat | Projector | — | — | 470 | 480 | LoadEhrPlugin.cpp:BuildProjector 3230 | WIRED |
+| P_PROJ_COL_V | Proj Bri | Projector | — | — | 471 | 481 | LoadEhrPlugin.cpp:BuildProjector 3230 | WIRED |
+| P_PROJ_COL_A | Proj Alpha | Projector | — | — | 472 | 482 | LoadEhrPlugin.cpp:BuildProjector 3162 | WIRED |
+| P_PROJ_BEAM | Proj Beam | Projector | — | — | 473 | 483 | LoadEhrPlugin.cpp:BuildProjector 3163,3227 | WIRED |
+| P_PROJ_SURFACE | Proj Surface | Projector | — | — | 474 | 484 | LoadEhrPlugin.cpp:BuildProjector 3163,3228 | WIRED |
+| P_BLOOM | Bloom | Post | 449 | 457 | 475 | 485 | LoadEhrPlugin.cpp:BuildPost 4394 | WIRED |
+| P_BLOOM_THRESHOLD | Bloom Threshold | Post | 450 | 458 | 476 | 486 | LoadEhrPlugin.cpp:BuildPost 4395 | WIRED |
+| P_BLOOM_RADIUS | Bloom Radius | Post | 451 | 459 | 477 | 487 | LoadEhrPlugin.cpp:BuildPost 4396 | WIRED |
+| P_FLARE_GHOSTS | Flare Ghosts | Post | 452 | 460 | 478 | 488 | LoadEhrPlugin.cpp:BuildPost 4397 | WIRED |
+| P_FLARE_STREAK | Flare Streak | Post | 453 | 461 | 479 | 489 | LoadEhrPlugin.cpp:BuildPost 4398 | WIRED |
+| P_SHADOW_CATCHER | Shadow Catcher | Floor | 454 | 462 | 480 | 490 | LoadEhrPlugin.cpp:BuildFrame 1463; LoadEhrPlugin.cpp:BuildPost 4368 | WIRED |
+| P_CATCHER_PLANE | Catcher Plane | Floor | 455 | 463 | 481 | 491 | LoadEhrPlugin.cpp:BuildPost 4375 | WIRED |
+| P_FLOOR_HEIGHT | Floor Height | Floor | 456 | 464 | 482 | 492 | LoadEhrPlugin.cpp:MakeStrike 2900; LoadEhrPlugin.cpp:BuildPost 4374 | WIRED |
+| P_WALL_DIST | Wall Distance | Floor | 457 | 465 | 483 | 493 | LoadEhrPlugin.cpp:BuildPost 4377 | WIRED |
+| P_SHADOW_SOFT | Shadow Soft | Floor | 458 | 466 | 484 | 494 | LoadEhrPlugin.cpp:BuildPost 4369 | WIRED |
+| P_MIRROR | Mirror Floor | Floor | 459 | 467 | 485 | 495 | LoadEhrPlugin.cpp:BuildFrame 1463; LoadEhrPlugin.cpp:BuildPost 4386 | WIRED |
+| P_MIRROR_BLUR | Mirror Blur | Floor | 460 | 468 | 486 | 496 | LoadEhrPlugin.cpp:BuildPost 4387 | WIRED |
+| P_MIRROR_FADE | Mirror Fade | Floor | 461 | 469 | 487 | 497 | LoadEhrPlugin.cpp:BuildPost 4388 | WIRED |
+| P_FLOOR_LIGHT | Floor Light | Floor | 462 | 470 | 488 | 498 | LoadEhrPlugin.cpp:BuildPost 4370 | WIRED |
+| P_FLOOR_CAMERA | Floor Camera | Floor | 463 | 471 | 489 | 499 | LoadEhrPlugin.cpp:BuildFrame 1463 | WIRED |
+| P_SILHOUETTE | Silhouette | Silhouette | 464 | 472 | — | — | LoadEhrPlugin.cpp:BuildPost 4389 | WIRED |
+| P_SIL_FILL | Sil Fill | Silhouette | 465 | 473 | — | — | LoadEhrPlugin.cpp:BuildPost 4390 | WIRED |
+| P_SIL_GLOW | Sil Glow | Silhouette | 466 | 474 | — | — | LoadEhrPlugin.cpp:BuildPost 4391 | WIRED |
+| P_SIL_WIDTH | Sil Width | Silhouette | 467 | 475 | — | — | LoadEhrPlugin.cpp:BuildPost 4392 | WIRED |
+| P_SIL_COL_H | Sil Color | Silhouette | 468 | 476 | — | — | LoadEhrPlugin.cpp:BuildPost 4391,4393 | WIRED |
+| P_SIL_COL_S | Sil Sat | Silhouette | 469 | 477 | — | — | LoadEhrPlugin.cpp:BuildPost 4391,4393 | WIRED |
+| P_SIL_COL_V | Sil Bri | Silhouette | 470 | 478 | — | — | LoadEhrPlugin.cpp:BuildPost 4391,4393 | WIRED |
+| P_SIL_COL_A | Sil Alpha | Silhouette | 471 | 479 | — | — | LoadEhrPlugin.cpp:BuildPost 4391 | WIRED |
+| P_EXPLODE | Explode | FX | 472 | 480 | — | — | LoadEhrPlugin.cpp:BuildFrame 1590 | WIRED |
+| P_EXPLODE_RANDOM | Explode Random | FX | 473 | 481 | — | — | LoadEhrPlugin.cpp:BuildFrame 1591 | WIRED |
+| P_DISSOLVE | Dissolve | FX | 474 | 482 | — | — | LoadEhrPlugin.cpp:BuildFrame 1593 | WIRED |
+| P_DISSOLVE_EDGE | Dissolve Glow | FX | 475 | 483 | — | — | LoadEhrPlugin.cpp:BuildFrame 1596 | WIRED |
+| P_TOON_STEPS | Toon Steps | FX | 476 | 484 | — | — | LoadEhrPlugin.cpp:BuildFrame 1597 | WIRED |
+| P_OUTLINE | Outline | FX | 477 | 485 | — | — | LoadEhrPlugin.cpp:BuildFrame 1598 | WIRED |
+| P_DEPTH_FOG | Depth Fog | FX | 478 | 486 | — | — | LoadEhrPlugin.cpp:BuildFrame 1599; LoadEhrPlugin.cpp:BuildCopies 3850,3851 | WIRED |
+| P_BG_H | Background Color | Output | 479 | 487 | 490 | 500 | LoadEhrPlugin.cpp:BuildFrame 1602,1603 | WIRED |
+| P_BG_S | Background Sat | Output | 480 | 488 | 491 | 501 | LoadEhrPlugin.cpp:BuildFrame 1602 | WIRED |
+| P_BG_V | Background Bri | Output | 481 | 489 | 492 | 502 | LoadEhrPlugin.cpp:BuildFrame 1602 | WIRED |
+| P_BG_A | Background Alpha | Output | 482 | 490 | 493 | 503 | LoadEhrPlugin.cpp:BuildFrame 1602,1603 | WIRED |
+| P_MSAA | MSAA | Output | 483 | 491 | 494 | 504 | LoadEhrPlugin.cpp:BuildFrame 1605 | WIRED |
+| P_INPUT_USE | Input Use | Input | — | 492 | — | 505 | LoadEhrPlugin.cpp:BuildFrame 1607 | WIRED |
+| P_INPUT_PROJECTION | Input Projection | Input | — | 493 | — | 506 | LoadEhrPlugin.cpp:BuildFrame 1608 | WIRED |
+| P_INPUT_MIX | Input Mix | Input | — | 494 | — | 507 | LoadEhrPlugin.cpp:BuildFrame 1609 | WIRED |
+| P_FACE_TRACK | Face Track | Face | — | 495 | — | — | LoadEhrPlugin.cpp:ProcessOpenGL 589; LoadEhrPlugin.cpp:BuildFaces 1644 | WIRED |
+| P_MAX_FACES | Max Faces | Face | — | 496 | — | — | LoadEhrPlugin.cpp:BuildFaces 1702 | WIRED |
+| P_FACE_SCALE | Face Scale | Face | — | 497 | — | — | LoadEhrPlugin.cpp:BuildFaces 1757 | WIRED |
+| P_FACE_OFFSET_X | Face Offset X | Face | — | 498 | — | — | LoadEhrPlugin.cpp:BuildFaces 1754 | WIRED |
+| P_FACE_OFFSET_Y | Face Offset Y | Face | — | 499 | — | — | LoadEhrPlugin.cpp:BuildFaces 1754 | WIRED |
+| P_FOLLOW_ROLL | Follow Roll | Face | — | 500 | — | — | LoadEhrPlugin.cpp:BuildFaces 1755 | WIRED |
+| P_FOLLOW_YAW | Follow Yaw | Face | — | 501 | — | — | LoadEhrPlugin.cpp:BuildFaces 1755 | WIRED |
+| P_FOLLOW_PITCH | Follow Pitch | Face | — | 502 | — | — | LoadEhrPlugin.cpp:BuildFaces 1756 | WIRED |
+| P_FACE_SMOOTH | Face Smooth | Face | — | 503 | — | — | LoadEhrPlugin.cpp:BuildFaces 1659 | WIRED |
+| P_HIDE_NO_FACE | Hide No Face | Face | — | 504 | — | — | LoadEhrPlugin.cpp:BuildFaces 1704 | WIRED |
+| P_FFT | Audio FFT | Audio | 484 | 505 | 495 | 508 | LoadEhrPlugin.cpp:UpdateAudio 1350 | WIRED |
+| P_DEBUG_VIEW | Debug View | Debug | 485 | 506 | — | — | LoadEhrPlugin.cpp:BuildFrame 1611 | WIRED |
+| P_DEBUG_LOG | Debug Log | Debug | 486 | 507 | 496 | 509 | LoadEhrPlugin.cpp:LoopFade 314; LoadEhrPlugin.cpp:SetFloatId 438; LoadEhrPlugin.cpp:ProcessOpenGL 567; LoadEhrPlugin.cpp:UpdateFit 1909 | WIRED |

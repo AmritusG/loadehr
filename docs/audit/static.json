@@ -547,13 +547,13 @@
     1064
    ],
    "LoadEhrPlugin.cpp:UpdateEyePlacement": [
-    1256
+    1268
    ],
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1421
+    1433
    ],
    "LoadEhrPlugin.cpp:BuildCut": [
-    3370
+    3382
    ]
   },
   "reads": 4,
@@ -595,7 +595,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:TargetFit": [
-    1839
+    1851
    ]
   },
   "reads": 1,
@@ -634,7 +634,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1523
+    1535
    ]
   },
   "reads": 1,
@@ -716,7 +716,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:ChainPosition": [
-    2361
+    2373
    ]
   },
   "reads": 1,
@@ -755,10 +755,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:ChainPosition": [
-    2386
+    2398
    ],
    "LoadEhrPlugin.cpp:EvalChain": [
-    2413
+    2425
    ]
   },
   "reads": 2,
@@ -821,17 +821,17 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:HopStyle": [
-    2308,
-    2309
+    2320,
+    2321
    ],
    "LoadEhrPlugin.cpp:ChainUses": [
-    2334
+    2346
    ],
    "LoadEhrPlugin.cpp:ChainPosition": [
-    2402
+    2414
    ],
    "LoadEhrPlugin.cpp:EvalChain": [
-    2434
+    2446
    ]
   },
   "reads": 5,
@@ -874,10 +874,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:HopStyle": [
-    2309
+    2321
    ],
    "LoadEhrPlugin.cpp:ChainUses": [
-    2333
+    2345
    ]
   },
   "reads": 2,
@@ -921,7 +921,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:ChainPosition": [
-    2353
+    2365
    ]
   },
   "reads": 1,
@@ -960,10 +960,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:GlideEyeFit": [
-    1166
+    1178
    ],
    "LoadEhrPlugin.cpp:ChainPosition": [
-    2363
+    2375
    ]
   },
   "reads": 2,
@@ -1002,7 +1002,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:ChainPosition": [
-    2363
+    2375
    ]
   },
   "reads": 1,
@@ -1041,10 +1041,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1500
+    1512
    ],
    "LoadEhrPlugin.cpp:SmokeStyle": [
-    2477
+    2489
    ]
   },
   "reads": 2,
@@ -1083,7 +1083,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1501
+    1513
    ]
   },
   "reads": 1,
@@ -1122,7 +1122,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1502
+    1514
    ]
   },
   "reads": 1,
@@ -1164,7 +1164,7 @@
     572
    ],
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2452
+    2464
    ]
   },
   "reads": 2,
@@ -1203,7 +1203,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1506
+    1518
    ]
   },
   "reads": 1,
@@ -1245,7 +1245,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1507
+    1519
    ]
   },
   "reads": 1,
@@ -1284,8 +1284,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1510,
-    1511
+    1522,
+    1523
    ]
   },
   "reads": 2,
@@ -1324,8 +1324,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1510,
-    1511
+    1522,
+    1523
    ]
   },
   "reads": 2,
@@ -1364,8 +1364,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1510,
-    1511
+    1522,
+    1523
    ]
   },
   "reads": 2,
@@ -1404,8 +1404,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1510,
-    1511
+    1522,
+    1523
    ]
   },
   "reads": 2,
@@ -1444,7 +1444,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1508
+    1520
    ]
   },
   "reads": 1,
@@ -1483,7 +1483,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1505
+    1517
    ]
   },
   "reads": 1,
@@ -2398,7 +2398,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLetters": [
-    4157
+    4169
    ]
   },
   "reads": 1,
@@ -2437,7 +2437,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLetters": [
-    4145
+    4157
    ]
   },
   "reads": 1,
@@ -2476,7 +2476,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLetters": [
-    4146
+    4158
    ]
   },
   "reads": 1,
@@ -2515,7 +2515,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLetters": [
-    4145
+    4157
    ]
   },
   "reads": 1,
@@ -2554,7 +2554,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLetters": [
-    4150
+    4162
    ]
   },
   "reads": 1,
@@ -2593,7 +2593,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLetters": [
-    4145
+    4157
    ]
   },
   "reads": 1,
@@ -2635,7 +2635,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLetters": [
-    4181
+    4193
    ]
   },
   "reads": 1,
@@ -2680,8 +2680,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLetters": [
-    4152,
-    4152
+    4164,
+    4164
    ]
   },
   "reads": 2,
@@ -2720,7 +2720,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLetters": [
-    4178
+    4190
    ]
   },
   "reads": 1,
@@ -2759,11 +2759,11 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1401
+    1413
    ],
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1756,
-    1757
+    1768,
+    1769
    ]
   },
   "reads": 3,
@@ -2802,11 +2802,11 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1401
+    1413
    ],
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1756,
-    1757
+    1768,
+    1769
    ]
   },
   "reads": 3,
@@ -2845,11 +2845,11 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1401
+    1413
    ],
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1756,
-    1757
+    1768,
+    1769
    ]
   },
   "reads": 3,
@@ -2888,7 +2888,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1382
+    1394
    ]
   },
   "reads": 1,
@@ -2927,7 +2927,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1382
+    1394
    ]
   },
   "reads": 1,
@@ -2966,7 +2966,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1382
+    1394
    ]
   },
   "reads": 1,
@@ -3044,10 +3044,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1405
+    1417
    ],
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1756
+    1768
    ]
   },
   "reads": 2,
@@ -3086,16 +3086,16 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1405
+    1417
    ],
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1756
+    1768
    ],
    "LoadEhrPlugin.cpp:MakeStrike": [
-    2888
+    2900
    ],
    "LoadEhrPlugin.cpp:BuildPost": [
-    4362
+    4374
    ]
   },
   "reads": 4,
@@ -3134,10 +3134,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1405
+    1417
    ],
    "LoadEhrPlugin.cpp:BuildPost": [
-    4365
+    4377
    ]
   },
   "reads": 2,
@@ -3176,11 +3176,11 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1406,
-    1458
+    1418,
+    1470
    ],
    "LoadEhrPlugin.cpp:BuildCut": [
-    3405
+    3417
    ]
   },
   "reads": 3,
@@ -3219,13 +3219,13 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1447
+    1459
    ],
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1756
+    1768
    ],
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3785
+    3797
    ]
   },
   "reads": 3,
@@ -3264,13 +3264,13 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1447
+    1459
    ],
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1756
+    1768
    ],
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3785
+    3797
    ]
   },
   "reads": 3,
@@ -3309,11 +3309,11 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1447
+    1459
    ],
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1756,
-    1757
+    1768,
+    1769
    ]
   },
   "reads": 3,
@@ -3352,10 +3352,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1447
+    1459
    ],
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1756
+    1768
    ]
   },
   "reads": 2,
@@ -3400,8 +3400,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:UpdateCameraLive": [
-    1946,
-    1946
+    1958,
+    1958
    ]
   },
   "reads": 2,
@@ -3440,7 +3440,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:UpdateCameraLive": [
-    1947
+    1959
    ]
   },
   "reads": 1,
@@ -3479,7 +3479,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:UpdateCameraLive": [
-    1963
+    1975
    ]
   },
   "reads": 1,
@@ -3521,7 +3521,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:UpdateCameraLive": [
-    1953
+    1965
    ]
   },
   "reads": 1,
@@ -3560,7 +3560,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:UpdateCameraLive": [
-    1969
+    1981
    ]
   },
   "reads": 1,
@@ -3599,7 +3599,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:UpdateCameraLive": [
-    1970
+    1982
    ]
   },
   "reads": 1,
@@ -3638,7 +3638,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1454
+    1466
    ]
   },
   "reads": 1,
@@ -3677,7 +3677,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:UpdateGlide": [
-    1915
+    1927
    ]
   },
   "reads": 1,
@@ -4033,7 +4033,7 @@
     458
    ],
    "LoadEhrPlugin.cpp:StorePose": [
-    1795
+    1807
    ]
   },
   "reads": 2,
@@ -4072,7 +4072,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1396
+    1408
    ]
   },
   "reads": 1,
@@ -4111,7 +4111,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1383
+    1395
    ]
   },
   "reads": 1,
@@ -4150,7 +4150,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1406
+    1418
    ]
   },
   "reads": 1,
@@ -4189,7 +4189,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1402
+    1414
    ]
   },
   "reads": 1,
@@ -4228,7 +4228,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:UpdateAudio": [
-    1353
+    1365
    ]
   },
   "reads": 1,
@@ -4267,7 +4267,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1406
+    1418
    ]
   },
   "reads": 1,
@@ -4306,7 +4306,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1527
+    1539
    ]
   },
   "reads": 1,
@@ -4345,7 +4345,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1578
+    1590
    ]
   },
   "reads": 1,
@@ -4384,8 +4384,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1513,
-    1515
+    1525,
+    1527
    ]
   },
   "reads": 2,
@@ -4424,7 +4424,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1513
+    1525
    ]
   },
   "reads": 1,
@@ -4463,7 +4463,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1513
+    1525
    ]
   },
   "reads": 1,
@@ -4502,8 +4502,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1513,
-    1515
+    1525,
+    1527
    ]
   },
   "reads": 2,
@@ -4542,7 +4542,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1516
+    1528
    ]
   },
   "reads": 1,
@@ -4581,7 +4581,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1517
+    1529
    ]
   },
   "reads": 1,
@@ -4620,7 +4620,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1518
+    1530
    ]
   },
   "reads": 1,
@@ -4659,7 +4659,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1519
+    1531
    ]
   },
   "reads": 1,
@@ -4698,7 +4698,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1520
+    1532
    ]
   },
   "reads": 1,
@@ -4737,7 +4737,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1521
+    1533
    ]
   },
   "reads": 1,
@@ -4776,7 +4776,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1522
+    1534
    ]
   },
   "reads": 1,
@@ -4815,7 +4815,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1524
+    1536
    ]
   },
   "reads": 1,
@@ -4854,7 +4854,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1525
+    1537
    ]
   },
   "reads": 1,
@@ -4893,7 +4893,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1526
+    1538
    ]
   },
   "reads": 1,
@@ -4932,8 +4932,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1514,
-    1526
+    1526,
+    1538
    ]
   },
   "reads": 2,
@@ -4972,7 +4972,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1514
+    1526
    ]
   },
   "reads": 1,
@@ -5011,7 +5011,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1514
+    1526
    ]
   },
   "reads": 1,
@@ -5050,8 +5050,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1514,
-    1526
+    1526,
+    1538
    ]
   },
   "reads": 2,
@@ -5090,7 +5090,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4329
+    4341
    ]
   },
   "reads": 1,
@@ -5129,7 +5129,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4329
+    4341
    ]
   },
   "reads": 1,
@@ -5168,7 +5168,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4329
+    4341
    ]
   },
   "reads": 1,
@@ -5207,7 +5207,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4329
+    4341
    ]
   },
   "reads": 1,
@@ -5246,7 +5246,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4330
+    4342
    ]
   },
   "reads": 1,
@@ -5285,7 +5285,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4330
+    4342
    ]
   },
   "reads": 1,
@@ -5324,7 +5324,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4330
+    4342
    ]
   },
   "reads": 1,
@@ -5363,7 +5363,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4316
+    4328
    ]
   },
   "reads": 1,
@@ -5402,7 +5402,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4331
+    4343
    ]
   },
   "reads": 1,
@@ -5441,7 +5441,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4332
+    4344
    ]
   },
   "reads": 1,
@@ -5480,7 +5480,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4332
+    4344
    ]
   },
   "reads": 1,
@@ -5519,7 +5519,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4333
+    4345
    ]
   },
   "reads": 1,
@@ -5558,7 +5558,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4333
+    4345
    ]
   },
   "reads": 1,
@@ -5597,7 +5597,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4333
+    4345
    ]
   },
   "reads": 1,
@@ -5636,8 +5636,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4334,
-    4336
+    4346,
+    4348
    ]
   },
   "reads": 2,
@@ -5676,8 +5676,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4334,
-    4336
+    4346,
+    4348
    ]
   },
   "reads": 2,
@@ -5716,8 +5716,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4334,
-    4336
+    4346,
+    4348
    ]
   },
   "reads": 2,
@@ -5756,8 +5756,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4334,
-    4336
+    4346,
+    4348
    ]
   },
   "reads": 2,
@@ -5796,7 +5796,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4338
+    4350
    ]
   },
   "reads": 1,
@@ -5835,7 +5835,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4338
+    4350
    ]
   },
   "reads": 1,
@@ -5874,7 +5874,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4338
+    4350
    ]
   },
   "reads": 1,
@@ -5913,7 +5913,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4338
+    4350
    ]
   },
   "reads": 1,
@@ -5952,7 +5952,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4339
+    4351
    ]
   },
   "reads": 1,
@@ -5991,8 +5991,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4340,
-    4342
+    4352,
+    4354
    ]
   },
   "reads": 2,
@@ -6031,7 +6031,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4340
+    4352
    ]
   },
   "reads": 1,
@@ -6070,7 +6070,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4340
+    4352
    ]
   },
   "reads": 1,
@@ -6109,8 +6109,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4340,
-    4342
+    4352,
+    4354
    ]
   },
   "reads": 2,
@@ -6149,7 +6149,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4343
+    4355
    ]
   },
   "reads": 1,
@@ -6188,7 +6188,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4343
+    4355
    ]
   },
   "reads": 1,
@@ -6227,7 +6227,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4343
+    4355
    ]
   },
   "reads": 1,
@@ -6271,7 +6271,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4344
+    4356
    ]
   },
   "reads": 1,
@@ -6310,7 +6310,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4344
+    4356
    ]
   },
   "reads": 1,
@@ -6349,7 +6349,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4344
+    4356
    ]
   },
   "reads": 1,
@@ -6388,7 +6388,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4324
+    4336
    ]
   },
   "reads": 1,
@@ -6427,8 +6427,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4337,
-    4344
+    4349,
+    4356
    ]
   },
   "reads": 2,
@@ -6467,7 +6467,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4337
+    4349
    ]
   },
   "reads": 1,
@@ -6506,7 +6506,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4337
+    4349
    ]
   },
   "reads": 1,
@@ -6545,8 +6545,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4337,
-    4344
+    4349,
+    4356
    ]
   },
   "reads": 2,
@@ -6585,7 +6585,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4345
+    4357
    ]
   },
   "reads": 1,
@@ -6624,7 +6624,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurface": [
-    4345
+    4357
    ]
   },
   "reads": 1,
@@ -6663,10 +6663,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1530
+    1542
    ],
    "LoadEhrPlugin.cpp:TargetFit": [
-    1849
+    1861
    ]
   },
   "reads": 2,
@@ -6705,7 +6705,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1531
+    1543
    ]
   },
   "reads": 1,
@@ -6744,7 +6744,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1532
+    1544
    ]
   },
   "reads": 1,
@@ -6783,7 +6783,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1533
+    1545
    ]
   },
   "reads": 1,
@@ -6822,7 +6822,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1534
+    1546
    ]
   },
   "reads": 1,
@@ -6861,10 +6861,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1530
+    1542
    ],
    "LoadEhrPlugin.cpp:TargetFit": [
-    1849
+    1861
    ]
   },
   "reads": 2,
@@ -6903,7 +6903,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1531
+    1543
    ]
   },
   "reads": 1,
@@ -6942,7 +6942,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1532
+    1544
    ]
   },
   "reads": 1,
@@ -6981,7 +6981,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1533
+    1545
    ]
   },
   "reads": 1,
@@ -7020,7 +7020,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1534
+    1546
    ]
   },
   "reads": 1,
@@ -7059,10 +7059,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1530
+    1542
    ],
    "LoadEhrPlugin.cpp:TargetFit": [
-    1849
+    1861
    ]
   },
   "reads": 2,
@@ -7101,7 +7101,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1531
+    1543
    ]
   },
   "reads": 1,
@@ -7140,7 +7140,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1532
+    1544
    ]
   },
   "reads": 1,
@@ -7179,7 +7179,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1533
+    1545
    ]
   },
   "reads": 1,
@@ -7218,7 +7218,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1534
+    1546
    ]
   },
   "reads": 1,
@@ -7257,10 +7257,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1530
+    1542
    ],
    "LoadEhrPlugin.cpp:TargetFit": [
-    1849
+    1861
    ]
   },
   "reads": 2,
@@ -7299,7 +7299,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1531
+    1543
    ]
   },
   "reads": 1,
@@ -7338,7 +7338,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1532
+    1544
    ]
   },
   "reads": 1,
@@ -7377,7 +7377,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1533
+    1545
    ]
   },
   "reads": 1,
@@ -7416,7 +7416,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1534
+    1546
    ]
   },
   "reads": 1,
@@ -7455,10 +7455,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1530
+    1542
    ],
    "LoadEhrPlugin.cpp:TargetFit": [
-    1849
+    1861
    ]
   },
   "reads": 2,
@@ -7497,7 +7497,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1531
+    1543
    ]
   },
   "reads": 1,
@@ -7536,7 +7536,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1532
+    1544
    ]
   },
   "reads": 1,
@@ -7575,7 +7575,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1533
+    1545
    ]
   },
   "reads": 1,
@@ -7614,7 +7614,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1534
+    1546
    ]
   },
   "reads": 1,
@@ -7653,10 +7653,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1530
+    1542
    ],
    "LoadEhrPlugin.cpp:TargetFit": [
-    1849
+    1861
    ]
   },
   "reads": 2,
@@ -7695,7 +7695,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1531
+    1543
    ]
   },
   "reads": 1,
@@ -7734,7 +7734,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1532
+    1544
    ]
   },
   "reads": 1,
@@ -7773,7 +7773,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1533
+    1545
    ]
   },
   "reads": 1,
@@ -7812,7 +7812,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1534
+    1546
    ]
   },
   "reads": 1,
@@ -7851,10 +7851,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1530
+    1542
    ],
    "LoadEhrPlugin.cpp:TargetFit": [
-    1849
+    1861
    ]
   },
   "reads": 2,
@@ -7893,7 +7893,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1531
+    1543
    ]
   },
   "reads": 1,
@@ -7932,7 +7932,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1532
+    1544
    ]
   },
   "reads": 1,
@@ -7971,7 +7971,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1533
+    1545
    ]
   },
   "reads": 1,
@@ -8010,7 +8010,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1534
+    1546
    ]
   },
   "reads": 1,
@@ -8049,10 +8049,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1530
+    1542
    ],
    "LoadEhrPlugin.cpp:TargetFit": [
-    1849
+    1861
    ]
   },
   "reads": 2,
@@ -8091,7 +8091,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1531
+    1543
    ]
   },
   "reads": 1,
@@ -8130,7 +8130,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1532
+    1544
    ]
   },
   "reads": 1,
@@ -8169,7 +8169,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1533
+    1545
    ]
   },
   "reads": 1,
@@ -8208,7 +8208,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1534
+    1546
    ]
   },
   "reads": 1,
@@ -8331,8 +8331,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    3963,
-    3963
+    3975,
+    3975
    ]
   },
   "reads": 2,
@@ -8374,7 +8374,7 @@
     809
    ],
    "LoadEhrPlugin.cpp:BuildShape": [
-    3961
+    3973
    ]
   },
   "reads": 2,
@@ -8420,7 +8420,7 @@
     808
    ],
    "LoadEhrPlugin.cpp:BuildShape": [
-    3962
+    3974
    ]
   },
   "reads": 2,
@@ -8459,7 +8459,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    3999
+    4011
    ]
   },
   "reads": 1,
@@ -8498,7 +8498,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4000
+    4012
    ]
   },
   "reads": 1,
@@ -8537,7 +8537,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4001
+    4013
    ]
   },
   "reads": 1,
@@ -8576,7 +8576,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    3960
+    3972
    ]
   },
   "reads": 1,
@@ -8618,7 +8618,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4002
+    4014
    ]
   },
   "reads": 1,
@@ -8657,7 +8657,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4003
+    4015
    ]
   },
   "reads": 1,
@@ -8696,7 +8696,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4004
+    4016
    ]
   },
   "reads": 1,
@@ -8735,7 +8735,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    3979
+    3991
    ]
   },
   "reads": 1,
@@ -8774,7 +8774,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4006
+    4018
    ]
   },
   "reads": 1,
@@ -8813,7 +8813,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4006
+    4018
    ]
   },
   "reads": 1,
@@ -8856,7 +8856,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4007
+    4019
    ]
   },
   "reads": 1,
@@ -8895,7 +8895,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4007
+    4019
    ]
   },
   "reads": 1,
@@ -8934,7 +8934,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4008
+    4020
    ]
   },
   "reads": 1,
@@ -8973,7 +8973,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4008
+    4020
    ]
   },
   "reads": 1,
@@ -9012,7 +9012,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4008
+    4020
    ]
   },
   "reads": 1,
@@ -9051,7 +9051,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4008
+    4020
    ]
   },
   "reads": 1,
@@ -9090,7 +9090,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLowPoly": [
-    4249
+    4261
    ]
   },
   "reads": 1,
@@ -9129,7 +9129,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLowPoly": [
-    4248
+    4260
    ]
   },
   "reads": 1,
@@ -9168,7 +9168,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLowPoly": [
-    4248
+    4260
    ]
   },
   "reads": 1,
@@ -9207,7 +9207,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLowPoly": [
-    4246
+    4258
    ]
   },
   "reads": 1,
@@ -9246,7 +9246,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLowPoly": [
-    4246
+    4258
    ]
   },
   "reads": 1,
@@ -9285,7 +9285,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLowPoly": [
-    4246
+    4258
    ]
   },
   "reads": 1,
@@ -9328,7 +9328,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLowPoly": [
-    4259
+    4271
    ]
   },
   "reads": 1,
@@ -9367,8 +9367,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLowPoly": [
-    4269,
-    4270
+    4281,
+    4282
    ]
   },
   "reads": 2,
@@ -9407,8 +9407,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLowPoly": [
-    4269,
-    4270
+    4281,
+    4282
    ]
   },
   "reads": 2,
@@ -9447,8 +9447,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLowPoly": [
-    4269,
-    4270
+    4281,
+    4282
    ]
   },
   "reads": 2,
@@ -9487,7 +9487,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLowPoly": [
-    4260
+    4272
    ]
   },
   "reads": 1,
@@ -9526,7 +9526,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLowPoly": [
-    4261
+    4273
    ]
   },
   "reads": 1,
@@ -9571,8 +9571,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLowPoly": [
-    4273,
-    4273
+    4285,
+    4285
    ]
   },
   "reads": 2,
@@ -9614,7 +9614,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLowPoly": [
-    4278
+    4290
    ]
   },
   "reads": 1,
@@ -9653,7 +9653,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLowPoly": [
-    4262
+    4274
    ]
   },
   "reads": 1,
@@ -9815,8 +9815,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDust": [
-    4201,
-    4201
+    4213,
+    4213
    ]
   },
   "reads": 2,
@@ -9855,7 +9855,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDust": [
-    4231
+    4243
    ]
   },
   "reads": 1,
@@ -9897,10 +9897,10 @@
     387
    ],
    "LoadEhrPlugin.cpp:BuildDust": [
-    4208,
-    4211,
-    4221,
-    4237
+    4220,
+    4223,
+    4233,
+    4249
    ]
   },
   "reads": 5,
@@ -9945,7 +9945,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4013
+    4025
    ]
   },
   "reads": 1,
@@ -9984,7 +9984,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4014
+    4026
    ]
   },
   "reads": 1,
@@ -10023,7 +10023,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4015
+    4027
    ]
   },
   "reads": 1,
@@ -10062,7 +10062,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4016
+    4028
    ]
   },
   "reads": 1,
@@ -10107,7 +10107,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4017
+    4029
    ]
   },
   "reads": 1,
@@ -10146,7 +10146,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4018
+    4030
    ]
   },
   "reads": 1,
@@ -10185,7 +10185,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4019
+    4031
    ]
   },
   "reads": 1,
@@ -10224,7 +10224,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4020
+    4032
    ]
   },
   "reads": 1,
@@ -10263,8 +10263,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4022,
-    4023
+    4034,
+    4035
    ]
   },
   "reads": 2,
@@ -10303,8 +10303,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4022,
-    4023
+    4034,
+    4035
    ]
   },
   "reads": 2,
@@ -10343,8 +10343,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4022,
-    4023
+    4034,
+    4035
    ]
   },
   "reads": 2,
@@ -10383,7 +10383,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildShape": [
-    4022
+    4034
    ]
   },
   "reads": 1,
@@ -10422,7 +10422,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4033
+    4045
    ]
   },
   "reads": 1,
@@ -10465,10 +10465,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLines": [
-    3500
+    3512
    ],
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4034
+    4046
    ]
   },
   "reads": 2,
@@ -10507,7 +10507,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4041
+    4053
    ]
   },
   "reads": 1,
@@ -10546,7 +10546,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4035
+    4047
    ]
   },
   "reads": 1,
@@ -10585,7 +10585,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4035
+    4047
    ]
   },
   "reads": 1,
@@ -10624,7 +10624,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4042
+    4054
    ]
   },
   "reads": 1,
@@ -10663,7 +10663,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4042
+    4054
    ]
   },
   "reads": 1,
@@ -10702,7 +10702,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4043
+    4055
    ]
   },
   "reads": 1,
@@ -10741,7 +10741,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4044
+    4056
    ]
   },
   "reads": 1,
@@ -10780,7 +10780,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4045
+    4057
    ]
   },
   "reads": 1,
@@ -10824,7 +10824,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4046
+    4058
    ]
   },
   "reads": 1,
@@ -10863,7 +10863,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4047
+    4059
    ]
   },
   "reads": 1,
@@ -10902,7 +10902,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4048
+    4060
    ]
   },
   "reads": 1,
@@ -10941,7 +10941,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4049
+    4061
    ]
   },
   "reads": 1,
@@ -10980,7 +10980,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4037
+    4049
    ]
   },
   "reads": 1,
@@ -11019,10 +11019,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2446
+    2458
    ],
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4038
+    4050
    ]
   },
   "reads": 2,
@@ -11061,7 +11061,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4039
+    4051
    ]
   },
   "reads": 1,
@@ -11100,7 +11100,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4037
+    4049
    ]
   },
   "reads": 1,
@@ -11139,7 +11139,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4036
+    4048
    ]
   },
   "reads": 1,
@@ -11178,7 +11178,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4036
+    4048
    ]
   },
   "reads": 1,
@@ -11217,7 +11217,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4051
+    4063
    ]
   },
   "reads": 1,
@@ -11256,10 +11256,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2446
+    2458
    ],
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4052
+    4064
    ]
   },
   "reads": 2,
@@ -11298,7 +11298,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4053
+    4065
    ]
   },
   "reads": 1,
@@ -11342,7 +11342,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4055
+    4067
    ]
   },
   "reads": 1,
@@ -11381,7 +11381,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4060
+    4072
    ]
   },
   "reads": 1,
@@ -11420,7 +11420,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildDeform": [
-    4033
+    4045
    ]
   },
   "reads": 1,
@@ -11466,7 +11466,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildWire": [
-    3229
+    3241
    ]
   },
   "reads": 1,
@@ -11505,7 +11505,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildWire": [
-    3232
+    3244
    ]
   },
   "reads": 1,
@@ -11544,13 +11544,13 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2466
+    2478
    ],
    "LoadEhrPlugin.cpp:BuildWire": [
-    3245
+    3257
    ],
    "LoadEhrPlugin.cpp:BuildLines": [
-    3501
+    3513
    ]
   },
   "reads": 3,
@@ -11592,7 +11592,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildWire": [
-    3230
+    3242
    ]
   },
   "reads": 1,
@@ -11634,7 +11634,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildWire": [
-    3231
+    3243
    ]
   },
   "reads": 1,
@@ -11673,26 +11673,26 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2444,
-    2465
+    2456,
+    2477
    ],
    "LoadEhrPlugin.cpp:BuildWire": [
-    3233,
-    3234
+    3245,
+    3246
    ],
    "LoadEhrPlugin.cpp:BuildBuild": [
-    3274
+    3286
    ],
    "LoadEhrPlugin.cpp:BuildCut": [
-    3333
+    3345
    ],
    "LoadEhrPlugin.cpp:BuildSurfLook": [
-    3447,
-    3448
+    3459,
+    3460
    ],
    "LoadEhrPlugin.cpp:BuildLines": [
-    3502,
-    3503
+    3514,
+    3515
    ]
   },
   "reads": 10,
@@ -11731,22 +11731,22 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2444
+    2456
    ],
    "LoadEhrPlugin.cpp:BuildWire": [
-    3233
+    3245
    ],
    "LoadEhrPlugin.cpp:BuildBuild": [
-    3274
+    3286
    ],
    "LoadEhrPlugin.cpp:BuildCut": [
-    3333
+    3345
    ],
    "LoadEhrPlugin.cpp:BuildSurfLook": [
-    3447
+    3459
    ],
    "LoadEhrPlugin.cpp:BuildLines": [
-    3502
+    3514
    ]
   },
   "reads": 6,
@@ -11785,22 +11785,22 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2444
+    2456
    ],
    "LoadEhrPlugin.cpp:BuildWire": [
-    3233
+    3245
    ],
    "LoadEhrPlugin.cpp:BuildBuild": [
-    3274
+    3286
    ],
    "LoadEhrPlugin.cpp:BuildCut": [
-    3333
+    3345
    ],
    "LoadEhrPlugin.cpp:BuildSurfLook": [
-    3447
+    3459
    ],
    "LoadEhrPlugin.cpp:BuildLines": [
-    3502
+    3514
    ]
   },
   "reads": 6,
@@ -11839,19 +11839,19 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2465
+    2477
    ],
    "LoadEhrPlugin.cpp:BuildWire": [
-    3233,
-    3234
+    3245,
+    3246
    ],
    "LoadEhrPlugin.cpp:BuildSurfLook": [
-    3447,
-    3448
+    3459,
+    3460
    ],
    "LoadEhrPlugin.cpp:BuildLines": [
-    3502,
-    3503
+    3514,
+    3515
    ]
   },
   "reads": 7,
@@ -11890,17 +11890,17 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2445,
-    2467
+    2457,
+    2479
    ],
    "LoadEhrPlugin.cpp:BuildWire": [
-    3235
+    3247
    ],
    "LoadEhrPlugin.cpp:BuildBuild": [
-    3275
+    3287
    ],
    "LoadEhrPlugin.cpp:BuildCut": [
-    3334
+    3346
    ]
   },
   "reads": 5,
@@ -11939,7 +11939,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildWire": [
-    3236
+    3248
    ]
   },
   "reads": 1,
@@ -11978,7 +11978,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildWire": [
-    3237
+    3249
    ]
   },
   "reads": 1,
@@ -12017,7 +12017,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildWire": [
-    3238
+    3250
    ]
   },
   "reads": 1,
@@ -12062,10 +12062,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildWire": [
-    3239
+    3251
    ],
    "LoadEhrPlugin.cpp:BuildLines": [
-    3485
+    3497
    ]
   },
   "reads": 2,
@@ -12104,10 +12104,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2468
+    2480
    ],
    "LoadEhrPlugin.cpp:BuildWire": [
-    3240
+    3252
    ]
   },
   "reads": 2,
@@ -12151,7 +12151,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLines": [
-    3476
+    3488
    ]
   },
   "reads": 1,
@@ -12190,7 +12190,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLines": [
-    3477
+    3489
    ]
   },
   "reads": 1,
@@ -12229,7 +12229,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLines": [
-    3477
+    3489
    ]
   },
   "reads": 1,
@@ -12268,7 +12268,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLines": [
-    3477
+    3489
    ]
   },
   "reads": 1,
@@ -12307,7 +12307,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLines": [
-    3484
+    3496
    ]
   },
   "reads": 1,
@@ -12352,7 +12352,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildBuild": [
-    3255
+    3267
    ]
   },
   "reads": 1,
@@ -12391,7 +12391,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildBuild": [
-    3256
+    3268
    ]
   },
   "reads": 1,
@@ -12434,7 +12434,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildBuild": [
-    3254
+    3266
    ]
   },
   "reads": 1,
@@ -12473,7 +12473,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildBuild": [
-    3256
+    3268
    ]
   },
   "reads": 1,
@@ -12518,12 +12518,12 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildBuild": [
-    3258,
-    3258
+    3270,
+    3270
    ],
    "LoadEhrPlugin.cpp:BuildCut": [
-    3323,
-    3323
+    3335,
+    3335
    ]
   },
   "reads": 4,
@@ -12573,10 +12573,10 @@
     986
    ],
    "LoadEhrPlugin.cpp:UpdateEyePlacement": [
-    1218
+    1230
    ],
    "LoadEhrPlugin.cpp:BuildCut": [
-    3321
+    3333
    ]
   },
   "reads": 4,
@@ -12615,7 +12615,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCut": [
-    3322
+    3334
    ]
   },
   "reads": 1,
@@ -12654,7 +12654,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCut": [
-    3322
+    3334
    ]
   },
   "reads": 1,
@@ -12693,7 +12693,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCut": [
-    3322
+    3334
    ]
   },
   "reads": 1,
@@ -12743,7 +12743,7 @@
     855
    ],
    "LoadEhrPlugin.cpp:BuildSurfLook": [
-    3441
+    3453
    ]
   },
   "reads": 2,
@@ -12782,7 +12782,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurfLook": [
-    3445
+    3457
    ]
   },
   "reads": 1,
@@ -12821,7 +12821,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurfLook": [
-    3445
+    3457
    ]
   },
   "reads": 1,
@@ -12860,8 +12860,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSurfLook": [
-    3442,
-    3445
+    3454,
+    3457
    ]
   },
   "reads": 2,
@@ -12908,7 +12908,7 @@
     855
    ],
    "LoadEhrPlugin.cpp:SourceModel": [
-    3423
+    3435
    ]
   },
   "reads": 2,
@@ -12953,7 +12953,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3772
+    3784
    ]
   },
   "reads": 1,
@@ -12992,7 +12992,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3800
+    3812
    ]
   },
   "reads": 1,
@@ -13031,7 +13031,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3801
+    3813
    ]
   },
   "reads": 1,
@@ -13070,7 +13070,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3802
+    3814
    ]
   },
   "reads": 1,
@@ -13109,7 +13109,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3802
+    3814
    ]
   },
   "reads": 1,
@@ -13148,9 +13148,9 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3774,
-    3778,
-    3781
+    3786,
+    3790,
+    3793
    ]
   },
   "reads": 3,
@@ -13189,7 +13189,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3801
+    3813
    ]
   },
   "reads": 1,
@@ -13228,7 +13228,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3834
+    3846
    ]
   },
   "reads": 1,
@@ -13267,7 +13267,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3804
+    3816
    ]
   },
   "reads": 1,
@@ -13306,7 +13306,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3786
+    3798
    ]
   },
   "reads": 1,
@@ -13345,7 +13345,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3903
+    3915
    ]
   },
   "reads": 1,
@@ -13384,7 +13384,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3904
+    3916
    ]
   },
   "reads": 1,
@@ -13423,7 +13423,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3905
+    3917
    ]
   },
   "reads": 1,
@@ -13462,7 +13462,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3906
+    3918
    ]
   },
   "reads": 1,
@@ -13501,7 +13501,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3907
+    3919
    ]
   },
   "reads": 1,
@@ -13540,7 +13540,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3881
+    3893
    ]
   },
   "reads": 1,
@@ -13579,7 +13579,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3882
+    3894
    ]
   },
   "reads": 1,
@@ -13618,7 +13618,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3897
+    3909
    ]
   },
   "reads": 1,
@@ -13657,7 +13657,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3884
+    3896
    ]
   },
   "reads": 1,
@@ -13696,7 +13696,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3910
+    3922
    ]
   },
   "reads": 1,
@@ -13735,7 +13735,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3911
+    3923
    ]
   },
   "reads": 1,
@@ -13774,7 +13774,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3918
+    3930
    ]
   },
   "reads": 1,
@@ -13813,7 +13813,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3919
+    3931
    ]
   },
   "reads": 1,
@@ -13852,7 +13852,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3919
+    3931
    ]
   },
   "reads": 1,
@@ -13895,7 +13895,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3883
+    3895
    ]
   },
   "reads": 1,
@@ -13934,7 +13934,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3913
+    3925
    ]
   },
   "reads": 1,
@@ -13973,9 +13973,9 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3913,
-    3914,
-    3915
+    3925,
+    3926,
+    3927
    ]
   },
   "reads": 3,
@@ -14014,9 +14014,9 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3913,
-    3914,
-    3915
+    3925,
+    3926,
+    3927
    ]
   },
   "reads": 3,
@@ -14055,9 +14055,9 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3913,
-    3914,
-    3915
+    3925,
+    3926,
+    3927
    ]
   },
   "reads": 3,
@@ -14096,8 +14096,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3913,
-    3914
+    3925,
+    3926
    ]
   },
   "reads": 2,
@@ -14136,7 +14136,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3914
+    3926
    ]
   },
   "reads": 1,
@@ -14175,7 +14175,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1537
+    1549
    ]
   },
   "reads": 1,
@@ -14214,7 +14214,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1537
+    1549
    ]
   },
   "reads": 1,
@@ -14253,7 +14253,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1541
+    1553
    ]
   },
   "reads": 1,
@@ -14292,11 +14292,11 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1541,
-    1544
+    1553,
+    1556
    ],
    "LoadEhrPlugin.cpp:BuildPost": [
-    4359
+    4371
    ]
   },
   "reads": 3,
@@ -14335,11 +14335,11 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1541,
-    1544
+    1553,
+    1556
    ],
    "LoadEhrPlugin.cpp:BuildPost": [
-    4359
+    4371
    ]
   },
   "reads": 3,
@@ -14378,11 +14378,11 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1541,
-    1544
+    1553,
+    1556
    ],
    "LoadEhrPlugin.cpp:BuildPost": [
-    4359
+    4371
    ]
   },
   "reads": 3,
@@ -14421,7 +14421,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1541
+    1553
    ]
   },
   "reads": 1,
@@ -14460,7 +14460,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1550
+    1562
    ]
   },
   "reads": 1,
@@ -14499,7 +14499,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1551
+    1563
    ]
   },
   "reads": 1,
@@ -14542,7 +14542,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1552
+    1564
    ]
   },
   "reads": 1,
@@ -14581,7 +14581,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1555
+    1567
    ]
   },
   "reads": 1,
@@ -14620,7 +14620,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1556
+    1568
    ]
   },
   "reads": 1,
@@ -14663,7 +14663,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1557
+    1569
    ]
   },
   "reads": 1,
@@ -14705,7 +14705,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2100
+    2112
    ]
   },
   "reads": 1,
@@ -14744,7 +14744,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2101
+    2113
    ]
   },
   "reads": 1,
@@ -14783,11 +14783,11 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2099,
-    2102
+    2111,
+    2114
    ],
    "LoadEhrPlugin.cpp:BuildLightning": [
-    2984
+    2996
    ]
   },
   "reads": 3,
@@ -14826,7 +14826,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2103
+    2115
    ]
   },
   "reads": 1,
@@ -14865,7 +14865,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2107
+    2119
    ]
   },
   "reads": 1,
@@ -14904,7 +14904,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2104
+    2116
    ]
   },
   "reads": 1,
@@ -14943,7 +14943,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2107
+    2119
    ]
   },
   "reads": 1,
@@ -14982,7 +14982,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2105
+    2117
    ]
   },
   "reads": 1,
@@ -15021,7 +15021,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2092
+    2104
    ]
   },
   "reads": 1,
@@ -15060,7 +15060,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2095
+    2107
    ]
   },
   "reads": 1,
@@ -15099,7 +15099,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2119
+    2131
    ]
   },
   "reads": 1,
@@ -15138,7 +15138,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2120
+    2132
    ]
   },
   "reads": 1,
@@ -15177,7 +15177,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2121
+    2133
    ]
   },
   "reads": 1,
@@ -15216,7 +15216,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2122
+    2134
    ]
   },
   "reads": 1,
@@ -15260,7 +15260,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2124
+    2136
    ]
   },
   "reads": 1,
@@ -15303,7 +15303,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2125
+    2137
    ]
   },
   "reads": 1,
@@ -15345,7 +15345,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2126
+    2138
    ]
   },
   "reads": 1,
@@ -15384,7 +15384,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:Drift": [
-    2000
+    2012
    ]
   },
   "reads": 1,
@@ -15430,7 +15430,7 @@
     986
    ],
    "LoadEhrPlugin.cpp:BuildSim": [
-    2134
+    2146
    ]
   },
   "reads": 2,
@@ -15474,7 +15474,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2145
+    2157
    ]
   },
   "reads": 1,
@@ -15513,7 +15513,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2151
+    2163
    ]
   },
   "reads": 1,
@@ -15552,7 +15552,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2163
+    2175
    ]
   },
   "reads": 1,
@@ -15591,7 +15591,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2164
+    2176
    ]
   },
   "reads": 1,
@@ -15630,7 +15630,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2166
+    2178
    ]
   },
   "reads": 1,
@@ -15669,7 +15669,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2167
+    2179
    ]
   },
   "reads": 1,
@@ -15708,7 +15708,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2168
+    2180
    ]
   },
   "reads": 1,
@@ -15747,7 +15747,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2171
+    2183
    ]
   },
   "reads": 1,
@@ -15786,7 +15786,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2171
+    2183
    ]
   },
   "reads": 1,
@@ -15825,7 +15825,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2171
+    2183
    ]
   },
   "reads": 1,
@@ -15864,7 +15864,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2169
+    2181
    ]
   },
   "reads": 1,
@@ -15906,7 +15906,7 @@
     986
    ],
    "LoadEhrPlugin.cpp:BuildSim": [
-    2193
+    2205
    ]
   },
   "reads": 2,
@@ -15945,7 +15945,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2194
+    2206
    ]
   },
   "reads": 1,
@@ -15984,7 +15984,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2198
+    2210
    ]
   },
   "reads": 1,
@@ -16023,7 +16023,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2199
+    2211
    ]
   },
   "reads": 1,
@@ -16062,7 +16062,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2200
+    2212
    ]
   },
   "reads": 1,
@@ -16101,7 +16101,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2201
+    2213
    ]
   },
   "reads": 1,
@@ -16140,7 +16140,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2202
+    2214
    ]
   },
   "reads": 1,
@@ -16179,7 +16179,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2204
+    2216
    ]
   },
   "reads": 1,
@@ -16218,7 +16218,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2187
+    2199
    ]
   },
   "reads": 1,
@@ -16263,8 +16263,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2206,
-    2206
+    2218,
+    2218
    ]
   },
   "reads": 2,
@@ -16303,7 +16303,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2210
+    2222
    ]
   },
   "reads": 1,
@@ -16342,7 +16342,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2210
+    2222
    ]
   },
   "reads": 1,
@@ -16420,8 +16420,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2214,
-    2215
+    2226,
+    2227
    ]
   },
   "reads": 2,
@@ -16460,7 +16460,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2214
+    2226
    ]
   },
   "reads": 1,
@@ -16499,7 +16499,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2214
+    2226
    ]
   },
   "reads": 1,
@@ -16538,8 +16538,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2214,
-    2215
+    2226,
+    2227
    ]
   },
   "reads": 2,
@@ -16578,7 +16578,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2211
+    2223
    ]
   },
   "reads": 1,
@@ -16617,7 +16617,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSim": [
-    2217
+    2229
    ]
   },
   "reads": 1,
@@ -16656,10 +16656,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2501
+    2513
    ],
    "LoadEhrPlugin.cpp:BuildSimTrip": [
-    2577
+    2589
    ]
   },
   "reads": 2,
@@ -16706,7 +16706,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2514
+    2526
    ]
   },
   "reads": 1,
@@ -16752,7 +16752,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2515
+    2527
    ]
   },
   "reads": 1,
@@ -16791,7 +16791,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2510
+    2522
    ]
   },
   "reads": 1,
@@ -16830,7 +16830,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2518
+    2530
    ]
   },
   "reads": 1,
@@ -16869,8 +16869,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2519,
-    2522
+    2531,
+    2534
    ]
   },
   "reads": 2,
@@ -16909,7 +16909,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2519
+    2531
    ]
   },
   "reads": 1,
@@ -16948,7 +16948,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2519
+    2531
    ]
   },
   "reads": 1,
@@ -16987,8 +16987,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2519,
-    2522
+    2531,
+    2534
    ]
   },
   "reads": 2,
@@ -17027,8 +17027,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2520,
-    2522
+    2532,
+    2534
    ]
   },
   "reads": 2,
@@ -17067,7 +17067,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2520
+    2532
    ]
   },
   "reads": 1,
@@ -17106,7 +17106,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2520
+    2532
    ]
   },
   "reads": 1,
@@ -17145,8 +17145,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2520,
-    2522
+    2532,
+    2534
    ]
   },
   "reads": 2,
@@ -17185,7 +17185,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2523
+    2535
    ]
   },
   "reads": 1,
@@ -17224,7 +17224,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2524
+    2536
    ]
   },
   "reads": 1,
@@ -17263,7 +17263,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2525
+    2537
    ]
   },
   "reads": 1,
@@ -17302,7 +17302,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2526
+    2538
    ]
   },
   "reads": 1,
@@ -17341,7 +17341,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2527
+    2539
    ]
   },
   "reads": 1,
@@ -17380,7 +17380,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2528
+    2540
    ]
   },
   "reads": 1,
@@ -17419,7 +17419,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2511
+    2523
    ]
   },
   "reads": 1,
@@ -17458,7 +17458,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2530
+    2542
    ]
   },
   "reads": 1,
@@ -17497,7 +17497,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2531
+    2543
    ]
   },
   "reads": 1,
@@ -17536,7 +17536,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2532
+    2544
    ]
   },
   "reads": 1,
@@ -17575,7 +17575,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2512
+    2524
    ]
   },
   "reads": 1,
@@ -17614,7 +17614,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2548
+    2560
    ]
   },
   "reads": 1,
@@ -17653,7 +17653,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2549
+    2561
    ]
   },
   "reads": 1,
@@ -17692,8 +17692,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2550,
-    2563
+    2562,
+    2575
    ]
   },
   "reads": 2,
@@ -17732,7 +17732,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2550
+    2562
    ]
   },
   "reads": 1,
@@ -17771,7 +17771,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2550
+    2562
    ]
   },
   "reads": 1,
@@ -17810,7 +17810,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2563
+    2575
    ]
   },
   "reads": 1,
@@ -17849,7 +17849,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2551
+    2563
    ]
   },
   "reads": 1,
@@ -17888,7 +17888,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2556
+    2568
    ]
   },
   "reads": 1,
@@ -17927,7 +17927,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2557
+    2569
    ]
   },
   "reads": 1,
@@ -17966,7 +17966,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2513
+    2525
    ]
   },
   "reads": 1,
@@ -18008,7 +18008,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2552
+    2564
    ]
   },
   "reads": 1,
@@ -18047,7 +18047,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2554
+    2566
    ]
   },
   "reads": 1,
@@ -18086,7 +18086,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2555
+    2567
    ]
   },
   "reads": 1,
@@ -18125,7 +18125,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2559
+    2571
    ]
   },
   "reads": 1,
@@ -18167,7 +18167,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2560
+    2572
    ]
   },
   "reads": 1,
@@ -18206,8 +18206,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2561,
-    2563
+    2573,
+    2575
    ]
   },
   "reads": 2,
@@ -18246,7 +18246,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2561
+    2573
    ]
   },
   "reads": 1,
@@ -18285,7 +18285,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2561
+    2573
    ]
   },
   "reads": 1,
@@ -18324,8 +18324,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2561,
-    2563
+    2573,
+    2575
    ]
   },
   "reads": 2,
@@ -18409,8 +18409,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSimTrip": [
-    2593,
-    2593
+    2605,
+    2605
    ]
   },
   "reads": 2,
@@ -18453,7 +18453,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSimTrip": [
-    2602
+    2614
    ]
   },
   "reads": 1,
@@ -18492,7 +18492,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSimTrip": [
-    2630
+    2642
    ]
   },
   "reads": 1,
@@ -18531,7 +18531,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSimTrip": [
-    2616
+    2628
    ]
   },
   "reads": 1,
@@ -18570,7 +18570,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSimTrip": [
-    2617
+    2629
    ]
   },
   "reads": 1,
@@ -18609,7 +18609,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSimTrip": [
-    2618
+    2630
    ]
   },
   "reads": 1,
@@ -18648,7 +18648,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSimTrip": [
-    2638
+    2650
    ]
   },
   "reads": 1,
@@ -18687,7 +18687,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSimTrip": [
-    2669
+    2681
    ]
   },
   "reads": 1,
@@ -18726,7 +18726,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSimTrip": [
-    2668
+    2680
    ]
   },
   "reads": 1,
@@ -18765,7 +18765,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSimTrip": [
-    2638
+    2650
    ]
   },
   "reads": 1,
@@ -18804,7 +18804,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSimTrip": [
-    2586
+    2598
    ]
   },
   "reads": 1,
@@ -18843,7 +18843,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSimTrip": [
-    2587
+    2599
    ]
   },
   "reads": 1,
@@ -18882,7 +18882,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2565
+    2577
    ]
   },
   "reads": 1,
@@ -18921,7 +18921,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildTrip": [
-    2567
+    2579
    ]
   },
   "reads": 1,
@@ -18960,7 +18960,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:Blackbody": [
-    2496
+    2508
    ]
   },
   "reads": 1,
@@ -18999,7 +18999,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:Blackbody": [
-    2496
+    2508
    ]
   },
   "reads": 1,
@@ -19038,16 +19038,16 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2098
+    2110
    ],
    "LoadEhrPlugin.cpp:BuildSim": [
-    2135
+    2147
    ],
    "LoadEhrPlugin.cpp:BuildFire": [
-    2237
+    2249
    ],
    "LoadEhrPlugin.cpp:BuildSimTrip": [
-    2580
+    2592
    ]
   },
   "reads": 4,
@@ -19086,11 +19086,11 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFire": [
-    2241
+    2253
    ],
    "LoadEhrPlugin.cpp:BuildSimTrip": [
-    2581,
-    2581
+    2593,
+    2593
    ]
   },
   "reads": 3,
@@ -19129,7 +19129,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFire": [
-    2251
+    2263
    ]
   },
   "reads": 1,
@@ -19168,10 +19168,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFire": [
-    2257
+    2269
    ],
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2447
+    2459
    ]
   },
   "reads": 2,
@@ -19210,7 +19210,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFire": [
-    2248
+    2260
    ]
   },
   "reads": 1,
@@ -19249,10 +19249,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFire": [
-    2258
+    2270
    ],
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2448
+    2460
    ]
   },
   "reads": 2,
@@ -19291,7 +19291,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFire": [
-    2253
+    2265
    ]
   },
   "reads": 1,
@@ -19330,8 +19330,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFire": [
-    2259,
-    2261
+    2271,
+    2273
    ]
   },
   "reads": 2,
@@ -19370,8 +19370,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFire": [
-    2259,
-    2261
+    2271,
+    2273
    ]
   },
   "reads": 2,
@@ -19410,8 +19410,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFire": [
-    2259,
-    2261
+    2271,
+    2273
    ]
   },
   "reads": 2,
@@ -19450,7 +19450,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFire": [
-    2259
+    2271
    ]
   },
   "reads": 1,
@@ -19495,8 +19495,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFire": [
-    2238,
-    2238
+    2250,
+    2250
    ]
   },
   "reads": 2,
@@ -19535,7 +19535,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFire": [
-    2247
+    2259
    ]
   },
   "reads": 1,
@@ -19574,7 +19574,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFire": [
-    2271
+    2283
    ]
   },
   "reads": 1,
@@ -19661,8 +19661,8 @@
     987
    ],
    "LoadEhrPlugin.cpp:BuildLightning": [
-    2917,
-    2917
+    2929,
+    2929
    ]
   },
   "reads": 3,
@@ -19704,7 +19704,7 @@
     987
    ],
    "LoadEhrPlugin.cpp:BuildLightning": [
-    2923
+    2935
    ]
   },
   "reads": 2,
@@ -19751,7 +19751,7 @@
     987
    ],
    "LoadEhrPlugin.cpp:MakeStrike": [
-    2832
+    2844
    ]
   },
   "reads": 2,
@@ -19790,7 +19790,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:MakeStrike": [
-    2831
+    2843
    ]
   },
   "reads": 1,
@@ -19829,7 +19829,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BoltPath": [
-    2719
+    2731
    ]
   },
   "reads": 1,
@@ -19868,7 +19868,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BoltPath": [
-    2719
+    2731
    ]
   },
   "reads": 1,
@@ -19907,7 +19907,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:MakeStrike": [
-    2817
+    2829
    ]
   },
   "reads": 1,
@@ -19946,7 +19946,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLightning": [
-    2970
+    2982
    ]
   },
   "reads": 1,
@@ -19985,7 +19985,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLightning": [
-    2976
+    2988
    ]
   },
   "reads": 1,
@@ -20024,7 +20024,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLightning": [
-    2967
+    2979
    ]
   },
   "reads": 1,
@@ -20063,7 +20063,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLightning": [
-    2967
+    2979
    ]
   },
   "reads": 1,
@@ -20102,7 +20102,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLightning": [
-    2967
+    2979
    ]
   },
   "reads": 1,
@@ -20141,8 +20141,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLightning": [
-    2932,
-    2969
+    2944,
+    2981
    ]
   },
   "reads": 2,
@@ -20181,7 +20181,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLightning": [
-    2978
+    2990
    ]
   },
   "reads": 1,
@@ -20227,7 +20227,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSwarm": [
-    3109
+    3121
    ]
   },
   "reads": 1,
@@ -20311,8 +20311,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSwarm": [
-    3110,
-    3110
+    3122,
+    3122
    ]
   },
   "reads": 2,
@@ -20351,8 +20351,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSwarm": [
-    3118,
-    3118
+    3130,
+    3130
    ]
   },
   "reads": 2,
@@ -20391,7 +20391,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSwarm": [
-    3119
+    3131
    ]
   },
   "reads": 1,
@@ -20430,7 +20430,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSwarm": [
-    3120
+    3132
    ]
   },
   "reads": 1,
@@ -20469,7 +20469,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSwarm": [
-    3121
+    3133
    ]
   },
   "reads": 1,
@@ -20508,7 +20508,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSwarm": [
-    3122
+    3134
    ]
   },
   "reads": 1,
@@ -20547,10 +20547,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2458
+    2470
    ],
    "LoadEhrPlugin.cpp:BuildSwarm": [
-    3123
+    3135
    ]
   },
   "reads": 2,
@@ -20589,10 +20589,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2459
+    2471
    ],
    "LoadEhrPlugin.cpp:BuildSwarm": [
-    3135
+    3147
    ]
   },
   "reads": 2,
@@ -20631,10 +20631,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2460
+    2472
    ],
    "LoadEhrPlugin.cpp:BuildSwarm": [
-    3124
+    3136
    ]
   },
   "reads": 2,
@@ -20673,12 +20673,12 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2456,
-    2459
+    2468,
+    2471
    ],
    "LoadEhrPlugin.cpp:BuildSwarm": [
-    3133,
-    3135
+    3145,
+    3147
    ]
   },
   "reads": 4,
@@ -20717,10 +20717,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2456
+    2468
    ],
    "LoadEhrPlugin.cpp:BuildSwarm": [
-    3133
+    3145
    ]
   },
   "reads": 2,
@@ -20759,10 +20759,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2456
+    2468
    ],
    "LoadEhrPlugin.cpp:BuildSwarm": [
-    3133
+    3145
    ]
   },
   "reads": 2,
@@ -20801,13 +20801,13 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2456,
-    2459
+    2468,
+    2471
    ],
    "LoadEhrPlugin.cpp:BuildSwarm": [
-    3109,
-    3133,
-    3135
+    3121,
+    3145,
+    3147
    ]
   },
   "reads": 5,
@@ -20846,7 +20846,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSwarm": [
-    3136
+    3148
    ]
   },
   "reads": 1,
@@ -20885,10 +20885,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLava": [
-    3054,
-    3083,
-    3088,
-    3095
+    3066,
+    3095,
+    3100,
+    3107
    ]
   },
   "reads": 4,
@@ -20930,8 +20930,8 @@
     403
    ],
    "LoadEhrPlugin.cpp:BuildLava": [
-    3076,
-    3082
+    3088,
+    3094
    ]
   },
   "reads": 3,
@@ -21054,8 +21054,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLava": [
-    3041,
-    3041
+    3053,
+    3053
    ]
   },
   "reads": 2,
@@ -21094,8 +21094,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLava": [
-    3080,
-    3080
+    3092,
+    3092
    ]
   },
   "reads": 2,
@@ -21134,7 +21134,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLava": [
-    3086
+    3098
    ]
   },
   "reads": 1,
@@ -21173,7 +21173,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLava": [
-    3090
+    3102
    ]
   },
   "reads": 1,
@@ -21212,7 +21212,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLava": [
-    3089
+    3101
    ]
   },
   "reads": 1,
@@ -21251,10 +21251,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildMorph": [
-    2449
+    2461
    ],
    "LoadEhrPlugin.cpp:BuildLava": [
-    3088
+    3100
    ]
   },
   "reads": 2,
@@ -21293,8 +21293,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLava": [
-    3091,
-    3092
+    3103,
+    3104
    ]
   },
   "reads": 2,
@@ -21333,8 +21333,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLava": [
-    3091,
-    3092
+    3103,
+    3104
    ]
   },
   "reads": 2,
@@ -21373,8 +21373,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLava": [
-    3091,
-    3092
+    3103,
+    3104
    ]
   },
   "reads": 2,
@@ -21413,7 +21413,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLava": [
-    3091
+    3103
    ]
   },
   "reads": 1,
@@ -21452,7 +21452,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLava": [
-    3095
+    3107
    ]
   },
   "reads": 1,
@@ -21491,7 +21491,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildLava": [
-    3087
+    3099
    ]
   },
   "reads": 1,
@@ -21530,8 +21530,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2073,
-    2080
+    2085,
+    2092
    ]
   },
   "reads": 2,
@@ -21570,7 +21570,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCaustics": [
-    3001
+    3013
    ]
   },
   "reads": 1,
@@ -21612,7 +21612,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCaustics": [
-    3016
+    3028
    ]
   },
   "reads": 1,
@@ -21651,7 +21651,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCaustics": [
-    3017
+    3029
    ]
   },
   "reads": 1,
@@ -21690,7 +21690,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCaustics": [
-    3018
+    3030
    ]
   },
   "reads": 1,
@@ -21729,7 +21729,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCaustics": [
-    3019
+    3031
    ]
   },
   "reads": 1,
@@ -21768,7 +21768,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCaustics": [
-    3020
+    3032
    ]
   },
   "reads": 1,
@@ -21807,8 +21807,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCaustics": [
-    3002,
-    3022
+    3014,
+    3034
    ]
   },
   "reads": 2,
@@ -21847,8 +21847,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCaustics": [
-    3002,
-    3023
+    3014,
+    3035
    ]
   },
   "reads": 2,
@@ -21887,8 +21887,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCaustics": [
-    3002,
-    3024
+    3014,
+    3036
    ]
   },
   "reads": 2,
@@ -21927,8 +21927,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCaustics": [
-    3001,
-    3025
+    3013,
+    3037
    ]
   },
   "reads": 2,
@@ -21967,7 +21967,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCaustics": [
-    3025
+    3037
    ]
   },
   "reads": 1,
@@ -22006,7 +22006,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCaustics": [
-    3025
+    3037
    ]
   },
   "reads": 1,
@@ -22045,7 +22045,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildCaustics": [
-    3001
+    3013
    ]
   },
   "reads": 1,
@@ -22084,9 +22084,9 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2021,
-    2022,
-    2030
+    2033,
+    2034,
+    2042
    ]
   },
   "reads": 3,
@@ -22128,7 +22128,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2033
+    2045
    ]
   },
   "reads": 1,
@@ -22167,7 +22167,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2034
+    2046
    ]
   },
   "reads": 1,
@@ -22206,7 +22206,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2035
+    2047
    ]
   },
   "reads": 1,
@@ -22245,7 +22245,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2035
+    2047
    ]
   },
   "reads": 1,
@@ -22284,7 +22284,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2035
+    2047
    ]
   },
   "reads": 1,
@@ -22327,7 +22327,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2041
+    2053
    ]
   },
   "reads": 1,
@@ -22366,7 +22366,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2050
+    2062
    ]
   },
   "reads": 1,
@@ -22405,7 +22405,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2050
+    2062
    ]
   },
   "reads": 1,
@@ -22444,7 +22444,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2067
+    2079
    ]
   },
   "reads": 1,
@@ -22483,7 +22483,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2068
+    2080
    ]
   },
   "reads": 1,
@@ -22522,7 +22522,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2064
+    2076
    ]
   },
   "reads": 1,
@@ -22561,8 +22561,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2063,
-    2064
+    2075,
+    2076
    ]
   },
   "reads": 2,
@@ -22601,7 +22601,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2063
+    2075
    ]
   },
   "reads": 1,
@@ -22640,7 +22640,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2063
+    2075
    ]
   },
   "reads": 1,
@@ -22679,8 +22679,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2063,
-    2064
+    2075,
+    2076
    ]
   },
   "reads": 2,
@@ -22719,7 +22719,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2029
+    2041
    ]
   },
   "reads": 1,
@@ -22758,7 +22758,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2064
+    2076
    ]
   },
   "reads": 1,
@@ -22797,7 +22797,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2064
+    2076
    ]
   },
   "reads": 1,
@@ -22836,8 +22836,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2021,
-    2030
+    2033,
+    2042
    ]
   },
   "reads": 2,
@@ -22879,7 +22879,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2033
+    2045
    ]
   },
   "reads": 1,
@@ -22918,7 +22918,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2034
+    2046
    ]
   },
   "reads": 1,
@@ -22957,7 +22957,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2035
+    2047
    ]
   },
   "reads": 1,
@@ -22996,7 +22996,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2035
+    2047
    ]
   },
   "reads": 1,
@@ -23035,7 +23035,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2035
+    2047
    ]
   },
   "reads": 1,
@@ -23078,7 +23078,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2041
+    2053
    ]
   },
   "reads": 1,
@@ -23117,7 +23117,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2050
+    2062
    ]
   },
   "reads": 1,
@@ -23156,7 +23156,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2050
+    2062
    ]
   },
   "reads": 1,
@@ -23195,7 +23195,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2067
+    2079
    ]
   },
   "reads": 1,
@@ -23234,7 +23234,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2068
+    2080
    ]
   },
   "reads": 1,
@@ -23273,7 +23273,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2064
+    2076
    ]
   },
   "reads": 1,
@@ -23312,8 +23312,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2063,
-    2064
+    2075,
+    2076
    ]
   },
   "reads": 2,
@@ -23352,7 +23352,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2063
+    2075
    ]
   },
   "reads": 1,
@@ -23391,7 +23391,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2063
+    2075
    ]
   },
   "reads": 1,
@@ -23430,8 +23430,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2063,
-    2064
+    2075,
+    2076
    ]
   },
   "reads": 2,
@@ -23470,7 +23470,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2029
+    2041
    ]
   },
   "reads": 1,
@@ -23509,7 +23509,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2064
+    2076
    ]
   },
   "reads": 1,
@@ -23548,7 +23548,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2064
+    2076
    ]
   },
   "reads": 1,
@@ -23590,7 +23590,7 @@
     986
    ],
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3692
+    3704
    ]
   },
   "reads": 2,
@@ -23715,7 +23715,7 @@
     997
    ],
    "LoadEhrPlugin.cpp:BuildCut": [
-    3365
+    3377
    ]
   },
   "reads": 2,
@@ -23754,7 +23754,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3754
+    3766
    ]
   },
   "reads": 1,
@@ -23793,23 +23793,24 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:SlotEyeFit": [
-    1126,
-    1136
+    1130,
+    1140,
+    1144
    ],
    "LoadEhrPlugin.cpp:GlideEyeFit": [
-    1142,
-    1152
+    1149,
+    1160
    ],
    "LoadEhrPlugin.cpp:UpdateEyePlacement": [
-    1298,
-    1299,
-    1304,
-    1306,
-    1307,
-    1310
+    1310,
+    1311,
+    1316,
+    1318,
+    1319,
+    1322
    ]
   },
-  "reads": 11,
+  "reads": 12,
   "bundles": {
    "LoadEhr": {
     "index": 406,
@@ -23845,16 +23846,16 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:UpdateEyePlacement": [
-    1321
+    1333
    ],
    "LoadEhrPlugin.cpp:BuildSim": [
-    2173
+    2185
    ],
    "LoadEhrPlugin.cpp:BuildCut": [
-    3381
+    3393
    ],
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3694
+    3706
    ]
   },
   "reads": 4,
@@ -23893,14 +23894,14 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:EyeOpen": [
-    1189
+    1201
    ],
    "LoadEhrPlugin.cpp:UpdateEyePlacement": [
-    1324,
-    1326
+    1336,
+    1338
    ],
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3694
+    3706
    ]
   },
   "reads": 4,
@@ -23942,18 +23943,18 @@
     977
    ],
    "LoadEhrPlugin.cpp:GlideEyeFit": [
-    1164,
-    1181
+    1176,
+    1193
    ],
    "LoadEhrPlugin.cpp:EyeOpen": [
-    1192
+    1204
    ],
    "LoadEhrPlugin.cpp:UpdateEyePlacement": [
-    1279,
-    1279,
-    1282,
-    1317,
-    1331
+    1291,
+    1291,
+    1294,
+    1329,
+    1343
    ]
   },
   "reads": 9,
@@ -23992,15 +23993,15 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:GlideEyeFit": [
-    1164,
-    1181
+    1176,
+    1193
    ],
    "LoadEhrPlugin.cpp:UpdateEyePlacement": [
-    1279,
-    1279,
-    1282,
-    1317,
-    1331
+    1291,
+    1291,
+    1294,
+    1329,
+    1343
    ]
   },
   "reads": 7,
@@ -24039,15 +24040,15 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:GlideEyeFit": [
-    1164,
-    1181
+    1176,
+    1193
    ],
    "LoadEhrPlugin.cpp:UpdateEyePlacement": [
-    1279,
-    1279,
-    1283,
-    1317,
-    1331
+    1291,
+    1291,
+    1295,
+    1329,
+    1343
    ]
   },
   "reads": 7,
@@ -24086,18 +24087,18 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:GlideEyeFit": [
-    1164,
-    1181
+    1176,
+    1193
    ],
    "LoadEhrPlugin.cpp:EyeOpen": [
-    1192
+    1204
    ],
    "LoadEhrPlugin.cpp:UpdateEyePlacement": [
-    1280,
-    1280,
-    1283,
-    1318,
-    1332
+    1292,
+    1292,
+    1295,
+    1330,
+    1344
    ]
   },
   "reads": 8,
@@ -24136,15 +24137,15 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:GlideEyeFit": [
-    1164,
-    1181
+    1176,
+    1193
    ],
    "LoadEhrPlugin.cpp:UpdateEyePlacement": [
-    1280,
-    1280,
-    1283,
-    1318,
-    1332
+    1292,
+    1292,
+    1295,
+    1330,
+    1344
    ]
   },
   "reads": 7,
@@ -24186,15 +24187,15 @@
     977
    ],
    "LoadEhrPlugin.cpp:GlideEyeFit": [
-    1164,
-    1181
+    1176,
+    1193
    ],
    "LoadEhrPlugin.cpp:UpdateEyePlacement": [
-    1280,
-    1280,
-    1283,
-    1318,
-    1332
+    1292,
+    1292,
+    1295,
+    1330,
+    1344
    ]
   },
   "reads": 8,
@@ -24237,10 +24238,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:UpdateEyePlacement": [
-    1320
+    1332
    ],
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3695
+    3707
    ]
   },
   "reads": 2,
@@ -24279,7 +24280,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3729
+    3741
    ]
   },
   "reads": 1,
@@ -24318,7 +24319,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3729
+    3741
    ]
   },
   "reads": 1,
@@ -24357,19 +24358,20 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:SlotEyeFit": [
-    1126,
-    1137
+    1130,
+    1142,
+    1144
    ],
    "LoadEhrPlugin.cpp:GlideEyeFit": [
-    1142,
-    1152
+    1149,
+    1160
    ],
    "LoadEhrPlugin.cpp:UpdateEyePlacement": [
-    1312,
-    1330
+    1324,
+    1342
    ]
   },
-  "reads": 6,
+  "reads": 7,
   "bundles": {
    "LoadEhr": {
     "index": 418,
@@ -24405,7 +24407,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3762
+    3774
    ]
   },
   "reads": 1,
@@ -24444,7 +24446,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3697
+    3709
    ]
   },
   "reads": 1,
@@ -24483,7 +24485,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3756
+    3768
    ]
   },
   "reads": 1,
@@ -24522,7 +24524,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3756
+    3768
    ]
   },
   "reads": 1,
@@ -24561,7 +24563,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3756
+    3768
    ]
   },
   "reads": 1,
@@ -24600,7 +24602,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3756
+    3768
    ]
   },
   "reads": 1,
@@ -24639,7 +24641,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3756
+    3768
    ]
   },
   "reads": 1,
@@ -24678,7 +24680,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3756
+    3768
    ]
   },
   "reads": 1,
@@ -24717,7 +24719,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3756
+    3768
    ]
   },
   "reads": 1,
@@ -24756,7 +24758,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3756
+    3768
    ]
   },
   "reads": 1,
@@ -24795,7 +24797,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3756
+    3768
    ]
   },
   "reads": 1,
@@ -24834,7 +24836,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3691
+    3703
    ]
   },
   "reads": 1,
@@ -24873,7 +24875,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3697
+    3709
    ]
   },
   "reads": 1,
@@ -24912,7 +24914,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildEyeLights": [
-    3697
+    3709
    ]
   },
   "reads": 1,
@@ -24954,7 +24956,7 @@
     460
    ],
    "LoadEhrPlugin.cpp:UpdateEyePlacement": [
-    1251
+    1263
    ]
   },
   "reads": 2,
@@ -24999,7 +25001,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSpots": [
-    4392
+    4404
    ]
   },
   "reads": 1,
@@ -25038,7 +25040,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSpots": [
-    4452
+    4464
    ]
   },
   "reads": 1,
@@ -25077,7 +25079,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSpots": [
-    4409
+    4421
    ]
   },
   "reads": 1,
@@ -25116,8 +25118,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSpots": [
-    4398,
-    4441
+    4410,
+    4453
    ]
   },
   "reads": 2,
@@ -25162,7 +25164,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSpots": [
-    4403
+    4415
    ]
   },
   "reads": 1,
@@ -25201,7 +25203,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSpots": [
-    4402
+    4414
    ]
   },
   "reads": 1,
@@ -25240,7 +25242,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSpots": [
-    4412
+    4424
    ]
   },
   "reads": 1,
@@ -25279,7 +25281,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSpots": [
-    4413
+    4425
    ]
   },
   "reads": 1,
@@ -25318,8 +25320,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSpots": [
-    4451,
-    4452
+    4463,
+    4464
    ]
   },
   "reads": 2,
@@ -25358,7 +25360,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSpots": [
-    4451
+    4463
    ]
   },
   "reads": 1,
@@ -25397,8 +25399,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSpots": [
-    4449,
-    4451
+    4461,
+    4463
    ]
   },
   "reads": 2,
@@ -25437,8 +25439,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSpots": [
-    4451,
-    4452
+    4463,
+    4464
    ]
   },
   "reads": 2,
@@ -25481,7 +25483,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSpots": [
-    4403
+    4415
    ]
   },
   "reads": 1,
@@ -25520,9 +25522,9 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildSpots": [
-    4396,
-    4396,
-    4402
+    4408,
+    4408,
+    4414
    ]
   },
   "reads": 3,
@@ -25561,7 +25563,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildVolume": [
-    2090
+    2102
    ]
   },
   "reads": 1,
@@ -25600,7 +25602,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3151
+    3163
    ]
   },
   "reads": 1,
@@ -25642,7 +25644,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3153
+    3165
    ]
   },
   "reads": 1,
@@ -25684,7 +25686,7 @@
     247
    ],
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3157
+    3169
    ]
   },
   "reads": 2,
@@ -25723,7 +25725,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:VideoClock": [
-    3532
+    3544
    ]
   },
   "reads": 1,
@@ -25767,7 +25769,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:VideoClock": [
-    3527
+    3539
    ]
   },
   "reads": 1,
@@ -25809,10 +25811,10 @@
     407
    ],
    "LoadEhrPlugin.cpp:VideoClock": [
-    3537,
-    3571,
-    3574,
-    3576
+    3549,
+    3583,
+    3586,
+    3588
    ]
   },
   "reads": 5,
@@ -25854,9 +25856,9 @@
     456
    ],
    "LoadEhrPlugin.cpp:SetVideoTime": [
-    3591,
-    3593,
-    3594
+    3603,
+    3605,
+    3606
    ]
   },
   "reads": 4,
@@ -25937,7 +25939,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3176
+    3188
    ]
   },
   "reads": 1,
@@ -25976,7 +25978,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3190
+    3202
    ]
   },
   "reads": 1,
@@ -26015,7 +26017,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3191
+    3203
    ]
   },
   "reads": 1,
@@ -26054,7 +26056,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3191
+    3203
    ]
   },
   "reads": 1,
@@ -26093,7 +26095,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3191
+    3203
    ]
   },
   "reads": 1,
@@ -26135,7 +26137,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3197
+    3209
    ]
   },
   "reads": 1,
@@ -26174,7 +26176,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3202
+    3214
    ]
   },
   "reads": 1,
@@ -26213,7 +26215,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3202
+    3214
    ]
   },
   "reads": 1,
@@ -26252,7 +26254,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3213
+    3225
    ]
   },
   "reads": 1,
@@ -26291,10 +26293,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3214
+    3226
    ],
    "LoadEhrPlugin.cpp:VideoStats": [
-    3623
+    3635
    ]
   },
   "reads": 2,
@@ -26333,7 +26335,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3150
+    3162
    ]
   },
   "reads": 1,
@@ -26372,8 +26374,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3150,
-    3218
+    3162,
+    3230
    ]
   },
   "reads": 2,
@@ -26412,7 +26414,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3218
+    3230
    ]
   },
   "reads": 1,
@@ -26451,7 +26453,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3218
+    3230
    ]
   },
   "reads": 1,
@@ -26490,7 +26492,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3150
+    3162
    ]
   },
   "reads": 1,
@@ -26529,8 +26531,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3151,
-    3215
+    3163,
+    3227
    ]
   },
   "reads": 2,
@@ -26569,8 +26571,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildProjector": [
-    3151,
-    3216
+    3163,
+    3228
    ]
   },
   "reads": 2,
@@ -26609,7 +26611,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4382
+    4394
    ]
   },
   "reads": 1,
@@ -26648,7 +26650,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4383
+    4395
    ]
   },
   "reads": 1,
@@ -26687,7 +26689,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4384
+    4396
    ]
   },
   "reads": 1,
@@ -26726,7 +26728,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4385
+    4397
    ]
   },
   "reads": 1,
@@ -26765,7 +26767,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4386
+    4398
    ]
   },
   "reads": 1,
@@ -26804,10 +26806,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1451
+    1463
    ],
    "LoadEhrPlugin.cpp:BuildPost": [
-    4356
+    4368
    ]
   },
   "reads": 2,
@@ -26849,7 +26851,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4363
+    4375
    ]
   },
   "reads": 1,
@@ -26888,10 +26890,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:MakeStrike": [
-    2888
+    2900
    ],
    "LoadEhrPlugin.cpp:BuildPost": [
-    4362
+    4374
    ]
   },
   "reads": 2,
@@ -26930,7 +26932,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4365
+    4377
    ]
   },
   "reads": 1,
@@ -26969,7 +26971,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4357
+    4369
    ]
   },
   "reads": 1,
@@ -27008,10 +27010,10 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1451
+    1463
    ],
    "LoadEhrPlugin.cpp:BuildPost": [
-    4374
+    4386
    ]
   },
   "reads": 2,
@@ -27050,7 +27052,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4375
+    4387
    ]
   },
   "reads": 1,
@@ -27089,7 +27091,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4376
+    4388
    ]
   },
   "reads": 1,
@@ -27128,7 +27130,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4358
+    4370
    ]
   },
   "reads": 1,
@@ -27167,7 +27169,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1451
+    1463
    ]
   },
   "reads": 1,
@@ -27206,7 +27208,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4377
+    4389
    ]
   },
   "reads": 1,
@@ -27245,7 +27247,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4378
+    4390
    ]
   },
   "reads": 1,
@@ -27284,7 +27286,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4379
+    4391
    ]
   },
   "reads": 1,
@@ -27323,7 +27325,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4380
+    4392
    ]
   },
   "reads": 1,
@@ -27362,8 +27364,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4379,
-    4381
+    4391,
+    4393
    ]
   },
   "reads": 2,
@@ -27402,8 +27404,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4379,
-    4381
+    4391,
+    4393
    ]
   },
   "reads": 2,
@@ -27442,8 +27444,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4379,
-    4381
+    4391,
+    4393
    ]
   },
   "reads": 2,
@@ -27482,7 +27484,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildPost": [
-    4379
+    4391
    ]
   },
   "reads": 1,
@@ -27521,7 +27523,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1578
+    1590
    ]
   },
   "reads": 1,
@@ -27560,7 +27562,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1579
+    1591
    ]
   },
   "reads": 1,
@@ -27599,7 +27601,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1581
+    1593
    ]
   },
   "reads": 1,
@@ -27638,7 +27640,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1584
+    1596
    ]
   },
   "reads": 1,
@@ -27677,7 +27679,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1585
+    1597
    ]
   },
   "reads": 1,
@@ -27716,7 +27718,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1586
+    1598
    ]
   },
   "reads": 1,
@@ -27755,11 +27757,11 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1587
+    1599
    ],
    "LoadEhrPlugin.cpp:BuildCopies": [
-    3838,
-    3839
+    3850,
+    3851
    ]
   },
   "reads": 3,
@@ -27798,8 +27800,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1590,
-    1591
+    1602,
+    1603
    ]
   },
   "reads": 2,
@@ -27838,7 +27840,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1590
+    1602
    ]
   },
   "reads": 1,
@@ -27877,7 +27879,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1590
+    1602
    ]
   },
   "reads": 1,
@@ -27916,8 +27918,8 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1590,
-    1591
+    1602,
+    1603
    ]
   },
   "reads": 2,
@@ -27960,7 +27962,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1593
+    1605
    ]
   },
   "reads": 1,
@@ -28004,7 +28006,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1595
+    1607
    ]
   },
   "reads": 1,
@@ -28047,7 +28049,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1596
+    1608
    ]
   },
   "reads": 1,
@@ -28086,7 +28088,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1597
+    1609
    ]
   },
   "reads": 1,
@@ -28128,7 +28130,7 @@
     589
    ],
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1632
+    1644
    ]
   },
   "reads": 2,
@@ -28167,7 +28169,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1690
+    1702
    ]
   },
   "reads": 1,
@@ -28206,7 +28208,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1745
+    1757
    ]
   },
   "reads": 1,
@@ -28245,7 +28247,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1742
+    1754
    ]
   },
   "reads": 1,
@@ -28284,7 +28286,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1742
+    1754
    ]
   },
   "reads": 1,
@@ -28323,7 +28325,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1743
+    1755
    ]
   },
   "reads": 1,
@@ -28362,7 +28364,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1743
+    1755
    ]
   },
   "reads": 1,
@@ -28401,7 +28403,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1744
+    1756
    ]
   },
   "reads": 1,
@@ -28440,7 +28442,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1647
+    1659
    ]
   },
   "reads": 1,
@@ -28479,7 +28481,7 @@
   "fx_only": true,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFaces": [
-    1692
+    1704
    ]
   },
   "reads": 1,
@@ -28518,7 +28520,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:UpdateAudio": [
-    1338
+    1350
    ]
   },
   "reads": 1,
@@ -28565,7 +28567,7 @@
   "fx_only": false,
   "consumers": {
    "LoadEhrPlugin.cpp:BuildFrame": [
-    1599
+    1611
    ]
   },
   "reads": 1,
@@ -28613,7 +28615,7 @@
     567
    ],
    "LoadEhrPlugin.cpp:UpdateFit": [
-    1897
+    1909
    ]
   },
   "reads": 4,
