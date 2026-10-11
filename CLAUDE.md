@@ -69,20 +69,15 @@ tools/w2_text.py run <out> <ref build>    # W2: text / logo silhouettes + triang
 tools/w2_shatter.py run|strips            # W2: solid pieces (modes, counts, logos, Bounce, transition; reform = rest)
 tools/w2_deform.py run|strips             # W2: every deform + its cost
 tools/w2_video.py make|run|modes          # W2: projector video files (test media from faces_clip.mp4; HAP via glenc-cli)
-tools/arena_w2.py <layer> [col]           # W2: dial the W2 Arena clips by param name (never triggers)
 tools/w3_dxv.py proof|alpha|cost <out>    # W3: DXV playback vs dxvtool dump-rgba, the Video Alpha strips, decode / upload cost
 tools/w4_scrub.py make|sweep|cue|reverse|latency|longshow|refuse  # W4: the scrubber on frame-coded clips (test_media/gen/w4); W6 refuse: Scrub only on DXV / HAP
-tools/arena_w4.py <layer> [col [get]]    # W4: dial / read the W4 scrub clips by param name (never triggers)
 tools/w5_wire.py renders|checks|combos|cost <out>  # W5: the wireframe modes, fill / edge / glow / bloom checks, combinations, cost
 tools/w6_points.py renders|follow|cost|wire_same <out>  # W6: Points Only / + Wire per source, what they follow, cost, the W5 renders unchanged
 tools/w6_trans.py strips|chain|cost|waits|smoke <out>  # W6: the transition pack: scrub strips + ends, D -> A hops, cost, frame waits, Smoke
-tools/arena_w6.py points|trans <layer> [col]  # W6: dial the W6 clips by param name (never triggers)
 tools/arena_w5.py <layer> [col]          # W5: dial the W5 wire clips by param name (never triggers)
 tools/w7_trans.py scrub|spikes|realtime|strip|cost ...  # W7: per-step change along a hop (the swap vs the hop's own motion), Arena's dials played, strips, cost
-tools/arena_w7.py <layer> [col]          # W7: dial the W7 clips (Twist / Melt / Lava / Sparkle / Cycle 21) by param name (never triggers)
 git submodule update --init               # W3: third_party/dxvkit (DXVKit, pinned: W8 tag v1.0.0) must be checked out before cmake
 tools/w8_dxv.py same|forms <out> ...      # W8: pictures byte-identical vs a reference build; the 33 DXVKit Arena forms play / refuse as Arena
-tools/arena_w8.py <layer> [col]          # W8: dial the HQ comparison clips (DXVKit vs Arena's own DXV decode) by param name (never triggers)
 tools/w9_lines.py renders|strips|combos|cost <out>  # W9 A: the line looks (plexus, light paint, neon tubes) per model, what moves, combinations, cost
 tools/w9_build.py renders|strips|combos|cost <out>  # W9 B: the Build looks (slit-scan, print on, exploded, black hole), progress strips (fwd = back), combos, cost
 tools/w9_cut.py renders|strips|combos|cost <out>  # W9 C: the Cut looks (cross-section, reveal box, window), strips, combos (+ sim smoke, + DXV video), cost
@@ -90,7 +85,6 @@ tools/w9_surface.py renders|strips|combos|cost <out>  # W9 D: the Surface Looks 
 tools/w9_shape.py renders|strips|same <ref build>|cost <out>  # W9 E: Shape Target (sphere / cube; W11: torus / crystal retired), Sphere = W8's Spherize
 tools/w9_same.py <out> wire points strips scrub [dxv <ref build>]  # W9: the earlier waves' pictures unchanged (vs verify/w8 / a reference build)
 tools/param_audit.py static|sweep <bundle> [names] [--fresh]|sheets|map  # W10: every param: carried / read / visible, gates -> docs/param_hierarchy.md
-tools/arena_w10.py <layer> [col] | get <layer> <col>  # W10: dial the Copies clips (one per control after LOD Bias) by name (never triggers)
 tools/param_audit.py canuse                # W11: every option / param a bundle offers but cannot load or use (0 left; Env Source Input (FX) kept)
 tools/w11_decisions.py defaults|lightc|window <out> [<ref build>]  # W11: the new Copies defaults, C Auto Place per option, the Window prune
 tools/arena_w11.py <layer> [col]          # W11: dial the W11 decision clips by param name (never triggers)
@@ -155,7 +149,7 @@ MaskEhr reference builds go to a scratch folder (`cmake -S <MaskEhr> -B <scratch
 - W20: `src/Sim.cpp`, `src/SimShaders.h`, `src/SdfBuilder.*` (3D smoke sim, see below).
 - W21: `src/Generate.*` (text / logos -> a generated model, see below), `third_party/nanosvg` (zlib), W2: `third_party/clipper2`
   (Boost: fill rules, PolyTree) + `third_party/earcut` (ISC: triangulation), replacing libtess2 (SGI-B; Amrit 2026-10-08: "swap"). `tools/probe/TextProbe.cpp` = the W21 text-editor probe (not installed). `test_logos/` = OUR generated test
-  emblem (`tools/w21_test_logos.py`: SVG + PDF from one geometry, PNG via sips). `tools/w21_arena.py` = set clip params by name over REST.
+  emblem (`tools/w21_test_logos.py`: SVG + PDF from one geometry, PNG via sips).
 - W3: `third_party/dxvkit` (submodule, MIT: DXV decoding), `tools/w3_dxv.py` (proof / alpha / cost of DXV playback).
 - W1: `tools/gen_test_models.py` (our test models), `tools/chain_test.py`, `tools/parity.py`, `tools/guards.sh`.
 - W6: `src/Points.cpp` (the Points Only / + Wire point sets), `src/Morph.cpp` (the transition pack's MORPH programs, per-pair uniforms,
@@ -398,7 +392,7 @@ d) W17: KHR_materials_pbrSpecularGlossiness -> diffuse = BaseColor, its spec/glo
 - TEXT / LOGO OUTLINES: `Boundary()` = Clipper2 Union under the source's fill rule (NonZero / EvenOdd; Positive for the Outline
   Only ring and the caps) -> PolyTree -> contours, outers CCW, holes CW (region on the left, as libtess2 gave); `Triangulate()`
   = each PolyTree outer + its holes -> earcut (islands in holes recurse). Precision: ~9 significant digits of the largest coordinate.
-  Proof (tools/w2_text.py, docs/parity/w2_text): 15 cases (holes O A B 8 % @, Bold, Italic, Letter Spacing, '|' rows, CJK, a font
+  Proof (tools/w2_text.py): 15 cases (holes O A B 8 % @, Bold, Italic, Letter Spacing, '|' rows, CJK, a font
   file, our even-odd / nonzero / nested / self-crossing SVGs, the emblem SVG / PDF / traced PNG): silhouettes max 0 vs W1, triangle
   counts equal except CJK (20958 -> 20840); lit 3/4 views bit-identical except z-fighting between two coplanar overlapping shapes.
 - SOLID PIECES (Shape: Shatter Mode Letters / Pieces / Pieces + Letters, default Pieces). With Pieces the spec carries

@@ -8,7 +8,7 @@ usage (repo root, after a Release build):
   tools/param_audit.py sheets                 Stage 2.4: Copies after LOD Bias, scene G at min / max -> docs/audit/copies_*.png
   tools/param_audit.py map                    Stage 3: docs/param_hierarchy.md from static.json + the sweeps + tools/param_audit_gates.json
   tools/param_audit.py canuse                 W11: every option / param a bundle offers that it cannot load or use -> docs/audit/canuse.md
-  tools/param_audit.py all                    static, the four sweeps, sheets, map, canuse
+  tools/param_audit.py all                    static, the four sweeps, map, canuse (sheets: on request only)
 
 THE VISIBILITY RULE (one rule for every param): render the scene with the param at its default (twice: the run-to-run noise)
 and at each test value, same clocks (hosttime pinned + `advance 0 zero` before the frames), and compare the raw premultiplied
@@ -691,7 +691,6 @@ def main():
         static()
         for b in BUNDLES:
             sweep(b)
-        sheets('LoadEhr'), sheets('LoadEhrFX')
         build_map()
         canuse()
 

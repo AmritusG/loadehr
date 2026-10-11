@@ -1,7 +1,7 @@
 # WOW recipe book (W26, MaskEhr's; LoadEhr W1 port)
 
-LoadEhr W1: these are MaskEhr's Wow looks without the lasers (C1-C3, C27, C28 are gone; Infinity Corridor and Mirror Storm render
-without their beams). In LoadEhr a look's model is a FILE a Model slot points at, by path (see `tools/w26_wow.py`); there is no
+LoadEhr W1: these are MaskEhr's Wow looks without the lasers (C1-C3, C27, C28 are gone); W2 removed the Mirror
+Room looks (C20, C21). In LoadEhr a look's model is a FILE a Model slot points at, by path (see `tools/w26_wow.py`); there is no
 library. The clip / layer numbers below are MaskEhr's Arena clips. `tools/parity.py` renders every look here in MaskEhr and LoadEhr.
 
 MaskEhr: twenty-one ready looks for the ten W26 effects, two per effect. They live in the **MaskEhr Wow** plugins: source
@@ -34,8 +34,6 @@ beam shows only in a medium. Beat-driven looks (Strike / Release / Crack / Burst
 | C17 | Caustic Crystal | 8 | Stage Icons/Crystal Cluster | Caustics 2, Caustic Source Whole Mask, Caustic IOR 1.6, Caustic Rainbow 1.5, Caustic Sharp 0.4, Caustic Ripple 0.15, Caustic Floor 1.5, Caustic Smoke 0.6, Key Elevation 45, Key Azimuth -60, Shadow Catcher 0.5, Haze 0.15, Spin Y 5. |
 | C18 | Bounce Shards | 9 | Skulls/Human Skull | Shatter Physics Bounce, Bounciness 0.55, Floor Friction 0.3, Shard Count 96, Shatter Force 1.5, Shatter Gravity 6, Shard Spin 4, Reform Time 1.2, Shadow Catcher 0.6, Mirror Floor 0.35, Orbit Yaw 25. Press: Shatter. |
 | C19 | Shard Wall | 9 | Masks/Plague Mask | Shatter Physics Bounce, Bounciness 0.7, Floor Friction 0.2, Shard Count 128, Shatter Force 3, Shatter Gravity 4, Catcher Plane Wall, Wall Distance 1.2, Shadow Catcher 0.6, Orbit Yaw 55, Orbit Pitch 10. Press: Shatter. |
-| C20 | Mirror Room | 10 | Skulls/Human Skull | Mirror Room Box, Mirror Count 3, Box Size 1.5, Box Depth 1.5, Mirror Color H 0.55 S 0.12 B 1 A 0.8, Mirror Gap 1.2, LED Colors Rainbow, LED Speed 0.25, Distance 8, Orbit Yaw 35, Orbit Pitch 18, Spin Y 6, Key Intensity 2. |
-| C21 | Infinity Corridor | 10 | Masks/Plague Mask | Mirror Room Corridor, Mirror Count 4, Box Size 1.6, Box Depth 1.6, Mirror Color H 0.6 S 0.25 B 1 A 0.8, Mirror Gap 1, LED Colors Rainbow, LED Speed 0.4, Orbit Yaw 18, Orbit Pitch 6. (LoadEhr: without its lasers.) |
 
 
 ## W28 fixes (Amrit's review, 2026-10-02/03)
