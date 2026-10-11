@@ -89,6 +89,7 @@ tools/param_audit.py canuse                # W11: every option / param a bundle 
 tools/w11_decisions.py defaults|lightc|window <out> [<ref build>]  # W11: the new Copies defaults, C Auto Place per option, the Window prune
 tools/arena_w11.py <layer> [col]          # W11: dial the W11 decision clips by param name (never triggers)
 tools/w12_glide.py hop|interrupt|same <out> <ref build>  # W12: Light C's cone / depth glide (Every Model Swap) vs a reference build
+tools/arena_w12.py <layer> [col]          # W12: dial the Light Glide clips (C1 Every Model Swap, C2 Once Per Model) by param name (never triggers)
 ```
 Log: `~/Library/Logs/LoadEhr/LoadEhr.log` (per-material texture resolution, load/upload/swap times per slot, shader compile
 logs; with Debug Log: PERF + MEM (GPU MB per slot) lines every second, CHAIN hops). `LOADEHR_LOG_STDERR=1` mirrors it to stderr.
