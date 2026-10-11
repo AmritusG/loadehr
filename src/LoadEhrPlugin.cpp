@@ -546,7 +546,7 @@ public:
 		dt            = std::min( 0.1f, std::max( 0.0f, dt ) );
 
 		UpdateModel();
-		UpdateEyes();
+		UpdateEyes( dt );
 		UpdateAudio( dt );
 
 		FrameState fs;
@@ -991,7 +991,7 @@ private:
 	// it is empty) and write the C params, as MaskEhr did for Model File. Every other filled slot gets its own eye search (cached
 	// per geometry, ahead of use); while the chain shows another model the openings move by the difference between its eyes and
 	// the anchor's (EyeOpen), gliding across the middle of each hop.
-	void UpdateEyes()
+	void UpdateEyes( float dt )
 	{
 		const int first = chain.n > 0 ? chain.filled[ 0 ] : 0;
 		const int mode  = Opt( P_LC_AUTO );
@@ -1003,6 +1003,7 @@ private:
 		// the C dials hold placedSlot's eyes: every other model's openings move by its eyes minus that model's (the glide). Every Model
 		// Swap re-places at a hop's midpoint, and the glide's offset is then taken from the new model: the openings do not jump
 		UpdateChainEyes( placedSlot );
+		GlideEyeFit( mode, dt );
 	}
 
 	struct EyeSlot
@@ -1011,6 +1012,7 @@ private:
 		std::string key;
 		bool found = false;
 		float pos[ 2 ][ 3 ] = {}; // left, right opening, mask space
+		float radius = 0, wall = 1e9f; // W12: the larger opening's radius, the nearer back wall behind the rim (1e9: see-through), mask units
 	};
 	EyeSlot eyeSlot[ kModelSlots ];
 	float eyeShift[ 2 ][ 3 ] = {}; // this frame: left / right opening offset from the anchor's (mask space)
@@ -1066,7 +1068,9 @@ private:
 				e.pos[ 0 ][ c ] = fit ? r.left.center[ c ] : r.left.center[ c ] * sc + q.fitCenter[ c ];
 				e.pos[ 1 ][ c ] = fit ? r.right.center[ c ] : r.right.center[ c ] * sc + q.fitCenter[ c ];
 			}
-			e.found = true;
+			e.radius = std::max( r.left.radius, r.right.radius ) * sc;
+			e.wall   = std::min( r.left.depth > 0 ? r.left.depth : 1e9f, r.right.depth > 0 ? r.right.depth : 1e9f ) * sc;
+			e.found  = true;
 			Log( "EYES slot %c: [%s] left (%.3f %.3f %.3f) right (%.3f %.3f %.3f) (the chain moves the C openings by its offset from slot %c's)", "ABCD"[ i ],
 			     r.kind.c_str(), e.pos[ 0 ][ 0 ], e.pos[ 0 ][ 1 ], e.pos[ 0 ][ 2 ], e.pos[ 1 ][ 0 ], e.pos[ 1 ][ 1 ], e.pos[ 1 ][ 2 ], "ABCD"[ anchorSlot ] );
 		}
@@ -1087,6 +1091,96 @@ private:
 				}
 				eyeShift[ side ][ c ] = o0 + ( o1 - o0 ) * w;
 			}
+	}
+
+	// the cone a placement fits: just fills an opening of `radius` from `behind`, plus a margin; capped at 40 deg (a light close behind a
+	// shallow opening would otherwise flood the whole frame)
+	static float EyeCone( float radius, float behind ) { return std::min( 40.0f, 2.0f * std::atan( radius / std::max( behind, 1e-3f ) ) / kDeg * 1.1f + 2.0f ); }
+	static float Clamped( unsigned id, float v ) { return std::min( ParamDefs()[ id ].max, std::max( ParamDefs()[ id ].min, v ) ); }
+
+	// W12 (Amrit: "Lights can glide, looks more natural."): with C Auto Place Every Model Swap the cone and Behind Depth glide from the
+	// outgoing model's fit to the incoming one's on the openings' glide (smoothstep t 0.35 .. 0.65), so position, cone and depth arrive
+	// together. Each model keeps its fit (the dials while it was the placed one, hand edits included); a revisit writes it back, a model
+	// not placed yet is predicted with the placement's own formula from the dials, so the dials written at the midpoint ARE the glide's
+	// end and nothing steps. A jump of the chain (a new hop before arrival, a restart, a fast drag) glides on from the values shown
+	// (a carry that fades over 0.3 x Transition Time, the glide's own share of a hop). Other modes: the dials as they are.
+	struct LcFit
+	{
+		std::string key; // the model + eye query it was placed for (EyeSlot::key; empty = none)
+		float cone = 0, behind = 0;
+	};
+	LcFit lcFit[ kModelSlots ];
+	float lcShow[ 2 ] = {}; // this frame's C cone, Behind Depth
+	struct
+	{
+		bool valid = false;
+		int cur = -1, next = -1;
+		float t = 0;
+		float shown[ 8 ] = {}, carry[ 8 ] = {}; // cone, Behind Depth, the openings (left xyz, right xyz: the dials + the shift)
+		double age = 0;                         // s since the last jump (stops at the fade's end)
+	} lcGlide;
+
+	// the cone / Behind Depth slot i rests with
+	void SlotEyeFit( int i, float* out ) const
+	{
+		out[ 0 ] = values[ P_LC_CONE ], out[ 1 ] = values[ P_LC_BEHIND ];
+		const EyeSlot& e = eyeSlot[ i ];
+		if( i == placedSlot || !e.found )
+			return; // the dials (a model without eyes changes nothing: the placement leaves the params untouched)
+		if( !lcFit[ i ].key.empty() && lcFit[ i ].key == e.key )
+		{
+			out[ 0 ] = lcFit[ i ].cone, out[ 1 ] = lcFit[ i ].behind;
+			return;
+		}
+		if( e.wall < 1e8f && out[ 1 ] > 0.6f * e.wall ) // what UpdateEyePlacement will write
+			out[ 1 ] = Clamped( P_LC_BEHIND, 0.6f * e.wall );
+		out[ 0 ] = Clamped( P_LC_CONE, EyeCone( e.radius, out[ 1 ] ) );
+	}
+
+	void GlideEyeFit( int mode, float dt )
+	{
+		lcShow[ 0 ] = values[ P_LC_CONE ], lcShow[ 1 ] = values[ P_LC_BEHIND ];
+		if( mode != AutoEvery )
+		{
+			for( LcFit& f : lcFit )
+				f.key.clear();
+			lcGlide.valid = false;
+			return;
+		}
+		const bool chained = chain.n >= 2 && WantEyes() && chain.cur >= 0; // UpdateChainEyes ran: the slot keys are this frame's
+		if( chained && eyeSlot[ placedSlot ].found )
+			lcFit[ placedSlot ] = { eyeSlot[ placedSlot ].key, values[ P_LC_CONE ], values[ P_LC_BEHIND ] };
+		if( chained && chain.next >= 0 )
+		{
+			float a[ 2 ], b[ 2 ];
+			SlotEyeFit( chain.cur, a ), SlotEyeFit( chain.next, b );
+			const float w = SmoothStep( 0.35f, 0.65f, chain.t ); // the openings' glide (UpdateChainEyes)
+			for( int k = 0; k < 2; ++k )
+				lcShow[ k ] = a[ k ] + ( b[ k ] - a[ k ] ) * w;
+		}
+		// the openings as shown (the dials + the chain's shift): a re-place moves the dials, so the carry is taken on the sum
+		float now[ 8 ] = { lcShow[ 0 ], lcShow[ 1 ] };
+		for( int k = 0; k < 3; ++k )
+			now[ 2 + k ] = values[ P_LC_L_POS_X + k ] + eyeShift[ 0 ][ k ], now[ 5 + k ] = values[ P_LC_R_POS_X + k ] + eyeShift[ 1 ][ k ];
+		const bool jump = lcGlide.valid && ( chain.cur != lcGlide.cur || chain.next != lcGlide.next || std::fabs( chain.t - lcGlide.t ) > 0.1f );
+		const double fade = 0.3 * std::max( 0.5f, values[ P_TRANS_TIME ] );
+		if( jump )
+		{
+			for( int k = 0; k < 8; ++k )
+				lcGlide.carry[ k ] = lcGlide.shown[ k ] - now[ k ];
+			lcGlide.age = 0.0;
+		}
+		else if( !lcGlide.valid )
+			lcGlide.age = fade;
+		lcGlide.age      = std::min( lcGlide.age + dt, fade );
+		const float keep = 1.0f - SmoothStep( 0.0f, 1.0f, float( lcGlide.age / fade ) );
+		for( int k = 0; k < 8; ++k )
+			now[ k ] += lcGlide.carry[ k ] * keep;
+		lcShow[ 0 ] = now[ 0 ], lcShow[ 1 ] = now[ 1 ];
+		for( int k = 0; k < 3; ++k )
+			eyeShift[ 0 ][ k ] = now[ 2 + k ] - values[ P_LC_L_POS_X + k ], eyeShift[ 1 ][ k ] = now[ 5 + k ] - values[ P_LC_R_POS_X + k ];
+		std::memcpy( lcGlide.shown, now, sizeof( now ) );
+		lcGlide.cur = chain.cur, lcGlide.next = chain.next, lcGlide.t = chain.t, lcGlide.valid = true;
 	}
 
 	// an eye opening in mask space (Light C's positions + the chain's eye offset). side 0 = left, 1 = right (Mirror X mirrors left)
@@ -1197,20 +1291,25 @@ private:
 			RaiseParamEvent( id, FF_EVENT_FLAG_VALUE );
 		};
 		const float radius = std::max( r.left.radius, r.right.radius ) * s;
+		// W12 Every Model Swap: a model placed before gets its own cone / Behind Depth back (the glide's end, SlotEyeFit)
+		const bool refit = req == EyeAutoPlace && mode == AutoEvery && !lcFit[ anchorSlot ].key.empty() && lcFit[ anchorSlot ].key == key;
+		if( refit )
+		{
+			write( P_LC_BEHIND, lcFit[ anchorSlot ].behind );
+			Log( "EYES placement: this model's own fit back, Behind Depth %.3f", values[ P_LC_BEHIND ] );
+		}
 		// a cavity eye (closed behind): the lights sit in front of the back wall, just behind the rim, so the wall does
 		// not block the beam and Front Only still starts the haze at the opening
 		const float wall = std::min( r.left.depth > 0 ? r.left.depth : 1e9f, r.right.depth > 0 ? r.right.depth : 1e9f ) * s;
-		if( req != EyeFitCone && wall < 1e8f && values[ P_LC_BEHIND ] > 0.6f * wall )
+		if( !refit && req != EyeFitCone && wall < 1e8f && values[ P_LC_BEHIND ] > 0.6f * wall )
 		{
 			write( P_LC_BEHIND, 0.6f * wall );
 			Log( "EYES placement: in the cavity, %.3f behind the rim (the back wall is %.3f behind it)", values[ P_LC_BEHIND ], wall );
 		}
-		else if( req != EyeFitCone )
+		else if( !refit && req != EyeFitCone )
 			Log( "EYES placement: %s, Behind Depth %.3f behind the opening", wall < 1e8f ? "in the cavity" : "behind the see-through opening", values[ P_LC_BEHIND ] );
 		const float behind = values[ P_LC_BEHIND ];
-		// full cone that just fills the opening from Behind Depth, plus a margin
-		// capped at 40 deg: a light close behind a shallow opening would otherwise flood the whole frame
-		write( P_LC_CONE, std::min( 40.0f, 2.0f * std::atan( radius / std::max( behind, 1e-3f ) ) / kDeg * 1.1f + 2.0f ) );
+		write( P_LC_CONE, refit ? lcFit[ anchorSlot ].cone : EyeCone( radius, behind ) );
 		if( req != EyeFitCone )
 		{
 			for( int k = 0; k < 3; ++k )
@@ -3594,7 +3693,7 @@ private:
 			return;
 		const bool anchored = On( P_LC_ANCHOR ), mirror = On( P_LC_MIRROR );
 		const int aim       = Opt( P_LC_AIM_MODE );
-		const float behind  = values[ P_LC_BEHIND ];
+		const float behind  = lcShow[ 1 ]; // W12: Behind Depth / cone as glided (Every Model Swap; else the dials)
 		const float gain    = values[ P_LC_INTENSITY ] * ( 1.0f + values[ P_LC_BEAT ] * pulse ) * ( 1.0f + values[ P_LC_AUDIO ] * audio[ 0 ] );
 		for( int side = 0; side < 2; ++side )
 		{
@@ -3659,7 +3758,7 @@ private:
 			ColourDrift( col, float( clk.lightHue[ 2 ] ), c );
 			for( int k = 0; k < 3; ++k )
 				x.color[ k ] = std::max( 0.0f, c[ k ] ) * gain * Alpha( col );
-			x.coneDeg  = values[ P_LC_CONE ];
+			x.coneDeg  = lcShow[ 0 ];
 			x.coneSoft = values[ P_LC_CONE_SOFT ];
 		}
 	}

@@ -495,38 +495,38 @@ Wobble Amount 1 + Pos X 0.4; **G** M + the param's gates opened. Numbers = the b
 
 ### Light C
 
-- **C Enable** — on its own. Two eye lights shining out of the eye openings. *VISIBLE ALWAYS* `S 1: 129600 px (noise 0); M 1: 6344 px (noise 0); G 1: 6339 px (noise 0)`
-- **C Place At Eyes** — when the model moves. Re-finds the eyes and writes the C positions back. *VISIBLE ONLY WHEN MOVING* `S pulse: 0 px (noise 0); M pulse: 2569 px (noise 0); G pulse: 6547 px (noise 0)`
+- **C Enable** — on its own. Two eye lights shining out of the eye openings. *VISIBLE ALWAYS* `S 1: 129600 px (noise 0); M 1: 6339 px (noise 0); G 1: 6339 px (noise 0)`
+- **C Place At Eyes** — when the model moves. Re-finds the eyes and writes the C positions back. *VISIBLE ONLY WHEN MOVING* `S pulse: 0 px (noise 0); M pulse: 2569 px (noise 0); G pulse: 6528 px (noise 0)`
 - **C Fit Cone** — when the model moves. Refits the cone to the eye opening. *VISIBLE ONLY WHEN MOVING* `S pulse: 0 px (noise 0); M pulse: 2569 px (noise 0); G pulse: 27290 px (noise 0)`
-  - **C Auto Place** — needs C Auto Place = 0, C Aim Mode = 2, C Aim Yaw = 40, C Cone Angle = 60, C Enable = 1, a moment (60 frames). What the eye finder writes by itself: Off nothing / Once Per Model everything once per file / Position Only the six positions / Every Model Swap everything for each model on show. *VISIBLE ONLY WHEN* `S 1: 0 px (noise 0); M 1: 0 px (noise 0); G 2: 14970 px (noise 2)`
-  - **C Front Only** — needs C Enable = 1, a moment (60 frames). Medium (and glow cloud) only beyond the opening vs all round the light. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 74299 px (noise 0)`
+  - **C Auto Place** — needs C Auto Place = 0, C Aim Mode = 2, C Aim Yaw = 40, C Cone Angle = 60, C Enable = 1, a moment (60 frames). What the eye finder writes by itself: Off nothing / Once Per Model everything once per file / Position Only the six positions / Every Model Swap everything for each model on show. *VISIBLE ONLY WHEN* `S 1: 0 px (noise 0); M 1: 0 px (noise 0); G 2: 14967 px (noise 0)`
+  - **C Front Only** — needs C Enable = 1, a moment (60 frames). Medium (and glow cloud) only beyond the opening vs all round the light. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 74323 px (noise 0)`
   - **C Behind Depth** — needs C Enable = 1, a moment (60 frames). How far behind the opening the light sits. *VISIBLE ONLY WHEN* `S 0.02: 0 px (noise 0); M 0.02: 0 px (noise 0); G 2: 9769 px (noise 0)`
-  - **C Anchor To Mask** — needs C Enable = 1, a moment (60 frames). Openings in mask space vs world. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 42017 px (noise 0)`
-  - **C Mirror X** — needs C Enable = 1, a moment (60 frames), C Right Pos X = 1.2. Right light mirrors the left one vs uses its own Pos. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 5725 px (noise 0)`
-  - **C Left Pos X** — needs C Enable = 1, a moment (60 frames). Left eye opening X. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G 1: 6522 px (noise 0)`
-  - **C Left Pos Y** — needs C Enable = 1, a moment (60 frames). Left eye opening Y. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 16267 px (noise 0)`
-  - **C Left Pos Z** — needs C Enable = 1, a moment (60 frames). Left eye opening Z. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 9466 px (noise 0)`
-  - **C Right Pos X** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening X. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 6380 px (noise 0)`
-  - **C Right Pos Y** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening Y. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 14742 px (noise 0)`
-  - **C Right Pos Z** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening Z. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 7443 px (noise 0)`
-  - **C Aim Mode** — needs C Enable = 1, a moment (60 frames). Through Hole / At Camera / Free. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 20192 px (noise 0)`
+  - **C Anchor To Mask** — needs C Enable = 1, a moment (60 frames). Openings in mask space vs world. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 41960 px (noise 0)`
+  - **C Mirror X** — needs C Enable = 1, a moment (60 frames), C Right Pos X = 1.2. Right light mirrors the left one vs uses its own Pos. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 5800 px (noise 0)`
+  - **C Left Pos X** — needs C Enable = 1, a moment (60 frames). Left eye opening X. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 6526 px (noise 0)`
+  - **C Left Pos Y** — needs C Enable = 1, a moment (60 frames). Left eye opening Y. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 16266 px (noise 0)`
+  - **C Left Pos Z** — needs C Enable = 1, a moment (60 frames). Left eye opening Z. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 9468 px (noise 0)`
+  - **C Right Pos X** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening X. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 6423 px (noise 0)`
+  - **C Right Pos Y** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening Y. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 14844 px (noise 0)`
+  - **C Right Pos Z** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening Z. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 7561 px (noise 0)`
+  - **C Aim Mode** — needs C Enable = 1, a moment (60 frames). Through Hole / At Camera / Free. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 20169 px (noise 0)`
   - **C Aim Yaw** — needs C Enable = 1, a moment (60 frames), C Aim Mode = 2, Haze = 1. Free aim yaw (mirrored on the right with Mirror X). *VISIBLE ONLY WHEN* `S -60: 0 px (noise 0); M -60: 0 px (noise 0); G -60: 4349 px (noise 0)`
   - **C Aim Pitch** — needs C Enable = 1, a moment (60 frames), C Aim Mode = 2, Haze = 1. Free aim pitch. *VISIBLE ONLY WHEN* `S -60: 0 px (noise 0); M -60: 0 px (noise 0); G -60: 14036 px (noise 0)`
-  - **C Cone Angle** — needs C Enable = 1, a moment (60 frames). Eye light cone width. *VISIBLE ONLY WHEN* `S 5: 0 px (noise 0); M 5: 0 px (noise 0); G 90: 21308 px (noise 0)`
-  - **C Cone Soft** — needs C Enable = 1, a moment (60 frames). Cone edge softness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 8271 px (noise 0)`
-  - **C Intensity** — needs C Enable = 1, a moment (60 frames). Eye light brightness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 100: 9158 px (noise 0)`
-  - **C Left Color** — needs C Enable = 1, a moment (60 frames). Left (and linked right) light hue. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 2668 px (noise 0)`
+  - **C Cone Angle** — needs C Enable = 1, a moment (60 frames). Eye light cone width. *VISIBLE ONLY WHEN* `S 5: 0 px (noise 0); M 5: 0 px (noise 0); G 90: 21298 px (noise 0)`
+  - **C Cone Soft** — needs C Enable = 1, a moment (60 frames). Cone edge softness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 8389 px (noise 0)`
+  - **C Intensity** — needs C Enable = 1, a moment (60 frames). Eye light brightness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 100: 9150 px (noise 0)`
+  - **C Left Color** — needs C Enable = 1, a moment (60 frames). Left (and linked right) light hue. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 2674 px (noise 0)`
   - **C Left Sat** — needs C Enable = 1, a moment (60 frames). Left (linked) light saturation. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 7678 px (noise 0)`
   - **C Left Bri** — needs C Enable = 1, a moment (60 frames). Left (linked) light brightness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 8036 px (noise 0)`
   - **C Left Alpha** — needs C Enable = 1, a moment (60 frames). Left (linked) light strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 8036 px (noise 0)`
-  - **C Link Colors** — needs C Enable = 1, a moment (60 frames), C Right Color = 0.6, C Right Sat = 1. Right light uses the left colour vs its own. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7072 px (noise 0)`
-  - **C Right Color** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 259 px (noise 0)`
-  - **C Right Sat** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 4476 px (noise 0)`
-  - **C Right Bri** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7072 px (noise 0)`
-  - **C Right Alpha** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7072 px (noise 0)`
-  - **C Hue Drift** — needs C Enable = 1, a moment (60 frames). Both eye lights' hue cycles. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0.3: 5055 px (noise 0)`
+  - **C Link Colors** — needs C Enable = 1, a moment (60 frames), C Right Color = 0.6, C Right Sat = 1. Right light uses the left colour vs its own. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7196 px (noise 0)`
+  - **C Right Color** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 201 px (noise 0)`
+  - **C Right Sat** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 4444 px (noise 0)`
+  - **C Right Bri** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7196 px (noise 0)`
+  - **C Right Alpha** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7196 px (noise 0)`
+  - **C Hue Drift** — needs C Enable = 1, a moment (60 frames). Both eye lights' hue cycles. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0.3: 5088 px (noise 0)`
   - **C Beat Pulse** — needs C Enable = 1, a moment (60 frames). Eye lights pulse on the beat. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 4: 7600 px (noise 0)`
-  - **C Audio > Light** — needs C Enable = 1, a moment (60 frames), audio (FFT). Eye lights follow the bass. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 4: 8329 px (noise 0)`
+  - **C Audio > Light** — needs C Enable = 1, a moment (60 frames), audio (FFT). Eye lights follow the bass. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 4: 8332 px (noise 0)`
 - **C Placed For** — non-visual: hidden store (the model Light C was placed for). None directly (stops a re-auto-place). *NON-VISUAL* ``
 
 ### Spots
@@ -1092,38 +1092,38 @@ Wobble Amount 1 + Pos X 0.4; **G** M + the param's gates opened. Numbers = the b
 
 ### Light C
 
-- **C Enable** — on its own. Two eye lights shining out of the eye openings. *VISIBLE ALWAYS* `S 1: 129600 px (noise 0); M 1: 6344 px (noise 0); G 1: 6339 px (noise 0)`
-- **C Place At Eyes** — when the model moves. Re-finds the eyes and writes the C positions back. *VISIBLE ONLY WHEN MOVING* `S pulse: 0 px (noise 0); M pulse: 2569 px (noise 0); G pulse: 6547 px (noise 0)`
+- **C Enable** — on its own. Two eye lights shining out of the eye openings. *VISIBLE ALWAYS* `S 1: 129600 px (noise 0); M 1: 6339 px (noise 0); G 1: 6339 px (noise 0)`
+- **C Place At Eyes** — when the model moves. Re-finds the eyes and writes the C positions back. *VISIBLE ONLY WHEN MOVING* `S pulse: 0 px (noise 0); M pulse: 2569 px (noise 0); G pulse: 6528 px (noise 0)`
 - **C Fit Cone** — when the model moves. Refits the cone to the eye opening. *VISIBLE ONLY WHEN MOVING* `S pulse: 0 px (noise 0); M pulse: 2569 px (noise 0); G pulse: 27290 px (noise 0)`
-  - **C Auto Place** — needs C Auto Place = 0, C Aim Mode = 2, C Aim Yaw = 40, C Cone Angle = 60, C Enable = 1, a moment (60 frames). What the eye finder writes by itself: Off nothing / Once Per Model everything once per file / Position Only the six positions / Every Model Swap everything for each model on show. *VISIBLE ONLY WHEN* `S 1: 0 px (noise 0); M 1: 0 px (noise 0); G 2: 14970 px (noise 2)`
-  - **C Front Only** — needs C Enable = 1, a moment (60 frames). Medium (and glow cloud) only beyond the opening vs all round the light. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 74299 px (noise 0)`
+  - **C Auto Place** — needs C Auto Place = 0, C Aim Mode = 2, C Aim Yaw = 40, C Cone Angle = 60, C Enable = 1, a moment (60 frames). What the eye finder writes by itself: Off nothing / Once Per Model everything once per file / Position Only the six positions / Every Model Swap everything for each model on show. *VISIBLE ONLY WHEN* `S 1: 0 px (noise 0); M 1: 0 px (noise 0); G 2: 14967 px (noise 0)`
+  - **C Front Only** — needs C Enable = 1, a moment (60 frames). Medium (and glow cloud) only beyond the opening vs all round the light. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 74323 px (noise 0)`
   - **C Behind Depth** — needs C Enable = 1, a moment (60 frames). How far behind the opening the light sits. *VISIBLE ONLY WHEN* `S 0.02: 0 px (noise 0); M 0.02: 0 px (noise 0); G 2: 9769 px (noise 0)`
-  - **C Anchor To Mask** — needs C Enable = 1, a moment (60 frames). Openings in mask space vs world. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 42017 px (noise 0)`
-  - **C Mirror X** — needs C Enable = 1, a moment (60 frames), C Right Pos X = 1.2. Right light mirrors the left one vs uses its own Pos. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 5725 px (noise 0)`
-  - **C Left Pos X** — needs C Enable = 1, a moment (60 frames). Left eye opening X. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G 1: 6522 px (noise 0)`
-  - **C Left Pos Y** — needs C Enable = 1, a moment (60 frames). Left eye opening Y. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 16267 px (noise 0)`
-  - **C Left Pos Z** — needs C Enable = 1, a moment (60 frames). Left eye opening Z. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 9466 px (noise 0)`
-  - **C Right Pos X** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening X. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 6380 px (noise 0)`
-  - **C Right Pos Y** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening Y. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 14742 px (noise 0)`
-  - **C Right Pos Z** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening Z. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 7443 px (noise 0)`
-  - **C Aim Mode** — needs C Enable = 1, a moment (60 frames). Through Hole / At Camera / Free. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 20192 px (noise 0)`
+  - **C Anchor To Mask** — needs C Enable = 1, a moment (60 frames). Openings in mask space vs world. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 41960 px (noise 0)`
+  - **C Mirror X** — needs C Enable = 1, a moment (60 frames), C Right Pos X = 1.2. Right light mirrors the left one vs uses its own Pos. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 5800 px (noise 0)`
+  - **C Left Pos X** — needs C Enable = 1, a moment (60 frames). Left eye opening X. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 6526 px (noise 0)`
+  - **C Left Pos Y** — needs C Enable = 1, a moment (60 frames). Left eye opening Y. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 16266 px (noise 0)`
+  - **C Left Pos Z** — needs C Enable = 1, a moment (60 frames). Left eye opening Z. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 9468 px (noise 0)`
+  - **C Right Pos X** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening X. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 6423 px (noise 0)`
+  - **C Right Pos Y** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening Y. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 14844 px (noise 0)`
+  - **C Right Pos Z** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening Z. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 7561 px (noise 0)`
+  - **C Aim Mode** — needs C Enable = 1, a moment (60 frames). Through Hole / At Camera / Free. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 20169 px (noise 0)`
   - **C Aim Yaw** — needs C Enable = 1, a moment (60 frames), C Aim Mode = 2, Haze = 1. Free aim yaw (mirrored on the right with Mirror X). *VISIBLE ONLY WHEN* `S -60: 0 px (noise 0); M -60: 0 px (noise 0); G -60: 4349 px (noise 0)`
   - **C Aim Pitch** — needs C Enable = 1, a moment (60 frames), C Aim Mode = 2, Haze = 1. Free aim pitch. *VISIBLE ONLY WHEN* `S -60: 0 px (noise 0); M -60: 0 px (noise 0); G -60: 14036 px (noise 0)`
-  - **C Cone Angle** — needs C Enable = 1, a moment (60 frames). Eye light cone width. *VISIBLE ONLY WHEN* `S 5: 0 px (noise 0); M 5: 0 px (noise 0); G 90: 21308 px (noise 0)`
-  - **C Cone Soft** — needs C Enable = 1, a moment (60 frames). Cone edge softness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 8271 px (noise 0)`
-  - **C Intensity** — needs C Enable = 1, a moment (60 frames). Eye light brightness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 100: 9158 px (noise 0)`
-  - **C Left Color** — needs C Enable = 1, a moment (60 frames). Left (and linked right) light hue. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 2668 px (noise 0)`
+  - **C Cone Angle** — needs C Enable = 1, a moment (60 frames). Eye light cone width. *VISIBLE ONLY WHEN* `S 5: 0 px (noise 0); M 5: 0 px (noise 0); G 90: 21298 px (noise 0)`
+  - **C Cone Soft** — needs C Enable = 1, a moment (60 frames). Cone edge softness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 8389 px (noise 0)`
+  - **C Intensity** — needs C Enable = 1, a moment (60 frames). Eye light brightness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 100: 9150 px (noise 0)`
+  - **C Left Color** — needs C Enable = 1, a moment (60 frames). Left (and linked right) light hue. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 2674 px (noise 0)`
   - **C Left Sat** — needs C Enable = 1, a moment (60 frames). Left (linked) light saturation. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 7678 px (noise 0)`
   - **C Left Bri** — needs C Enable = 1, a moment (60 frames). Left (linked) light brightness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 8036 px (noise 0)`
   - **C Left Alpha** — needs C Enable = 1, a moment (60 frames). Left (linked) light strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 8036 px (noise 0)`
-  - **C Link Colors** — needs C Enable = 1, a moment (60 frames), C Right Color = 0.6, C Right Sat = 1. Right light uses the left colour vs its own. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7072 px (noise 0)`
-  - **C Right Color** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 259 px (noise 0)`
-  - **C Right Sat** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 4476 px (noise 0)`
-  - **C Right Bri** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7072 px (noise 0)`
-  - **C Right Alpha** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7072 px (noise 0)`
-  - **C Hue Drift** — needs C Enable = 1, a moment (60 frames). Both eye lights' hue cycles. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0.3: 5055 px (noise 0)`
+  - **C Link Colors** — needs C Enable = 1, a moment (60 frames), C Right Color = 0.6, C Right Sat = 1. Right light uses the left colour vs its own. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7196 px (noise 0)`
+  - **C Right Color** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 201 px (noise 0)`
+  - **C Right Sat** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 4444 px (noise 0)`
+  - **C Right Bri** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7196 px (noise 0)`
+  - **C Right Alpha** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7196 px (noise 0)`
+  - **C Hue Drift** — needs C Enable = 1, a moment (60 frames). Both eye lights' hue cycles. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0.3: 5088 px (noise 0)`
   - **C Beat Pulse** — needs C Enable = 1, a moment (60 frames). Eye lights pulse on the beat. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 4: 7600 px (noise 0)`
-  - **C Audio > Light** — needs C Enable = 1, a moment (60 frames), audio (FFT). Eye lights follow the bass. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 4: 8329 px (noise 0)`
+  - **C Audio > Light** — needs C Enable = 1, a moment (60 frames), audio (FFT). Eye lights follow the bass. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 4: 8332 px (noise 0)`
 - **C Placed For** — non-visual: hidden store (the model Light C was placed for). None directly (stops a re-auto-place). *NON-VISUAL* ``
 
 ### Spots
@@ -1717,38 +1717,38 @@ Wobble Amount 1 + Pos X 0.4; **G** M + the param's gates opened. Numbers = the b
 
 ### Light C
 
-- **C Enable** — on its own. Two eye lights shining out of the eye openings. *VISIBLE ALWAYS* `S 1: 129600 px (noise 0); M 1: 6344 px (noise 0); G 1: 6339 px (noise 0)`
-- **C Place At Eyes** — when the model moves. Re-finds the eyes and writes the C positions back. *VISIBLE ONLY WHEN MOVING* `S pulse: 0 px (noise 0); M pulse: 2569 px (noise 0); G pulse: 6547 px (noise 0)`
+- **C Enable** — on its own. Two eye lights shining out of the eye openings. *VISIBLE ALWAYS* `S 1: 129600 px (noise 0); M 1: 6339 px (noise 0); G 1: 6339 px (noise 0)`
+- **C Place At Eyes** — when the model moves. Re-finds the eyes and writes the C positions back. *VISIBLE ONLY WHEN MOVING* `S pulse: 0 px (noise 0); M pulse: 2569 px (noise 0); G pulse: 6528 px (noise 0)`
 - **C Fit Cone** — when the model moves. Refits the cone to the eye opening. *VISIBLE ONLY WHEN MOVING* `S pulse: 0 px (noise 0); M pulse: 2569 px (noise 0); G pulse: 27290 px (noise 0)`
-  - **C Auto Place** — needs C Auto Place = 0, C Aim Mode = 2, C Aim Yaw = 40, C Cone Angle = 60, C Enable = 1, a moment (60 frames). What the eye finder writes by itself: Off nothing / Once Per Model everything once per file / Position Only the six positions / Every Model Swap everything for each model on show. *VISIBLE ONLY WHEN* `S 1: 0 px (noise 0); M 1: 0 px (noise 0); G 2: 14970 px (noise 2)`
-  - **C Front Only** — needs C Enable = 1, a moment (60 frames). Medium (and glow cloud) only beyond the opening vs all round the light. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 74299 px (noise 0)`
+  - **C Auto Place** — needs C Auto Place = 0, C Aim Mode = 2, C Aim Yaw = 40, C Cone Angle = 60, C Enable = 1, a moment (60 frames). What the eye finder writes by itself: Off nothing / Once Per Model everything once per file / Position Only the six positions / Every Model Swap everything for each model on show. *VISIBLE ONLY WHEN* `S 1: 0 px (noise 0); M 1: 0 px (noise 0); G 2: 14967 px (noise 0)`
+  - **C Front Only** — needs C Enable = 1, a moment (60 frames). Medium (and glow cloud) only beyond the opening vs all round the light. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 74323 px (noise 0)`
   - **C Behind Depth** — needs C Enable = 1, a moment (60 frames). How far behind the opening the light sits. *VISIBLE ONLY WHEN* `S 0.02: 0 px (noise 0); M 0.02: 0 px (noise 0); G 2: 9769 px (noise 0)`
-  - **C Anchor To Mask** — needs C Enable = 1, a moment (60 frames). Openings in mask space vs world. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 42017 px (noise 0)`
-  - **C Mirror X** — needs C Enable = 1, a moment (60 frames), C Right Pos X = 1.2. Right light mirrors the left one vs uses its own Pos. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 5725 px (noise 0)`
-  - **C Left Pos X** — needs C Enable = 1, a moment (60 frames). Left eye opening X. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G 1: 6522 px (noise 0)`
-  - **C Left Pos Y** — needs C Enable = 1, a moment (60 frames). Left eye opening Y. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 16267 px (noise 0)`
-  - **C Left Pos Z** — needs C Enable = 1, a moment (60 frames). Left eye opening Z. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 9466 px (noise 0)`
-  - **C Right Pos X** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening X. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 6380 px (noise 0)`
-  - **C Right Pos Y** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening Y. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 14742 px (noise 0)`
-  - **C Right Pos Z** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening Z. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 7443 px (noise 0)`
-  - **C Aim Mode** — needs C Enable = 1, a moment (60 frames). Through Hole / At Camera / Free. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 20192 px (noise 0)`
+  - **C Anchor To Mask** — needs C Enable = 1, a moment (60 frames). Openings in mask space vs world. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 41960 px (noise 0)`
+  - **C Mirror X** — needs C Enable = 1, a moment (60 frames), C Right Pos X = 1.2. Right light mirrors the left one vs uses its own Pos. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 5800 px (noise 0)`
+  - **C Left Pos X** — needs C Enable = 1, a moment (60 frames). Left eye opening X. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 6526 px (noise 0)`
+  - **C Left Pos Y** — needs C Enable = 1, a moment (60 frames). Left eye opening Y. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 16266 px (noise 0)`
+  - **C Left Pos Z** — needs C Enable = 1, a moment (60 frames). Left eye opening Z. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 9468 px (noise 0)`
+  - **C Right Pos X** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening X. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 6423 px (noise 0)`
+  - **C Right Pos Y** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening Y. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 14844 px (noise 0)`
+  - **C Right Pos Z** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening Z. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 7561 px (noise 0)`
+  - **C Aim Mode** — needs C Enable = 1, a moment (60 frames). Through Hole / At Camera / Free. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 20169 px (noise 0)`
   - **C Aim Yaw** — needs C Enable = 1, a moment (60 frames), C Aim Mode = 2, Haze = 1. Free aim yaw (mirrored on the right with Mirror X). *VISIBLE ONLY WHEN* `S -60: 0 px (noise 0); M -60: 0 px (noise 0); G -60: 4349 px (noise 0)`
   - **C Aim Pitch** — needs C Enable = 1, a moment (60 frames), C Aim Mode = 2, Haze = 1. Free aim pitch. *VISIBLE ONLY WHEN* `S -60: 0 px (noise 0); M -60: 0 px (noise 0); G -60: 14036 px (noise 0)`
-  - **C Cone Angle** — needs C Enable = 1, a moment (60 frames). Eye light cone width. *VISIBLE ONLY WHEN* `S 5: 0 px (noise 0); M 5: 0 px (noise 0); G 90: 21308 px (noise 0)`
-  - **C Cone Soft** — needs C Enable = 1, a moment (60 frames). Cone edge softness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 8271 px (noise 0)`
-  - **C Intensity** — needs C Enable = 1, a moment (60 frames). Eye light brightness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 100: 9158 px (noise 0)`
-  - **C Left Color** — needs C Enable = 1, a moment (60 frames). Left (and linked right) light hue. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 2668 px (noise 0)`
+  - **C Cone Angle** — needs C Enable = 1, a moment (60 frames). Eye light cone width. *VISIBLE ONLY WHEN* `S 5: 0 px (noise 0); M 5: 0 px (noise 0); G 90: 21298 px (noise 0)`
+  - **C Cone Soft** — needs C Enable = 1, a moment (60 frames). Cone edge softness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 8389 px (noise 0)`
+  - **C Intensity** — needs C Enable = 1, a moment (60 frames). Eye light brightness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 100: 9150 px (noise 0)`
+  - **C Left Color** — needs C Enable = 1, a moment (60 frames). Left (and linked right) light hue. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 2674 px (noise 0)`
   - **C Left Sat** — needs C Enable = 1, a moment (60 frames). Left (linked) light saturation. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 7678 px (noise 0)`
   - **C Left Bri** — needs C Enable = 1, a moment (60 frames). Left (linked) light brightness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 8036 px (noise 0)`
   - **C Left Alpha** — needs C Enable = 1, a moment (60 frames). Left (linked) light strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 8036 px (noise 0)`
-  - **C Link Colors** — needs C Enable = 1, a moment (60 frames), C Right Color = 0.6, C Right Sat = 1. Right light uses the left colour vs its own. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7072 px (noise 0)`
-  - **C Right Color** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 259 px (noise 0)`
-  - **C Right Sat** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 4476 px (noise 0)`
-  - **C Right Bri** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7072 px (noise 0)`
-  - **C Right Alpha** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7072 px (noise 0)`
-  - **C Hue Drift** — needs C Enable = 1, a moment (60 frames). Both eye lights' hue cycles. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0.3: 5055 px (noise 0)`
+  - **C Link Colors** — needs C Enable = 1, a moment (60 frames), C Right Color = 0.6, C Right Sat = 1. Right light uses the left colour vs its own. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7196 px (noise 0)`
+  - **C Right Color** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 201 px (noise 0)`
+  - **C Right Sat** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 4444 px (noise 0)`
+  - **C Right Bri** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7196 px (noise 0)`
+  - **C Right Alpha** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7196 px (noise 0)`
+  - **C Hue Drift** — needs C Enable = 1, a moment (60 frames). Both eye lights' hue cycles. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0.3: 5088 px (noise 0)`
   - **C Beat Pulse** — needs C Enable = 1, a moment (60 frames). Eye lights pulse on the beat. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 4: 7600 px (noise 0)`
-  - **C Audio > Light** — needs C Enable = 1, a moment (60 frames), audio (FFT). Eye lights follow the bass. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 4: 8329 px (noise 0)`
+  - **C Audio > Light** — needs C Enable = 1, a moment (60 frames), audio (FFT). Eye lights follow the bass. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 4: 8332 px (noise 0)`
 - **C Placed For** — non-visual: hidden store (the model Light C was placed for). None directly (stops a re-auto-place). *NON-VISUAL* ``
 
 ### Projector
@@ -2319,38 +2319,38 @@ Wobble Amount 1 + Pos X 0.4; **G** M + the param's gates opened. Numbers = the b
 
 ### Light C
 
-- **C Enable** — on its own. Two eye lights shining out of the eye openings. *VISIBLE ALWAYS* `S 1: 129600 px (noise 0); M 1: 6344 px (noise 0); G 1: 6339 px (noise 0)`
-- **C Place At Eyes** — when the model moves. Re-finds the eyes and writes the C positions back. *VISIBLE ONLY WHEN MOVING* `S pulse: 0 px (noise 0); M pulse: 2569 px (noise 0); G pulse: 6547 px (noise 0)`
+- **C Enable** — on its own. Two eye lights shining out of the eye openings. *VISIBLE ALWAYS* `S 1: 129600 px (noise 0); M 1: 6339 px (noise 0); G 1: 6339 px (noise 0)`
+- **C Place At Eyes** — when the model moves. Re-finds the eyes and writes the C positions back. *VISIBLE ONLY WHEN MOVING* `S pulse: 0 px (noise 0); M pulse: 2569 px (noise 0); G pulse: 6528 px (noise 0)`
 - **C Fit Cone** — when the model moves. Refits the cone to the eye opening. *VISIBLE ONLY WHEN MOVING* `S pulse: 0 px (noise 0); M pulse: 2569 px (noise 0); G pulse: 27290 px (noise 0)`
-  - **C Auto Place** — needs C Auto Place = 0, C Aim Mode = 2, C Aim Yaw = 40, C Cone Angle = 60, C Enable = 1, a moment (60 frames). What the eye finder writes by itself: Off nothing / Once Per Model everything once per file / Position Only the six positions / Every Model Swap everything for each model on show. *VISIBLE ONLY WHEN* `S 1: 0 px (noise 0); M 1: 0 px (noise 0); G 2: 14970 px (noise 2)`
-  - **C Front Only** — needs C Enable = 1, a moment (60 frames). Medium (and glow cloud) only beyond the opening vs all round the light. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 74299 px (noise 0)`
+  - **C Auto Place** — needs C Auto Place = 0, C Aim Mode = 2, C Aim Yaw = 40, C Cone Angle = 60, C Enable = 1, a moment (60 frames). What the eye finder writes by itself: Off nothing / Once Per Model everything once per file / Position Only the six positions / Every Model Swap everything for each model on show. *VISIBLE ONLY WHEN* `S 1: 0 px (noise 0); M 1: 0 px (noise 0); G 2: 14967 px (noise 0)`
+  - **C Front Only** — needs C Enable = 1, a moment (60 frames). Medium (and glow cloud) only beyond the opening vs all round the light. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 74323 px (noise 0)`
   - **C Behind Depth** — needs C Enable = 1, a moment (60 frames). How far behind the opening the light sits. *VISIBLE ONLY WHEN* `S 0.02: 0 px (noise 0); M 0.02: 0 px (noise 0); G 2: 9769 px (noise 0)`
-  - **C Anchor To Mask** — needs C Enable = 1, a moment (60 frames). Openings in mask space vs world. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 42017 px (noise 0)`
-  - **C Mirror X** — needs C Enable = 1, a moment (60 frames), C Right Pos X = 1.2. Right light mirrors the left one vs uses its own Pos. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 5725 px (noise 0)`
-  - **C Left Pos X** — needs C Enable = 1, a moment (60 frames). Left eye opening X. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G 1: 6522 px (noise 0)`
-  - **C Left Pos Y** — needs C Enable = 1, a moment (60 frames). Left eye opening Y. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 16267 px (noise 0)`
-  - **C Left Pos Z** — needs C Enable = 1, a moment (60 frames). Left eye opening Z. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 9466 px (noise 0)`
-  - **C Right Pos X** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening X. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 6380 px (noise 0)`
-  - **C Right Pos Y** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening Y. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 14742 px (noise 0)`
-  - **C Right Pos Z** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening Z. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 7443 px (noise 0)`
-  - **C Aim Mode** — needs C Enable = 1, a moment (60 frames). Through Hole / At Camera / Free. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 20192 px (noise 0)`
+  - **C Anchor To Mask** — needs C Enable = 1, a moment (60 frames). Openings in mask space vs world. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 41960 px (noise 0)`
+  - **C Mirror X** — needs C Enable = 1, a moment (60 frames), C Right Pos X = 1.2. Right light mirrors the left one vs uses its own Pos. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 5800 px (noise 0)`
+  - **C Left Pos X** — needs C Enable = 1, a moment (60 frames). Left eye opening X. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 6526 px (noise 0)`
+  - **C Left Pos Y** — needs C Enable = 1, a moment (60 frames). Left eye opening Y. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 16266 px (noise 0)`
+  - **C Left Pos Z** — needs C Enable = 1, a moment (60 frames). Left eye opening Z. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 9468 px (noise 0)`
+  - **C Right Pos X** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening X. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 6423 px (noise 0)`
+  - **C Right Pos Y** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening Y. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 14844 px (noise 0)`
+  - **C Right Pos Z** — needs C Enable = 1, a moment (60 frames), C Mirror X = 0. Right eye opening Z. *VISIBLE ONLY WHEN* `S -1: 0 px (noise 0); M -1: 0 px (noise 0); G -1: 7561 px (noise 0)`
+  - **C Aim Mode** — needs C Enable = 1, a moment (60 frames). Through Hole / At Camera / Free. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 20169 px (noise 0)`
   - **C Aim Yaw** — needs C Enable = 1, a moment (60 frames), C Aim Mode = 2, Haze = 1. Free aim yaw (mirrored on the right with Mirror X). *VISIBLE ONLY WHEN* `S -60: 0 px (noise 0); M -60: 0 px (noise 0); G -60: 4349 px (noise 0)`
   - **C Aim Pitch** — needs C Enable = 1, a moment (60 frames), C Aim Mode = 2, Haze = 1. Free aim pitch. *VISIBLE ONLY WHEN* `S -60: 0 px (noise 0); M -60: 0 px (noise 0); G -60: 14036 px (noise 0)`
-  - **C Cone Angle** — needs C Enable = 1, a moment (60 frames). Eye light cone width. *VISIBLE ONLY WHEN* `S 5: 0 px (noise 0); M 5: 0 px (noise 0); G 90: 21308 px (noise 0)`
-  - **C Cone Soft** — needs C Enable = 1, a moment (60 frames). Cone edge softness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 8271 px (noise 0)`
-  - **C Intensity** — needs C Enable = 1, a moment (60 frames). Eye light brightness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 100: 9158 px (noise 0)`
-  - **C Left Color** — needs C Enable = 1, a moment (60 frames). Left (and linked right) light hue. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 2668 px (noise 0)`
+  - **C Cone Angle** — needs C Enable = 1, a moment (60 frames). Eye light cone width. *VISIBLE ONLY WHEN* `S 5: 0 px (noise 0); M 5: 0 px (noise 0); G 90: 21298 px (noise 0)`
+  - **C Cone Soft** — needs C Enable = 1, a moment (60 frames). Cone edge softness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 8389 px (noise 0)`
+  - **C Intensity** — needs C Enable = 1, a moment (60 frames). Eye light brightness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 100: 9150 px (noise 0)`
+  - **C Left Color** — needs C Enable = 1, a moment (60 frames). Left (and linked right) light hue. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 2674 px (noise 0)`
   - **C Left Sat** — needs C Enable = 1, a moment (60 frames). Left (linked) light saturation. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 7678 px (noise 0)`
   - **C Left Bri** — needs C Enable = 1, a moment (60 frames). Left (linked) light brightness. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 8036 px (noise 0)`
   - **C Left Alpha** — needs C Enable = 1, a moment (60 frames). Left (linked) light strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 8036 px (noise 0)`
-  - **C Link Colors** — needs C Enable = 1, a moment (60 frames), C Right Color = 0.6, C Right Sat = 1. Right light uses the left colour vs its own. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7072 px (noise 0)`
-  - **C Right Color** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 259 px (noise 0)`
-  - **C Right Sat** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 4476 px (noise 0)`
-  - **C Right Bri** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7072 px (noise 0)`
-  - **C Right Alpha** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7072 px (noise 0)`
-  - **C Hue Drift** — needs C Enable = 1, a moment (60 frames). Both eye lights' hue cycles. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0.3: 5055 px (noise 0)`
+  - **C Link Colors** — needs C Enable = 1, a moment (60 frames), C Right Color = 0.6, C Right Sat = 1. Right light uses the left colour vs its own. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7196 px (noise 0)`
+  - **C Right Color** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 201 px (noise 0)`
+  - **C Right Sat** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 1: 4444 px (noise 0)`
+  - **C Right Bri** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7196 px (noise 0)`
+  - **C Right Alpha** — needs C Enable = 1, a moment (60 frames), C Link Colors = 0. Right eye light colour / strength. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0: 7196 px (noise 0)`
+  - **C Hue Drift** — needs C Enable = 1, a moment (60 frames). Both eye lights' hue cycles. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 0.3: 5088 px (noise 0)`
   - **C Beat Pulse** — needs C Enable = 1, a moment (60 frames). Eye lights pulse on the beat. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 4: 7600 px (noise 0)`
-  - **C Audio > Light** — needs C Enable = 1, a moment (60 frames), audio (FFT). Eye lights follow the bass. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 4: 8329 px (noise 0)`
+  - **C Audio > Light** — needs C Enable = 1, a moment (60 frames), audio (FFT). Eye lights follow the bass. *VISIBLE ONLY WHEN* `S 0: 0 px (noise 0); M 0: 0 px (noise 0); G 4: 8332 px (noise 0)`
 - **C Placed For** — non-visual: hidden store (the model Light C was placed for). None directly (stops a re-auto-place). *NON-VISUAL* ``
 
 ### Projector

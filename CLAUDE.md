@@ -88,6 +88,7 @@ tools/param_audit.py static|sweep <bundle> [names] [--fresh]|sheets|map  # W10: 
 tools/param_audit.py canuse                # W11: every option / param a bundle offers but cannot load or use (0 left; Env Source Input (FX) kept)
 tools/w11_decisions.py defaults|lightc|window <out> [<ref build>]  # W11: the new Copies defaults, C Auto Place per option, the Window prune
 tools/arena_w11.py <layer> [col]          # W11: dial the W11 decision clips by param name (never triggers)
+tools/w12_glide.py hop|interrupt|same <out> <ref build>  # W12: Light C's cone / depth glide (Every Model Swap) vs a reference build
 ```
 Log: `~/Library/Logs/LoadEhr/LoadEhr.log` (per-material texture resolution, load/upload/swap times per slot, shader compile
 logs; with Debug Log: PERF + MEM (GPU MB per slot) lines every second, CHAIN hops). `LOADEHR_LOG_STDERR=1` mirrors it to stderr.
@@ -743,10 +744,25 @@ d) W17: KHR_materials_pbrSpecularGlossiness -> diffuse = BaseColor, its spec/glo
   openings then come from the finder itself, `finder`); Once Per Model = W10 (everything, once per model file, not over hand-set positions);
   Position Only = once per file, the six positions only; Every Model Swap = everything, for every model on show (`placedSerial`: each hop's
   dominant model, each load / reload), hand-set dials included. The chain glide is taken from the slot the dials were placed for
-  (`placedSlot`), so the openings do not jump at a re-place; cone / Behind Depth do (beam-only per-step change at the swap 2.10 vs Once 1.08).
+  (`placedSlot`), so the openings do not jump at a re-place; W11's cone / Behind Depth stepped there (W12: they glide, see below).
 - PRUNE: Shape Target Torus / Crystal (tombstones; ShapeTarget is the cube only; Sphere and Cube max 0 vs W10), the Cut Window's projector
   world (winPicture / winQuad / winSampler / windowPic, kWinQuad's picture mode gone; classic Window max 0 vs W10; Wow Window with the
   projector on = off, max 0). Smoke Sim stays Wow only (Amrit 2026-10-11: "Smoke Sim in Wow only.").
+
+## W12 (2026-10-11): Light C's cone / depth glide in Every Model Swap (Amrit: "Lights can glide, looks more natural.")
+- C Auto Place Every Model Swap: the cone and Behind Depth the lights USE (`lcShow`, read by BuildEyeLights) glide from the outgoing
+  model's fit to the incoming one's on the openings' glide (smoothstep t 0.35 .. 0.65), so position, cone and depth arrive together;
+  the DIALS still change at the hop's midpoint (the placement), and the glide's end is exactly what it writes: a model not placed yet is
+  predicted with the placement's own formula from the dials (`SlotEyeFit`, `EyeCone`), a model placed before keeps its fit (`lcFit`:
+  the dials while it was the placed slot, hand edits included) and a revisit writes it back (W11 re-fitted from the current dials: Behind
+  Depth only ever went down, so skull -> helmet -> skull came back at the helmet's 0.035 instead of the skull's 0.157). A jump of the
+  chain (new hop before arrival, restart, fast drag) glides on from what was shown: a carry on cone, depth and the openings (dials +
+  shift, so a re-place in the same frame cannot snap them) fading over 0.3 x Transition Time. Aim / anchor / Mirror X are switches the
+  placement sets: they do not glide. Off / Once Per Model / Position Only: the dials as they are (renders max 0 vs W11).
+- Measured (`tools/w12_glide.py`, beam only, 100 slider steps each way): skull -> Damaged Helmet max step 0.284 (W11 0.861 at the swap;
+  Once 0.294), skull -> Goat Skull (cone 40 -> 24) 0.219 (W11 5.00; Once 0.383); interrupted hop (skull -> goat -> damaged, 0.35 -> 0.8)
+  max per frame 0.138 (W11 6.54, Once 7.65). Volume renders are not run-to-run exact (a series' first run is a cold outlier, later runs
+  vary too): bit-identity tests run without haze.
 
 ## W28: Amrit's Wow review (`tools/w28_review.py`: strip / speed / lag (HEAD vs this build) / timeline / arena; FIXES = the fresh clips, lasers gone)
 - TIME SCALES (1 = the W26 pace, 2 = crazy; Amrit: "Soooooft I want, Crazy as max MAYBE"): Fire Speed (default 0.5: sim time x it,
