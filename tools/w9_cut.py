@@ -5,7 +5,7 @@ usage: tools/w9_cut.py renders <out>   every Cut Look on the skull (slot B = the
                                       SVG emblem (B = skull), default + the "too much" end -> renders.md (Wow bundle; the emblem in LoadEhr)
        tools/w9_cut.py strips <out>    Cut Position 0 .. 1 .. 0 (Cross-Section: forward = backward), Cut Speed sweeps / drifts / turns,
                                       Reveal Box roundness 0 .. 1 -> strips.md
-       tools/w9_cut.py combos <out>    Cross-Section + sim smoke (Emit Inside), Window + the projector's video (DXV), Reveal Box + Points
+       tools/w9_cut.py combos <out>    Cross-Section + sim smoke (Emit Inside), Window + the projector's video (DXV; W11: the window shows the slot, the video only lights), Reveal Box + Points
                                       Only, Cross-Section + Print On's classic bundle (LoadEhr), Window mid-hop -> combos.md
        tools/w9_cut.py cost <out>      harness 1080p plugin / GPU ms per look (default / top) -> cost.md"""
 import os, re, sys

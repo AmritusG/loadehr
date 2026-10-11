@@ -41,8 +41,10 @@ struct ParamDef
 	unsigned type;
 	float min, max, def;
 	const char* group;
-	std::vector< std::string > options; // FF_TYPE_OPTION element names (values 0..n-1; W7: "~name" = a retired value, not listed)
+	std::vector< std::string > options; // FF_TYPE_OPTION element names (values 0..n-1; W7: "~name" = a retired value, not listed;
+	                                    // W11: "name{wow}" / "name{classic}" = listed in that bundle family only)
 	bool hidden;
+	bool fxOnly; // W11: carried by the FX bundles only
 	int region; // MEHR_REGION: 0 every bundle, MEHR_WOW / MEHR_CLASSIC one family only
 };
 
@@ -75,10 +77,11 @@ const std::vector< ParamDef >& ParamDefs()
 		BRI    = FF_TYPE_BRIGHTNESS,
 		ALPHA  = FF_TYPE_ALPHA,
 		BUFFER = FF_TYPE_BUFFER,
-		HIDDEN = 1
+		HIDDEN = 1,
+		FXONLY = 2
 	};
 	static const std::vector< ParamDef > defs = {
-#define X( id, name, type, mn, mx, def, group, opts, flags ) { id, name, type, mn, mx, def, group, SplitOptions( opts ), ( flags ) == HIDDEN, MEHR_REGION },
+#define X( id, name, type, mn, mx, def, group, opts, flags ) { id, name, type, mn, mx, def, group, SplitOptions( opts ), ( ( flags ) & HIDDEN ) != 0, ( ( flags ) & FXONLY ) != 0, MEHR_REGION },
 #include "ParamList.inc"
 #undef X
 	};
@@ -98,7 +101,7 @@ const ParamMap& Map()
 		ParamMap r;
 		r.ffgl.assign( P_COUNT, kNoParam );
 		for( const ParamDef& p : ParamDefs() )
-			if( p.region == 0 || p.region == ( LOADEHR_WOW ? MEHR_WOW : MEHR_CLASSIC ) )
+			if( ( p.region == 0 || p.region == ( LOADEHR_WOW ? MEHR_WOW : MEHR_CLASSIC ) ) && ( LOADEHR_FX || !p.fxOnly ) )
 			{
 				r.ffgl[ p.id ] = (unsigned)r.id.size();
 				r.id.push_back( p.id );
@@ -108,6 +111,36 @@ const ParamMap& Map()
 	return m;
 }
 unsigned IdOf( unsigned index ) { return index < Map().id.size() ? Map().id[ index ] : P_COUNT; }
+
+// W11: an option element as this bundle sees it: listed here or not ("~" retired everywhere; "{wow}" / "{classic}" one family only)
+bool OptionHere( const std::string& o )
+{
+	if( o.empty() || o[ 0 ] == '~' )
+		return false;
+	if( o.size() > 5 && o.compare( o.size() - 5, 5, "{wow}" ) == 0 )
+		return LOADEHR_WOW;
+	if( o.size() > 9 && o.compare( o.size() - 9, 9, "{classic}" ) == 0 )
+		return !LOADEHR_WOW;
+	return true;
+}
+std::string OptionName( const std::string& o )
+{
+	const size_t b = o.find( '{' );
+	return b == std::string::npos ? o : o.substr( 0, b );
+}
+// the option values this bundle lists, in list order (empty for a param that is not an option)
+const std::vector< int >& OptionValues( unsigned id )
+{
+	static const std::vector< std::vector< int > > all = [] {
+		std::vector< std::vector< int > > r( P_COUNT );
+		for( const ParamDef& p : ParamDefs() )
+			for( size_t i = 0; i < p.options.size(); ++i )
+				if( OptionHere( p.options[ i ] ) )
+					r[ p.id ].push_back( int( i ) );
+		return r;
+	}();
+	return all[ id ];
+}
 
 // Beat envelope with a short smooth attack and a decay that reaches zero at the next beat,
 // so it is continuous across beat boundaries.
@@ -243,14 +276,12 @@ public:
 				}
 				else
 				{
-					// an element's VALUE is its place in the list; a retired one ("~") keeps its value unlisted (W7)
-					unsigned n = 0;
-					for( const std::string& o : p.options )
-						n += o[ 0 ] != '~';
-					SetOptionParamInfo( p.id, p.name, n, p.def );
-					for( size_t i = 0, e = 0; i < p.options.size(); ++i )
-						if( p.options[ i ][ 0 ] != '~' )
-							SetParamElementInfo( p.id, (unsigned)e++, p.options[ i ].c_str(), float( i ) );
+					// an element's VALUE is its place in the list; a retired one ("~", W7) or one this bundle cannot use (W11) keeps
+					// its value unlisted
+					const std::vector< int >& vals = OptionValues( p.id );
+					SetOptionParamInfo( p.id, p.name, (unsigned)vals.size(), p.def );
+					for( size_t e = 0; e < vals.size(); ++e )
+						SetParamElementInfo( p.id, (unsigned)e, OptionName( p.options[ size_t( vals[ e ] ) ] ).c_str(), float( vals[ e ] ) );
 				}
 				break;
 			case FF_TYPE_BOOLEAN:
@@ -396,6 +427,13 @@ public:
 				RaiseParamEvent( P_FONT_STYLE, FF_EVENT_FLAG_VALUE );
 			}
 			return FF_SUCCESS;
+		}
+		if( !ParamDefs()[ index ].options.empty() )
+		{
+			// W11: a value this bundle does not list (retired, another bundle's, out of range: a saved clip, REST) = the default
+			const std::vector< int >& vals = OptionValues( index );
+			if( std::find( vals.begin(), vals.end(), (int)std::lround( value ) ) == vals.end() )
+				value = ParamDefs()[ index ].def;
 		}
 		if( index == P_DEBUG_LOG && ( value > 0.5f ) != ( values[ index ] > 0.5f ) )
 			LogVerboseRef( value > 0.5f );
@@ -918,8 +956,7 @@ private:
 			for( unsigned f = 0; f < kPartFields; ++f )
 			{
 				unsigned id = PartParam( s, PartField( f ) );
-				bool show   = used && ( f != PF_SKIN || LOADEHR_FX );
-				SetParamVisibility( id, show, true );
+				SetParamVisibility( id, used, true ); // W11: Skin is carried by the FX bundles only
 				SetParamDisplayName( id, used ? CapName( base, more, fields[ f ] ) : "Part " + std::to_string( s + 1 ) + " " + fields[ f ], true );
 			}
 		}
@@ -928,7 +965,9 @@ private:
 	// ---- Light C eye placement. Place At Eyes / Fit Cone / the first Enable per model start an eye search on
 	// the current model (worker thread, cached per geometry); the answer is written into the C params through
 	// value-change events, so it is visible, editable and saved with the composition.
-	enum EyeRequest { EyeNone, EyePlace, EyeFitCone, EyeAutoPlace };
+	enum EyeRequest { EyeNone, EyePlace, EyeFitCone, EyeAutoPlace, EyeFind };
+	// W11 C Auto Place (Amrit: "Allow for choosing behaviour"): what the eye finder writes by itself (the buttons always place)
+	enum AutoPlace { AutoOff = 0, AutoOnce, AutoPosition, AutoEvery };
 
 	// positions moved by hand before any placement: the auto-place leaves them alone (the buttons still work)
 	bool EyesSetByHand() const
@@ -954,9 +993,16 @@ private:
 	// the anchor's (EyeOpen), gliding across the middle of each hop.
 	void UpdateEyes()
 	{
-		const int as = chain.n > 0 ? chain.filled[ 0 ] : 0;
-		UpdateEyePlacement( as );
-		UpdateChainEyes( as );
+		const int first = chain.n > 0 ? chain.filled[ 0 ] : 0;
+		const int mode  = Opt( P_LC_AUTO );
+		// W11: Every Model Swap places for the model on show (the chain's dominant model, last frame's); the others for the anchor
+		const int target = mode == AutoEvery && domSlot >= 0 ? domSlot : first;
+		if( mode != AutoEvery )
+			placedSlot = first;
+		UpdateEyePlacement( target, mode );
+		// the C dials hold placedSlot's eyes: every other model's openings move by its eyes minus that model's (the glide). Every Model
+		// Swap re-places at a hop's midpoint, and the glide's offset is then taken from the new model: the openings do not jump
+		UpdateChainEyes( placedSlot );
 	}
 
 	struct EyeSlot
@@ -1054,20 +1100,32 @@ private:
 			open[ 0 ] = -open[ 0 ];
 	}
 
-	void UpdateEyePlacement( int anchorSlot )
+	void UpdateEyePlacement( int anchorSlot, int mode )
 	{
 		const std::shared_ptr< GpuModel >& current = slots[ anchorSlot ].current;
 		const std::string& modelFile = slots[ anchorSlot ].file;
 		const bool modelReady = current && current->geometry && current->path == modelFile && !IsGenSpec( modelFile ); // text / logos have no eyes
-		// the first switch-on per model places them
-		const bool wantEyes = WantEyes();
-		if( eyeRequest == EyeNone && wantEyes && modelReady && eyePlacedFor != modelFile && !EyesSetByHand() )
-			eyeRequest = EyeAutoPlace; // first switch-on for this model: give eye beams right away
-		if( eyeRequest == EyeNone || !modelReady )
+		if( !modelReady )
 			return;
 		// the finder sees what Auto Fit sizes by (Fit To: Visible Parts = hidden stands / props are left out), in that fit
 		const EyeQuery query = EyeQueryFor( *current );
 		const std::string key = std::to_string( current->serial ) + " " + query.Key();
+		if( eyeJobKey != key )
+			finder.valid = false;
+		// the auto-place (W11: as C Auto Place says): Once Per Model / Position Only = the first switch-on per model file, unless the
+		// positions were set by hand first; Every Model Swap = each new model on show (a hop's dominant model, a load, a reload); Off =
+		// nothing, but the Window still needs the eyes: the finder runs for it and writes no dial
+		if( eyeRequest == EyeNone && WantEyes() )
+		{
+			if( ( mode == AutoOnce || mode == AutoPosition ) && eyePlacedFor != modelFile && !EyesSetByHand() )
+				eyeRequest = EyeAutoPlace; // first switch-on for this model: give eye beams right away
+			else if( mode == AutoEvery && placedSerial != current->serial )
+				eyeRequest = EyeAutoPlace;
+			else if( mode == AutoOff && Opt( P_CUT_LOOK ) == 3 && !finder.valid && eyeJobKey != key )
+				eyeRequest = EyeFind;
+		}
+		if( eyeRequest == EyeNone )
+			return;
 		if( !eyeJob || eyeJobKey != key )
 		{
 			std::string dbg = getenv( "LOADEHR_EYE_DEBUG" ) ? getenv( "LOADEHR_EYE_DEBUG" ) : "";
@@ -1097,16 +1155,42 @@ private:
 		{
 			eyePlacedFor = modelFile; // also when nothing was found: the auto-place runs once per model
 			RaiseParamEvent( P_LC_PLACED, FF_EVENT_FLAG_VALUE );
+			if( req == EyeAutoPlace && mode == AutoEvery )
+				placedSerial = current->serial; // ... and with Every Model Swap once per model on show
+		}
+		// the finder works in fitted mask space; without Auto Fit, mask space is the file's own units
+		const bool fit  = On( P_AUTO_FIT );
+		const float s   = fit ? 1.0f : 1.0f / query.fitScale;
+		auto toMask     = [ & ]( const float* c, int k ) { return fit ? c[ k ] : c[ k ] * s + query.fitCenter[ k ]; };
+		// what the finder saw, in mask space (W11: the Window's openings while C Auto Place is Off)
+		finder.valid = r.found;
+		for( int k = 0; k < 3 && r.found; ++k )
+			finder.pos[ 0 ][ k ] = toMask( r.left.center, k ), finder.pos[ 1 ][ k ] = toMask( r.right.center, k );
+		finder.radius = r.found ? std::max( r.left.radius, r.right.radius ) * s : 0.0f;
+		if( req == EyeFind )
+		{
+			Log( "EYES %s for the Window (C Auto Place Off: no C dial written)", r.found ? "found" : "not found" );
+			return;
 		}
 		if( !r.found )
 		{
 			Log( "EYES %s: params left untouched", req == EyeFitCone ? "Fit Cone" : "Place At Eyes" );
 			return;
 		}
-		// the finder works in fitted mask space; without Auto Fit, mask space is the file's own units
-		const bool fit  = On( P_AUTO_FIT );
-		const float s   = fit ? 1.0f : 1.0f / query.fitScale;
-		auto toMask     = [ & ]( const float* c, int k ) { return fit ? c[ k ] : c[ k ] * s + query.fitCenter[ k ]; };
+		// W11 Position Only: the six positions and nothing else (aim, cone, depth, anchor, mirror stay as set)
+		if( req == EyeAutoPlace && mode == AutoPosition )
+		{
+			for( int k = 0; k < 3; ++k )
+			{
+				values[ P_LC_L_POS_X + k ] = std::clamp( toMask( r.left.center, k ), -6.0f, 6.0f ), RaiseParamEvent( P_LC_L_POS_X + k, FF_EVENT_FLAG_VALUE );
+				values[ P_LC_R_POS_X + k ] = std::clamp( toMask( r.right.center, k ), -6.0f, 6.0f ), RaiseParamEvent( P_LC_R_POS_X + k, FF_EVENT_FLAG_VALUE );
+			}
+			Log( "EYES placed (Position Only): left (%.3f %.3f %.3f) right (%.3f %.3f %.3f)", values[ P_LC_L_POS_X ], values[ P_LC_L_POS_Y ],
+			     values[ P_LC_L_POS_Z ], values[ P_LC_R_POS_X ], values[ P_LC_R_POS_Y ], values[ P_LC_R_POS_Z ] );
+			return;
+		}
+		if( req != EyeFitCone )
+			placedSlot = anchorSlot; // the C dials now hold this model's eyes
 		auto write      = [ & ]( unsigned id, float v ) {
 			const ParamDef& d = ParamDefs()[ id ];
 			values[ id ]      = std::min( d.max, std::max( d.min, v ) );
@@ -1313,7 +1397,7 @@ private:
 		BuildFaces( fs, M, pos, V, P, dt );
 #endif
 		fs.transition      = chain.next >= 0 ? chain.t : 0.0f;
-		fs.transitionStyle = StyleHere( chain.style );
+		fs.transitionStyle = chain.style;
 		fs.transEase       = values[ P_TRANS_EASE ];
 		fs.transStagger    = values[ P_TRANS_STAGGER ];
 		fs.transSpread     = values[ P_TRANS_SPREAD ];
@@ -2110,7 +2194,7 @@ private:
 		int style   = 0;
 	};
 	Chain chain;
-	int chainLoops = 0; // W6: Transition Play passes round the chain since its restart, modulo kStyleCount (0 with Play Off)
+	int chainLoops = 0; // W6: Transition Play passes round the chain since its restart, modulo the style count (0 with Play Off)
 	bool SlotFilled( int i ) const
 	{
 		const ModelSlot& m = slots[ i ];
@@ -2120,38 +2204,35 @@ private:
 	// (stable while scrubbing, the same hop always morphs the same way)
 	int HopStyle( int h, int hops ) const
 	{
-		const int base = LiveStyle( Opt( P_TRANSITION_STYLE ) ), order = Opt( P_STYLE_ORDER );
+		// W11: the styles this bundle lists, in list order (retired ones and the Wow-only Swarm / Smoke / Burn / Lava in LoadEhr / FX are
+		// not; a value it does not list never arrives: SetFloatId reads it as Dissolve)
+		const std::vector< int >& live = OptionValues( P_TRANSITION_STYLE );
+		const int count = (int)live.size(), base = Opt( P_TRANSITION_STYLE ), order = Opt( P_STYLE_ORDER );
 		// W6: while Transition Play loops (Loop / Ping-Pong), every pass round the chain moves on by its hops, so a 4-slot loop goes
-		// round all the styles, not the same 4 (chainLoops: passes since the restart, kept modulo kStyleCount; 0 while the slider drives).
-		// W7: round the styles in the list (kLiveStyles: the retired ones are skipped)
+		// round all the styles, not the same 4 (chainLoops: passes since the restart, kept modulo the style count; 0 while the slider drives).
 		h += chainLoops * std::max( 1, hops );
 		if( order == 1 )
 		{
 			int at = 0;
-			while( at < kStyleCount - 1 && kLiveStyles[ at ] != base )
+			while( at < count - 1 && live[ at ] != base )
 				++at;
-			return kLiveStyles[ ( at + h ) % kStyleCount ];
+			return live[ ( at + h ) % count ];
 		}
 		if( order == 2 )
 		{
 			uint32_t x = uint32_t( h + 1 ) * 2654435761u;
 			x ^= x >> 15, x *= 2246822519u, x ^= x >> 13;
-			return kLiveStyles[ x % uint32_t( kStyleCount ) ];
+			return live[ x % uint32_t( count ) ];
 		}
 		return base;
 	}
-	// W7: a retired value (a clip saved with Shrinkwrap / Fold) dissolves
-	static int LiveStyle( int st ) { return st < 0 || st >= kStyleValues || st == kStyleRetired6 || st == kStyleRetired22 ? kStyleDissolve : st; }
-	// W6: Swarm, Burn and Lava read the Wow bundles' dials (Firefly, Fire, Lava): in LoadEhr / FX they dissolve
-	// W9: Smoke too (the sim went to the Wow bundles)
-	static int StyleHere( int st ) { return !LOADEHR_WOW && ( st == kStyleSwarm || st == kStyleBurn || st == kStyleLava || st == kStyleSmoke ) ? kStyleDissolve : st; }
 	// which per-slot caches the chain's hops need ahead of use (the styles any hop can take)
 	unsigned ChainUses() const
 	{
 		if( chain.hops == 0 )
 			return 0;
 		const int order = Opt( P_STYLE_ORDER );
-		const int style = StyleHere( LiveStyle( Opt( P_TRANSITION_STYLE ) ) );
+		const int style = Opt( P_TRANSITION_STYLE );
 		auto use = []( int st ) {
 			return st == kStyleShatter || st == kStylePieces ? (unsigned)kUseShards : st == kStyleDust ? (unsigned)kUseDust
 			     : st == kStylePoints || st == kStyleSwarm ? (unsigned)kUseCloud : st == kStyleSmoke ? (unsigned)kUseSim : 0u;
@@ -2219,7 +2300,7 @@ private:
 			const double before = clk.transPlay;
 			clk.transPlay       = play == 1 ? std::min( clk.transPlay + dt, period ) : Wrap( clk.transPlay + dt, period );
 			if( play != 1 && clk.transPlay < before )
-				chainLoops = ( chainLoops + 1 ) % kStyleCount; // a pass round the chain (W6: Style Order Cycle / Random move on)
+				chainLoops = ( chainLoops + 1 ) % (int)OptionValues( P_TRANSITION_STYLE ).size(); // a pass round the chain (W6: Style Order Cycle / Random move on)
 		}
 		return position( clk.transPlay );
 	}
@@ -2293,7 +2374,7 @@ private:
 	// runs, and the smoke is lit (Smoke Ambient at least 1.2 when it is 0), through the hop and a 4 s tail (the last 1.5 s fade the light).
 	void SmokeStyle( float dt )
 	{
-		const bool hop = chain.next >= 0 && chain.t > 0.0f && chain.t < 1.0f && StyleHere( chain.style ) == kStyleSmoke;
+		const bool hop = chain.next >= 0 && chain.t > 0.0f && chain.t < 1.0f && chain.style == kStyleSmoke;
 		const float t  = chain.t, e = t + values[ P_TRANS_EASE ] * ( t * t * ( 3.0f - 2.0f * t ) - t );
 		smokeEmit      = hop && smokeHop == chain.hop && dt > 0.0f ? std::min( 10.0f, std::fabs( e - smokeE ) / dt * 6.0f ) : 0.0f;
 		smokeE = e, smokeHop = hop ? chain.hop : -1;
@@ -2649,9 +2730,7 @@ private:
 		anchor.Dir( u1, uw );
 		const float unit = std::sqrt( uw[ 0 ] * uw[ 0 ] + uw[ 1 ] * uw[ 1 ] + uw[ 2 ] * uw[ 2 ] ); // world length of a mask unit
 		const int count  = std::clamp( (int)std::lround( values[ P_BOLT_COUNT ] ), 1, 8 );
-		int path         = Opt( P_BOLT_PATH );
-		if( path == 3 && fs.inst.size() < 2 )
-			path = 0; // no clones: crawl
+		const int path   = Opt( P_BOLT_PATH ); // 0 crawl, 1 eye to eye, 2 to floor (W11: To Clones retired, Wow has no clones)
 		st.raw = path == 0;
 		float csum[ 3 ] = {};
 		int cn          = 0;
@@ -2707,19 +2786,8 @@ private:
 					if( !g || !SurfacePoint( *g, M, fs.camPos, r, raw, n, path == 2 ) )
 						continue;
 					M.Point( raw, a );
-					if( path == 2 )
-					{
-						const float floorY = values[ P_POS_Y ] + values[ P_FLOOR_HEIGHT ];
-						b[ 0 ] = a[ 0 ] + r.S() * 0.6f * unit, b[ 1 ] = floorY, b[ 2 ] = a[ 2 ] + r.S() * 0.6f * unit;
-					}
-					else
-					{
-						// a clone (any copy but the first, the original when kept): toward its centre
-						const Instance& in = fs.inst[ 1 + size_t( r.U() * float( fs.inst.size() - 1 ) ) % ( fs.inst.size() - 1 ) ];
-						Mat4 C;
-						std::memcpy( C.m, in.m, sizeof( C.m ) );
-						C.Point( g->fitCenter, b );
-					}
+					const float floorY = values[ P_POS_Y ] + values[ P_FLOOR_HEIGHT ];
+					b[ 0 ] = a[ 0 ] + r.S() * 0.6f * unit, b[ 1 ] = floorY, b[ 2 ] = a[ 2 ] + r.S() * 0.6f * unit;
 				}
 				if( path == 1 )
 				{
@@ -3186,18 +3254,19 @@ private:
 		{
 			// the window: the eye openings (Light C's places + the chain's offsets, the finder's radius), the other world behind them
 			x.window = true;
-			const float o[ 3 ] = { 0, 0, 0 }, fz[ 3 ] = { 0, 0, 1 }, ux[ 3 ] = { 1, 0, 0 }, uy[ 3 ] = { 0, 1, 0 };
-			float c[ 3 ], wx[ 3 ], up[ 3 ], right[ 3 ];
+			const float o[ 3 ] = { 0, 0, 0 }, fz[ 3 ] = { 0, 0, 1 }, ux[ 3 ] = { 1, 0, 0 };
+			float c[ 3 ], wx[ 3 ];
 			anchor.Point( o, c );
 			anchor.Dir( fz, x.front );
 			anchor.Dir( ux, wx );
-			anchor.Dir( uy, up );
-			std::memcpy( right, wx, sizeof( right ) );
 			const float unit = std::max( 1e-3f, std::sqrt( wx[ 0 ] * wx[ 0 ] + wx[ 1 ] * wx[ 1 ] + wx[ 2 ] * wx[ 2 ] ) );
-			Mat4::Norm( x.front ), Mat4::Norm( up ), Mat4::Norm( right );
+			Mat4::Norm( x.front );
 			float rad = 0.0f;
 			const int as = chain.n > 0 ? chain.filled[ 0 ] : 0;
-			if( eyeJob && eyeJob->done.load() && eyeJob->result.found && !eyePlacedFor.empty() && slots[ as ].current )
+			const bool own = Opt( P_LC_AUTO ) == AutoOff && finder.valid; // W11: C Auto Place Off = the finder's own openings (no C dial written)
+			if( own )
+				rad = finder.radius;
+			else if( eyeJob && eyeJob->done.load() && eyeJob->result.found && !eyePlacedFor.empty() && slots[ as ].current )
 			{
 				const float s = On( P_AUTO_FIT ) ? 1.0f : 1.0f / std::max( 1e-6f, slots[ as ].current->fitScale );
 				rad = std::max( eyeJob->result.left.radius, eyeJob->result.right.radius ) * s;
@@ -3205,8 +3274,12 @@ private:
 			for( int e = 0; e < 2; ++e )
 			{
 				float open[ 3 ];
-				EyeOpen( e, open );
-				if( On( P_LC_ANCHOR ) )
+				if( own )
+					for( int k = 0; k < 3; ++k )
+						open[ k ] = finder.pos[ e ][ k ] + eyeShift[ e ][ k ];
+				else
+					EyeOpen( e, open );
+				if( own || On( P_LC_ANCHOR ) ) // the finder's openings are in mask space
 					anchor.Point( open, x.eyes[ e ] );
 				else
 					std::memcpy( x.eyes[ e ], open, sizeof( open ) );
@@ -3218,14 +3291,6 @@ private:
 			const float D = ( 0.6f + 3.0f * pos ) * unit, k = 1.0f + 3.0f * size;
 			const double turn = clk.cut * kTwoPi;
 			const float b[ 3 ] = { c[ 0 ] - x.front[ 0 ] * D, c[ 1 ] - x.front[ 1 ] * D, c[ 2 ] - x.front[ 2 ] * D };
-			x.winPicture = LOADEHR_WOW && fs.projector.on && ( fs.projector.image || fs.projector.video || fs.projector.source == 0 );
-			if( x.winPicture )
-			{
-				const float hw = ( 1.2f + 3.0f * size ) * unit, hh = hw * 9.0f / 16.0f;
-				for( int q = 0; q < 4; ++q )
-					for( int j = 0; j < 3; ++j )
-						x.winQuad[ q ][ j ] = b[ j ] + right[ j ] * hw * ( ( q & 1 ) ? 1.0f : -1.0f ) + up[ j ] * hh * ( ( q & 2 ) ? 1.0f : -1.0f );
-			}
 			// the world's model: Surf Source (classic), else the first filled slot that is not on show
 			GpuModel* src = SourceModel();
 			const int ws  = src ? -1 : WindowSlot();
@@ -3879,7 +3944,7 @@ private:
 		s.shear       = values[ P_SHEAR ] * k;
 		s.bulge       = values[ P_BULGE ] * k;
 		s.spherize    = std::min( 1.0f, values[ P_SPHERIZE ] * k );
-		s.shapeTarget = std::clamp( Opt( P_SHAPE_TARGET ), 0, 3 ); // W9 Stage E
+		s.shapeTarget = Opt( P_SHAPE_TARGET ) == 1 ? 1 : 0; // W9 Stage E (W11: Sphere / Cube; Torus, Crystal retired)
 		s.warp        = values[ P_NOISE_WARP ] * k;
 		s.warpScale   = values[ P_WARP_SCALE ];
 		clk.warp      = Wrap( clk.warp + dt * values[ P_WARP_SPEED ], 256.0 );
@@ -4425,6 +4490,13 @@ private:
 	std::shared_ptr< EyeJob > eyeJob;
 	std::string eyeJobKey;
 	bool eyeJobLogged = false;
+	int placedSlot = 0;          // W11: the slot whose eyes the C positions hold (the anchor; Every Model Swap: the last one placed)
+	uint64_t placedSerial = 0;   // W11 Every Model Swap: the GPU model the auto-place last ran for
+	struct
+	{
+		bool valid = false;
+		float pos[ 2 ][ 3 ] = {}, radius = 0; // left, right opening (mask space), the larger radius
+	} finder;                    // W11: the last eye search's answer for the anchor (the Window's openings with C Auto Place Off)
 	// W18 Fit To: the fit in use (centre xyz, scale) glides to the target when parts are shown / hidden; one per model slot
 	float fitNow[ kModelSlots ][ 4 ] = { { 0, 0, 0, 1 }, { 0, 0, 0, 1 }, { 0, 0, 0, 1 }, { 0, 0, 0, 1 } };
 	float fitFrom[ kModelSlots ][ 4 ] = { { 0, 0, 0, 1 }, { 0, 0, 0, 1 }, { 0, 0, 0, 1 }, { 0, 0, 0, 1 } };

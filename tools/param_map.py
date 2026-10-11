@@ -62,8 +62,24 @@ def main():
             rows.append(a[i]); i += 1
         else:
             rows.append(b[j]); j += 1
+    # W11: an option a bundle family does not list is marked with the family that does: "Logo (classic)", "Swarm (Wow)"
+    opts = [{x['name']: (x['opts'] or '').split(' / ') for x in c if x['type'] == 11} for c in cols]
+    fam = ('classic', 'classic', 'Wow', 'Wow')
+
+    def options(r):
+        per = [(k, o[r['name']]) for k, o in enumerate(opts) if r['name'] in o]
+        allo = []
+        for _, lst in sorted(per, key=lambda kl: -len(kl[1])):  # the longest list's order (every list is a subsequence of the same one)
+            allo += [x for x in lst if x not in allo]
+        out = []
+        for x in allo:
+            fams = sorted({fam[k] for k, lst in per if x in lst})
+            out.append(x if len(fams) == len({fam[k] for k, _ in per}) else '%s (%s)' % (x, ', '.join(fams)))
+        return ' / '.join(out)
     lines = ['| LoadEhr | FX | Wow | Wow FX | Group | Name | Type | Range | Default |', '|---|---|---|---|---|---|---|---|---|']
     for r in rows:
+        if r['type'] == 11 and r['opts']:
+            r = dict(r, opts=options(r))
         t = TYPES.get(r['type'], str(r['type'])) + (' (hidden)' if r['hidden'] and r['type'] == 100 else '')
         d = '-' if r['type'] in (1, 12, 14, 100) else r['d']
         n = ' | '.join('—' if r['name'] not in x else str(x[r['name']]) for x in idx)

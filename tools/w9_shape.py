@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-"""LoadEhr W9 Stage E: Shape Target (Spherize generalised: Sphere / Cube / Torus / Crystal; every bundle).
+"""LoadEhr W9 Stage E: Shape Target (Spherize generalised: Sphere / Cube; every bundle. W11: Torus / Crystal retired, Amrit "Sphere and Cube").
 
 usage: tools/w9_shape.py renders <out>          each target on the skull, the SciFi helmet, text "LOADEHR" and our SVG emblem at Spherize 0.6
                                                and 1 ("too much": Spherize 1 x Deform Amount 2) -> renders.md
        tools/w9_shape.py strips <out>           Spherize 0 .. 1 .. 0 per target (forward = backward), + Twist / Shatter / the morph chain on
                                                top -> strips.md
-       tools/w9_shape.py same <out> <ref build> Shape Target Sphere = the reference build's Spherize (0.3 / 0.7 / 1, skull + text): max diff
+       tools/w9_shape.py same <out> <ref build> Sphere and Cube vs the reference build (0.3 / 0.7 / 1, skull + text): max diff
        tools/w9_shape.py cost <out>             harness 1080p GPU ms per target -> cost.md"""
 import os, re, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import w5_wire as W  # noqa: E402
 
-TARGETS = ['sphere', 'cube', 'torus', 'crystal']
+TARGETS = ['sphere', 'cube']
 
 
 def shot(out, tag, settle='frames 4'):
@@ -49,9 +49,9 @@ def strips(out):
         so, _ = W.harness(L, out, 's_' + tn)
         m = [int(x) for x in re.findall(r'max (\d+) pixels', so)]
         rows.append('| %s, Spherize 0 .. 1 .. 0 | %s |' % (tn, max(m) if m else '?'))
-    for tag, cmd in (('torus_twist', ['set Shape Target 2', 'set Spherize 0.7', 'set Twist 2']),
+    for tag, cmd in (('cube_twist', ['set Shape Target 1', 'set Spherize 0.7', 'set Twist 2']),
                      ('cube_shatter', ['set Shape Target 1', 'set Spherize 0.8', 'realtime 0.5', 'pulse Shatter', 'realtime 0.6']),
-                     ('crystal_midhop', ['mark', 'text Model_B ' + W.HELMET, 'wait_slots 1 60', 'set Shape Target 3', 'set Spherize 0.7', 'set Transition 0.5'])):
+                     ('cube_midhop', ['mark', 'text Model_B ' + W.HELMET, 'wait_slots 1 60', 'set Shape Target 1', 'set Spherize 0.7', 'set Transition 0.5'])):
         W.harness(W.load(W.SKULL, bundle='LoadEhr') + cmd + shot(out, tag, 'realtime 1'), out, 'c_' + tag)
         rows.append('| combination %s | %s.png |' % (tag, tag))
     print('\n'.join(rows))
@@ -60,22 +60,23 @@ def strips(out):
 
 def same(out, ref):
     os.makedirs(out, exist_ok=True)
-    rows = ['| model | Spherize | max diff vs %s |' % os.path.basename(ref.rstrip('/')), '|---|---|---|']
+    rows = ['| model | target | Spherize | max diff vs %s |' % os.path.basename(ref.rstrip('/')), '|---|---|---|---|']
     for name, m in (('skull', W.SKULL), ('text', 'text')):
-        for build, side in ((os.path.join(W.ROOT, 'build'), 'new'), (ref, 'ref')):
-            L = W.load(m, bundle='LoadEhr')
-            L[0] = 'bundle %s/LoadEhr.bundle' % build
-            L += ['realtime 1']
-            for a in (0.3, 0.7, 1.0):
-                L += ['set Spherize %g' % a, 'advance 0 zero', 'hosttime 5', 'frames 3', 'shot %s/%s_%g_%s.png' % (out, name, a, side)]
-            sp = os.path.join(out, '%s_%s.txt' % (name, side))
-            open(sp, 'w').write('\n'.join(L) + '\n')
-            import subprocess
-            subprocess.run([os.path.join(build, 'loadehr_harness'), sp], capture_output=True)
-        L = ['compare %s/%s_%g_ref.png %s/%s_%g_new.png' % (out, name, a, out, name, a) for a in (0.3, 0.7, 1.0)]
-        so, _ = W.harness(L, out, 'cmp_' + name)
-        for a, mx in zip((0.3, 0.7, 1.0), re.findall(r'max (\d+) pixels', so)):
-            rows.append('| %s | %g | %s |' % (name, a, mx))
+        for t, tn in enumerate(TARGETS):
+            for build, side in ((os.path.join(W.ROOT, 'build'), 'new'), (ref, 'ref')):
+                L = W.load(m, bundle='LoadEhr')
+                L[0] = 'bundle %s/LoadEhr.bundle' % build
+                L += ['realtime 1', 'set Shape Target %d' % t]
+                for a in (0.3, 0.7, 1.0):
+                    L += ['set Spherize %g' % a, 'advance 0 zero', 'hosttime 5', 'frames 3', 'shot %s/%s_%s_%g_%s.png' % (out, name, tn, a, side)]
+                sp = os.path.join(out, '%s_%s_%s.txt' % (name, tn, side))
+                open(sp, 'w').write('\n'.join(L) + '\n')
+                import subprocess
+                subprocess.run([os.path.join(build, 'loadehr_harness'), sp], capture_output=True)
+            L = ['compare %s/%s_%s_%g_ref.png %s/%s_%s_%g_new.png' % (out, name, tn, a, out, name, tn, a) for a in (0.3, 0.7, 1.0)]
+            so, _ = W.harness(L, out, 'cmp_%s_%s' % (name, tn))
+            for a, mx in zip((0.3, 0.7, 1.0), re.findall(r'max (\d+) pixels', so)):
+                rows.append('| %s | %s | %g | %s |' % (name, tn, a, mx))
     print('\n'.join(rows))
     open(os.path.join(out, 'same.md'), 'w').write('\n'.join(rows) + '\n')
 

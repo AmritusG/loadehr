@@ -253,7 +253,6 @@ void Renderer::RenderProjector( const FrameState& fs, GpuModel* model )
 {
 	const ProjState& pr = fs.projector;
 	projOk              = false;
-	windowPic           = 0;
 	if( !pr.on )
 		return;
 	// the picture: the FX input (the mip-mapped copy) or the image file (uploaded once per decode, mips from the loader)
@@ -303,7 +302,6 @@ void Renderer::RenderProjector( const FrameState& fs, GpuModel* model )
 	else if( pr.source == 0 && fs.inputTex && inTex )
 		img = inTex, iw = inW, ih = inH, levels = inLevels; // already scaled into the copy
 	const float aspect = iw > 0 && ih > 0 ? float( iw ) / float( ih ) : 16.0f / 9.0f;
-	windowPic = img; // W9: the Window look shows this picture too
 	const float tx     = std::tan( std::min( 170.0f, std::max( 1.0f, pr.fovX ) ) * 0.5f * 3.14159265f / 180.0f );
 	const float fovY   = 2.0f * std::atan( tx / aspect );
 	float at[ 3 ]      = { pr.pos[ 0 ] + pr.dir[ 0 ], pr.pos[ 1 ] + pr.dir[ 1 ], pr.pos[ 2 ] + pr.dir[ 2 ] };

@@ -93,37 +93,24 @@ void main()
 	fragColor = vec4( 0.0 );
 }
 )GLSL";
-// inside the openings: the depth reset to far and the other world's backdrop (a deep dark), or the projector's picture on a quad
+// inside the openings: the depth reset to far and the other world's backdrop (a deep dark), full screen at the far plane
 const char* kWinQuadVS = R"GLSL(
-uniform int uMode;           // 0 full screen (the backdrop, depth far), 1 the picture's quad (world corners)
-uniform mat4 uViewProj;
-uniform vec3 uCorner[ 4 ];
 out vec2 vUV;
 void main()
 {
-	vec2 q = vec2( ( gl_VertexID & 1 ) == 0 ? 0.0 : 1.0, ( gl_VertexID & 2 ) == 0 ? 0.0 : 1.0 );
-	vUV    = q;
-	if( uMode == 0 )
-		gl_Position = vec4( q * 2.0 - 1.0, 1.0, 1.0 ); // the far plane
-	else
-		gl_Position = uViewProj * vec4( uCorner[ gl_VertexID ], 1.0 );
+	vec2 q      = vec2( ( gl_VertexID & 1 ) == 0 ? 0.0 : 1.0, ( gl_VertexID & 2 ) == 0 ? 0.0 : 1.0 );
+	vUV         = q;
+	gl_Position = vec4( q * 2.0 - 1.0, 1.0, 1.0 ); // the far plane
 }
 )GLSL";
 const char* kWinQuadFS = R"GLSL(
 in vec2 vUV;
-uniform int uMode;
-uniform sampler2D uPicture;
 uniform vec3 uDeep;
 out vec4 fragColor;
 void main()
 {
-	if( uMode == 0 )
-	{
-		float v   = length( vUV - 0.5 );
-		fragColor = vec4( uDeep * ( 1.0 - 0.6 * v ), 1.0 );
-	}
-	else
-		fragColor = vec4( texture( uPicture, vUV ).rgb, 1.0 );
+	float v   = length( vUV - 0.5 );
+	fragColor = vec4( uDeep * ( 1.0 - 0.6 * v ), 1.0 );
 }
 )GLSL";
 
@@ -293,13 +280,6 @@ bool Renderer::InitBuild( std::string& error )
 	progWinQuad  = Link( kWinQuadVS, kWinQuadFS, error );
 	if( !progCap || !progPostLens || !progWinMark || !progWinQuad )
 		return false;
-	glUseProgram( progWinQuad );
-	glUniform1i( U( progWinQuad, "uPicture" ), 0 );
-	glGenSamplers( 1, &winSampler );
-	glSamplerParameteri( winSampler, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-	glSamplerParameteri( winSampler, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glSamplerParameteri( winSampler, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glSamplerParameteri( winSampler, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
 	glUseProgram( progPostLens );
 	glUniform1i( U( progPostLens, "uBase" ), 0 );
 	glUniform1i( U( progPostLens, "uBloom" ), 1 );
@@ -336,8 +316,6 @@ void Renderer::ReleaseBuild()
 	}
 	delTex( xDummy ), delBuf( xDummyBuf ), delTex( xHistTex ), delBuf( xHistBuf );
 	xHistCap = 0;
-	if( winSampler )
-		glDeleteSamplers( 1, &winSampler ), winSampler = 0;
 	for( GLuint* p : { &progCap, &progPostLens, &progWinMark, &progWinQuad } )
 		if( *p )
 			glDeleteProgram( *p ), *p = 0;
@@ -739,8 +717,8 @@ void Renderer::WarmLooks( const FrameState& fs, GpuModel* model )
 
 // WINDOW: the eye openings (a disc each, from the eye finder) and the glass parts mark the stencil where they show (depth tested: a rim in
 // front hides its disc); a model without either becomes a window as a whole (its silhouette). There the depth is reset to far, a deep
-// backdrop drawn, and the other world: another model slot in its own place behind the mask (bigger, turning), or the projector's picture
-// on a quad behind it (Wow bundles, Proj Enable)
+// backdrop drawn, and the other world: another model slot in its own place behind the mask (bigger, turning). (W11: the Wow bundles'
+// projector picture as the world is gone, Amrit's prune: the world is the slot there too)
 void Renderer::DrawWindow( const FrameState& fs, GpuModel* model )
 {
 	const XState& x = fs.x;
@@ -804,23 +782,10 @@ void Renderer::DrawWindow( const FrameState& fs, GpuModel* model )
 	// the backdrop at the far plane (depth reset there)
 	glDepthFunc( GL_ALWAYS );
 	glUseProgram( progWinQuad );
-	glUniform1i( U( progWinQuad, "uMode" ), 0 );
 	glUniform3f( U( progWinQuad, "uDeep" ), 0.02f + 0.06f * x.color[ 0 ], 0.02f + 0.06f * x.color[ 1 ], 0.03f + 0.06f * x.color[ 2 ] );
 	glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
 	glDepthFunc( GL_LESS );
-	if( x.winPicture && windowPic )
-	{
-		glUniform1i( U( progWinQuad, "uMode" ), 1 );
-		glUniformMatrix4fv( U( progWinQuad, "uViewProj" ), 1, GL_FALSE, VP.m );
-		glUniform3fv( U( progWinQuad, "uCorner" ), 4, &x.winQuad[ 0 ][ 0 ] );
-		glActiveTexture( GL_TEXTURE0 );
-		glBindTexture( GL_TEXTURE_2D, windowPic );
-		glBindSampler( 0, winSampler ); // level 0, linear: the picture may carry no mips (a video without Focus)
-		glDrawArrays( GL_TRIANGLE_STRIP, 0, 4 );
-		glBindSampler( 0, 0 );
-		glBindTexture( GL_TEXTURE_2D, 0 );
-	}
-	else if( x.winModel && x.winModel->Complete() )
+	if( x.winModel && x.winModel->Complete() )
 	{
 		// the other world: a model slot drawn plainly in its own place (its own fit, the frame's lights)
 		FrameState w = fs;

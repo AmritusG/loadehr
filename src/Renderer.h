@@ -66,11 +66,6 @@ enum TransStyle : int
 	kStyleGlitch, kStyleRipple, kStyleSwarm, kStyleSmoke, kStyleBurn, kStyleLava, kStyleSpinSwap, kStyleRetired22,
 	kStyleValues // option values 0 .. kStyleValues - 1
 };
-// the styles in the list, in its order (Style Order Cycle / Random go round these)
-static constexpr int kLiveStyles[] = { kStyleDissolve, kStyleShatter, kStyleDust, kStyleSlice, kStyleLiquid, kStylePoints, kStyleWire, kStyleVoxel,
-                                       kStyleLowPoly, kStylePieces, kStyleImplode, kStyleTwist, kStyleMelt, kStyleScan, kStyleGlitch, kStyleRipple,
-                                       kStyleSwarm, kStyleSmoke, kStyleBurn, kStyleLava, kStyleSpinSwap };
-static constexpr int kStyleCount = int( sizeof( kLiveStyles ) / sizeof( kLiveStyles[ 0 ] ) );
 static constexpr int kSKShadowUnit = 21; // W23: the key shadow map in the volume march (Smoke Key Light)
 static constexpr int kMaxVolLights = 4; // A, B, C left, C right (only A/B can be point lights: cube maps 0/1)
 static constexpr int kMaxXLights   = 8;
@@ -194,7 +189,7 @@ struct ShapeState
 	// W2 Deform group (values already x Deform Amount): deform = any of them on (the DEFORM program twins draw)
 	bool deform = false;
 	float taper = 0, squash = 0, shear = 0, bulge = 0, spherize = 0;
-	int shapeTarget = 0; // W9: Spherize's target: 0 sphere, 1 cube, 2 torus, 3 crystal
+	int shapeTarget = 0; // W9: Spherize's target: 0 sphere, 1 cube (W11: torus / crystal retired)
 	float warp = 0, warpScale = 2, warpPhase = 0; // warpPhase: lattice cells, wrapped at 256
 	float glitchShift = 0, glitchBands = 12, glitchStep = 0; // glitchStep: the step index, wrapped at 1000
 	float foldAxes[ 3 ] = { 0, 0, 0 }, foldK = 0;
@@ -410,8 +405,6 @@ struct XState
 	float front[ 3 ] = { 0, 0, 1 }; // the mask's front (world)
 	GpuModel* winModel = nullptr;   // the other world: a model slot (drawn with winM) ...
 	float winM[ 16 ] = {}, winScale = 1;
-	bool winPicture = false;        // ... or the projector's picture (Wow bundles: Proj Enable with a picture)
-	float winQuad[ 4 ][ 3 ] = {};   // the picture's quad behind the openings (world corners)
 };
 
 // W9 Stage D (Surface Look group, classic): spikes and copies on captured surface spots (the dominant model), camera looks (DEFORM twins)
@@ -690,8 +683,7 @@ private:
 	void DrawSide( GLuint prog, const FrameState& fs, GpuModel* model, const std::vector< Instance >* inst ); // the main draw of one model
 	void DrawCap( GLuint prog, const FrameState& fs, GpuModel* model, int plane = 0 ); // plane 1: the cross-section slab's lower plane
 	void DrawWindow( const FrameState& fs, GpuModel* model ); // the openings (stencil) and the other world behind them
-	GLuint progWinMark = 0, progWinQuad = 0, winSampler = 0;
-	GLuint windowPic = 0; // the projector's picture this frame (RenderProjector), 0 = none
+	GLuint progWinMark = 0, progWinQuad = 0;
 	bool LensOn( const FrameState& fs ) const { return fs.x.lens && fs.x.lensAmt > 0.0f; }
 	void SetLensUniforms( GLuint prog, const FrameState& fs, int w, int h );
 	void WarmLooks( const FrameState& fs, GpuModel* model ); // at model swap, through the 1-pixel scissor

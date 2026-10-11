@@ -1,6 +1,9 @@
 // THE parameter list. Index order = Resolume display order: groups contiguous, Debug last.
 // X( id, name, type, min, max, default, group, options "A|B|C", flags )
-//   type: FILE TEXT OPT EVENT BOOL STD HUE SAT BRI ALPHA BUFFER    flags: 0 or HIDDEN
+//   type: FILE TEXT OPT EVENT BOOL STD HUE SAT BRI ALPHA BUFFER    flags: 0, HIDDEN or FXONLY (W11: the FX bundles only)
+// OPTIONS (an element's VALUE is its place in the list, never renumbered): "~Name" = retired everywhere (a tombstone, W7);
+// W11 (Amrit: "If a plugin cannot load or use something, remove it"): "Name{wow}" / "Name{classic}" = listed only in that bundle family.
+// A value a bundle does not list (a saved clip, REST) is read as the param's default (SetFloatId).
 // Names are <=16 chars (Arena truncates) and unique (Resolume stores values by NAME: never rename one).
 // Included with X defined; Params.h builds the enum, LoadEhrPlugin.cpp the definitions.
 //
@@ -27,7 +30,7 @@
 // MODEL
 // LoadEhr has NO library: a model comes only from a file the user points a Model slot at. Nothing loaded = transparent.
 // W21: what slot A shows: its file, typed text or a logo file, each extruded into the same pipeline
-X( P_MODEL_SOURCE, "Model Source", OPT, 0, 2, 0, "Model", "Model File|Text|Logo", 0 )
+X( P_MODEL_SOURCE, "Model Source", OPT, 0, 2, 0, "Model", "Model File|Text|Logo{classic}", 0 ) // W11: no Logo group in Wow
 // FOUR MODEL SLOTS (LoadEhr W1): each a FILE + its own read-only Status line + Reload (re-read the file from disk). Every filled
 // slot loads and uploads in the background ahead of use; Transition walks the chain of filled slots A -> B -> C -> D.
 // SLOT LAYOUT: P_MODEL_A + 3 x slot + { 0 file, 1 status, 2 reload } (SlotParam in LoadEhrPlugin.cpp)
@@ -54,10 +57,10 @@ X( P_MAX_TEX, "Max Texture Size", OPT, 0, 2, 0, "Model", "Full|4K|2K", 0 )
 X( P_TRANSITION, "Transition", STD, 0, 1, 0, "Model", "", 0 )
 X( P_CHAIN_LOOP, "Chain Loop", BOOL, 0, 1, 0, "Model", "", 0 )
 // W6 Stage 2 (Amrit: "how many transitions types between models can be added?"): the pack appended (0..4 keep their numbers, so saved
-// clips keep their style). Swarm, Burn and Lava need the Wow bundles' dials: in LoadEhr / FX they dissolve. W7: "~" = a retired option
+// clips keep their style). W11: Swarm, Smoke, Burn and Lava need the Wow bundles' groups: listed only there (classic: Dissolve). W7: "~" = a retired option
 // (Shrinkwrap 6, Fold 22: Amrit "Fold can go and also Shrink Wrap"): not in the list, its value kept (a tombstone), so no style moves.
 X( P_TRANSITION_STYLE, "Transition Style", OPT, 0, 22, 0, "Model",
-   "Dissolve|Shatter|Dust|Slice|Liquid|Points|~Shrinkwrap|Wire|Voxel|Low Poly|Pieces|Implode|Twist|Melt|Scan|Glitch|Ripple|Swarm|Smoke|Burn|Lava|Spin Swap|~Fold", 0 ) // W26: + Liquid
+   "Dissolve|Shatter|Dust|Slice|Liquid|Points|~Shrinkwrap|Wire|Voxel|Low Poly|Pieces|Implode|Twist|Melt|Scan|Glitch|Ripple|Swarm{wow}|Smoke{wow}|Burn{wow}|Lava{wow}|Spin Swap|~Fold", 0 ) // W26: + Liquid
 // the style per hop: Fixed = Transition Style every hop; Cycle = Transition Style, then the next style each hop; Random = a
 // style per hop from a hash of the hop (stable while scrubbing)
 X( P_STYLE_ORDER, "Style Order", OPT, 0, 2, 0, "Model", "Fixed|Cycle|Random", 0 )
@@ -225,12 +228,12 @@ X( P_PAT_BEAT, "Pattern Beat", STD, 0, 4, 0, "Surface", "", 0 )
 X( P_PAT_AUDIO, "Pattern Audio", STD, 0, 4, 0, "Surface", "", 0 )
 #undef MEHR_REGION
 #define MEHR_REGION 0
-// PARTS: 8 slots; renamed "<material> <field>" at load, unused slots hidden
+// PARTS: 8 slots; renamed "<material> <field>" at load, unused slots hidden. W11: Skin (the FX input on the part) in the FX bundles only
 #define MEHR_PART( n )                                                                \
 	X( P_PART##n##_VISIBLE, "Part " #n " Visible", BOOL, 0, 1, 1, "Parts", "", 0 )     \
 	X( P_PART##n##_HUE, "Part " #n " Hue Shift", STD, 0, 1, 0, "Parts", "", 0 )        \
 	X( P_PART##n##_GLOW, "Part " #n " Glow", STD, 0, 5, 0, "Parts", "", 0 )            \
-	X( P_PART##n##_SKIN, "Part " #n " Skin", BOOL, 0, 1, 0, "Parts", "", 0 )            \
+	X( P_PART##n##_SKIN, "Part " #n " Skin", BOOL, 0, 1, 0, "Parts", "", FXONLY )       \
 	X( P_PART##n##_SURFACE, "Part " #n " Surface", STD, 0, 1, 1, "Parts", "", 0 )
 MEHR_PART( 1 )
 MEHR_PART( 2 )
@@ -323,7 +326,7 @@ X( P_SHEAR, "Shear", STD, -2, 2, 0, "Deform", "", 0 )                    // slid
 X( P_BULGE, "Bulge", STD, -1, 2, 0, "Deform", "", 0 )                    // rounds the middle out (negative: pinches it in)
 X( P_SPHERIZE, "Spherize", STD, 0, 1, 0, "Deform", "", 0 )               // toward a sphere of the fitted radius
 // W9 Stage E: what Spherize morphs toward (Sphere = as before: saved Spherize values keep their look); Torus / Crystal round the Deform Axis
-X( P_SHAPE_TARGET, "Shape Target", OPT, 0, 3, 0, "Deform", "Sphere|Cube|Torus|Crystal", 0 )
+X( P_SHAPE_TARGET, "Shape Target", OPT, 0, 3, 0, "Deform", "Sphere|Cube|~Torus|~Crystal", 0 ) // W11: Amrit "Sphere and Cube"
 X( P_NOISE_WARP, "Noise Warp", STD, 0, 2, 0, "Deform", "", 0 )           // smooth 3D noise displacement
 X( P_WARP_SCALE, "Warp Scale", STD, 0.2f, 10, 2, "Deform", "", 0 )       // noise cells per fitted unit
 X( P_WARP_SPEED, "Warp Speed", STD, 0, 4, 0.3f, "Deform", "", 0 )        // noise cells per second
@@ -427,10 +430,10 @@ X( P_LOD_BIAS, "LOD Bias", STD, 0.1f, 4, 1, "Copies", "", 0 )
 X( P_TRAIL_ECHOES, "Trail Echoes", STD, 0, 7, 0, "Copies", "", 0 )
 X( P_TRAIL_DELAY, "Trail Delay", STD, 1, 30, 4, "Copies", "", 0 )
 X( P_TRAIL_DECAY, "Trail Decay", STD, 0, 1, 0.7f, "Copies", "", 0 )
-X( P_TRAIL_OFFSET_X, "Trail Offset X", STD, -0.1f, 0.1f, 0, "Copies", "", 0 )
+X( P_TRAIL_OFFSET_X, "Trail Offset X", STD, -0.1f, 0.1f, 0.02f, "Copies", "", 0 ) // W11 (Amrit "yes"): 0 -> 0.02, echoes show on their own
 X( P_TRAIL_OFFSET_Y, "Trail Offset Y", STD, -0.1f, 0.1f, 0, "Copies", "", 0 )
 X( P_GHOSTS, "Ghosts", STD, 0, 8, 0, "Copies", "", 0 )
-X( P_GHOST_SPACING, "Ghost Spacing", STD, 1, 30, 5, "Copies", "", 0 )
+X( P_GHOST_SPACING, "Ghost Spacing", STD, 1, 30, 15, "Copies", "", 0 ) // W11 (Amrit "yes"): 5 -> 15, ghosts leave the silhouette
 X( P_GHOST_FADE, "Ghost Fade", STD, 0, 1, 0.6f, "Copies", "", 0 )
 // W15: how the trail copies (Trail Echoes and Ghosts) look. Smear fills the gaps, Blur softens with age (echoes),
 // Dust breaks them into drifting grain; Fade Curve shapes the fade (Decay / Ghost Fade stay the master).
@@ -589,7 +592,7 @@ X( P_FIRE_LIGHT, "Fire Light", STD, 0, 10, 2, "Fire", "", 0 )              // th
 X( P_STRIKE, "Lightning Strike", EVENT, 0, 1, 0, "Lightning", "", 0 )
 X( P_STRIKE_BEAT, "Strike On Beat", OPT, 0, 4, 0, "Lightning", "Off|Every Beat|Every 2|Every 4|Every 8", 0 )
 X( P_STRIKE_RATE, "Strike Rate", STD, 0, 10, 0, "Lightning", "", 0 )      // strikes per second by themselves (crackle)
-X( P_BOLT_PATH, "Bolt Path", OPT, 0, 3, 0, "Lightning", "Crawl|Eye To Eye|To Floor|To Clones", 0 )
+X( P_BOLT_PATH, "Bolt Path", OPT, 0, 3, 0, "Lightning", "Crawl|Eye To Eye|To Floor|~To Clones", 0 ) // W11: To Clones retired (no clones in Wow: Amrit "Drop")
 X( P_BOLT_COUNT, "Bolt Count", STD, 1, 8, 2, "Lightning", "", 0 )         // bolts per strike
 X( P_BRANCHING, "Branching", STD, 0, 1, 0.5f, "Lightning", "", 0 )
 X( P_JAGGEDNESS, "Jaggedness", STD, 0, 1, 0.5f, "Lightning", "", 0 )
@@ -669,9 +672,14 @@ MEHR_VLIGHT( LB, "B", 2.5f, 0.6f, 1, 0, 1, 0.5925926f, 0.45f, 1 )
 // Each Pos is the EYE OPENING; the light sits Behind Depth behind it along the aim. Place At Eyes finds the
 // eye holes (EyeFinder) and writes Pos / aim / cone; C Placed For (hidden) records the model it was placed
 // for, so the auto-place on Enable runs once per model and never overwrites a saved placement.
+// W11 (Amrit: "Allow for choosing behaviour"): C Auto Place = what the eye finder may write by itself (the buttons always place):
+// Off = nothing (the Window still finds the eyes for itself); Once Per Model = positions, aim, cone, depth, anchor, mirror once per model
+// file (W10); Position Only = once per model file, only the six positions; Every Model Swap = everything, again for every model the
+// chain lands on (each hop's dominant model, each load / reload), hand-set dials included.
 X( P_LC_ENABLE, "C Enable", BOOL, 0, 1, 0, "Light C", "", 0 )
 X( P_LC_PLACE, "C Place At Eyes", EVENT, 0, 1, 0, "Light C", "", 0 )
 X( P_LC_FIT_CONE, "C Fit Cone", EVENT, 0, 1, 0, "Light C", "", 0 )
+X( P_LC_AUTO, "C Auto Place", OPT, 0, 3, 1, "Light C", "Off|Once Per Model|Position Only|Every Model Swap", 0 )
 X( P_LC_FRONT_ONLY, "C Front Only", BOOL, 0, 1, 1, "Light C", "", 0 )
 X( P_LC_BEHIND, "C Behind Depth", STD, 0.02f, 2, 0.3f, "Light C", "", 0 )
 X( P_LC_ANCHOR, "C Anchor To Mask", BOOL, 0, 1, 1, "Light C", "", 0 )

@@ -1,0 +1,6066 @@
+{
+ "id": 1791675350393,
+ "name": {
+  "valuetype": "ParamString",
+  "id": 1791675350374,
+  "value": "FX Map Check Wow FX"
+ },
+ "colorid": {
+  "id": 1791675350375,
+  "valuetype": "ParamChoice",
+  "value": "1",
+  "index": 0,
+  "options": [
+   "1",
+   "2",
+   "3",
+   "4",
+   "5",
+   "6"
+  ]
+ },
+ "selected": {
+  "id": 1791675350379,
+  "valuetype": "ParamTrigger",
+  "value": false
+ },
+ "connected": {
+  "value": "Disconnected",
+  "valuetype": "ParamState",
+  "options": [
+   "Empty",
+   "Disconnected",
+   "Previewing",
+   "Connected",
+   "Connected & previewing"
+  ],
+  "index": 1,
+  "id": 1791675350377
+ },
+ "target": {
+  "id": 1791675350370,
+  "valuetype": "ParamChoice",
+  "value": "Composition Determined",
+  "index": 0,
+  "options": [
+   "Composition Determined",
+   "Active Layer",
+   "Own Layer",
+   "Free Layer",
+   "Denon Player Determined",
+   "Pioneer Player Determined"
+  ]
+ },
+ "triggerstyle": {
+  "id": 1791675350371,
+  "valuetype": "ParamChoice",
+  "value": "Composition Determined",
+  "index": 0,
+  "options": [
+   "Composition Determined",
+   "Normal",
+   "Piano",
+   "Toggle"
+  ]
+ },
+ "beatsnap": {
+  "id": 1791675350367,
+  "valuetype": "ParamChoice",
+  "value": "None",
+  "index": 1,
+  "options": [
+   "Composition Determined",
+   "None",
+   "8 Bars",
+   "4 Bars",
+   "2 Bars",
+   "1 Bar",
+   "1/2 Bar",
+   "1/4 Bar"
+  ]
+ },
+ "ignorecolumntrigger": {
+  "id": 1791675350372,
+  "valuetype": "ParamChoice",
+  "value": "Layer Determined",
+  "index": 0,
+  "options": [
+   "Layer Determined",
+   "On",
+   "Off"
+  ]
+ },
+ "faderstart": {
+  "id": 1791675350373,
+  "valuetype": "ParamChoice",
+  "value": "Layer Determined",
+  "index": 0,
+  "options": [
+   "Layer Determined",
+   "On",
+   "Off"
+  ]
+ },
+ "transporttype": {
+  "id": 1791675350368,
+  "valuetype": "ParamChoice",
+  "value": "Timeline",
+  "index": 0,
+  "options": [
+   "Timeline",
+   "BPM Sync",
+   "SMPTE 1",
+   "SMPTE 2",
+   "Denon DJ",
+   "Pioneer DJ"
+  ]
+ },
+ "transport": {
+  "position": {
+   "id": 1791675377124,
+   "valuetype": "ParamRange",
+   "min": 0.0,
+   "max": 5000.0,
+   "in": 0.0,
+   "out": 5000.0,
+   "value": 0.0
+  },
+  "controls": {
+   "playdirection": {
+    "id": 1791675377150,
+    "valuetype": "ParamChoice",
+    "value": ">",
+    "index": 2,
+    "options": [
+     "<",
+     "||",
+     ">"
+    ]
+   },
+   "playmode": {
+    "id": 1791675377151,
+    "valuetype": "ParamChoice",
+    "value": "Loop",
+    "index": 0,
+    "options": [
+     "Loop",
+     "Bounce",
+     "Random",
+     "Play Once & Clear",
+     "Play Once & Hold"
+    ]
+   },
+   "playmodeaway": {
+    "id": 1791675377152,
+    "valuetype": "ParamChoice",
+    "value": "Restart",
+    "index": 0,
+    "options": [
+     "Restart",
+     "Continue",
+     "Relative"
+    ]
+   },
+   "duration": {
+    "id": 1791675377158,
+    "valuetype": "ParamRange",
+    "min": 0.001,
+    "max": 604800.0,
+    "in": 0.001,
+    "out": 604800.0,
+    "value": 5.0
+   },
+   "speed": {
+    "id": 1791675377154,
+    "valuetype": "ParamRange",
+    "min": 0.0,
+    "max": 10.0,
+    "in": 0.0,
+    "out": 10.0,
+    "value": 1.0
+   }
+  }
+ },
+ "transition": {
+  "layer_determined": {
+   "valuetype": "ParamBoolean",
+   "id": 1791675350388,
+   "value": true
+  },
+  "duration": {
+   "id": 1791675350389,
+   "valuetype": "ParamRange",
+   "min": 0.0,
+   "max": 10.0,
+   "in": 0.0,
+   "out": 10.0,
+   "value": 0.0
+  },
+  "blend_mode": {
+   "id": 1791675350390,
+   "valuetype": "ParamChoice",
+   "value": "Layer Determined",
+   "index": 0,
+   "options": [
+    "Layer Determined",
+    "Add",
+    "Alpha",
+    "B&W",
+    "Bumper",
+    "Burn",
+    "Chaser",
+    "Cube",
+    "Cut",
+    "Darken",
+    "Depth",
+    "Difference",
+    "Difference I",
+    "Displace",
+    "Dissolve",
+    "Dodge",
+    "Exclusion",
+    "Hard Light",
+    "JitterBug",
+    "Lighten",
+    "LoRez",
+    "Luma Is Alpha",
+    "Luma Key",
+    "Luma Key I",
+    "Mask",
+    "Meta Mix",
+    "Multiply",
+    "Multi Task",
+    "Noisy",
+    "Overlay",
+    "Parts",
+    "PiP",
+    "PixieDustDuo",
+    "Push Down",
+    "Push Left",
+    "Push Right",
+    "Push Up",
+    "Random",
+    "RefractGURU",
+    "RGB",
+    "Rotate X",
+    "Rotate Y",
+    "Screen",
+    "Shift RGB",
+    "Side by Side",
+    "Soft Light",
+    "Static",
+    "Subtract",
+    "Tile",
+    "TimeSwitcher",
+    "to Black",
+    "to Color",
+    "to White",
+    "Twitch",
+    "Video Bumper",
+    "Wipe Ellipse",
+    "Zoom In",
+    "Zoom Out"
+   ]
+  },
+  "params": null
+ },
+ "dashboard": {
+  "Link 1": {
+   "id": 1791675350359,
+   "valuetype": "ParamRange",
+   "min": 0.0,
+   "max": 1.0,
+   "in": 0.0,
+   "out": 1.0,
+   "value": 0.0,
+   "view": {
+    "suffix": "",
+    "control_type": "rotary"
+   }
+  },
+  "Link 2": {
+   "id": 1791675350360,
+   "valuetype": "ParamRange",
+   "min": 0.0,
+   "max": 1.0,
+   "in": 0.0,
+   "out": 1.0,
+   "value": 0.0,
+   "view": {
+    "suffix": "",
+    "control_type": "rotary"
+   }
+  },
+  "Link 3": {
+   "id": 1791675350361,
+   "valuetype": "ParamRange",
+   "min": 0.0,
+   "max": 1.0,
+   "in": 0.0,
+   "out": 1.0,
+   "value": 0.0,
+   "view": {
+    "suffix": "",
+    "control_type": "rotary"
+   }
+  },
+  "Link 4": {
+   "id": 1791675350362,
+   "valuetype": "ParamRange",
+   "min": 0.0,
+   "max": 1.0,
+   "in": 0.0,
+   "out": 1.0,
+   "value": 0.0,
+   "view": {
+    "suffix": "",
+    "control_type": "rotary"
+   }
+  },
+  "Link 5": {
+   "id": 1791675350363,
+   "valuetype": "ParamRange",
+   "min": 0.0,
+   "max": 1.0,
+   "in": 0.0,
+   "out": 1.0,
+   "value": 0.0,
+   "view": {
+    "suffix": "",
+    "control_type": "rotary"
+   }
+  },
+  "Link 6": {
+   "id": 1791675350364,
+   "valuetype": "ParamRange",
+   "min": 0.0,
+   "max": 1.0,
+   "in": 0.0,
+   "out": 1.0,
+   "value": 0.0,
+   "view": {
+    "suffix": "",
+    "control_type": "rotary"
+   }
+  },
+  "Link 7": {
+   "id": 1791675350365,
+   "valuetype": "ParamRange",
+   "min": 0.0,
+   "max": 1.0,
+   "in": 0.0,
+   "out": 1.0,
+   "value": 0.0,
+   "view": {
+    "suffix": "",
+    "control_type": "rotary"
+   }
+  },
+  "Link 8": {
+   "id": 1791675350366,
+   "valuetype": "ParamRange",
+   "min": 0.0,
+   "max": 1.0,
+   "in": 0.0,
+   "out": 1.0,
+   "value": 0.0,
+   "view": {
+    "suffix": "",
+    "control_type": "rotary"
+   }
+  }
+ },
+ "audio": null,
+ "video": {
+  "width": {
+   "id": 1791675377095,
+   "valuetype": "ParamRange",
+   "min": 0.0,
+   "max": 16384.0,
+   "in": 0.0,
+   "out": 16384.0,
+   "value": 1920.0
+  },
+  "height": {
+   "id": 1791675377096,
+   "valuetype": "ParamRange",
+   "min": 0.0,
+   "max": 16384.0,
+   "in": 0.0,
+   "out": 16384.0,
+   "value": 1080.0
+  },
+  "opacity": {
+   "id": 1791675377094,
+   "valuetype": "ParamRange",
+   "min": 0.0,
+   "max": 1.0,
+   "in": 0.0,
+   "out": 1.0,
+   "value": 1.0
+  },
+  "mixer": {
+   "Blend Mode": {
+    "id": 1791675377097,
+    "valuetype": "ParamChoice",
+    "value": "Layer Determined",
+    "index": 0,
+    "options": [
+     "Layer Determined",
+     "50 Add",
+     "50 Burn",
+     "50 Difference",
+     "50 Distance",
+     "50 Dodge",
+     "50 Lighten",
+     "50 Mask",
+     "50 Multiply",
+     "50 Overlay",
+     "50 Subtract",
+     "Add",
+     "Alpha",
+     "B&W",
+     "Bumper",
+     "Burn",
+     "Chaser",
+     "Cube",
+     "Cut",
+     "Darken",
+     "Depth",
+     "Difference",
+     "Difference I",
+     "Displace",
+     "Dissolve",
+     "Dodge",
+     "Exclusion",
+     "Hard Light",
+     "JitterBug",
+     "Lighten",
+     "LoRez",
+     "Luma Is Alpha",
+     "Luma Key",
+     "Luma Key I",
+     "Mask",
+     "Meta Mix",
+     "Multiply",
+     "Multi Task",
+     "Noisy",
+     "Overlay",
+     "Parts",
+     "PiP",
+     "PixieDustDuo",
+     "Push Down",
+     "Push Left",
+     "Push Right",
+     "Push Up",
+     "Random",
+     "RefractGURU",
+     "RGB",
+     "Rotate X",
+     "Rotate Y",
+     "Screen",
+     "Shift RGB",
+     "Side by Side",
+     "Soft Light",
+     "Static",
+     "Subtract",
+     "Tile",
+     "TimeSwitcher",
+     "to Black",
+     "to Color",
+     "to White",
+     "Twitch",
+     "Video Bumper",
+     "Wipe Ellipse",
+     "Zoom In",
+     "Zoom Out"
+    ],
+    "view": {
+     "suffix": "",
+     "control_type": "choice_combobox"
+    }
+   }
+  },
+  "effects": [
+   {
+    "id": 1791675377106,
+    "is_user_removable": false,
+    "name": "Transform",
+    "display_name": "Transform",
+    "mixer": null,
+    "params": {
+     "Position X": {
+      "id": 1791675377111,
+      "valuetype": "ParamRange",
+      "min": -16384.0,
+      "max": 16384.0,
+      "in": -16384.0,
+      "out": 16384.0,
+      "value": 0.0,
+      "view": {
+       "suffix": "",
+       "step": 1.0,
+       "display_units": "real",
+       "control_type": "spinner"
+      }
+     },
+     "Position Y": {
+      "id": 1791675377112,
+      "valuetype": "ParamRange",
+      "min": -16384.0,
+      "max": 16384.0,
+      "in": -16384.0,
+      "out": 16384.0,
+      "value": 0.0,
+      "view": {
+       "suffix": "",
+       "step": 1.0,
+       "display_units": "real",
+       "control_type": "spinner"
+      }
+     },
+     "Scale": {
+      "id": 1791675377108,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1000.0,
+      "in": 0.0,
+      "out": 1000.0,
+      "value": 100.0,
+      "view": {
+       "suffix": " %",
+       "step": 1.0,
+       "multiplier": 1.0,
+       "display_units": "percent",
+       "control_type": "slider"
+      }
+     },
+     "Scale W": {
+      "id": 1791675377109,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1000.0,
+      "in": 0.0,
+      "out": 1000.0,
+      "value": 100.0,
+      "view": {
+       "suffix": " %",
+       "step": 1.0,
+       "multiplier": 1.0,
+       "display_units": "percent",
+       "control_type": "slider"
+      }
+     },
+     "Scale H": {
+      "id": 1791675377110,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1000.0,
+      "in": 0.0,
+      "out": 1000.0,
+      "value": 100.0,
+      "view": {
+       "suffix": " %",
+       "step": 1.0,
+       "multiplier": 1.0,
+       "display_units": "percent",
+       "control_type": "slider"
+      }
+     },
+     "Rotation X": {
+      "id": 1791675377113,
+      "valuetype": "ParamRange",
+      "min": -180.0,
+      "max": 180.0,
+      "in": -180.0,
+      "out": 180.0,
+      "value": 0.0,
+      "view": {
+       "suffix": " \u00b0",
+       "step": 1.0,
+       "display_units": "degrees",
+       "control_type": "slider"
+      }
+     },
+     "Rotation Y": {
+      "id": 1791675377114,
+      "valuetype": "ParamRange",
+      "min": -180.0,
+      "max": 180.0,
+      "in": -180.0,
+      "out": 180.0,
+      "value": 0.0,
+      "view": {
+       "suffix": " \u00b0",
+       "step": 1.0,
+       "display_units": "degrees",
+       "control_type": "slider"
+      }
+     },
+     "Rotation Z": {
+      "id": 1791675377115,
+      "valuetype": "ParamRange",
+      "min": -180.0,
+      "max": 180.0,
+      "in": -180.0,
+      "out": 180.0,
+      "value": 0.0,
+      "view": {
+       "suffix": " \u00b0",
+       "step": 1.0,
+       "display_units": "degrees",
+       "control_type": "slider"
+      }
+     },
+     "Anchor X": {
+      "id": 1791675377116,
+      "valuetype": "ParamRange",
+      "min": -8192.0,
+      "max": 8192.0,
+      "in": -8192.0,
+      "out": 8192.0,
+      "value": 0.0,
+      "view": {
+       "suffix": "",
+       "step": 1.0,
+       "control_type": "slider"
+      }
+     },
+     "Anchor Y": {
+      "id": 1791675377117,
+      "valuetype": "ParamRange",
+      "min": -8192.0,
+      "max": 8192.0,
+      "in": -8192.0,
+      "out": 8192.0,
+      "value": 0.0,
+      "view": {
+       "suffix": "",
+       "step": 1.0,
+       "control_type": "slider"
+      }
+     },
+     "Anchor Z": {
+      "id": 1791675377118,
+      "valuetype": "ParamRange",
+      "min": -8192.0,
+      "max": 8192.0,
+      "in": -8192.0,
+      "out": 8192.0,
+      "value": 0.0,
+      "view": {
+       "suffix": "",
+       "step": 1.0,
+       "control_type": "slider"
+      }
+     }
+    }
+   },
+   {
+    "id": 1791675378883,
+    "is_user_removable": true,
+    "name": "LoadEhr Wow FX",
+    "display_name": "LoadEhr Wow FX",
+    "bypassed": {
+     "valuetype": "ParamBoolean",
+     "id": 1791675378882,
+     "value": false
+    },
+    "mixer": {
+     "Blend Mode": {
+      "id": 1791675378886,
+      "valuetype": "ParamChoice",
+      "value": "Alpha",
+      "index": 1,
+      "options": [
+       "Add",
+       "Alpha",
+       "B&W",
+       "Bumper",
+       "Burn",
+       "Chaser",
+       "Cube",
+       "Cut",
+       "Darken",
+       "Depth",
+       "Difference",
+       "Difference I",
+       "Displace",
+       "Dissolve",
+       "Dodge",
+       "Exclusion",
+       "Hard Light",
+       "JitterBug",
+       "Lighten",
+       "LoRez",
+       "Luma Is Alpha",
+       "Luma Key",
+       "Luma Key I",
+       "Mask",
+       "Meta Mix",
+       "Multiply",
+       "Multi Task",
+       "Noisy",
+       "Overlay",
+       "Parts",
+       "PiP",
+       "PixieDustDuo",
+       "Push Down",
+       "Push Left",
+       "Push Right",
+       "Push Up",
+       "Random",
+       "RefractGURU",
+       "RGB",
+       "Rotate X",
+       "Rotate Y",
+       "Screen",
+       "Shift RGB",
+       "Side by Side",
+       "Soft Light",
+       "Static",
+       "Subtract",
+       "Tile",
+       "TimeSwitcher",
+       "to Black",
+       "to Color",
+       "to White",
+       "Twitch",
+       "Video Bumper",
+       "Wipe Ellipse",
+       "Zoom In",
+       "Zoom Out"
+      ],
+      "view": {
+       "suffix": "",
+       "control_type": "choice_combobox"
+      }
+     }
+    },
+    "params": {
+     "Opacity": {
+      "id": 1791675378885,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 1.0,
+      "view": {
+       "suffix": " %",
+       "multiplier": 100.0,
+       "display_units": "percent",
+       "control_type": "slider_color_opacity"
+      }
+     },
+     "Model Source": {
+      "id": 1791675378259,
+      "valuetype": "ParamChoice",
+      "value": "Model File",
+      "index": 0,
+      "options": [
+       "Model File",
+       "Text"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Model A": {
+      "id": 1791675378260,
+      "valuetype": "ParamFile",
+      "value": "",
+      "extensions": [
+       "fbx",
+       "obj",
+       "gltf",
+       "glb"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Status A": {
+      "valuetype": "ParamString",
+      "id": 1791675378261,
+      "value": "Nothing loaded: transparent output. Point Model A (or B, C, D) at a model file",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Reload A": {
+      "id": 1791675378262,
+      "valuetype": "ParamEvent",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Model B": {
+      "id": 1791675378263,
+      "valuetype": "ParamFile",
+      "value": "",
+      "extensions": [
+       "fbx",
+       "obj",
+       "gltf",
+       "glb"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Status B": {
+      "valuetype": "ParamString",
+      "id": 1791675378264,
+      "value": "Empty: skipped by the chain",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Reload B": {
+      "id": 1791675378265,
+      "valuetype": "ParamEvent",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Model C": {
+      "id": 1791675378266,
+      "valuetype": "ParamFile",
+      "value": "",
+      "extensions": [
+       "fbx",
+       "obj",
+       "gltf",
+       "glb"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Status C": {
+      "valuetype": "ParamString",
+      "id": 1791675378267,
+      "value": "Empty: skipped by the chain",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Reload C": {
+      "id": 1791675378268,
+      "valuetype": "ParamEvent",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Model D": {
+      "id": 1791675378269,
+      "valuetype": "ParamFile",
+      "value": "",
+      "extensions": [
+       "fbx",
+       "obj",
+       "gltf",
+       "glb"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Status D": {
+      "valuetype": "ParamString",
+      "id": 1791675378270,
+      "value": "Empty: skipped by the chain",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Reload D": {
+      "id": 1791675378271,
+      "valuetype": "ParamEvent",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Auto Fit": {
+      "valuetype": "ParamBoolean",
+      "id": 1791675378272,
+      "value": true,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Fit To": {
+      "id": 1791675378273,
+      "valuetype": "ParamChoice",
+      "value": "Visible Parts",
+      "index": 1,
+      "options": [
+       "All Parts",
+       "Visible Parts"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Normal Flip Y": {
+      "valuetype": "ParamBoolean",
+      "id": 1791675378274,
+      "value": false,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Max Texture Size": {
+      "id": 1791675378275,
+      "valuetype": "ParamChoice",
+      "value": "Full",
+      "index": 0,
+      "options": [
+       "Full",
+       "4K",
+       "2K"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Transition": {
+      "id": 1791675378276,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Chain Loop": {
+      "valuetype": "ParamBoolean",
+      "id": 1791675378277,
+      "value": false,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Transition Style": {
+      "id": 1791675378278,
+      "valuetype": "ParamChoice",
+      "value": "Dissolve",
+      "index": 0,
+      "options": [
+       "Dissolve",
+       "Shatter",
+       "Dust",
+       "Slice",
+       "Liquid",
+       "Points",
+       "Wire",
+       "Voxel",
+       "Low Poly",
+       "Pieces",
+       "Implode",
+       "Twist",
+       "Melt",
+       "Scan",
+       "Glitch",
+       "Ripple",
+       "Swarm",
+       "Smoke",
+       "Burn",
+       "Lava",
+       "Spin Swap"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Style Order": {
+      "id": 1791675378279,
+      "valuetype": "ParamChoice",
+      "value": "Fixed",
+      "index": 0,
+      "options": [
+       "Fixed",
+       "Cycle",
+       "Random"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Transition Play": {
+      "id": 1791675378280,
+      "valuetype": "ParamChoice",
+      "value": "Off",
+      "index": 0,
+      "options": [
+       "Off",
+       "Once On Trigger",
+       "Ping-Pong",
+       "Loop"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Transition Time": {
+      "id": 1791675378281,
+      "valuetype": "ParamRange",
+      "min": 0.5,
+      "max": 30.0,
+      "in": 0.5,
+      "out": 30.0,
+      "value": 6.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Hold Time": {
+      "id": 1791675378282,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 60.0,
+      "in": 0.0,
+      "out": 60.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Trans Ease": {
+      "id": 1791675378283,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Trans Stagger": {
+      "id": 1791675378284,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.8500000238418579,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Trans Spread": {
+      "id": 1791675378285,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 0.6000000238418579,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Trans Sparkle": {
+      "id": 1791675378286,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Liquid Goo": {
+      "id": 1791675378287,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.6000000238418579,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Liquid Look": {
+      "id": 1791675378288,
+      "valuetype": "ParamChoice",
+      "value": "Chrome",
+      "index": 0,
+      "options": [
+       "Chrome",
+       "Paint"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Liquid Color": {
+      "id": 1791675378289,
+      "valuetype": "ParamColor",
+      "value": "#ffaf6600",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Liquid Wobble": {
+      "id": 1791675378298,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.4000000059604645,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Liquid Speed": {
+      "id": 1791675378299,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.25,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Text": {
+      "valuetype": "ParamString",
+      "id": 1791675378300,
+      "value": "LOADEHR",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Font": {
+      "id": 1791675378301,
+      "valuetype": "ParamChoice",
+      "value": "Use Font Name",
+      "index": 0,
+      "options": [
+       "Use Font Name",
+       "Academy Engraved LET",
+       "Al Bayan",
+       "Al Nile",
+       "Al Tarikh",
+       "American Typewriter",
+       "Andale Mono",
+       "Apple Braille",
+       "Apple Chancery",
+       "Apple Color Emoji",
+       "Apple SD Gothic Neo",
+       "Apple Symbols",
+       "AppleGothic",
+       "AppleMyungjo",
+       "Arial",
+       "Arial Black",
+       "Arial Hebrew",
+       "Arial Hebrew Scholar",
+       "Arial Narrow",
+       "Arial Rounded MT Bold",
+       "Arial Unicode MS",
+       "Avenir",
+       "Avenir Next",
+       "Avenir Next Condensed",
+       "Ayuthaya",
+       "Baghdad",
+       "Bangla MN",
+       "Bangla Sangam MN",
+       "Baskerville",
+       "Beirut",
+       "Big Caslon",
+       "Bodoni 72",
+       "Bodoni 72 Oldstyle",
+       "Bodoni 72 Smallcaps",
+       "Bodoni Ornaments",
+       "Bradley Hand",
+       "Brush Script MT",
+       "Chalkboard",
+       "Chalkboard SE",
+       "Chalkduster",
+       "Charter",
+       "Cochin",
+       "Comic Sans MS",
+       "Copperplate",
+       "Corsiva Hebrew",
+       "Courier New",
+       "Damascus",
+       "DecoType Naskh",
+       "Devanagari MT",
+       "Devanagari Sangam MN",
+       "Didot",
+       "DIN Alternate",
+       "DIN Condensed",
+       "Diwan Kufi",
+       "Diwan Thuluth",
+       "Euphemia UCAS",
+       "Farah",
+       "Farisi",
+       "Futura",
+       "Galvji",
+       "GB18030 Bitmap",
+       "Geeza Pro",
+       "Geneva",
+       "Georgia",
+       "Gill Sans",
+       "Grantha Sangam MN",
+       "Gujarati MT",
+       "Gujarati Sangam MN",
+       "Gurmukhi MN",
+       "Gurmukhi MT",
+       "Gurmukhi Sangam MN",
+       "Heiti SC",
+       "Heiti TC",
+       "Helvetica",
+       "Helvetica Neue",
+       "Herculanum",
+       "Hiragino Maru Gothic ProN",
+       "Hiragino Mincho ProN",
+       "Hiragino Sans",
+       "Hiragino Sans GB",
+       "Hoefler Text",
+       "Impact",
+       "InaiMathi",
+       "ITF Devanagari",
+       "ITF Devanagari Marathi",
+       "JetBrains Mono",
+       "Kailasa",
+       "Kannada MN",
+       "Kannada Sangam MN",
+       "Kefa III",
+       "Khmer MN",
+       "Khmer Sangam MN",
+       "Kohinoor Bangla",
+       "Kohinoor Devanagari",
+       "Kohinoor Gujarati",
+       "Kohinoor Telugu",
+       "Kokonor",
+       "Krungthep",
+       "KufiStandardGK",
+       "Lao MN",
+       "Lao Sangam MN",
+       "Lucida Grande",
+       "Luminari",
+       "Malayalam MN",
+       "Malayalam Sangam MN",
+       "Marker Felt",
+       "Menlo",
+       "Microsoft Sans Serif",
+       "Mishafi",
+       "Mishafi Gold",
+       "Monaco",
+       "Mshtakan",
+       "Mukta Mahee",
+       "Muna",
+       "Myanmar MN",
+       "Myanmar Sangam MN",
+       "Nadeem",
+       "New Peninim MT",
+       "Noteworthy",
+       "Noto Nastaliq Urdu",
+       "Noto Sans Batak",
+       "Noto Sans Kannada",
+       "Noto Sans Myanmar",
+       "Noto Sans NKo",
+       "Noto Sans Oriya",
+       "Noto Sans Syriac",
+       "Noto Sans Tagalog",
+       "Noto Serif Myanmar",
+       "Optima",
+       "Oriya MN",
+       "Oriya Sangam MN",
+       "Palatino",
+       "Papyrus",
+       "Party LET",
+       "Phosphate",
+       "PingFang HK",
+       "PingFang MO",
+       "PingFang SC",
+       "PingFang TC",
+       "Plantagenet Cherokee",
+       "PT Mono",
+       "PT Sans",
+       "PT Sans Caption",
+       "PT Sans Narrow",
+       "PT Serif",
+       "PT Serif Caption",
+       "Raanana",
+       "Rockwell",
+       "Sana",
+       "Sathu",
+       "Savoye LET",
+       "Shree Devanagari 714",
+       "SignPainter",
+       "Silom",
+       "Sinhala MN",
+       "Sinhala Sangam MN",
+       "Skia",
+       "Snell Roundhand",
+       "Songti SC",
+       "Songti TC",
+       "STIX Two Math",
+       "STIX Two Text",
+       "STSong",
+       "Studio Manager Big Font",
+       "Studio Manager ChFont",
+       "Studio Manager Dot Font 1",
+       "Studio Manager Dot Font 3",
+       "Sukhumvit Set",
+       "Symbol",
+       "Tahoma",
+       "Tamil MN",
+       "Tamil Sangam MN",
+       "Telugu MN",
+       "Telugu Sangam MN",
+       "Thonburi",
+       "Times New Roman",
+       "Trattatello",
+       "Trebuchet MS",
+       "Verdana",
+       "Waseem",
+       "Webdings",
+       "Wingdings",
+       "Wingdings 2",
+       "Wingdings 3",
+       "Yamaha EBM 10",
+       "Yamaha EBM 8",
+       "Zapf Dingbats",
+       "Zapfino"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Font Name": {
+      "valuetype": "ParamString",
+      "id": 1791675378302,
+      "value": "Helvetica Neue",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Font Style": {
+      "id": 1791675378303,
+      "valuetype": "ParamChoice",
+      "value": "Default",
+      "index": 0,
+      "options": [
+       "Default",
+       "UltraLight",
+       "UltraLight Italic",
+       "Thin",
+       "Thin Italic",
+       "Light",
+       "Light Italic",
+       "Regular",
+       "Italic",
+       "Medium",
+       "Medium Italic",
+       "Bold",
+       "Condensed Bold",
+       "Bold Italic",
+       "Condensed Black"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Font File": {
+      "id": 1791675378304,
+      "valuetype": "ParamFile",
+      "value": "",
+      "extensions": [
+       "ttf",
+       "otf",
+       "ttc"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Align": {
+      "id": 1791675378305,
+      "valuetype": "ParamChoice",
+      "value": "Center",
+      "index": 1,
+      "options": [
+       "Left",
+       "Center",
+       "Right"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Line Spacing": {
+      "id": 1791675378306,
+      "valuetype": "ParamRange",
+      "min": 0.5,
+      "max": 3.0,
+      "in": 0.5,
+      "out": 3.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Letter Spacing": {
+      "id": 1791675378307,
+      "valuetype": "ParamRange",
+      "min": -0.30000001192092896,
+      "max": 2.0,
+      "in": -0.30000001192092896,
+      "out": 2.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Curve Detail": {
+      "id": 1791675378308,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Rotate X": {
+      "id": 1791675378309,
+      "valuetype": "ParamRange",
+      "min": -180.0,
+      "max": 180.0,
+      "in": -180.0,
+      "out": 180.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Rotate Y": {
+      "id": 1791675378310,
+      "valuetype": "ParamRange",
+      "min": -180.0,
+      "max": 180.0,
+      "in": -180.0,
+      "out": 180.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Rotate Z": {
+      "id": 1791675378311,
+      "valuetype": "ParamRange",
+      "min": -180.0,
+      "max": 180.0,
+      "in": -180.0,
+      "out": 180.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Spin X": {
+      "id": 1791675378312,
+      "valuetype": "ParamRange",
+      "min": -30.0,
+      "max": 30.0,
+      "in": -30.0,
+      "out": 30.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Spin Y": {
+      "id": 1791675378313,
+      "valuetype": "ParamRange",
+      "min": -30.0,
+      "max": 30.0,
+      "in": -30.0,
+      "out": 30.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Spin Z": {
+      "id": 1791675378314,
+      "valuetype": "ParamRange",
+      "min": -30.0,
+      "max": 30.0,
+      "in": -30.0,
+      "out": 30.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Reset Spin": {
+      "id": 1791675378315,
+      "valuetype": "ParamEvent",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Pos X": {
+      "id": 1791675378316,
+      "valuetype": "ParamRange",
+      "min": -3.0,
+      "max": 3.0,
+      "in": -3.0,
+      "out": 3.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Pos Y": {
+      "id": 1791675378317,
+      "valuetype": "ParamRange",
+      "min": -3.0,
+      "max": 3.0,
+      "in": -3.0,
+      "out": 3.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Pos Z": {
+      "id": 1791675378318,
+      "valuetype": "ParamRange",
+      "min": -10.0,
+      "max": 10.0,
+      "in": -10.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Scale": {
+      "id": 1791675378319,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 6.0,
+      "in": 0.0,
+      "out": 6.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "FOV": {
+      "id": 1791675378320,
+      "valuetype": "ParamRange",
+      "min": 5.0,
+      "max": 150.0,
+      "in": 5.0,
+      "out": 150.0,
+      "value": 35.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Distance": {
+      "id": 1791675378321,
+      "valuetype": "ParamRange",
+      "min": 0.30000001192092896,
+      "max": 20.0,
+      "in": 0.30000001192092896,
+      "out": 20.0,
+      "value": 4.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Orbit Yaw": {
+      "id": 1791675378322,
+      "valuetype": "ParamRange",
+      "min": -180.0,
+      "max": 180.0,
+      "in": -180.0,
+      "out": 180.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Orbit Pitch": {
+      "id": 1791675378323,
+      "valuetype": "ParamRange",
+      "min": -89.0,
+      "max": 89.0,
+      "in": -89.0,
+      "out": 89.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Wobble Amount": {
+      "id": 1791675378324,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Wobble Speed": {
+      "id": 1791675378325,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 5.0,
+      "in": 0.0,
+      "out": 5.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Beat Bounce": {
+      "id": 1791675378326,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Beat Nod": {
+      "id": 1791675378327,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Audio Gain": {
+      "id": 1791675378328,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Audio > Scale": {
+      "id": 1791675378329,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 3.0,
+      "in": 0.0,
+      "out": 3.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Audio > Glow": {
+      "id": 1791675378330,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Audio > Explode": {
+      "id": 1791675378331,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 3.0,
+      "in": 0.0,
+      "out": 3.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Tint Color": {
+      "id": 1791675378332,
+      "valuetype": "ParamColor",
+      "value": "#ffffff00",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Hue Shift": {
+      "id": 1791675378341,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": " \u00b0",
+       "multiplier": 360.0,
+       "display_units": "degrees",
+       "control_type": "slider_color_hue"
+      }
+     },
+     "Saturation": {
+      "id": 1791675378342,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Brightness": {
+      "id": 1791675378343,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 6.0,
+      "in": 0.0,
+      "out": 6.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Metal Override": {
+      "valuetype": "ParamBoolean",
+      "id": 1791675378344,
+      "value": false,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Metallic Value": {
+      "id": 1791675378345,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Roughness Scale": {
+      "id": 1791675378346,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Normal Strength": {
+      "id": 1791675378347,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 6.0,
+      "in": 0.0,
+      "out": 6.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Height Displace": {
+      "id": 1791675378348,
+      "valuetype": "ParamRange",
+      "min": -0.5,
+      "max": 0.5,
+      "in": -0.5,
+      "out": 0.5,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Emissive Glow": {
+      "id": 1791675378349,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Rim Glow": {
+      "id": 1791675378350,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Rim Color": {
+      "id": 1791675378351,
+      "valuetype": "ParamColor",
+      "value": "#ffd999ff",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Glass": {
+      "id": 1791675378360,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Glass IOR": {
+      "id": 1791675378361,
+      "valuetype": "ParamRange",
+      "min": 1.0,
+      "max": 2.5,
+      "in": 1.0,
+      "out": 2.5,
+      "value": 1.4500000476837158,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Glass Dispersion": {
+      "id": 1791675378362,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.4000000059604645,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Glass Color": {
+      "id": 1791675378363,
+      "valuetype": "ParamColor",
+      "value": "#ebf7ffff",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Shatter": {
+      "id": 1791675378412,
+      "valuetype": "ParamEvent",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Reform": {
+      "id": 1791675378413,
+      "valuetype": "ParamEvent",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Shatter On Beat": {
+      "id": 1791675378414,
+      "valuetype": "ParamChoice",
+      "value": "Off",
+      "index": 0,
+      "options": [
+       "Off",
+       "Every Beat",
+       "Every 2",
+       "Every 4",
+       "Every 8"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Shard Count": {
+      "id": 1791675378415,
+      "valuetype": "ParamRange",
+      "min": 8.0,
+      "max": 512.0,
+      "in": 8.0,
+      "out": 512.0,
+      "value": 64.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Shatter Mode": {
+      "id": 1791675378416,
+      "valuetype": "ParamChoice",
+      "value": "Pieces",
+      "index": 1,
+      "options": [
+       "Letters",
+       "Pieces",
+       "Pieces + Letters"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Shatter Force": {
+      "id": 1791675378417,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 1.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Shatter Gravity": {
+      "id": 1791675378418,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 20.0,
+      "in": 0.0,
+      "out": 20.0,
+      "value": 2.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Shard Spin": {
+      "id": 1791675378419,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 20.0,
+      "in": 0.0,
+      "out": 20.0,
+      "value": 3.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Reform Time": {
+      "id": 1791675378420,
+      "valuetype": "ParamRange",
+      "min": 0.05000000074505806,
+      "max": 10.0,
+      "in": 0.05000000074505806,
+      "out": 10.0,
+      "value": 1.2000000476837158,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Shatter Physics": {
+      "id": 1791675378421,
+      "valuetype": "ParamChoice",
+      "value": "Analytic",
+      "index": 0,
+      "options": [
+       "Analytic",
+       "Bounce"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Bounciness": {
+      "id": 1791675378422,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Floor Friction": {
+      "id": 1791675378423,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.30000001192092896,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Physics Speed": {
+      "id": 1791675378424,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.3499999940395355,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Deform Amount": {
+      "id": 1791675378425,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Deform Axis": {
+      "id": 1791675378426,
+      "valuetype": "ParamChoice",
+      "value": "Y",
+      "index": 1,
+      "options": [
+       "X",
+       "Y",
+       "Z"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Taper": {
+      "id": 1791675378427,
+      "valuetype": "ParamRange",
+      "min": -2.0,
+      "max": 2.0,
+      "in": -2.0,
+      "out": 2.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Twist": {
+      "id": 1791675378428,
+      "valuetype": "ParamRange",
+      "min": -8.0,
+      "max": 8.0,
+      "in": -8.0,
+      "out": 8.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Bend": {
+      "id": 1791675378429,
+      "valuetype": "ParamRange",
+      "min": -4.0,
+      "max": 4.0,
+      "in": -4.0,
+      "out": 4.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Squash": {
+      "id": 1791675378430,
+      "valuetype": "ParamRange",
+      "min": -1.0,
+      "max": 1.0,
+      "in": -1.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Squash Beat": {
+      "id": 1791675378431,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Shear": {
+      "id": 1791675378432,
+      "valuetype": "ParamRange",
+      "min": -2.0,
+      "max": 2.0,
+      "in": -2.0,
+      "out": 2.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Bulge": {
+      "id": 1791675378433,
+      "valuetype": "ParamRange",
+      "min": -1.0,
+      "max": 2.0,
+      "in": -1.0,
+      "out": 2.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Spherize": {
+      "id": 1791675378434,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Shape Target": {
+      "id": 1791675378435,
+      "valuetype": "ParamChoice",
+      "value": "Sphere",
+      "index": 0,
+      "options": [
+       "Sphere",
+       "Cube"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Noise Warp": {
+      "id": 1791675378436,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Warp Scale": {
+      "id": 1791675378437,
+      "valuetype": "ParamRange",
+      "min": 0.20000000298023224,
+      "max": 10.0,
+      "in": 0.20000000298023224,
+      "out": 10.0,
+      "value": 2.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Warp Speed": {
+      "id": 1791675378438,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 0.30000001192092896,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Ripple": {
+      "id": 1791675378439,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 0.5,
+      "in": 0.0,
+      "out": 0.5,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Ripple Freq": {
+      "id": 1791675378440,
+      "valuetype": "ParamRange",
+      "min": 1.0,
+      "max": 80.0,
+      "in": 1.0,
+      "out": 80.0,
+      "value": 14.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Ripple Speed": {
+      "id": 1791675378441,
+      "valuetype": "ParamRange",
+      "min": -20.0,
+      "max": 20.0,
+      "in": -20.0,
+      "out": 20.0,
+      "value": 4.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Ripple Beat": {
+      "id": 1791675378442,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Melt": {
+      "id": 1791675378443,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Drip": {
+      "id": 1791675378444,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 3.0,
+      "in": 0.0,
+      "out": 3.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Glitch Shift": {
+      "id": 1791675378445,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Glitch Bands": {
+      "id": 1791675378446,
+      "valuetype": "ParamRange",
+      "min": 2.0,
+      "max": 64.0,
+      "in": 2.0,
+      "out": 64.0,
+      "value": 12.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Glitch Rate": {
+      "id": 1791675378447,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 30.0,
+      "in": 0.0,
+      "out": 30.0,
+      "value": 6.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Mirror Fold": {
+      "id": 1791675378448,
+      "valuetype": "ParamChoice",
+      "value": "Off",
+      "index": 0,
+      "options": [
+       "Off",
+       "X",
+       "X+Y",
+       "X+Y+Z"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Jelly": {
+      "id": 1791675378449,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Audio > Deform": {
+      "id": 1791675378450,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Wire Mode": {
+      "id": 1791675378451,
+      "valuetype": "ParamChoice",
+      "value": "Off",
+      "index": 0,
+      "options": [
+       "Off",
+       "Over Surface",
+       "Wire Only",
+       "Wire + Dark Fill",
+       "Points Only",
+       "Points + Wire"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Wireframe Mix": {
+      "id": 1791675378452,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Wire Thickness": {
+      "id": 1791675378453,
+      "valuetype": "ParamRange",
+      "min": 0.20000000298023224,
+      "max": 8.0,
+      "in": 0.20000000298023224,
+      "out": 8.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Wire Back": {
+      "id": 1791675378454,
+      "valuetype": "ParamChoice",
+      "value": "Hidden",
+      "index": 0,
+      "options": [
+       "Hidden",
+       "X-Ray"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Wire Edges": {
+      "id": 1791675378455,
+      "valuetype": "ParamChoice",
+      "value": "All Triangles",
+      "index": 0,
+      "options": [
+       "All Triangles",
+       "Feature Edges"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Wire Color": {
+      "id": 1791675378456,
+      "valuetype": "ParamColor",
+      "value": "#00ffff00",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Wire Glow": {
+      "id": 1791675378465,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Wire Bloom": {
+      "id": 1791675378466,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Wire Bloom Size": {
+      "id": 1791675378467,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Wire Fade": {
+      "id": 1791675378468,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Point Source": {
+      "id": 1791675378469,
+      "valuetype": "ParamChoice",
+      "value": "Surface 100k",
+      "index": 3,
+      "options": [
+       "Vertices",
+       "Feature Vertices",
+       "Surface 25k",
+       "Surface 100k",
+       "Surface 400k"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Point Twinkle": {
+      "id": 1791675378470,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Build Axis": {
+      "id": 1791675378471,
+      "valuetype": "ParamChoice",
+      "value": "Y",
+      "index": 1,
+      "options": [
+       "X",
+       "Y",
+       "Z"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Cut Look": {
+      "id": 1791675378472,
+      "valuetype": "ParamChoice",
+      "value": "Off",
+      "index": 0,
+      "options": [
+       "Off",
+       "Cross-Section",
+       "Reveal Box",
+       "Window"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Cut Position": {
+      "id": 1791675378473,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Cut Size": {
+      "id": 1791675378474,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.4000000059604645,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Cut Speed": {
+      "id": 1791675378475,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 30.0,
+      "in": 0.0,
+      "out": 30.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Key Azimuth": {
+      "id": 1791675378476,
+      "valuetype": "ParamRange",
+      "min": -180.0,
+      "max": 180.0,
+      "in": -180.0,
+      "out": 180.0,
+      "value": 35.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Key Elevation": {
+      "id": 1791675378477,
+      "valuetype": "ParamRange",
+      "min": -90.0,
+      "max": 90.0,
+      "in": -90.0,
+      "out": 90.0,
+      "value": 35.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Key Intensity": {
+      "id": 1791675378478,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 20.0,
+      "in": 0.0,
+      "out": 20.0,
+      "value": 3.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Key Color": {
+      "id": 1791675378479,
+      "valuetype": "ParamColor",
+      "value": "#fff7ebff",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Ambient": {
+      "id": 1791675378488,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.029999999329447746,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Env Intensity": {
+      "id": 1791675378489,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Env Source": {
+      "id": 1791675378490,
+      "valuetype": "ParamChoice",
+      "value": "Studio",
+      "index": 0,
+      "options": [
+       "Studio",
+       "Input (FX)",
+       "Off"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Env Rotate": {
+      "id": 1791675378491,
+      "valuetype": "ParamRange",
+      "min": -180.0,
+      "max": 180.0,
+      "in": -180.0,
+      "out": 180.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Exposure": {
+      "id": 1791675378492,
+      "valuetype": "ParamRange",
+      "min": -5.0,
+      "max": 5.0,
+      "in": -5.0,
+      "out": 5.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Tonemap": {
+      "id": 1791675378493,
+      "valuetype": "ParamChoice",
+      "value": "ACES",
+      "index": 0,
+      "options": [
+       "ACES",
+       "Filmic",
+       "None"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Vol Method": {
+      "id": 1791675378494,
+      "valuetype": "ParamChoice",
+      "value": "Raymarch",
+      "index": 0,
+      "options": [
+       "Raymarch",
+       "Screen Rays"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Haze": {
+      "id": 1791675378495,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.11999999731779099,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Smoke Amount": {
+      "id": 1791675378496,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Smoke Scale": {
+      "id": 1791675378497,
+      "valuetype": "ParamRange",
+      "min": 0.10000000149011612,
+      "max": 10.0,
+      "in": 0.10000000149011612,
+      "out": 10.0,
+      "value": 1.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Smoke Speed": {
+      "id": 1791675378498,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 0.30000001192092896,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Smoke Turbulence": {
+      "id": 1791675378499,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Smoke Rise": {
+      "id": 1791675378500,
+      "valuetype": "ParamRange",
+      "min": -2.0,
+      "max": 2.0,
+      "in": -2.0,
+      "out": 2.0,
+      "value": 0.15000000596046448,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Glow Cloud": {
+      "id": 1791675378501,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Smoke Ambient": {
+      "id": 1791675378502,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Smoke Key Light": {
+      "id": 1791675378503,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Volume Size": {
+      "id": 1791675378504,
+      "valuetype": "ParamRange",
+      "min": 0.5,
+      "max": 12.0,
+      "in": 0.5,
+      "out": 12.0,
+      "value": 3.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Scatter G": {
+      "id": 1791675378505,
+      "valuetype": "ParamRange",
+      "min": -0.8999999761581421,
+      "max": 0.9900000095367432,
+      "in": -0.8999999761581421,
+      "out": 0.9900000095367432,
+      "value": 0.6000000238418579,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Shaft Length": {
+      "id": 1791675378506,
+      "valuetype": "ParamRange",
+      "min": 0.20000000298023224,
+      "max": 20.0,
+      "in": 0.20000000298023224,
+      "out": 20.0,
+      "value": 6.000000000000001,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Motes": {
+      "id": 1791675378507,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Vol Quality": {
+      "id": 1791675378508,
+      "valuetype": "ParamChoice",
+      "value": "32",
+      "index": 1,
+      "options": [
+       "16",
+       "32",
+       "64",
+       "128"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Vol Res": {
+      "id": 1791675378509,
+      "valuetype": "ParamChoice",
+      "value": "Half",
+      "index": 1,
+      "options": [
+       "Full",
+       "Half",
+       "Quarter"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Fog Blend": {
+      "id": 1791675378510,
+      "valuetype": "ParamChoice",
+      "value": "Add",
+      "index": 0,
+      "options": [
+       "Add",
+       "Over"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Drift Return": {
+      "id": 1791675378511,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 3.0,
+      "in": 0.0,
+      "out": 3.0,
+      "value": 0.4000000059604645,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Smoke Engine": {
+      "id": 1791675378512,
+      "valuetype": "ParamChoice",
+      "value": "Noise",
+      "index": 0,
+      "options": [
+       "Noise",
+       "Sim",
+       "Sim + Detail"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Sim Res": {
+      "id": 1791675378513,
+      "valuetype": "ParamChoice",
+      "value": "64",
+      "index": 1,
+      "options": [
+       "48",
+       "64",
+       "96",
+       "128"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Sim Box": {
+      "id": 1791675378514,
+      "valuetype": "ParamRange",
+      "min": 1.0,
+      "max": 6.0,
+      "in": 1.0,
+      "out": 6.0,
+      "value": 2.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Sim Iterations": {
+      "id": 1791675378515,
+      "valuetype": "ParamRange",
+      "min": 10.0,
+      "max": 40.0,
+      "in": 10.0,
+      "out": 40.0,
+      "value": 20.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Buoyancy": {
+      "id": 1791675378516,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 2.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Heat Decay": {
+      "id": 1791675378517,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 5.0,
+      "in": 0.0,
+      "out": 5.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Vorticity": {
+      "id": 1791675378518,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 2.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Smoke Fade": {
+      "id": 1791675378519,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 3.0,
+      "in": 0.0,
+      "out": 3.0,
+      "value": 0.6000000238418579,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Wind X": {
+      "id": 1791675378520,
+      "valuetype": "ParamRange",
+      "min": -3.0,
+      "max": 3.0,
+      "in": -3.0,
+      "out": 3.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Wind Y": {
+      "id": 1791675378521,
+      "valuetype": "ParamRange",
+      "min": -3.0,
+      "max": 3.0,
+      "in": -3.0,
+      "out": 3.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Wind Z": {
+      "id": 1791675378522,
+      "valuetype": "ParamRange",
+      "min": -3.0,
+      "max": 3.0,
+      "in": -3.0,
+      "out": 3.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Sim Turbulence": {
+      "id": 1791675378523,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Emit Eyes": {
+      "id": 1791675378524,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Eyes Heat": {
+      "id": 1791675378525,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 5.0,
+      "in": 0.0,
+      "out": 5.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Emit Behind": {
+      "id": 1791675378526,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Behind Heat": {
+      "id": 1791675378527,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 5.0,
+      "in": 0.0,
+      "out": 5.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Emit Rim": {
+      "id": 1791675378528,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Rim Heat": {
+      "id": 1791675378529,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 5.0,
+      "in": 0.0,
+      "out": 5.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Emit Inside": {
+      "id": 1791675378530,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Inside Heat": {
+      "id": 1791675378531,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 5.0,
+      "in": 0.0,
+      "out": 5.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Emit Offset": {
+      "id": 1791675378532,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 0.5,
+      "in": 0.0,
+      "out": 0.5,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Beat Puff": {
+      "id": 1791675378533,
+      "valuetype": "ParamChoice",
+      "value": "Off",
+      "index": 0,
+      "options": [
+       "Off",
+       "Every Beat",
+       "Every 2",
+       "Every 4",
+       "Every 8"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Puff Amount": {
+      "id": 1791675378534,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 3.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Audio > Emit": {
+      "id": 1791675378535,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Sim Reset": {
+      "id": 1791675378536,
+      "valuetype": "ParamEvent",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Smoke Color": {
+      "id": 1791675378537,
+      "valuetype": "ParamColor",
+      "value": "#ffffffff",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Smoke Confine": {
+      "id": 1791675378546,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Project Input": {
+      "id": 1791675378547,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Trip Master": {
+      "id": 1791675378548,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Colour By": {
+      "id": 1791675378549,
+      "valuetype": "ParamChoice",
+      "value": "Off",
+      "index": 0,
+      "options": [
+       "Off",
+       "Density",
+       "Heat",
+       "Speed",
+       "Swirl",
+       "Age",
+       "Height"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Trip Palette": {
+      "id": 1791675378550,
+      "valuetype": "ParamChoice",
+      "value": "Rainbow",
+      "index": 0,
+      "options": [
+       "Rainbow",
+       "Acid",
+       "Neon",
+       "Fire",
+       "Ice",
+       "Picker Pair"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Palette Shift": {
+      "id": 1791675378551,
+      "valuetype": "ParamRange",
+      "min": -2.0,
+      "max": 2.0,
+      "in": -2.0,
+      "out": 2.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Palette Spread": {
+      "id": 1791675378552,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Trip A Color": {
+      "id": 1791675378553,
+      "valuetype": "ParamColor",
+      "value": "#fa00ffff",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Trip B Color": {
+      "id": 1791675378562,
+      "valuetype": "ParamColor",
+      "value": "#00ffb3ff",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Thin Film": {
+      "id": 1791675378571,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Thin Film Thick": {
+      "id": 1791675378572,
+      "valuetype": "ParamRange",
+      "min": 0.10000000149011612,
+      "max": 3.0,
+      "in": 0.10000000149011612,
+      "out": 3.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Prism": {
+      "id": 1791675378573,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Prism Angle": {
+      "id": 1791675378574,
+      "valuetype": "ParamRange",
+      "min": -180.0,
+      "max": 180.0,
+      "in": -180.0,
+      "out": 180.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Kaleido Smoke": {
+      "id": 1791675378575,
+      "valuetype": "ParamRange",
+      "min": 1.0,
+      "max": 16.0,
+      "in": 1.0,
+      "out": 16.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Kaleido Twist": {
+      "id": 1791675378576,
+      "valuetype": "ParamRange",
+      "min": -360.0,
+      "max": 360.0,
+      "in": -360.0,
+      "out": 360.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Kaleido Spin": {
+      "id": 1791675378577,
+      "valuetype": "ParamRange",
+      "min": -30.0,
+      "max": 30.0,
+      "in": -30.0,
+      "out": 30.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Fractal Fog": {
+      "id": 1791675378578,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Fractal Scale": {
+      "id": 1791675378579,
+      "valuetype": "ParamRange",
+      "min": 0.20000000298023224,
+      "max": 4.0,
+      "in": 0.20000000298023224,
+      "out": 4.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Fractal Iter": {
+      "id": 1791675378580,
+      "valuetype": "ParamRange",
+      "min": 1.0,
+      "max": 6.0,
+      "in": 1.0,
+      "out": 6.0,
+      "value": 3.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Fractal Morph": {
+      "id": 1791675378581,
+      "valuetype": "ParamRange",
+      "min": -30.0,
+      "max": 30.0,
+      "in": -30.0,
+      "out": 30.0,
+      "value": 6.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Neon Veins": {
+      "id": 1791675378582,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Vein Width": {
+      "id": 1791675378583,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.4000000059604645,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Vein Color": {
+      "id": 1791675378584,
+      "valuetype": "ParamColor",
+      "value": "#00ffffff",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Smoke Contours": {
+      "id": 1791675378593,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Contour Bands": {
+      "id": 1791675378594,
+      "valuetype": "ParamRange",
+      "min": 2.0,
+      "max": 32.0,
+      "in": 2.0,
+      "out": 32.0,
+      "value": 8.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Band Sharpness": {
+      "id": 1791675378595,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.6000000238418579,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Band Scroll": {
+      "id": 1791675378596,
+      "valuetype": "ParamRange",
+      "min": -4.0,
+      "max": 4.0,
+      "in": -4.0,
+      "out": 4.0,
+      "value": 0.30000001192092896,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Contour Style": {
+      "id": 1791675378597,
+      "valuetype": "ParamChoice",
+      "value": "Lines",
+      "index": 0,
+      "options": [
+       "Lines",
+       "Bands"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Line Width": {
+      "id": 1791675378598,
+      "valuetype": "ParamRange",
+      "min": 0.5,
+      "max": 6.0,
+      "in": 0.5,
+      "out": 6.0,
+      "value": 1.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Line Glow": {
+      "id": 1791675378599,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Blacklight": {
+      "id": 1791675378600,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Blacklight By": {
+      "id": 1791675378601,
+      "valuetype": "ParamChoice",
+      "value": "Density",
+      "index": 0,
+      "options": [
+       "Density",
+       "Heat"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Blacklight Color": {
+      "id": 1791675378602,
+      "valuetype": "ParamColor",
+      "value": "#a026ffff",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Fire Ring": {
+      "id": 1791675378611,
+      "valuetype": "ParamEvent",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Ring On Beat": {
+      "id": 1791675378612,
+      "valuetype": "ParamChoice",
+      "value": "Off",
+      "index": 0,
+      "options": [
+       "Off",
+       "Every Beat",
+       "Every 2",
+       "Every 4",
+       "Every 8"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Ring From": {
+      "id": 1791675378613,
+      "valuetype": "ParamChoice",
+      "value": "Eyes",
+      "index": 0,
+      "options": [
+       "Eyes",
+       "Mouth",
+       "Behind"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Ring Size": {
+      "id": 1791675378614,
+      "valuetype": "ParamRange",
+      "min": 0.05000000074505806,
+      "max": 1.0,
+      "in": 0.05000000074505806,
+      "out": 1.0,
+      "value": 0.30000001192092896,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Ring Speed": {
+      "id": 1791675378615,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 6.0,
+      "in": 0.0,
+      "out": 6.0,
+      "value": 2.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Ring Spin": {
+      "id": 1791675378616,
+      "valuetype": "ParamRange",
+      "min": -10.0,
+      "max": 10.0,
+      "in": -10.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Ring Smoke": {
+      "id": 1791675378617,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 4.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Smoke Ghosts": {
+      "id": 1791675378618,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Ghost Offset": {
+      "id": 1791675378619,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 3.0,
+      "in": 0.0,
+      "out": 3.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Ghost Scale": {
+      "id": 1791675378620,
+      "valuetype": "ParamRange",
+      "min": 0.30000001192092896,
+      "max": 3.0,
+      "in": 0.30000001192092896,
+      "out": 3.0,
+      "value": 1.2999999523162842,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Ghost Fade Time": {
+      "id": 1791675378621,
+      "valuetype": "ParamRange",
+      "min": 0.10000000149011612,
+      "max": 5.0,
+      "in": 0.10000000149011612,
+      "out": 5.0,
+      "value": 1.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Whirlpool": {
+      "id": 1791675378622,
+      "valuetype": "ParamRange",
+      "min": -5.0,
+      "max": 5.0,
+      "in": -5.0,
+      "out": 5.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Hyperspace": {
+      "id": 1791675378623,
+      "valuetype": "ParamRange",
+      "min": -5.0,
+      "max": 5.0,
+      "in": -5.0,
+      "out": 5.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Hue Echo": {
+      "id": 1791675378624,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Echo Hue Step": {
+      "id": 1791675378625,
+      "valuetype": "ParamRange",
+      "min": -0.10000000149011612,
+      "max": 0.10000000149011612,
+      "in": -0.10000000149011612,
+      "out": 0.10000000149011612,
+      "value": 0.019999999552965164,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Time Warp": {
+      "id": 1791675378626,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Freeze": {
+      "id": 1791675378627,
+      "valuetype": "ParamEvent",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Fire": {
+      "id": 1791675378628,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Fire Speed": {
+      "id": 1791675378629,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Burn Rate": {
+      "id": 1791675378630,
+      "valuetype": "ParamRange",
+      "min": 0.20000000298023224,
+      "max": 10.0,
+      "in": 0.20000000298023224,
+      "out": 10.0,
+      "value": 2.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Flame Temp": {
+      "id": 1791675378631,
+      "valuetype": "ParamRange",
+      "min": 1000.0,
+      "max": 6000.0,
+      "in": 1000.0,
+      "out": 6000.0,
+      "value": 2000.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Flame Height": {
+      "id": 1791675378632,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Flame Glow": {
+      "id": 1791675378633,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 2.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Fire Smoke": {
+      "id": 1791675378634,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.4000000059604645,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Flame Tint Color": {
+      "id": 1791675378635,
+      "valuetype": "ParamColor",
+      "value": "#3385ff00",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Fire Burst": {
+      "id": 1791675378644,
+      "valuetype": "ParamChoice",
+      "value": "Off",
+      "index": 0,
+      "options": [
+       "Off",
+       "Every Beat",
+       "Every 2",
+       "Every 4",
+       "Every 8"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Burst Amount": {
+      "id": 1791675378645,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 2.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Fire Light": {
+      "id": 1791675378646,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 2.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Lightning Strike": {
+      "id": 1791675378647,
+      "valuetype": "ParamEvent",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Strike On Beat": {
+      "id": 1791675378648,
+      "valuetype": "ParamChoice",
+      "value": "Off",
+      "index": 0,
+      "options": [
+       "Off",
+       "Every Beat",
+       "Every 2",
+       "Every 4",
+       "Every 8"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Strike Rate": {
+      "id": 1791675378649,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Bolt Path": {
+      "id": 1791675378650,
+      "valuetype": "ParamChoice",
+      "value": "Crawl",
+      "index": 0,
+      "options": [
+       "Crawl",
+       "Eye To Eye",
+       "To Floor"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Bolt Count": {
+      "id": 1791675378651,
+      "valuetype": "ParamRange",
+      "min": 1.0,
+      "max": 8.0,
+      "in": 1.0,
+      "out": 8.0,
+      "value": 2.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Branching": {
+      "id": 1791675378652,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Jaggedness": {
+      "id": 1791675378653,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Bolt Life": {
+      "id": 1791675378654,
+      "valuetype": "ParamRange",
+      "min": 0.05000000074505806,
+      "max": 2.0,
+      "in": 0.05000000074505806,
+      "out": 2.0,
+      "value": 0.4000000059604645,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Bolt Width": {
+      "id": 1791675378655,
+      "valuetype": "ParamRange",
+      "min": 0.5,
+      "max": 6.0,
+      "in": 0.5,
+      "out": 6.0,
+      "value": 1.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Bolt Glow": {
+      "id": 1791675378656,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 3.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Bolt Color": {
+      "id": 1791675378657,
+      "valuetype": "ParamColor",
+      "value": "#7389ffff",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Bolt Flash": {
+      "id": 1791675378666,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 2.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Swarm Count": {
+      "id": 1791675378667,
+      "valuetype": "ParamChoice",
+      "value": "Off",
+      "index": 0,
+      "options": [
+       "Off",
+       "2k",
+       "5k",
+       "10k",
+       "20k",
+       "40k"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Swarm Release": {
+      "id": 1791675378668,
+      "valuetype": "ParamEvent",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Release On Beat": {
+      "id": 1791675378669,
+      "valuetype": "ParamChoice",
+      "value": "Off",
+      "index": 0,
+      "options": [
+       "Off",
+       "Every Beat",
+       "Every 2",
+       "Every 4",
+       "Every 8"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Release Time": {
+      "id": 1791675378670,
+      "valuetype": "ParamRange",
+      "min": 0.20000000298023224,
+      "max": 10.0,
+      "in": 0.20000000298023224,
+      "out": 10.0,
+      "value": 2.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Attraction": {
+      "id": 1791675378671,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 3.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Flock": {
+      "id": 1791675378672,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Swarm Speed": {
+      "id": 1791675378673,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Swarm Offset": {
+      "id": 1791675378674,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.029999999329447746,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Firefly Size": {
+      "id": 1791675378675,
+      "valuetype": "ParamRange",
+      "min": 0.5,
+      "max": 8.0,
+      "in": 0.5,
+      "out": 8.0,
+      "value": 2.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Firefly Glow": {
+      "id": 1791675378676,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 3.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Twinkle": {
+      "id": 1791675378677,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Firefly Color": {
+      "id": 1791675378678,
+      "valuetype": "ParamColor",
+      "value": "#ffe040ff",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Mask Visible": {
+      "valuetype": "ParamBoolean",
+      "id": 1791675378687,
+      "value": true,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Lava Cracks": {
+      "id": 1791675378688,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Crack Spread": {
+      "id": 1791675378689,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Crack Start": {
+      "id": 1791675378690,
+      "valuetype": "ParamEvent",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Crack Reverse": {
+      "id": 1791675378691,
+      "valuetype": "ParamEvent",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Crack On Beat": {
+      "id": 1791675378692,
+      "valuetype": "ParamChoice",
+      "value": "Off",
+      "index": 0,
+      "options": [
+       "Off",
+       "Every Beat",
+       "Every 2",
+       "Every 4",
+       "Every 8"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Crack Time": {
+      "id": 1791675378693,
+      "valuetype": "ParamRange",
+      "min": 0.20000000298023224,
+      "max": 10.0,
+      "in": 0.20000000298023224,
+      "out": 10.0,
+      "value": 2.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Crack Scale": {
+      "id": 1791675378694,
+      "valuetype": "ParamRange",
+      "min": 0.5,
+      "max": 8.0,
+      "in": 0.5,
+      "out": 8.0,
+      "value": 2.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Crack Width": {
+      "id": 1791675378695,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.30000001192092896,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Lava Temp": {
+      "id": 1791675378696,
+      "valuetype": "ParamRange",
+      "min": 800.0,
+      "max": 4000.0,
+      "in": 800.0,
+      "out": 4000.0,
+      "value": 1600.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Lava Glow": {
+      "id": 1791675378697,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 3.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Lava Tint Color": {
+      "id": 1791675378698,
+      "valuetype": "ParamColor",
+      "value": "#33c2ff00",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Heat Haze": {
+      "id": 1791675378707,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Lava Split": {
+      "id": 1791675378708,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Lava Light": {
+      "id": 1791675378709,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 40.0,
+      "in": 0.0,
+      "out": 40.0,
+      "value": 10.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Caustics": {
+      "id": 1791675378710,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Caustic Source": {
+      "id": 1791675378711,
+      "valuetype": "ParamChoice",
+      "value": "Glass Parts",
+      "index": 0,
+      "options": [
+       "Glass Parts",
+       "Whole Mask"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Caustic IOR": {
+      "id": 1791675378712,
+      "valuetype": "ParamRange",
+      "min": 1.0,
+      "max": 2.5,
+      "in": 1.0,
+      "out": 2.5,
+      "value": 1.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Caustic Rainbow": {
+      "id": 1791675378713,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Caustic Sharp": {
+      "id": 1791675378714,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.6000000238418579,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Caustic Ripple": {
+      "id": 1791675378715,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.30000001192092896,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Caustic Floor": {
+      "id": 1791675378716,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Caustic Smoke": {
+      "id": 1791675378717,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Caustic Surface": {
+      "id": 1791675378718,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 2.0,
+      "in": 0.0,
+      "out": 2.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Caustic Color": {
+      "id": 1791675378719,
+      "valuetype": "ParamColor",
+      "value": "#fff4d9ff",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "A Enable": {
+      "valuetype": "ParamBoolean",
+      "id": 1791675378728,
+      "value": false,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "A Type": {
+      "id": 1791675378729,
+      "valuetype": "ParamChoice",
+      "value": "Spot",
+      "index": 0,
+      "options": [
+       "Spot",
+       "Point"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "A Anchor To Mask": {
+      "valuetype": "ParamBoolean",
+      "id": 1791675378730,
+      "value": true,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "A Pos X": {
+      "id": 1791675378731,
+      "valuetype": "ParamRange",
+      "min": -6.0,
+      "max": 6.0,
+      "in": -6.0,
+      "out": 6.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "A Pos Y": {
+      "id": 1791675378732,
+      "valuetype": "ParamRange",
+      "min": -6.0,
+      "max": 6.0,
+      "in": -6.0,
+      "out": 6.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "A Pos Z": {
+      "id": 1791675378733,
+      "valuetype": "ParamRange",
+      "min": -6.0,
+      "max": 6.0,
+      "in": -6.0,
+      "out": 6.0,
+      "value": -1.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "A Aim Mode": {
+      "id": 1791675378734,
+      "valuetype": "ParamChoice",
+      "value": "At Camera",
+      "index": 0,
+      "options": [
+       "At Camera",
+       "At Mask",
+       "Free"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "A Aim Yaw": {
+      "id": 1791675378735,
+      "valuetype": "ParamRange",
+      "min": -180.0,
+      "max": 180.0,
+      "in": -180.0,
+      "out": 180.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "A Aim Pitch": {
+      "id": 1791675378736,
+      "valuetype": "ParamRange",
+      "min": -90.0,
+      "max": 90.0,
+      "in": -90.0,
+      "out": 90.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "A Cone Angle": {
+      "id": 1791675378737,
+      "valuetype": "ParamRange",
+      "min": 1.0,
+      "max": 170.0,
+      "in": 1.0,
+      "out": 170.0,
+      "value": 45.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "A Cone Soft": {
+      "id": 1791675378738,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "A Intensity": {
+      "id": 1791675378739,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 100.0,
+      "in": 0.0,
+      "out": 100.0,
+      "value": 12.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "A Color": {
+      "id": 1791675378740,
+      "valuetype": "ParamColor",
+      "value": "#ffdb9eff",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "A Hue Drift": {
+      "id": 1791675378749,
+      "valuetype": "ParamRange",
+      "min": -0.699999988079071,
+      "max": 0.699999988079071,
+      "in": -0.699999988079071,
+      "out": 0.699999988079071,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "A Beat Pulse": {
+      "id": 1791675378750,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "A Audio > Light": {
+      "id": 1791675378751,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "B Enable": {
+      "valuetype": "ParamBoolean",
+      "id": 1791675378752,
+      "value": false,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "B Type": {
+      "id": 1791675378753,
+      "valuetype": "ParamChoice",
+      "value": "Spot",
+      "index": 0,
+      "options": [
+       "Spot",
+       "Point"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "B Anchor To Mask": {
+      "valuetype": "ParamBoolean",
+      "id": 1791675378754,
+      "value": false,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "B Pos X": {
+      "id": 1791675378755,
+      "valuetype": "ParamRange",
+      "min": -6.0,
+      "max": 6.0,
+      "in": -6.0,
+      "out": 6.0,
+      "value": 2.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "B Pos Y": {
+      "id": 1791675378756,
+      "valuetype": "ParamRange",
+      "min": -6.0,
+      "max": 6.0,
+      "in": -6.0,
+      "out": 6.0,
+      "value": 0.6000000238418579,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "B Pos Z": {
+      "id": 1791675378757,
+      "valuetype": "ParamRange",
+      "min": -6.0,
+      "max": 6.0,
+      "in": -6.0,
+      "out": 6.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "B Aim Mode": {
+      "id": 1791675378758,
+      "valuetype": "ParamChoice",
+      "value": "At Mask",
+      "index": 1,
+      "options": [
+       "At Camera",
+       "At Mask",
+       "Free"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "B Aim Yaw": {
+      "id": 1791675378759,
+      "valuetype": "ParamRange",
+      "min": -180.0,
+      "max": 180.0,
+      "in": -180.0,
+      "out": 180.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "B Aim Pitch": {
+      "id": 1791675378760,
+      "valuetype": "ParamRange",
+      "min": -90.0,
+      "max": 90.0,
+      "in": -90.0,
+      "out": 90.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "B Cone Angle": {
+      "id": 1791675378761,
+      "valuetype": "ParamRange",
+      "min": 1.0,
+      "max": 170.0,
+      "in": 1.0,
+      "out": 170.0,
+      "value": 45.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "B Cone Soft": {
+      "id": 1791675378762,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "B Intensity": {
+      "id": 1791675378763,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 100.0,
+      "in": 0.0,
+      "out": 100.0,
+      "value": 12.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "B Color": {
+      "id": 1791675378764,
+      "valuetype": "ParamColor",
+      "value": "#8cbfffff",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "B Hue Drift": {
+      "id": 1791675378773,
+      "valuetype": "ParamRange",
+      "min": -0.699999988079071,
+      "max": 0.699999988079071,
+      "in": -0.699999988079071,
+      "out": 0.699999988079071,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "B Beat Pulse": {
+      "id": 1791675378774,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "B Audio > Light": {
+      "id": 1791675378775,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Enable": {
+      "valuetype": "ParamBoolean",
+      "id": 1791675378776,
+      "value": false,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Place At Eyes": {
+      "id": 1791675378777,
+      "valuetype": "ParamEvent",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Fit Cone": {
+      "id": 1791675378778,
+      "valuetype": "ParamEvent",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Auto Place": {
+      "id": 1791675378779,
+      "valuetype": "ParamChoice",
+      "value": "Once Per Model",
+      "index": 1,
+      "options": [
+       "Off",
+       "Once Per Model",
+       "Position Only",
+       "Every Model Swap"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Front Only": {
+      "valuetype": "ParamBoolean",
+      "id": 1791675378780,
+      "value": true,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Behind Depth": {
+      "id": 1791675378781,
+      "valuetype": "ParamRange",
+      "min": 0.019999999552965164,
+      "max": 2.0,
+      "in": 0.019999999552965164,
+      "out": 2.0,
+      "value": 0.30000001192092896,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Anchor To Mask": {
+      "valuetype": "ParamBoolean",
+      "id": 1791675378782,
+      "value": true,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Mirror X": {
+      "valuetype": "ParamBoolean",
+      "id": 1791675378783,
+      "value": true,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Left Pos X": {
+      "id": 1791675378784,
+      "valuetype": "ParamRange",
+      "min": -6.0,
+      "max": 6.0,
+      "in": -6.0,
+      "out": 6.0,
+      "value": -0.30000001192092896,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Left Pos Y": {
+      "id": 1791675378785,
+      "valuetype": "ParamRange",
+      "min": -6.0,
+      "max": 6.0,
+      "in": -6.0,
+      "out": 6.0,
+      "value": 0.20000000298023224,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Left Pos Z": {
+      "id": 1791675378786,
+      "valuetype": "ParamRange",
+      "min": -6.0,
+      "max": 6.0,
+      "in": -6.0,
+      "out": 6.0,
+      "value": 0.20000000298023224,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Right Pos X": {
+      "id": 1791675378787,
+      "valuetype": "ParamRange",
+      "min": -6.0,
+      "max": 6.0,
+      "in": -6.0,
+      "out": 6.0,
+      "value": 0.30000001192092896,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Right Pos Y": {
+      "id": 1791675378788,
+      "valuetype": "ParamRange",
+      "min": -6.0,
+      "max": 6.0,
+      "in": -6.0,
+      "out": 6.0,
+      "value": 0.20000000298023224,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Right Pos Z": {
+      "id": 1791675378789,
+      "valuetype": "ParamRange",
+      "min": -6.0,
+      "max": 6.0,
+      "in": -6.0,
+      "out": 6.0,
+      "value": 0.20000000298023224,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Aim Mode": {
+      "id": 1791675378790,
+      "valuetype": "ParamChoice",
+      "value": "Through Hole",
+      "index": 0,
+      "options": [
+       "Through Hole",
+       "At Camera",
+       "Free"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Aim Yaw": {
+      "id": 1791675378791,
+      "valuetype": "ParamRange",
+      "min": -180.0,
+      "max": 180.0,
+      "in": -180.0,
+      "out": 180.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Aim Pitch": {
+      "id": 1791675378792,
+      "valuetype": "ParamRange",
+      "min": -90.0,
+      "max": 90.0,
+      "in": -90.0,
+      "out": 90.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Cone Angle": {
+      "id": 1791675378793,
+      "valuetype": "ParamRange",
+      "min": 1.0,
+      "max": 170.0,
+      "in": 1.0,
+      "out": 170.0,
+      "value": 20.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Cone Soft": {
+      "id": 1791675378794,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Intensity": {
+      "id": 1791675378795,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 100.0,
+      "in": 0.0,
+      "out": 100.0,
+      "value": 6.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Left Color": {
+      "id": 1791675378796,
+      "valuetype": "ParamColor",
+      "value": "#ffdb9eff",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Link Colors": {
+      "valuetype": "ParamBoolean",
+      "id": 1791675378805,
+      "value": true,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Right Color": {
+      "id": 1791675378806,
+      "valuetype": "ParamColor",
+      "value": "#ffdb9eff",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Hue Drift": {
+      "id": 1791675378815,
+      "valuetype": "ParamRange",
+      "min": -0.699999988079071,
+      "max": 0.699999988079071,
+      "in": -0.699999988079071,
+      "out": 0.699999988079071,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Beat Pulse": {
+      "id": 1791675378816,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "C Audio > Light": {
+      "id": 1791675378817,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Proj Enable": {
+      "valuetype": "ParamBoolean",
+      "id": 1791675378819,
+      "value": false,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Proj Source": {
+      "id": 1791675378820,
+      "valuetype": "ParamChoice",
+      "value": "Input",
+      "index": 0,
+      "options": [
+       "Input",
+       "File"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Proj File": {
+      "id": 1791675378821,
+      "valuetype": "ParamFile",
+      "value": "",
+      "extensions": [
+       "png",
+       "jpg",
+       "jpeg",
+       "mov",
+       "mp4",
+       "m4v"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Video Speed": {
+      "id": 1791675378822,
+      "valuetype": "ParamRange",
+      "min": -4.0,
+      "max": 4.0,
+      "in": -4.0,
+      "out": 4.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Video Loop": {
+      "id": 1791675378823,
+      "valuetype": "ParamChoice",
+      "value": "Loop",
+      "index": 0,
+      "options": [
+       "Loop",
+       "Ping-Pong",
+       "Once",
+       "Scrub"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Video Position": {
+      "id": 1791675378824,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Video Time": {
+      "valuetype": "ParamString",
+      "id": 1791675378825,
+      "value": "",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Video Restart": {
+      "id": 1791675378826,
+      "valuetype": "ParamEvent",
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Video Alpha": {
+      "id": 1791675378827,
+      "valuetype": "ParamChoice",
+      "value": "Premultiplied",
+      "index": 0,
+      "options": [
+       "Premultiplied",
+       "Straight"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Proj Anchor": {
+      "valuetype": "ParamBoolean",
+      "id": 1791675378828,
+      "value": false,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Proj Pos X": {
+      "id": 1791675378829,
+      "valuetype": "ParamRange",
+      "min": -6.0,
+      "max": 6.0,
+      "in": -6.0,
+      "out": 6.0,
+      "value": 0.800000011920929,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Proj Pos Y": {
+      "id": 1791675378830,
+      "valuetype": "ParamRange",
+      "min": -6.0,
+      "max": 6.0,
+      "in": -6.0,
+      "out": 6.0,
+      "value": 1.2000000476837158,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Proj Pos Z": {
+      "id": 1791675378831,
+      "valuetype": "ParamRange",
+      "min": -6.0,
+      "max": 6.0,
+      "in": -6.0,
+      "out": 6.0,
+      "value": 4.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Proj Aim Mode": {
+      "id": 1791675378832,
+      "valuetype": "ParamChoice",
+      "value": "At Mask",
+      "index": 0,
+      "options": [
+       "At Mask",
+       "Free"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Proj Aim Yaw": {
+      "id": 1791675378833,
+      "valuetype": "ParamRange",
+      "min": -180.0,
+      "max": 180.0,
+      "in": -180.0,
+      "out": 180.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Proj Aim Pitch": {
+      "id": 1791675378834,
+      "valuetype": "ParamRange",
+      "min": -90.0,
+      "max": 90.0,
+      "in": -90.0,
+      "out": 90.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Proj Throw": {
+      "id": 1791675378835,
+      "valuetype": "ParamRange",
+      "min": 5.0,
+      "max": 120.0,
+      "in": 5.0,
+      "out": 120.0,
+      "value": 30.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Proj Focus": {
+      "id": 1791675378836,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Proj Intensity": {
+      "id": 1791675378837,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 100.0,
+      "in": 0.0,
+      "out": 100.0,
+      "value": 25.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Proj Color": {
+      "id": 1791675378838,
+      "valuetype": "ParamColor",
+      "value": "#ffffffff",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Proj Beam": {
+      "id": 1791675378847,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Proj Surface": {
+      "id": 1791675378848,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 4.0,
+      "in": 0.0,
+      "out": 4.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Bloom": {
+      "id": 1791675378849,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Bloom Threshold": {
+      "id": 1791675378850,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.6499999761581421,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Bloom Radius": {
+      "id": 1791675378851,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.6000000238418579,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Flare Ghosts": {
+      "id": 1791675378852,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Flare Streak": {
+      "id": 1791675378853,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 10.0,
+      "in": 0.0,
+      "out": 10.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Shadow Catcher": {
+      "id": 1791675378854,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Catcher Plane": {
+      "id": 1791675378855,
+      "valuetype": "ParamChoice",
+      "value": "Floor",
+      "index": 0,
+      "options": [
+       "Floor",
+       "Wall"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Floor Height": {
+      "id": 1791675378856,
+      "valuetype": "ParamRange",
+      "min": -4.0,
+      "max": 2.0,
+      "in": -4.0,
+      "out": 2.0,
+      "value": -1.0199999809265137,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Wall Distance": {
+      "id": 1791675378857,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 8.0,
+      "in": 0.0,
+      "out": 8.0,
+      "value": 1.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Shadow Soft": {
+      "id": 1791675378858,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.4000000059604645,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Mirror Floor": {
+      "id": 1791675378859,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Mirror Blur": {
+      "id": 1791675378860,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.20000000298023224,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Mirror Fade": {
+      "id": 1791675378861,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.20000000298023224,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Floor Light": {
+      "id": 1791675378862,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 0.5,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Floor Camera": {
+      "id": 1791675378863,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Background Color": {
+      "id": 1791675378864,
+      "valuetype": "ParamColor",
+      "value": "#00000000",
+      "palette": [
+       "#000000ff",
+       "#ff0000ff",
+       "#00ff00ff",
+       "#ffff00ff",
+       "#7f7f7fff",
+       "#0000ffff",
+       "#ff00ffff",
+       "#00ffffff",
+       "#ffffffff"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "MSAA": {
+      "id": 1791675378873,
+      "valuetype": "ParamChoice",
+      "value": "4x",
+      "index": 1,
+      "options": [
+       "1x",
+       "4x",
+       "8x"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Input Use": {
+      "id": 1791675378874,
+      "valuetype": "ParamChoice",
+      "value": "Off",
+      "index": 0,
+      "options": [
+       "Off",
+       "Background",
+       "Skin on flagged parts",
+       "Skin all"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Input Projection": {
+      "id": 1791675378875,
+      "valuetype": "ParamChoice",
+      "value": "Front planar",
+      "index": 0,
+      "options": [
+       "Front planar",
+       "Model UV",
+       "Spherical"
+      ],
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Input Mix": {
+      "id": 1791675378876,
+      "valuetype": "ParamRange",
+      "min": 0.0,
+      "max": 1.0,
+      "in": 0.0,
+      "out": 1.0,
+      "value": 1.0,
+      "view": {
+       "suffix": ""
+      }
+     },
+     "Audio FFT": {
+      "id": 1791675378877,
+      "valuetype": "ParamChoice",
+      "value": "Composition",
+      "index": 1,
+      "options": [
+       "Local",
+       "Composition",
+       "External"
+      ],
+      "view": {
+       "suffix": "",
+       "control_type": "choice_combobox"
+      }
+     },
+     "Debug Log": {
+      "valuetype": "ParamBoolean",
+      "id": 1791675378878,
+      "value": false,
+      "view": {
+       "suffix": ""
+      }
+     }
+    }
+   }
+  ],
+  "description": "Solid Color",
+  "fileinfo": null,
+  "r": {
+   "valuetype": "ParamBoolean",
+   "id": 1791675377100,
+   "value": true
+  },
+  "g": {
+   "valuetype": "ParamBoolean",
+   "id": 1791675377101,
+   "value": true
+  },
+  "b": {
+   "valuetype": "ParamBoolean",
+   "id": 1791675377102,
+   "value": true
+  },
+  "a": {
+   "valuetype": "ParamBoolean",
+   "id": 1791675377103,
+   "value": true
+  },
+  "resize": {
+   "id": 1791675377099,
+   "valuetype": "ParamChoice",
+   "value": "Original",
+   "index": 3,
+   "options": [
+    "Fill",
+    "Fit",
+    "Stretch",
+    "Original"
+   ]
+  },
+  "sourceparams": {
+   "Color": {
+    "id": 1791675377081,
+    "valuetype": "ParamColor",
+    "value": "#ff0000ff",
+    "palette": [
+     "#000000ff",
+     "#ff0000ff",
+     "#00ff00ff",
+     "#ffff00ff",
+     "#7f7f7fff",
+     "#0000ffff",
+     "#ff00ffff",
+     "#00ffffff",
+     "#ffffffff"
+    ],
+    "view": {
+     "suffix": ""
+    }
+   }
+  }
+ },
+ "thumbnail": {
+  "last_update": "1791675332837220",
+  "is_default": false,
+  "id": 1791675350393,
+  "path": "/api/v1/composition/clips/by-id/1791675350393/thumbnail"
+ },
+ "autopilot": {
+  "target": {
+   "id": 1791675350387,
+   "valuetype": "ParamChoice",
+   "value": "Layer Determined",
+   "index": 0,
+   "options": [
+    "Layer Determined",
+    "Do nothing",
+    "Play Next Clip",
+    "Play Previous Clip",
+    "Play Random Clip",
+    "Play First Clip",
+    "Play Last Clip"
+   ]
+  },
+  "duration_type": {
+   "id": 1791675350382,
+   "valuetype": "ParamChoice",
+   "value": "Layer Determined",
+   "index": 0,
+   "options": [
+    "Layer Determined",
+    "Transport",
+    "Beats",
+    "Seconds"
+   ]
+  },
+  "beats": {
+   "id": 1791675350385,
+   "valuetype": "ParamRange",
+   "min": 0.015625,
+   "max": 1048576.0,
+   "in": 0.015625,
+   "out": 1048576.0,
+   "value": 4.0
+  },
+  "seconds": {
+   "id": 1791675350386,
+   "valuetype": "ParamRange",
+   "min": 0.001,
+   "max": 604800.0,
+   "in": 0.001,
+   "out": 604800.0,
+   "value": 5.0
+  },
+  "loop_count": {
+   "id": 1791675350384,
+   "valuetype": "ParamRange",
+   "min": 1.0,
+   "max": 10000.0,
+   "in": 1.0,
+   "out": 10000.0,
+   "value": 1.0
+  },
+  "random_type": {
+   "id": 1791675350383,
+   "valuetype": "ParamChoice",
+   "value": "Other",
+   "index": 1,
+   "options": [
+    "Any",
+    "Other",
+    "Bag"
+   ]
+  }
+ }
+}

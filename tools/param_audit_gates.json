@@ -1310,7 +1310,7 @@
  },
  "Bolt Path": {
   "consumer": "LoadEhrPlugin.cpp:BuildLightning / MakeStrike; Lightning.cpp (MakeStrike); WantEyes",
-  "effect": "Bolts crawl on the surface / arc eye to eye / drop to the floor.",
+  "effect": "Bolts crawl on the surface / arc eye to eye / drop to the floor (W11: To Clones retired, Wow has no clones).",
   "gates": "a strike: Lightning Strike press / Strike On Beat + beats / Strike Rate > 0; Bolt Alpha > 0 at strike time (else no strike is made); a loaded model (Crawl / To Floor need camera-facing surface points); Eye To Eye needs the eye finder (worker; runs for path 1 with a strike source)",
   "needs_motion": false,
   "recipe": [
@@ -1318,12 +1318,10 @@
    "set Bolt Life 1"
   ],
   "settle_frames": 60,
-  "suspect": "'To Clones' (3) can never differ from Crawl: needs fs.inst.size() >= 2, but Copies/Clone Layout is MEHR_CLASSIC (ParamList.inc:415-417) and Face is classic-FX only, so in the Wow bundles (the only carriers of Lightning) inst is always 1 -> path = 0 (LoadEhrPlugin.cpp:2651-2652)",
+  "suspect": null,
   "test": [
-   0,
    1,
-   2,
-   3
+   2
   ]
  },
  "Bolt Sat": {
@@ -1552,7 +1550,7 @@
  "C Aim Mode": {
   "consumer": "LoadEhrPlugin.cpp:BuildEyeLights / EyeOpen / UpdateEyePlacement; VolumeShaders.h XLFront; Shaders.h surface lights",
   "effect": "Through Hole / At Camera / Free.",
-  "gates": "C Enable = 1 (on enable the eye finder auto-places the openings once per model: Pos, Cone, Behind Depth, Aim Through Hole, Anchor, maybe Mirror off).  (C Enable starts the eye finder; once it lands it auto-places Light C ONCE per model and writes C Aim Mode = Through Hole, Pos, cone: set C dials after that)",
+  "gates": "C Enable = 1 (on enable the eye finder auto-places the openings once per model: Pos, Cone, Behind Depth, Aim Through Hole, Anchor, maybe Mirror off).  (C Enable starts the eye finder; once it lands it auto-places Light C ONCE per model and writes C Aim Mode = Through Hole, Pos, cone: set C dials after that) W11: C Auto Place (default Once Per Model) says what the finder writes; Position Only / Off leave the aim alone.",
   "needs_motion": false,
   "recipe": [
    "set C Enable 1",
@@ -1633,6 +1631,27 @@
   "test": [
    0,
    4
+  ]
+ },
+ "C Auto Place": {
+  "consumer": "LoadEhrPlugin.cpp:UpdateEyes / UpdateEyePlacement (which C dials the eye finder writes), BuildCut (the Window's openings with Off)",
+  "effect": "What the eye finder writes by itself: Off nothing / Once Per Model everything once per file / Position Only the six positions / Every Model Swap everything for each model on show.",
+  "gates": "C Enable = 1 (or the Cut Window / eye smoke / eye-to-eye bolts) and a model with eyes; the recipe starts at Off so the finder has written nothing, then the test value lets it write.",
+  "needs_motion": false,
+  "recipe": [
+   "set C Auto Place 0",
+   "set C Aim Mode 2",
+   "set C Aim Yaw 40",
+   "set C Cone Angle 60",
+   "set C Enable 1",
+   "frames 60"
+  ],
+  "settle_frames": 120,
+  "suspect": null,
+  "test": [
+   1,
+   2,
+   3
   ]
  },
  "C Beat Pulse": {
@@ -1912,7 +1931,7 @@
  "C Place At Eyes": {
   "consumer": "LoadEhrPlugin.cpp:ProcessEvent eyeRequest=EyePlace -> UpdateEyePlacement",
   "effect": "Re-finds the eyes and writes the C positions back.",
-  "gates": "C Enable = 1 (on enable the eye finder auto-places the openings once per model: Pos, Cone, Behind Depth, Aim Through Hole, Anchor, maybe Mirror off). Event; only visible if the C positions were moved off the found eyes first (the auto-place already put them there). (C Enable starts the eye finder; once it lands it auto-places Light C ONCE per model and writes C Aim Mode = Through Hole, Pos, cone: set C dials after that)",
+  "gates": "C Enable = 1 (on enable the eye finder auto-places the openings once per model: Pos, Cone, Behind Depth, Aim Through Hole, Anchor, maybe Mirror off). Event; only visible if the C positions were moved off the found eyes first (the auto-place already put them there). (C Enable starts the eye finder; once it lands it auto-places Light C ONCE per model and writes C Aim Mode = Through Hole, Pos, cone: set C dials after that) W11: C Auto Place (default Once Per Model) says what the finder writes; Position Only / Off leave the aim alone.",
   "needs_motion": false,
   "recipe": [
    "set C Enable 1",
@@ -3539,12 +3558,13 @@
   },
   "consumer": "LoadEhrPlugin.cpp:BuildFire; Sim.cpp (FIRE passes); SimShaders.h (uSoot)",
   "effect": "Soot smoke above the flames.",
-  "gates": "Fire > 0 (forces the sim on, self-lit volume), an emitter > 0 (fuel comes only from the emitters), Smoke Amount > 0, Vol Method Raymarch",
+  "gates": "Fire > 0 (forces the sim on, self-lit volume), an emitter > 0 (fuel comes only from the emitters), Smoke Amount > 0, Vol Method Raymarch W11: Smoke Ambient 1 lights the soot (without it the soot read 112-165 px, at the 130 px rule).",
   "needs_motion": false,
   "recipe": [
    "set Emit Rim 3",
    "set Emit Behind 3",
-   "set Fire 1"
+   "set Fire 1",
+   "set Smoke Ambient 1"
   ],
   "settle_frames": 150,
   "suspect": null,
@@ -4226,13 +4246,11 @@
   "applies_to": "ghosts",
   "consumer": "LoadEhrPlugin.cpp:BuildCopies ghosts; Renderer.cpp:1608 ghost draw + DrawModel:842-855 (uTrail*); Shaders.h INSTANCED VS/FS",
   "effect": "Translucent copies of past poses behind the mask.",
-  "gates": "Classic bundles only (LoadEhr / LoadEhr FX): Copies is MEHR_CLASSIC (ParamList.inc:414-415). ALL Copies controls after LOD Bias are inert at defaults: Trail Echoes = 0 and Ghosts = 0. Needs real model motion between poses (ghosts = past model matrices, no offset dial). With Spin Y 30 and Ghost Spacing 5 each ghost is only 2.5 deg behind and almost fully hidden behind the live mask; use Ghost Spacing 20-30 (10-15 deg per ghost) or translation. Echoes are composited UNDER the live mask (Shaders.h:2361-2365) and ghosts are drawn BEHIND it (depth test + polygon offset, Renderer.cpp:1608-1623): with spin-only motion and no offset they are hidden inside the live silhouette.",
+  "gates": "Classic bundles only (LoadEhr / LoadEhr FX): Copies is MEHR_CLASSIC. W11: visible on its own once raised, with motion (ghosts = past poses; Ghost Spacing default 15 puts them outside the live silhouette; W10's 5 hid them).",
   "needs_motion": true,
-  "recipe": [
-   "set Ghost Spacing 20"
-  ],
+  "recipe": [],
   "settle_frames": 260,
-  "suspect": "Wired correctly, but no offset dial: past poses of a spinning mask sit inside the live silhouette and are drawn behind it (Renderer.cpp:1612-1620, depth test + glPolygonOffset(1,64)), so at Spin Y 30 / Spacing 5 they are nearly invisible",
+  "suspect": null,
   "test": [
    0,
    8
@@ -6132,13 +6150,12 @@
    "Generate.cpp"
   ],
   "effect": "Slot A shows extruded text (or a logo) instead of the Model A file.",
-  "gates": "None for Text (1): default text 'LOADEHR' is built into slot A. Logo (2) needs a Logo File (classic bundles only). Visible while slot A is on show (Transition 0).",
+  "gates": "None for Text (1): default text 'LOADEHR' is built into slot A. Logo (2) needs a Logo File; W11: Logo is listed in the classic bundles only (Wow has no Logo group). Visible while slot A is on show (Transition 0).",
   "needs_motion": false,
   "recipe": [],
   "settle_frames": 120,
-  "suspect": "Option 'Logo' (2) exists in every bundle (ParamList.inc:30, region 0) but Logo File/Logo group is MEHR_CLASSIC only (ParamList.inc:98-105): in Wow / Wow FX Model Source=Logo can only build a logo with an empty file (TextLogoSpec LoadEhrPlugin.cpp:764) -> load fails, previous model kept; dead option there",
+  "suspect": null,
   "test": [
-   0,
    1,
    2
   ]
@@ -6368,17 +6385,13 @@
   ]
  },
  "Part 1 Skin": {
-  "accepted_in": {
-   "LoadEhr": "Skin needs the input layer: an FX-bundle feature, hidden in the source bundles",
-   "LoadEhrWow": "Skin needs the input layer: an FX-bundle feature, hidden in the source bundles"
-  },
   "consumer": [
    "LoadEhrPlugin.cpp:BuildFrame",
    "Renderer.cpp:DrawModel per-part uniforms (l.935-941)",
    "Shaders.h kMainFS uInputUse==2 && uPartSkin (l.1732)"
   ],
   "effect": "the input layer is projected as that part's base colour",
-  "gates": "FX bundle only (LoadEhr FX / Wow FX); Input Use = 2 (Skin on flagged parts); an input layer; Input Mix > 0 (default 1); slot 1 exists on every model (skull / helmet: 1 part each) On a GLASS part (the Flight Helmet / Gas Mask lenses are part 1) the glass pass shows the refracted input instead: Skin shows once that part's Surface is 0 (glass off).",
+  "gates": "FX bundles only (W11: not carried by the source bundles); Input Use = 2 (Skin on flagged parts); an input layer; Input Mix > 0 (default 1); slot 1 exists on every model (skull / helmet: 1 part each) On a GLASS part (the Flight Helmet / Gas Mask lenses are part 1) the glass pass shows the refracted input instead: Skin shows once that part's Surface is 0 (glass off).",
   "needs_motion": false,
   "recipe": [
    "mark",
@@ -6478,17 +6491,13 @@
   ]
  },
  "Part 2 Skin": {
-  "accepted_in": {
-   "LoadEhr": "Skin needs the input layer: an FX-bundle feature, hidden in the source bundles",
-   "LoadEhrWow": "Skin needs the input layer: an FX-bundle feature, hidden in the source bundles"
-  },
   "consumer": [
    "LoadEhrPlugin.cpp:BuildFrame",
    "Renderer.cpp:DrawModel per-part uniforms (l.935-941)",
    "Shaders.h kMainFS uInputUse==2 && uPartSkin (l.1732)"
   ],
   "effect": "the input layer is projected as that part's base colour",
-  "gates": "FX bundle only (LoadEhr FX / Wow FX); Input Use = 2 (Skin on flagged parts); an input layer; Input Mix > 0 (default 1); the shown model needs >= 2 part slots: skull and SciFi helmet have 1 part each (LoadEhr.log LOAD done '1 parts'); e.g. Gas Mask (5 parts) or Text (Front/Back/Side/Bevel = slots 1-4)",
+  "gates": "FX bundles only (W11: not carried by the source bundles); Input Use = 2 (Skin on flagged parts); an input layer; Input Mix > 0 (default 1); the shown model needs >= 2 part slots: skull and SciFi helmet have 1 part each (LoadEhr.log LOAD done '1 parts'); e.g. Gas Mask (5 parts) or Text (Front/Back/Side/Bevel = slots 1-4)",
   "needs_motion": false,
   "recipe": [
    "mark",
@@ -6587,17 +6596,13 @@
   ]
  },
  "Part 3 Skin": {
-  "accepted_in": {
-   "LoadEhr": "Skin needs the input layer: an FX-bundle feature, hidden in the source bundles",
-   "LoadEhrWow": "Skin needs the input layer: an FX-bundle feature, hidden in the source bundles"
-  },
   "consumer": [
    "LoadEhrPlugin.cpp:BuildFrame",
    "Renderer.cpp:DrawModel per-part uniforms (l.935-941)",
    "Shaders.h kMainFS uInputUse==2 && uPartSkin (l.1732)"
   ],
   "effect": "the input layer is projected as that part's base colour",
-  "gates": "FX bundle only (LoadEhr FX / Wow FX); Input Use = 2 (Skin on flagged parts); an input layer; Input Mix > 0 (default 1); the shown model needs >= 3 part slots: skull and SciFi helmet have 1 part each (LoadEhr.log LOAD done '1 parts'); e.g. Gas Mask (5 parts) or Text (Front/Back/Side/Bevel = slots 1-4)",
+  "gates": "FX bundles only (W11: not carried by the source bundles); Input Use = 2 (Skin on flagged parts); an input layer; Input Mix > 0 (default 1); the shown model needs >= 3 part slots: skull and SciFi helmet have 1 part each (LoadEhr.log LOAD done '1 parts'); e.g. Gas Mask (5 parts) or Text (Front/Back/Side/Bevel = slots 1-4)",
   "needs_motion": false,
   "recipe": [
    "mark",
@@ -6696,17 +6701,13 @@
   ]
  },
  "Part 4 Skin": {
-  "accepted_in": {
-   "LoadEhr": "Skin needs the input layer: an FX-bundle feature, hidden in the source bundles",
-   "LoadEhrWow": "Skin needs the input layer: an FX-bundle feature, hidden in the source bundles"
-  },
   "consumer": [
    "LoadEhrPlugin.cpp:BuildFrame",
    "Renderer.cpp:DrawModel per-part uniforms (l.935-941)",
    "Shaders.h kMainFS uInputUse==2 && uPartSkin (l.1732)"
   ],
   "effect": "the input layer is projected as that part's base colour",
-  "gates": "FX bundle only (LoadEhr FX / Wow FX); Input Use = 2 (Skin on flagged parts); an input layer; Input Mix > 0 (default 1); the shown model needs >= 4 part slots: skull and SciFi helmet have 1 part each (LoadEhr.log LOAD done '1 parts'); e.g. Gas Mask (5 parts) or Text (Front/Back/Side/Bevel = slots 1-4)",
+  "gates": "FX bundles only (W11: not carried by the source bundles); Input Use = 2 (Skin on flagged parts); an input layer; Input Mix > 0 (default 1); the shown model needs >= 4 part slots: skull and SciFi helmet have 1 part each (LoadEhr.log LOAD done '1 parts'); e.g. Gas Mask (5 parts) or Text (Front/Back/Side/Bevel = slots 1-4)",
   "needs_motion": false,
   "recipe": [
    "mark",
@@ -6805,17 +6806,13 @@
   ]
  },
  "Part 5 Skin": {
-  "accepted_in": {
-   "LoadEhr": "Skin needs the input layer: an FX-bundle feature, hidden in the source bundles",
-   "LoadEhrWow": "Skin needs the input layer: an FX-bundle feature, hidden in the source bundles"
-  },
   "consumer": [
    "LoadEhrPlugin.cpp:BuildFrame",
    "Renderer.cpp:DrawModel per-part uniforms (l.935-941)",
    "Shaders.h kMainFS uInputUse==2 && uPartSkin (l.1732)"
   ],
   "effect": "the input layer is projected as that part's base colour",
-  "gates": "FX bundle only (LoadEhr FX / Wow FX); Input Use = 2 (Skin on flagged parts); an input layer; Input Mix > 0 (default 1); the shown model needs >= 5 part slots: skull and SciFi helmet have 1 part each (LoadEhr.log LOAD done '1 parts'); e.g. Gas Mask (5 parts) or Text (Front/Back/Side/Bevel = slots 1-4)",
+  "gates": "FX bundles only (W11: not carried by the source bundles); Input Use = 2 (Skin on flagged parts); an input layer; Input Mix > 0 (default 1); the shown model needs >= 5 part slots: skull and SciFi helmet have 1 part each (LoadEhr.log LOAD done '1 parts'); e.g. Gas Mask (5 parts) or Text (Front/Back/Side/Bevel = slots 1-4)",
   "needs_motion": false,
   "recipe": [
    "mark",
@@ -6914,17 +6911,13 @@
   ]
  },
  "Part 6 Skin": {
-  "accepted_in": {
-   "LoadEhr": "Skin needs the input layer: an FX-bundle feature, hidden in the source bundles",
-   "LoadEhrWow": "Skin needs the input layer: an FX-bundle feature, hidden in the source bundles"
-  },
   "consumer": [
    "LoadEhrPlugin.cpp:BuildFrame",
    "Renderer.cpp:DrawModel per-part uniforms (l.935-941)",
    "Shaders.h kMainFS uInputUse==2 && uPartSkin (l.1732)"
   ],
   "effect": "the input layer is projected as that part's base colour",
-  "gates": "FX bundle only (LoadEhr FX / Wow FX); Input Use = 2 (Skin on flagged parts); an input layer; Input Mix > 0 (default 1); the shown model needs >= 6 part slots: no model seen in the log has more than 5 (Gas Mask / Kabuto); untestable with the planned context",
+  "gates": "FX bundles only (W11: not carried by the source bundles); Input Use = 2 (Skin on flagged parts); an input layer; Input Mix > 0 (default 1); the shown model needs >= 6 part slots: no model seen in the log has more than 5 (Gas Mask / Kabuto); untestable with the planned context",
   "needs_motion": false,
   "recipe": [
    "mark",
@@ -7023,17 +7016,13 @@
   ]
  },
  "Part 7 Skin": {
-  "accepted_in": {
-   "LoadEhr": "Skin needs the input layer: an FX-bundle feature, hidden in the source bundles",
-   "LoadEhrWow": "Skin needs the input layer: an FX-bundle feature, hidden in the source bundles"
-  },
   "consumer": [
    "LoadEhrPlugin.cpp:BuildFrame",
    "Renderer.cpp:DrawModel per-part uniforms (l.935-941)",
    "Shaders.h kMainFS uInputUse==2 && uPartSkin (l.1732)"
   ],
   "effect": "the input layer is projected as that part's base colour",
-  "gates": "FX bundle only (LoadEhr FX / Wow FX); Input Use = 2 (Skin on flagged parts); an input layer; Input Mix > 0 (default 1); the shown model needs >= 7 part slots: no model seen in the log has more than 5 (Gas Mask / Kabuto); untestable with the planned context",
+  "gates": "FX bundles only (W11: not carried by the source bundles); Input Use = 2 (Skin on flagged parts); an input layer; Input Mix > 0 (default 1); the shown model needs >= 7 part slots: no model seen in the log has more than 5 (Gas Mask / Kabuto); untestable with the planned context",
   "needs_motion": false,
   "recipe": [
    "mark",
@@ -7134,17 +7123,13 @@
   ]
  },
  "Part 8 Skin": {
-  "accepted_in": {
-   "LoadEhr": "Skin needs the input layer: an FX-bundle feature, hidden in the source bundles",
-   "LoadEhrWow": "Skin needs the input layer: an FX-bundle feature, hidden in the source bundles"
-  },
   "consumer": [
    "LoadEhrPlugin.cpp:BuildFrame",
    "Renderer.cpp:DrawModel per-part uniforms (l.935-941)",
    "Shaders.h kMainFS uInputUse==2 && uPartSkin (l.1732)"
   ],
   "effect": "the input layer is projected as that part's base colour",
-  "gates": "FX bundle only (LoadEhr FX / Wow FX); Input Use = 2 (Skin on flagged parts); an input layer; Input Mix > 0 (default 1); the shown model needs >= 8 part slots: no model seen in the log has more than 5 (Gas Mask / Kabuto); untestable with the planned context",
+  "gates": "FX bundles only (W11: not carried by the source bundles); Input Use = 2 (Skin on flagged parts); an input layer; Input Mix > 0 (default 1); the shown model needs >= 8 part slots: no model seen in the log has more than 5 (Gas Mask / Kabuto); untestable with the planned context",
   "needs_motion": false,
   "recipe": [
    "mark",
@@ -8408,7 +8393,7 @@
  },
  "Shape Target": {
   "consumer": "LoadEhrPlugin.cpp:BuildDeform, Shape.cpp:SetShapeUniforms (if s.deform), Shaders.h DeformPre/Post (DEFORM twins)",
-  "effect": "Spherize morphs toward cube / torus / crystal.",
+  "effect": "Spherize morphs toward a cube instead of a sphere (W11: Torus / Crystal retired).",
   "gates": "Spherize > 0 (Sphere = default path)",
   "needs_motion": false,
   "recipe": [
@@ -8417,9 +8402,7 @@
   "settle_frames": 90,
   "suspect": null,
   "test": [
-   1,
-   2,
-   3
+   1
   ]
  },
  "Shard Count": {
@@ -10072,13 +10055,11 @@
   "applies_to": "echoes",
   "consumer": "Post.cpp:UpdateEchoes (kTrailFS / kEchoFS in PostShaders.h); Renderer.cpp composite uEchoOn/uEcho",
   "effect": "Feedback trail of past frames behind the live mask.",
-  "gates": "Classic bundles only (LoadEhr / LoadEhr FX): Copies is MEHR_CLASSIC (ParamList.inc:414-415). ALL Copies controls after LOD Bias are inert at defaults: Trail Echoes = 0 and Ghosts = 0. Needs the mask to move on screen OR Trail Offset X/Y != 0. Echoes are composited UNDER the live mask (Shaders.h:2361-2365) and ghosts are drawn BEHIND it (depth test + polygon offset, Renderer.cpp:1608-1623): with spin-only motion and no offset they are hidden inside the live silhouette.",
+  "gates": "Classic bundles only (LoadEhr / LoadEhr FX): Copies is MEHR_CLASSIC. W11: visible on its own once raised (Trail Offset X default 0.02 slides each echo out from under the live mask; W10 needed an offset or motion).",
   "needs_motion": true,
-  "recipe": [
-   "set Trail Offset X 0.05"
-  ],
+  "recipe": [],
   "settle_frames": 120,
-  "suspect": "Wired correctly, but at Trail Offset 0 the trail is composited UNDER the opaque live mask (Shaders.h:2361-2365): only silhouette changes show",
+  "suspect": null,
   "test": [
    0,
    7

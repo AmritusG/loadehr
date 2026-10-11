@@ -430,7 +430,7 @@ vec3 MorphField( vec3 f )
 // Taper, Twist, Bend, Squash, Shear, Bulge, Spherize, Noise Warp, Ripple, Melt / Drip, Glitch, Mirror Fold, Jelly. The values
 // arrive already scaled by Deform Amount (+ Audio > Deform).
 uniform float uTaper, uSquash, uShear, uBulge, uSpherize;
-uniform int uShapeTarget; // W9: what Spherize morphs toward: 0 sphere, 1 cube, 2 torus, 3 crystal (round the Deform Axis)
+uniform int uShapeTarget; // W9: what Spherize morphs toward: 0 sphere, 1 cube (W11: torus / crystal retired)
 uniform float uWarp, uWarpScale, uWarpPhase;       // the noise drifts at Warp Speed lattice cells / s (phase wraps at 256)
 uniform float uGlitchShift, uGlitchBands, uGlitchStep; // the step index wraps at 1000 (a wrap = one more random step)
 uniform vec3 uFoldAxes;                           // 1 = folded across that fitted centre plane
@@ -471,20 +471,11 @@ vec3 BlackHole( vec3 f )
 	q.z *= 1.0 - 0.6 * u * ( 1.0 - u ) * 4.0 * 0.5; // flattened toward the disc on the way in
 	return FromAxis( q, uXAxis );
 }
-// W9 SHAPE MORPH: the point's place on the target shape, along its direction from the centre (cube: onto the faces; torus: the nearest
-// point of the ring tube round the axis; crystal: a bipyramid, faceted, longer along the axis)
+// W9 SHAPE MORPH: the point's place on the cube, along its direction from the centre (onto the faces; W11: torus / crystal retired)
 vec3 ShapeTarget( vec3 f )
 {
 	vec3 q = ToAxis( f, uDeformAxis ) + vec3( 1e-6 );
-	if( uShapeTarget == 1 )
-		q = q / max( abs( q.x ), max( abs( q.y ), abs( q.z ) ) ) * 0.72;
-	else if( uShapeTarget == 2 )
-	{
-		vec3 ring = vec3( normalize( q.xy ) * 0.58, 0.0 );
-		q         = ring + normalize( q - ring ) * 0.26;
-	}
-	else
-		q = q / ( abs( q.x ) + abs( q.y ) + abs( q.z ) / 1.7 ) * 0.78;
+	q      = q / max( abs( q.x ), max( abs( q.y ), abs( q.z ) ) ) * 0.72;
 	return FromAxis( q, uDeformAxis );
 }
 vec3 gFoldS = vec3( 1.0 );                        // this copy's side per folded axis (+1 / -1)
