@@ -5,3 +5,4 @@ verify/
 .claude/
 test_media/
 __pycache__/
+dist/
