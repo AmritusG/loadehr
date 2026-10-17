@@ -290,23 +290,23 @@ LoadEhr W7 opacity 1.0
  C11 W7 Cycle 21 Sparkle 2 Disconnected
 
 $ ls -la ~/Documents/Resolume\ Arena/Extra\ Effects/LoadEhr*.bundle/Contents/MacOS/
--rwxr-xr-x  1 amritrosell  staff  4604544 Oct  8 21:42 /Users/amritrosell/Documents/Resolume Arena/Extra Effects/LoadEhr.bundle/Contents/MacOS/LoadEhr
--rwxr-xr-x  1 amritrosell  staff  4676912 Oct  8 21:42 /Users/amritrosell/Documents/Resolume Arena/Extra Effects/LoadEhrFX.bundle/Contents/MacOS/LoadEhrFX
--rwxr-xr-x  1 amritrosell  staff  4604544 Oct  8 21:42 /Users/amritrosell/Documents/Resolume Arena/Extra Effects/LoadEhrWow.bundle/Contents/MacOS/LoadEhrWow
--rwxr-xr-x  1 amritrosell  staff  4676912 Oct  8 21:42 /Users/amritrosell/Documents/Resolume Arena/Extra Effects/LoadEhrWowFX.bundle/Contents/MacOS/LoadEhrWowFX
+-rwxr-xr-x  1 <user>  staff  4604544 Oct  8 21:42 ~/Documents/Resolume Arena/Extra Effects/LoadEhr.bundle/Contents/MacOS/LoadEhr
+-rwxr-xr-x  1 <user>  staff  4676912 Oct  8 21:42 ~/Documents/Resolume Arena/Extra Effects/LoadEhrFX.bundle/Contents/MacOS/LoadEhrFX
+-rwxr-xr-x  1 <user>  staff  4604544 Oct  8 21:42 ~/Documents/Resolume Arena/Extra Effects/LoadEhrWow.bundle/Contents/MacOS/LoadEhrWow
+-rwxr-xr-x  1 <user>  staff  4676912 Oct  8 21:42 ~/Documents/Resolume Arena/Extra Effects/LoadEhrWowFX.bundle/Contents/MacOS/LoadEhrWowFX
 
 $ ls -la verify/w7 (evidence, local; selection)
-drwxr-xr-x   4 amritrosell  staff    128 Oct  8 21:42 cost
-drwxr-xr-x  18 amritrosell  staff    576 Oct  8 20:54 diag
-drwxr-xr-x  15 amritrosell  staff    480 Oct  8 22:04 final_strips
-drwxr-xr-x  35 amritrosell  staff   1120 Oct  8 21:11 lava_diag
-drwxr-xr-x   8 amritrosell  staff    256 Oct  8 21:11 lava_fix
-drwxr-xr-x   8 amritrosell  staff    256 Oct  8 22:05 realtime
-drwxr-xr-x  10 amritrosell  staff    320 Oct  8 22:04 regress_final
--rw-r--r--   1 amritrosell  staff   2373 Oct  8 22:04 regress_final.txt
-drwxr-xr-x   9 amritrosell  staff    288 Oct  8 21:19 spike2
-drwxr-xr-x  54 amritrosell  staff   1728 Oct  8 21:41 strips_final
--rw-r--r--   1 amritrosell  staff   6039 Oct  8 21:41 strips_final.txt
-drwxr-xr-x  56 amritrosell  staff   1792 Oct  8 21:36 wire_same2
+drwxr-xr-x   4 <user>  staff    128 Oct  8 21:42 cost
+drwxr-xr-x  18 <user>  staff    576 Oct  8 20:54 diag
+drwxr-xr-x  15 <user>  staff    480 Oct  8 22:04 final_strips
+drwxr-xr-x  35 <user>  staff   1120 Oct  8 21:11 lava_diag
+drwxr-xr-x   8 <user>  staff    256 Oct  8 21:11 lava_fix
+drwxr-xr-x   8 <user>  staff    256 Oct  8 22:05 realtime
+drwxr-xr-x  10 <user>  staff    320 Oct  8 22:04 regress_final
+-rw-r--r--   1 <user>  staff   2373 Oct  8 22:04 regress_final.txt
+drwxr-xr-x   9 <user>  staff    288 Oct  8 21:19 spike2
+drwxr-xr-x  54 <user>  staff   1728 Oct  8 21:41 strips_final
+-rw-r--r--   1 <user>  staff   6039 Oct  8 21:41 strips_final.txt
+drwxr-xr-x  56 <user>  staff   1792 Oct  8 21:36 wire_same2
 ```
 END OF HANDOFF w7-transition-prune sha256:5b104c41 21922

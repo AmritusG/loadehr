@@ -95,7 +95,7 @@ written_at: 2026-10-07T23:19:38Z
 ```
 $ git log -1 --stat | head -3 ; git status -sb
 commit 3936c34138f3ac25c691cc6523039d5390b6328f
-Author: Amrit Rosell <amrit.rosell@gmail.com>
+Author: AmritusG <email omitted>
 Date:   Thu Oct 8 01:15:20 2026 +0200
 ## main...origin/main
 
@@ -127,16 +127,16 @@ Architectures in the fat file: build/LoadEhrWow.bundle/Contents/MacOS/LoadEhrWow
 Architectures in the fat file: build/LoadEhrWowFX.bundle/Contents/MacOS/LoadEhrWowFX are: x86_64 arm64 
 
 $ ls -la "~/Documents/Resolume Arena/Extra Effects" | grep LoadEhr
-drwxr-xr-x@  3 amritrosell  staff     96 Oct  7 20:05 LoadEhr.bundle
-drwxr-xr-x@  3 amritrosell  staff     96 Oct  7 20:05 LoadEhrFX.bundle
-drwxr-xr-x@  3 amritrosell  staff     96 Oct  7 20:05 LoadEhrWow.bundle
-drwxr-xr-x@  3 amritrosell  staff     96 Oct  7 20:05 LoadEhrWowFX.bundle
+drwxr-xr-x@  3 <user>  staff     96 Oct  7 20:05 LoadEhr.bundle
+drwxr-xr-x@  3 <user>  staff     96 Oct  7 20:05 LoadEhrFX.bundle
+drwxr-xr-x@  3 <user>  staff     96 Oct  7 20:05 LoadEhrWow.bundle
+drwxr-xr-x@  3 <user>  staff     96 Oct  7 20:05 LoadEhrWowFX.bundle
 
 $ ls -la docs/parity | head -4; du -sh docs/parity; ls docs/parity | wc -l
 total 20464
-drwxr-xr-x  82 amritrosell  staff    2624 Oct  8 00:51 .
-drwxr-xr-x   6 amritrosell  staff     192 Oct  8 00:48 ..
--rw-r--r--   1 amritrosell  staff   21708 Oct  8 00:48 script_smoke.jpg
+drwxr-xr-x  82 <user>  staff    2624 Oct  8 00:51 .
+drwxr-xr-x   6 <user>  staff     192 Oct  8 00:48 ..
+-rw-r--r--   1 <user>  staff   21708 Oct  8 00:48 script_smoke.jpg
  10M	docs/parity
       80
 

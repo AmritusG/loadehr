@@ -56,5 +56,5 @@ public:
 namespace
 {
 CFFGLPluginInfo PluginInfo( PluginFactory< TextProbe >, "MEtp", "LoadEhr TextProbe", 2, 1, 1, 0, FF_SOURCE,
-                            "W21 diagnostic: FFGL text param editors.", "LoadEhr by Amrit Rosell" );
+                            "W21 diagnostic: FFGL text param editors.", "LoadEhr by AmritusG" );
 }

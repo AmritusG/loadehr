@@ -2,10 +2,10 @@
 """LoadEhr W5: dial the W5 wireframe clips (layer "LoadEhr W5", LoadEhr Wow source clips) over REST by param NAME. Never triggers.
 usage: tools/arena_w5.py <layer>          every clip below
        tools/arena_w5.py <layer> <col>    one column"""
-import colorsys, json, sys, urllib.request
+import colorsys, json, os, sys, urllib.request
 
 API = 'http://127.0.0.1:8080/api/v1'
-LIB = '/Users/amritrosell/Documents/Resolume Arena/MaskEhr Library'
+LIB = os.path.expanduser('~/Documents/Resolume Arena/MaskEhr Library')
 SKULL = LIB + '/Skulls/Human Skull/scene.gltf'
 HELMET = LIB + '/Helmets/SciFi Helmet/SciFiHelmet.gltf'
 SOFT = [('Spin Y', 3), ('Key Intensity', 0.8), ('Wireframe Mix', 1), ('Wire Thickness', 1.2)]

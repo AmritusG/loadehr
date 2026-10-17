@@ -2,7 +2,7 @@
 bundle build/LoadEhr.bundle
 size 1280 720
 instance
-text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
 wait_loaded 60
 bpm 120
 # 21 beat cuts (120 bpm = 30 frames per beat), sequence order
@@ -40,7 +40,7 @@ delete
 # a fresh instance gets the saved Pose Data text back (what Arena does on comp load) and can glide to pose 2
 bundle build/LoadEhr.bundle
 instance
-text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
 wait_loaded 60
 text Pose_Data 1:40.0000,15.0000,3.0000,35.0000,0.0000,0.0000,0.0000,0.0000,0.0000;2:-60.0000,-10.0000,6.0000,35.0000,0.0000,0.0000,20.0000,0.0000,0.0000;
 set Pose Glide 0
@@ -68,7 +68,7 @@ frames 2
 shot verify/w8/c3_vertigo_plus1.png
 set Vertigo 0
 # 24 Model B transitions: mask -> DamagedHelmet
-text Model_B /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_models/DamagedHelmet/DamagedHelmet.glb
+text Model_B ~/Documents/claude/ffgl/LoadEhr/test_models/DamagedHelmet/DamagedHelmet.glb
 wait_loaded 60
 realtime 1
 set Transition 0.5

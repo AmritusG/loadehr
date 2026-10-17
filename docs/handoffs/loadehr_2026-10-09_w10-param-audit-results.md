@@ -119,27 +119,27 @@ G7 ok   no LGPL file in the tree (1165 tracked files, submodules included)
 
 $ ls -la docs/audit docs/audit/proposals
 docs/audit:
-drwxr-xr-x  16 amritrosell  staff      512 Oct  9 16:45 .
-drwxr-xr-x   9 amritrosell  staff      288 Oct  9 16:32 ..
--rw-r--r--   1 amritrosell  staff    70005 Oct  9 15:35 arena_rest_L14C1_LoadEhr.json
--rw-r--r--   1 amritrosell  staff    69405 Oct  9 16:42 arena_rest_L19C14_LoadEhr.json
--rw-r--r--   1 amritrosell  staff    72496 Oct  9 16:42 arena_rest_L19C19_LoadEhrFX.json
--rw-r--r--   1 amritrosell  staff  1743861 Oct  9 16:38 copies_LoadEhrFX_sheet_a.png
--rw-r--r--   1 amritrosell  staff  1982333 Oct  9 16:38 copies_LoadEhrFX_sheet_b.png
--rw-r--r--   1 amritrosell  staff  1743861 Oct  9 14:57 copies_LoadEhr_sheet_a.png
--rw-r--r--   1 amritrosell  staff  1982333 Oct  9 14:57 copies_LoadEhr_sheet_b.png
-drwxr-xr-x   3 amritrosell  staff       96 Oct  9 16:45 proposals
--rw-r--r--   1 amritrosell  staff   441777 Oct  9 14:40 static.json
--rw-r--r--   1 amritrosell  staff    81969 Oct  9 14:40 static.md
--rw-r--r--   1 amritrosell  staff   368839 Oct  9 16:30 sweep_LoadEhr.json
--rw-r--r--   1 amritrosell  staff   378729 Oct  9 16:35 sweep_LoadEhrFX.json
--rw-r--r--   1 amritrosell  staff   385113 Oct  9 16:30 sweep_LoadEhrWow.json
--rw-r--r--   1 amritrosell  staff   387377 Oct  9 16:35 sweep_LoadEhrWowFX.json
+drwxr-xr-x  16 <user>  staff      512 Oct  9 16:45 .
+drwxr-xr-x   9 <user>  staff      288 Oct  9 16:32 ..
+-rw-r--r--   1 <user>  staff    70005 Oct  9 15:35 arena_rest_L14C1_LoadEhr.json
+-rw-r--r--   1 <user>  staff    69405 Oct  9 16:42 arena_rest_L19C14_LoadEhr.json
+-rw-r--r--   1 <user>  staff    72496 Oct  9 16:42 arena_rest_L19C19_LoadEhrFX.json
+-rw-r--r--   1 <user>  staff  1743861 Oct  9 16:38 copies_LoadEhrFX_sheet_a.png
+-rw-r--r--   1 <user>  staff  1982333 Oct  9 16:38 copies_LoadEhrFX_sheet_b.png
+-rw-r--r--   1 <user>  staff  1743861 Oct  9 14:57 copies_LoadEhr_sheet_a.png
+-rw-r--r--   1 <user>  staff  1982333 Oct  9 14:57 copies_LoadEhr_sheet_b.png
+drwxr-xr-x   3 <user>  staff       96 Oct  9 16:45 proposals
+-rw-r--r--   1 <user>  staff   441777 Oct  9 14:40 static.json
+-rw-r--r--   1 <user>  staff    81969 Oct  9 14:40 static.md
+-rw-r--r--   1 <user>  staff   368839 Oct  9 16:30 sweep_LoadEhr.json
+-rw-r--r--   1 <user>  staff   378729 Oct  9 16:35 sweep_LoadEhrFX.json
+-rw-r--r--   1 <user>  staff   385113 Oct  9 16:30 sweep_LoadEhrWow.json
+-rw-r--r--   1 <user>  staff   387377 Oct  9 16:35 sweep_LoadEhrWowFX.json
 
 docs/audit/proposals:
-drwxr-xr-x   3 amritrosell  staff       96 Oct  9 16:45 .
-drwxr-xr-x  16 amritrosell  staff      512 Oct  9 16:45 ..
--rw-r--r--   1 amritrosell  staff  1234209 Oct  9 16:44 proposals.png
+drwxr-xr-x   3 <user>  staff       96 Oct  9 16:45 .
+drwxr-xr-x  16 <user>  staff      512 Oct  9 16:45 ..
+-rw-r--r--   1 <user>  staff  1234209 Oct  9 16:44 proposals.png
 
 $ tools/param_audit.py map (counts)
 { "LoadEhr": { "VISIBLE ALWAYS": 110, "NON-VISUAL": 12, "VISIBLE ONLY WHEN MOVING": 41, "VISIBLE ONLY WHEN": 322, "NO VISIBLE EFFECT": 9 }, "LoadEhrFX": { "VISIBLE ALWAYS": 112, "NON-VISUAL": 12, "VISIBLE ONLY WHEN MOVING": 44, "VISIBLE ONLY WHEN": 337, "NO VISIBLE EFFECT": 2 }, "LoadEhrWow": { "VISIBLE ALWAYS": 86, "NON-VISUAL": 12, "VISIBLE ONLY WHEN MOVING": 30, "VISIBLE ONLY WHEN": 366, "NO VISIBLE EFFECT": 10 }, "LoadEhrWowFX": { "VISIBLE ALWAYS": 87, "NON-VISUAL": 12, "VISIBLE ONLY WHEN MOVING": 30, "VISIBLE ONLY WHEN": 374, "NO VISIBLE EFFECT": 6 }}

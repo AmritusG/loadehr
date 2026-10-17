@@ -67,22 +67,22 @@ G7 ok   no libtess2 / tesselator / SGI-B in src, third_party, CMakeLists.txt
 G7 ok   no LGPL file in the tree (1046 tracked files, submodules included)
 $ ls -la verify/w12r ; du -sh  (cleared after this handoff)
 total 6976
-drwxr-xr-x  10 amritrosell  staff      320 Oct 11 14:42 .
-drwxr-xr-x   4 amritrosell  staff      128 Oct 11 14:42 ..
--rw-r--r--   1 amritrosell  staff   268451 Oct 11 14:42 r1_mask_front.png
--rw-r--r--   1 amritrosell  staff  1027046 Oct 11 14:42 r2_wireframe50.png
--rw-r--r--   1 amritrosell  staff  1422743 Oct 11 14:42 r3_explode.png
--rw-r--r--   1 amritrosell  staff   297800 Oct 11 14:42 r4_fx_skin_env_input.png
--rw-r--r--   1 amritrosell  staff   372455 Oct 11 14:42 r5_chain_mid_hop_b_c.png
--rw-r--r--   1 amritrosell  staff   165019 Oct 11 14:42 r6_chain_rest_d.png
--rw-r--r--   1 amritrosell  staff     1712 Oct 11 14:42 regress.log
--rw-r--r--   1 amritrosell  staff     1999 Oct 11 14:42 regress_script.txt
+drwxr-xr-x  10 <user>  staff      320 Oct 11 14:42 .
+drwxr-xr-x   4 <user>  staff      128 Oct 11 14:42 ..
+-rw-r--r--   1 <user>  staff   268451 Oct 11 14:42 r1_mask_front.png
+-rw-r--r--   1 <user>  staff  1027046 Oct 11 14:42 r2_wireframe50.png
+-rw-r--r--   1 <user>  staff  1422743 Oct 11 14:42 r3_explode.png
+-rw-r--r--   1 <user>  staff   297800 Oct 11 14:42 r4_fx_skin_env_input.png
+-rw-r--r--   1 <user>  staff   372455 Oct 11 14:42 r5_chain_mid_hop_b_c.png
+-rw-r--r--   1 <user>  staff   165019 Oct 11 14:42 r6_chain_rest_d.png
+-rw-r--r--   1 <user>  staff     1712 Oct 11 14:42 regress.log
+-rw-r--r--   1 <user>  staff     1999 Oct 11 14:42 regress_script.txt
 3.4M	verify/w12r
 $ ls -la Extra Effects/LoadEhr*.bundle/Contents/MacOS/*
--rwxr-xr-x  1 amritrosell  staff  4879168 Oct 11 14:38 /Users/amritrosell/Documents/Resolume Arena/Extra Effects/LoadEhr.bundle/Contents/MacOS/LoadEhr
--rwxr-xr-x  1 amritrosell  staff  4935104 Oct 11 14:38 /Users/amritrosell/Documents/Resolume Arena/Extra Effects/LoadEhrFX.bundle/Contents/MacOS/LoadEhrFX
--rwxr-xr-x  1 amritrosell  staff  4862592 Oct 11 14:38 /Users/amritrosell/Documents/Resolume Arena/Extra Effects/LoadEhrWow.bundle/Contents/MacOS/LoadEhrWow
--rwxr-xr-x  1 amritrosell  staff  4934960 Oct 11 14:38 /Users/amritrosell/Documents/Resolume Arena/Extra Effects/LoadEhrWowFX.bundle/Contents/MacOS/LoadEhrWowFX
+-rwxr-xr-x  1 <user>  staff  4879168 Oct 11 14:38 ~/Documents/Resolume Arena/Extra Effects/LoadEhr.bundle/Contents/MacOS/LoadEhr
+-rwxr-xr-x  1 <user>  staff  4935104 Oct 11 14:38 ~/Documents/Resolume Arena/Extra Effects/LoadEhrFX.bundle/Contents/MacOS/LoadEhrFX
+-rwxr-xr-x  1 <user>  staff  4862592 Oct 11 14:38 ~/Documents/Resolume Arena/Extra Effects/LoadEhrWow.bundle/Contents/MacOS/LoadEhrWow
+-rwxr-xr-x  1 <user>  staff  4934960 Oct 11 14:38 ~/Documents/Resolume Arena/Extra Effects/LoadEhrWowFX.bundle/Contents/MacOS/LoadEhrWowFX
 $ pgrep Arena
 97391 /Applications/Resolume Arena/Arena.app/Contents/MacOS/Arena
 $ Arena layer 22 "LoadEhr W12 Light Glide": 2 clips, 0 playing (composition playing: nothing on 22 layers). tools/arena_w12.py get 22 1 / 2:
@@ -94,7 +94,7 @@ $ Arena layer 22 "LoadEhr W12 Light Glide": 2 clips, 0 playing (composition play
   C Auto Place       ParamChoice = Once Per Model
   C Enable           ParamBoolean = True
 $ comp file (14:40 = Arena's save at your cmd-Q, BEFORE layer 22 was built ~14:41: layer 22 lives in the open comp until you save)
--rw-r--r--  1 amritrosell  staff  9735980 Oct 11 14:40 /Users/amritrosell/Documents/Resolume Arena/Compositions/LoadEhr.avc
+-rw-r--r--  1 <user>  staff  9735980 Oct 11 14:40 ~/Documents/Resolume Arena/Compositions/LoadEhr.avc
 $ ls _Commons/ARENA-HELD-BY.txt
 ls: ../_Commons/ARENA-HELD-BY.txt: No such file or directory
 ```

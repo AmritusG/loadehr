@@ -104,26 +104,26 @@ W13 Once 0.142 (frame 1) max 0.142, frames > 0.5: 0 | W13 Every 0.143 | W12 Once
 $ tools/w13_once.py same: 15 of 15 rows max 0 vs W12 and vs repeat
 $ ls -la verify/w13 verify/w13r ; du -sh  (cleared after this handoff)
 total 24
-drwxr-xr-x   9 amritrosell  staff   288 Oct 11 14:56 .
-drwxr-xr-x   5 amritrosell  staff   160 Oct 11 14:57 ..
-drwxr-xr-x  77 amritrosell  staff  2464 Oct 11 14:56 arrive
--rw-r--r--   1 amritrosell  staff   571 Oct 11 14:56 arrive.log
-drwxr-xr-x  20 amritrosell  staff   640 Oct 11 14:53 hop
--rw-r--r--   1 amritrosell  staff  1841 Oct 11 14:53 hop.log
-drwxr-xr-x  15 amritrosell  staff   480 Oct 11 14:57 int
-drwxr-xr-x  68 amritrosell  staff  2176 Oct 11 14:53 same
--rw-r--r--   1 amritrosell  staff  1238 Oct 11 14:53 same.log
+drwxr-xr-x   9 <user>  staff   288 Oct 11 14:56 .
+drwxr-xr-x   5 <user>  staff   160 Oct 11 14:57 ..
+drwxr-xr-x  77 <user>  staff  2464 Oct 11 14:56 arrive
+-rw-r--r--   1 <user>  staff   571 Oct 11 14:56 arrive.log
+drwxr-xr-x  20 <user>  staff   640 Oct 11 14:53 hop
+-rw-r--r--   1 <user>  staff  1841 Oct 11 14:53 hop.log
+drwxr-xr-x  15 <user>  staff   480 Oct 11 14:57 int
+drwxr-xr-x  68 <user>  staff  2176 Oct 11 14:53 same
+-rw-r--r--   1 <user>  staff  1238 Oct 11 14:53 same.log
 6.0M	verify/w13
 3.4M	verify/w13r
 $ ls -la Extra Effects/LoadEhr*.bundle/Contents/MacOS/*
--rwxr-xr-x  1 amritrosell  staff  4879168 Oct 11 15:08 /Users/amritrosell/Documents/Resolume Arena/Extra Effects/LoadEhr.bundle/Contents/MacOS/LoadEhr
--rwxr-xr-x  1 amritrosell  staff  4935104 Oct 11 15:08 /Users/amritrosell/Documents/Resolume Arena/Extra Effects/LoadEhrFX.bundle/Contents/MacOS/LoadEhrFX
--rwxr-xr-x  1 amritrosell  staff  4862592 Oct 11 15:08 /Users/amritrosell/Documents/Resolume Arena/Extra Effects/LoadEhrWow.bundle/Contents/MacOS/LoadEhrWow
--rwxr-xr-x  1 amritrosell  staff  4934960 Oct 11 15:08 /Users/amritrosell/Documents/Resolume Arena/Extra Effects/LoadEhrWowFX.bundle/Contents/MacOS/LoadEhrWowFX
+-rwxr-xr-x  1 <user>  staff  4879168 Oct 11 15:08 ~/Documents/Resolume Arena/Extra Effects/LoadEhr.bundle/Contents/MacOS/LoadEhr
+-rwxr-xr-x  1 <user>  staff  4935104 Oct 11 15:08 ~/Documents/Resolume Arena/Extra Effects/LoadEhrFX.bundle/Contents/MacOS/LoadEhrFX
+-rwxr-xr-x  1 <user>  staff  4862592 Oct 11 15:08 ~/Documents/Resolume Arena/Extra Effects/LoadEhrWow.bundle/Contents/MacOS/LoadEhrWow
+-rwxr-xr-x  1 <user>  staff  4934960 Oct 11 15:08 ~/Documents/Resolume Arena/Extra Effects/LoadEhrWowFX.bundle/Contents/MacOS/LoadEhrWowFX
 $ pgrep Arena
 71623 /Applications/Resolume Arena/Arena.app/Contents/MacOS/Arena
 $ Arena layer 23 "LoadEhr W13 Once Follows": 2 clips, nothing playing on 23 layers. tools/arena_w13.py get 23 1 / 2:
-  Model B            ParamFile = /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Skulls/Goat Skull/scene.gltf
+  Model B            ParamFile = ~/Documents/Resolume Arena/MaskEhr Library/Skulls/Goat Skull/scene.gltf
   C Auto Place       ParamChoice = Once Per Model
   C Enable           ParamBoolean = True;   C Auto Place       ParamChoice = Every Model Swap
 $ ls _Commons/ARENA-HELD-BY.txt

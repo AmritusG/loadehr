@@ -132,13 +132,13 @@ G6 ok   no Mirror* source, no MIRROR program variant
 G7 ok   no libtess2 / tesselator / SGI-B in src, third_party, CMakeLists.txt
 G7 ok   no LGPL file in the tree (619 tracked files, submodules included)
 
-drwxr-xr-x  35 amritrosell  staff    1120 Oct  8 18:35 checks
-drwxr-xr-x  13 amritrosell  staff     416 Oct  8 18:37 combos
-drwxr-xr-x   5 amritrosell  staff     160 Oct  8 18:38 cost
-drwxr-xr-x  55 amritrosell  staff    1760 Oct  8 18:37 renders
-drwxr-xr-x  16 amritrosell  staff     512 Oct  8 18:41 w3proof
-drwxr-xr-x   7 amritrosell  staff     224 Oct  8 18:40 w4_cue
-drwxr-xr-x   7 amritrosell  staff     224 Oct  8 18:40 w4_sweep
+drwxr-xr-x  35 <user>  staff    1120 Oct  8 18:35 checks
+drwxr-xr-x  13 <user>  staff     416 Oct  8 18:37 combos
+drwxr-xr-x   5 <user>  staff     160 Oct  8 18:38 cost
+drwxr-xr-x  55 <user>  staff    1760 Oct  8 18:37 renders
+drwxr-xr-x  16 <user>  staff     512 Oct  8 18:41 w3proof
+drwxr-xr-x   7 <user>  staff     224 Oct  8 18:40 w4_cue
+drwxr-xr-x   7 <user>  staff     224 Oct  8 18:40 w4_sweep
       48
 
 LoadEhr W5 opacity 1.0
@@ -152,12 +152,12 @@ LoadEhr W5 opacity 1.0
 Arena PID 43403
 
 $ ls -la verify/w5 (dirs)
-drwxr-xr-x  35 amritrosell  staff    1120 Oct  8 18:35 checks
-drwxr-xr-x  13 amritrosell  staff     416 Oct  8 18:37 combos
-drwxr-xr-x   5 amritrosell  staff     160 Oct  8 18:38 cost
-drwxr-xr-x  55 amritrosell  staff    1760 Oct  8 18:37 renders
-drwxr-xr-x  16 amritrosell  staff     512 Oct  8 18:41 w3proof
-drwxr-xr-x   7 amritrosell  staff     224 Oct  8 18:40 w4_cue
-drwxr-xr-x   7 amritrosell  staff     224 Oct  8 18:40 w4_sweep
+drwxr-xr-x  35 <user>  staff    1120 Oct  8 18:35 checks
+drwxr-xr-x  13 <user>  staff     416 Oct  8 18:37 combos
+drwxr-xr-x   5 <user>  staff     160 Oct  8 18:38 cost
+drwxr-xr-x  55 <user>  staff    1760 Oct  8 18:37 renders
+drwxr-xr-x  16 <user>  staff     512 Oct  8 18:41 w3proof
+drwxr-xr-x   7 <user>  staff     224 Oct  8 18:40 w4_cue
+drwxr-xr-x   7 <user>  staff     224 Oct  8 18:40 w4_sweep
 ```
 END OF HANDOFF w5-wire sha256:db9b1f64 9767

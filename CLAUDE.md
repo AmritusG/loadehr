@@ -171,6 +171,7 @@ MaskEhr reference builds go to a scratch folder (`cmake -S <MaskEhr> -B <scratch
   capped at 40 deg. Worker thread, cached per geometry + part selection; `LOADEHR_EYE_DEBUG=<png or folder/>`). `tools/param_map.py` regenerates the parameter map below. `tools/probe/` = the W11 colour probe.
 - Harness: `composite arena|straight|black` (W23) = how `shot` flattens: arena (default) = premultiplied over a textured
   background, straight = Arena's reading below FFGL API 2.3, black = the old dark checker (regress.txt uses it).
+  Go-public (2026-10-17): " ~/" in a script line = $HOME (no user name in tracked files; Python tools use expanduser).
   Params by NAME (`set Spin Y 30`, `_` for spaces in one-token commands), `pulse`, `get`, `compare`,
   `delta` (mean RGB a shot adds over another), `input_seq <dir>`; W21: `text <name> <string>` ("\n" = a line break), `mark` (the next wait_loaded waits for a swap after it); `tools/regress.sh <dir>` re-renders the W1 reference set and diffs it (must stay max 0), then runs the guards. W1:
   `wait_slots <n>` waits for n swaps after a `mark` (the `text` commands after a `mark` keep it).
@@ -1758,7 +1759,7 @@ Colours: every "<X> Color" row starts a HUE / SAT / BRI / ALPHA quartet = ONE pi
   background queue with a `VNImageRequestHandler` over a CVPixelBuffer/CGImage.
 
 ## THE COMMONS
-Commons: `/Users/amritrosell/Documents/claude/ffgl/_Commons` (repo `AmritusG/ffgl-commons`). LoadEhr is an FFGL repo:
+Commons: `~/Documents/claude/ffgl/_Commons` (repo `AmritusG/ffgl-commons`). LoadEhr is an FFGL repo:
 CONTRACT section 1 (Wire/ISF toolchain facts) does not bind it; file only what applies, tagged honestly
 (`applies-to: [ffgl]`, `[arena]`, `[isf]`, `[wire]` or `[any]`).
 - FIRST, every session, before anything else: read `_Commons/CONTRACT.md`, `_Commons/INDEX.md`, and every finding whose

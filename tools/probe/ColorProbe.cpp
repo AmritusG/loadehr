@@ -115,5 +115,5 @@ public:
 namespace
 {
 CFFGLPluginInfo PluginInfo( PluginFactory< ColorProbe >, "MEcp", "LoadEhr ColorProbe", 2, 1, 1, 0, FF_SOURCE,
-                            "W11 diagnostic: FFGL colour param layouts.", "LoadEhr by Amrit Rosell" );
+                            "W11 diagnostic: FFGL colour param layouts.", "LoadEhr by AmritusG" );
 }

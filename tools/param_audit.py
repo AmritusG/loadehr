@@ -33,7 +33,7 @@ SRC = os.path.join(ROOT, 'src')
 AUD = os.path.join(ROOT, 'docs', 'audit')
 HARNESS = os.path.join(ROOT, 'build', 'loadehr_harness')
 GATES = os.path.join(ROOT, 'tools', 'param_audit_gates.json')
-LIB = '/Users/amritrosell/Documents/Resolume Arena/MaskEhr Library'  # MaskEhr's folder: two files by path, nothing listed
+LIB = os.path.expanduser('~/Documents/Resolume Arena/MaskEhr Library')  # MaskEhr's folder: two files by path, nothing listed
 SKULL = LIB + '/Skulls/Human Skull/scene.gltf'
 HELMET = LIB + '/Helmets/SciFi Helmet/SciFiHelmet.gltf'
 BUNDLES = {'LoadEhr': (0, 0), 'LoadEhrFX': (1, 0), 'LoadEhrWow': (0, 1), 'LoadEhrWowFX': (1, 1)}
@@ -525,8 +525,8 @@ def needs(rec, name):
             out.append('press %s' % ' '.join(w[1:]))
         elif w[0] == 'text':
             k, v = w[1].replace('_', ' '), ' '.join(w[2:])
-            out.append('%s = %s' % (k, os.path.basename(os.path.dirname(v)) if v.startswith('/') and k.startswith('Model') else
-                                     os.path.basename(v) if v.startswith('/') else '"%s"' % v))
+            out.append('%s = %s' % (k, os.path.basename(os.path.dirname(v)) if v.startswith(('/', '~')) and k.startswith('Model') else
+                                     os.path.basename(v) if v.startswith(('/', '~')) else '"%s"' % v))
         elif w[0] == 'fft':
             out.append('audio (FFT)')
         elif w[0] == 'bpm':

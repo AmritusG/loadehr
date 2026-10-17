@@ -2,7 +2,7 @@
 bundle build/LoadEhr.bundle
 size 960 540
 instance
-text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
 wait_loaded 60
 # (c) Light A, saturated red, Hue Drift 0.7 (one turn in 1.43 s): per-frame change stays small and even
 set A Enable 1
@@ -73,7 +73,7 @@ delete
 bundle build/LoadEhr.bundle
 size 960 540
 instance
-text Model_A /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_models/DamagedHelmet/DamagedHelmet.glb
+text Model_A ~/Documents/claude/ffgl/LoadEhr/test_models/DamagedHelmet/DamagedHelmet.glb
 wait_loaded 60
 get C Left Pos X
 pulse C_Place_At_Eyes

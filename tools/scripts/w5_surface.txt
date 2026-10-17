@@ -2,7 +2,7 @@
 bundle build/LoadEhr.bundle
 size 1920 1080
 instance
-text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
 wait_loaded 60
 bpm 128
 set Rotate Y -25
@@ -65,7 +65,7 @@ shot verify/w5/p1_glitter_part1_only.png
 delete
 bundle build/LoadEhr.bundle
 instance
-text Model_A /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_models/DamagedHelmet/DamagedHelmet.glb
+text Model_A ~/Documents/claude/ffgl/LoadEhr/test_models/DamagedHelmet/DamagedHelmet.glb
 wait_loaded 60
 set Heat Glow 2
 frames 10
@@ -79,7 +79,7 @@ delete
 bundle build/LoadEhrFX.bundle
 input bars
 instance
-text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
 wait_loaded 60
 set Input Use 1
 set Glass 1

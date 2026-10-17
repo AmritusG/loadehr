@@ -101,15 +101,15 @@ G6 ok   no Mirror* source, no MIRROR program variant
 G7 ok   no libtess2 / tesselator / SGI-B in src, third_party, CMakeLists.txt
 G7 FAIL LGPL: docs/handoffs/loadehr_2026-10-08_w3-dxv_BLOCKED.md
 $ ls -la verify/w3/*
--rw-r--r--  1 amritrosell  staff     456 Oct  8 14:39 alpha.md
--rw-r--r--  1 amritrosell  staff  467621 Oct  8 14:39 alpha_DXT5_DXV3.png
--rw-r--r--  1 amritrosell  staff  467361 Oct  8 14:39 alpha_YG10_DXV3.png
--rw-r--r--  1 amritrosell  staff  9892 Oct  8 15:03 perf_lines.txt
--rw-r--r--  1 amritrosell  staff  1916 Oct  8 14:41 cost.md
--rw-r--r--  1 amritrosell  staff  274 Oct  8 14:38 longshow.md
--rw-r--r--  1 amritrosell  staff  5218 Oct  8 14:37 proof.md
--rw-r--r--  1 amritrosell  staff  248793 Oct  8 14:26 strip_prores4444a.png
--rw-r--r--  1 amritrosell  staff    1762 Oct  8 14:24 w2_files_vs_w2.py
+-rw-r--r--  1 <user>  staff     456 Oct  8 14:39 alpha.md
+-rw-r--r--  1 <user>  staff  467621 Oct  8 14:39 alpha_DXT5_DXV3.png
+-rw-r--r--  1 <user>  staff  467361 Oct  8 14:39 alpha_YG10_DXV3.png
+-rw-r--r--  1 <user>  staff  9892 Oct  8 15:03 perf_lines.txt
+-rw-r--r--  1 <user>  staff  1916 Oct  8 14:41 cost.md
+-rw-r--r--  1 <user>  staff  274 Oct  8 14:38 longshow.md
+-rw-r--r--  1 <user>  staff  5218 Oct  8 14:37 proof.md
+-rw-r--r--  1 <user>  staff  248793 Oct  8 14:26 strip_prores4444a.png
+-rw-r--r--  1 <user>  staff    1762 Oct  8 14:24 w2_files_vs_w2.py
 $ longshow.md
 | 0.5 min | 115 | 115 |
 | 60 min | 6 | 6 |

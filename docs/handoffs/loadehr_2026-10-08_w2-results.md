@@ -132,7 +132,7 @@ in haze) | C16 Projector Video HAP (the HAP version). C4-C13 on the Human Skull 
 ```
 $ git log -1 --stat | head -3 ; git status -sb
 commit c0c2f5ef999f5d6c4bcb81dd2f638207dd5e6f1b
-Author: Amrit Rosell <amrit.rosell@gmail.com>
+Author: AmritusG <email omitted>
 Date:   Thu Oct 8 09:44:10 2026 +0200
 ## main...origin/main
 
@@ -173,10 +173,10 @@ libtess / tesselator / SGI-B: 0 files; third_party/libtess2: 0
 Mirror Room params in ParamList.inc: 0
 
 $ ls -la ~/Documents/Resolume Arena/Extra Effects | grep LoadEhr
-drwxr-xr-x   3 amritrosell  staff     96 Oct  7 20:05 LoadEhr.bundle
-drwxr-xr-x   3 amritrosell  staff     96 Oct  7 20:05 LoadEhrFX.bundle
-drwxr-xr-x   3 amritrosell  staff     96 Oct  7 20:05 LoadEhrWow.bundle
-drwxr-xr-x   3 amritrosell  staff     96 Oct  7 20:05 LoadEhrWowFX.bundle
+drwxr-xr-x   3 <user>  staff     96 Oct  7 20:05 LoadEhr.bundle
+drwxr-xr-x   3 <user>  staff     96 Oct  7 20:05 LoadEhrFX.bundle
+drwxr-xr-x   3 <user>  staff     96 Oct  7 20:05 LoadEhrWow.bundle
+drwxr-xr-x   3 <user>  staff     96 Oct  7 20:05 LoadEhrWowFX.bundle
 
 $ du -sh docs/parity/w2_text docs/parity/w2_shatter; ls docs/parity/w2_text | wc -l; ls docs/parity/w2_shatter | wc -l
 1.1M	docs/parity/w2_text

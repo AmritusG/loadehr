@@ -13,7 +13,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GEN = os.path.join(ROOT, 'test_media', 'gen')
 SRC = os.path.join(ROOT, 'test_media', 'faces_clip.mp4')
 GLENC = os.path.expanduser('~/Documents/claude/native-builds/glenc-public/.build/release/glenc-cli')
-MASK = '/Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Skulls/Human Skull/scene.gltf'
+MASK = os.path.expanduser('~/Documents/Resolume Arena/MaskEhr Library/Skulls/Human Skull/scene.gltf')
 FILES = ['h264_1080.mp4', 'h264_4k.mp4', 'hevc_1080.mp4', 'hevc_4k.mp4', 'prores422_1080.mov', 'prores422_4k.mov', 'prores4444a_1080.mov',
          'hap_1080.mov', 'hap_4k.mov', 'hapalpha_1080.mov', 'hapq_1080.mov', 'hapq_4k.mov', 'hapqalpha_1080.mov']
 LOG = os.path.expanduser('~/Library/Logs/LoadEhr/LoadEhr.log')

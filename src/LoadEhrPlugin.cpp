@@ -4660,18 +4660,18 @@ void DeinitBundle()
 #if LOADEHR_WOW && LOADEHR_FX
 CFFGLPluginInfo PluginInfo( PluginFactory< LoadEhrPlugin >, "LEwf", "LoadEhr Wow FX", 2, 3, 1, 0, FF_EFFECT,
                             "LoadEhr with the W26 showpieces (projector + video, fire, lightning, swarm, lava, caustics, trip, ...); the incoming layer can be background, skin or reflection.",
-                            "LoadEhr by Amrit Rosell", 0, nullptr, nullptr, DeinitBundle );
+                            "LoadEhr by AmritusG", 0, nullptr, nullptr, DeinitBundle );
 #elif LOADEHR_WOW
 CFFGLPluginInfo PluginInfo( PluginFactory< LoadEhrPlugin >, "LEwo", "LoadEhr Wow", 2, 3, 1, 0, FF_SOURCE,
                             "LoadEhr with the W26 showpieces (projector + video, fire, lightning, swarm, lava, caustics, trip, ...) over a transparent background.",
-                            "LoadEhr by Amrit Rosell", 0, nullptr, nullptr, DeinitBundle );
+                            "LoadEhr by AmritusG", 0, nullptr, nullptr, DeinitBundle );
 #elif LOADEHR_FX
 CFFGLPluginInfo PluginInfo( PluginFactory< LoadEhrPlugin >, "LEfx", "LoadEhr FX", 2, 3, 1, 0, FF_EFFECT,
                             "Load any 3D model (fbx/obj/gltf/glb) and animate it; the incoming layer can be background, skin or reflection.",
-                            "LoadEhr by Amrit Rosell", 0, nullptr, nullptr, DeinitBundle );
+                            "LoadEhr by AmritusG", 0, nullptr, nullptr, DeinitBundle );
 #else
 CFFGLPluginInfo PluginInfo( PluginFactory< LoadEhrPlugin >, "LEhr", "LoadEhr", 2, 3, 1, 0, FF_SOURCE,
                             "Load any 3D model (fbx/obj/gltf/glb) and animate it over a transparent background.",
-                            "LoadEhr by Amrit Rosell", 0, nullptr, nullptr, DeinitBundle );
+                            "LoadEhr by AmritusG", 0, nullptr, nullptr, DeinitBundle );
 #endif
 }

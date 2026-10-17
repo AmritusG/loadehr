@@ -4,7 +4,7 @@ bundle build/LoadEhrWowFX.bundle
 size 1920 1080
 input test_media/faces_1080.png
 instance
-text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
 wait_loaded 60
 set Input Use 1
 frames 5
@@ -31,7 +31,7 @@ bundle build/LoadEhrWowFX.bundle
 size 1280 720
 input_seq test_media/seq
 instance
-text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
 wait_loaded 60
 set Input Use 1
 set Face Track 1

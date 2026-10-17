@@ -157,10 +157,10 @@ worst: 0 over 48 shots
 $ harness compare verify/w7/{strips_final,points_w7}/*.png vs verify/w8/{strips,points}
   76 max 0 pixels>2
 $ ls -la ~/Documents/Resolume\ Arena/Extra\ Effects/LoadEhr*.bundle/Contents/MacOS/
--rwxr-xr-x  1 amritrosell  staff  4621472 Oct  8 22:47 LoadEhr
--rwxr-xr-x  1 amritrosell  staff  4677456 Oct  8 22:47 LoadEhrFX
--rwxr-xr-x  1 amritrosell  staff  4621472 Oct  8 22:47 LoadEhrWow
--rwxr-xr-x  1 amritrosell  staff  4677456 Oct  8 22:47 LoadEhrWowFX
+-rwxr-xr-x  1 <user>  staff  4621472 Oct  8 22:47 LoadEhr
+-rwxr-xr-x  1 <user>  staff  4677456 Oct  8 22:47 LoadEhrFX
+-rwxr-xr-x  1 <user>  staff  4621472 Oct  8 22:47 LoadEhrWow
+-rwxr-xr-x  1 <user>  staff  4677456 Oct  8 22:47 LoadEhrWowFX
 $ Arena: PID 53933 -> 27709 (Amrit quit + relaunched) ; layer 13 "LoadEhr W8" opacity 1
  C1 W8 YCG6 DXVKit Disconnected File proj resolume-alley_ycg6_testsrc2_1920x1080.mov
  C2 W8 YCG6 Arena Native Disconnected Input

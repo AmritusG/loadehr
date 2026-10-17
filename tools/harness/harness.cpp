@@ -500,6 +500,8 @@ int main( int argc, char** argv )
 	{
 		if( line.empty() || line[ 0 ] == '#' )
 			continue;
+		for( size_t k = 0; ( k = line.find( " ~/", k ) ) != std::string::npos; ) // " ~/" = the home folder (scripts carry no user name)
+			line.replace( k + 1, 1, getenv( "HOME" ) ), ++k;
 		std::istringstream ss( line );
 		std::string cmd;
 		ss >> cmd;

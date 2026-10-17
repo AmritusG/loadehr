@@ -136,15 +136,15 @@ G6 ok   no Mirror* source, no MIRROR program variant
 G7 ok   no libtess2 / tesselator / SGI-B in src, third_party, CMakeLists.txt
 G7 ok   no LGPL file in the tree (611 tracked files, submodules included)
 
-drwxr-xr-x  31 amritrosell  staff    992 Oct  8 17:46 cue
-drwxr-xr-x  31 amritrosell  staff    992 Oct  8 17:58 latency
-drwxr-xr-x  15 amritrosell  staff    480 Oct  8 18:10 longshow
-drwxr-xr-x  87 amritrosell  staff   2784 Oct  8 17:53 reverse
-drwxr-xr-x  31 amritrosell  staff    992 Oct  8 17:45 sweep
-drwxr-xr-x  11 amritrosell  staff    352 Oct  8 18:13 v_cue
-drwxr-xr-x  27 amritrosell  staff    864 Oct  8 18:15 v_reverse
-drwxr-xr-x  11 amritrosell  staff    352 Oct  8 18:12 v_sweep
-drwxr-xr-x  16 amritrosell  staff    512 Oct  8 18:08 w3proof
+drwxr-xr-x  31 <user>  staff    992 Oct  8 17:46 cue
+drwxr-xr-x  31 <user>  staff    992 Oct  8 17:58 latency
+drwxr-xr-x  15 <user>  staff    480 Oct  8 18:10 longshow
+drwxr-xr-x  87 <user>  staff   2784 Oct  8 17:53 reverse
+drwxr-xr-x  31 <user>  staff    992 Oct  8 17:45 sweep
+drwxr-xr-x  11 <user>  staff    352 Oct  8 18:13 v_cue
+drwxr-xr-x  27 <user>  staff    864 Oct  8 18:15 v_reverse
+drwxr-xr-x  11 <user>  staff    352 Oct  8 18:12 v_sweep
+drwxr-xr-x  16 <user>  staff    512 Oct  8 18:08 w3proof
 
 LoadEhr W4 opacity 1.0
  C1 W4 Scrub Transport (Disconnected)

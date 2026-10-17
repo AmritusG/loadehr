@@ -11,7 +11,7 @@ usage: tools/w5_wire.py renders <out>   every Wire Mode x Wire Back x Wire Edges
 import os, re, struct, subprocess, sys, zlib
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-LIB = '/Users/amritrosell/Documents/Resolume Arena/MaskEhr Library'
+LIB = os.path.expanduser('~/Documents/Resolume Arena/MaskEhr Library')
 SKULL = LIB + '/Skulls/Human Skull/scene.gltf'
 HELMET = LIB + '/Helmets/SciFi Helmet/SciFiHelmet.gltf'
 LOGO = os.path.join(ROOT, 'test_logos', 'test_emblem.svg')

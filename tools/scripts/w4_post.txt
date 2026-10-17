@@ -2,7 +2,7 @@
 bundle build/LoadEhr.bundle
 size 1920 1080
 instance
-text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
 wait_loaded 60
 bpm 128
 # 17 sweeping spots: 4 spots, rainbow, beams in the haze, beat strobe; two moments of the sweep

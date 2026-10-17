@@ -9,8 +9,8 @@ import os, re, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FONT = '/System/Library/Fonts/Supplemental/Arial.ttf'
-SKULL = '/Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Skulls/Human Skull/scene.gltf'
-MASK = '/Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf'
+SKULL = os.path.expanduser('~/Documents/Resolume Arena/MaskEhr Library/Skulls/Human Skull/scene.gltf')
+MASK = os.path.expanduser('~/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf')
 CASES = [  # name, dials, model ('text' = Model Source Text)
     ('none', [], SKULL),
     ('taper', [('Taper', 1.2)], SKULL),

@@ -11,7 +11,7 @@ usage: tools/parity.py list
                                                     (a model / script naming a forbidden file stops the run: FORBIDDEN)
 Looks = tools/w22_smoke.py (12), w24_trip.py (14), w25_looks.py (3), w26_wow.py (18), w28_review.py (6),
         + the name-based harness scripts in tools/scripts/ (each shot of each script)."""
-import os, re, subprocess, sys
+import os, re, subprocess, sys, tempfile
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.dont_write_bytecode = True
 import w22_smoke as W
@@ -21,7 +21,7 @@ import w26_wow as V
 import w28_review as F
 
 ROOT = W.ROOT
-MEHR = os.environ.get('MASKEHR_BUILD', '/private/tmp/claude-501/-Users-amritrosell-Documents-claude-ffgl-LoadEhr/4b964771-8c73-47e3-8148-97956e9c25c7/scratchpad/mehr_build')
+MEHR = os.environ.get('MASKEHR_BUILD', os.path.join(tempfile.gettempdir(), 'mehr_build'))
 TIMES = (1, 2, 3, 5)
 # MaskEhr's laser looks (intentionally gone in LoadEhr) and the looks that had lasers (rendered without them on both sides)
 GONE = ['Laser Eyes', 'Laser Tunnel', 'Laser Scanner', 'Laser Scanner 2', 'Laser Fan 2', 'T Lasers']

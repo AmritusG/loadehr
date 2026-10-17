@@ -164,20 +164,20 @@ $ tools/w12_glide.py same verify/w12/same <W11 build>
 | Position | 1 | mean 0.0000 max 0 pixels>2 0 | mean 0.0000 max 0 pixels>2 0 | mean 0.1402 max 155 pixels>2 500 |
 $ ls -la verify/w12 ; du -sh   (proof output; cleared after this handoff, see below)
 total 0
-drwxr-xr-x   5 amritrosell  staff   160 Oct 11 12:26 .
-drwxr-xr-x   5 amritrosell  staff   160 Oct 11 12:28 ..
-drwxr-xr-x  36 amritrosell  staff  1152 Oct 11 12:21 hop
-drwxr-xr-x  15 amritrosell  staff   480 Oct 11 12:20 int
-drwxr-xr-x  68 amritrosell  staff  2176 Oct 11 12:27 same
+drwxr-xr-x   5 <user>  staff   160 Oct 11 12:26 .
+drwxr-xr-x   5 <user>  staff   160 Oct 11 12:28 ..
+drwxr-xr-x  36 <user>  staff  1152 Oct 11 12:21 hop
+drwxr-xr-x  15 <user>  staff   480 Oct 11 12:20 int
+drwxr-xr-x  68 <user>  staff  2176 Oct 11 12:27 same
 360K	verify/w12/hop
 116K	verify/w12/int
 3.5M	verify/w12/same
 3.4M	verify/verify/w12
 $ ls -la build/*.bundle/Contents/MacOS/*   (built, NOT installed)
--rwxr-xr-x  1 amritrosell  staff  4824856 Oct 11 12:17 build/LoadEhr.bundle/Contents/MacOS/LoadEhr
--rwxr-xr-x  1 amritrosell  staff  4880952 Oct 11 12:17 build/LoadEhrFX.bundle/Contents/MacOS/LoadEhrFX
--rwxr-xr-x  1 amritrosell  staff  4808184 Oct 11 12:17 build/LoadEhrWow.bundle/Contents/MacOS/LoadEhrWow
--rwxr-xr-x  1 amritrosell  staff  4880816 Oct 11 12:17 build/LoadEhrWowFX.bundle/Contents/MacOS/LoadEhrWowFX
+-rwxr-xr-x  1 <user>  staff  4824856 Oct 11 12:17 build/LoadEhr.bundle/Contents/MacOS/LoadEhr
+-rwxr-xr-x  1 <user>  staff  4880952 Oct 11 12:17 build/LoadEhrFX.bundle/Contents/MacOS/LoadEhrFX
+-rwxr-xr-x  1 <user>  staff  4808184 Oct 11 12:17 build/LoadEhrWow.bundle/Contents/MacOS/LoadEhrWow
+-rwxr-xr-x  1 <user>  staff  4880816 Oct 11 12:17 build/LoadEhrWowFX.bundle/Contents/MacOS/LoadEhrWowFX
 $ cat _Commons/ARENA-HELD-BY.txt ; pgrep Arena
 Fanous W3 (session 2026-10-11T11:50 — Arena-only cost diagnosis: REST reads, Metal traces, GPU measurement); 3910 /Applications/Resolume Arena/Arena.app/Contents/MacOS/Arena
 ```

@@ -23,7 +23,7 @@ import os, random, re, statistics, subprocess, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 GEN = os.path.join(ROOT, 'test_media', 'gen', 'w4')
 GLENC = os.path.expanduser('~/Documents/claude/native-builds/glenc-public/.build/release/glenc-cli')
-MASK = '/Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Skulls/Human Skull/scene.gltf'
+MASK = os.path.expanduser('~/Documents/Resolume Arena/MaskEhr Library/Skulls/Human Skull/scene.gltf')
 LOG = os.path.expanduser('~/Library/Logs/LoadEhr/LoadEhr.log')
 N = 150  # frames in every coded clip (5 s at 30 fps)
 CODECS = ['dxv', 'hap', 'hapq', 'prores', 'h264', 'h264g30', 'hevc']

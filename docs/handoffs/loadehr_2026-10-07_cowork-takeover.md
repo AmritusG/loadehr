@@ -30,7 +30,7 @@ A new FFGL plugin for Resolume Arena, spun off from MaskEhr. Amrit's words (2026
    - guard tests and grep receipts;
    - an Arena layer "LoadEhr" with 3 parity clips and 4 morph-chain clips, untriggered.
 2. Continuation line for the NEW LoadEhr CC session:
-   `Read /Users/amritrosell/Documents/claude/ffgl/MaskEhr/docs/handoffs/loadehr_2026-10-07_w1-kickoff.md and execute it.`
+   `Read ~/Documents/claude/ffgl/MaskEhr/docs/handoffs/loadehr_2026-10-07_w1-kickoff.md and execute it.`
 3. **Your next job:** when Amrit posts the W1 results (loadehr_2026-10-07_w1-results.md):
    - Read the whole file.
    - Check the no-library and no-laser proof: grep receipts, the guard tests, and that the param list has no Library* or Laser*.

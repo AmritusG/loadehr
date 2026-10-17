@@ -2258,7 +2258,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "set Caustics 2",
    "set Caustic Source 0"
@@ -3127,7 +3127,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Skulls/Crystal Skull/scene.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Skulls/Crystal Skull/scene.gltf",
    "wait_loaded"
   ],
   "settle_frames": 90,
@@ -3344,7 +3344,7 @@
   "needs_motion": false,
   "realtime": 1,
   "recipe": [
-   "input /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png",
+   "input ~/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png",
    "set Face Track 1"
   ],
   "settle_frames": 60,
@@ -3357,7 +3357,7 @@
   "needs_motion": false,
   "realtime": 1,
   "recipe": [
-   "input /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png",
+   "input ~/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png",
    "set Face Track 1"
   ],
   "settle_frames": 60,
@@ -3370,7 +3370,7 @@
   "needs_motion": false,
   "realtime": 1,
   "recipe": [
-   "input /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png",
+   "input ~/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png",
    "set Face Track 1"
   ],
   "settle_frames": 60,
@@ -3384,7 +3384,7 @@
   "needs_motion": false,
   "realtime": 1,
   "recipe": [
-   "input /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png",
+   "input ~/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png",
    "set Face Track 1"
   ],
   "settle_frames": 60,
@@ -3689,7 +3689,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "set Part 7 Visible 0",
    "set Part 8 Visible 0"
@@ -3950,7 +3950,7 @@
   "needs_motion": false,
   "realtime": 1,
   "recipe": [
-   "input /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png",
+   "input ~/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png",
    "set Face Track 1"
   ],
   "settle_frames": 60,
@@ -3963,7 +3963,7 @@
   "needs_motion": false,
   "realtime": 1,
   "recipe": [
-   "input /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png",
+   "input ~/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png",
    "set Face Track 1"
   ],
   "settle_frames": 60,
@@ -3976,7 +3976,7 @@
   "needs_motion": false,
   "realtime": 1,
   "recipe": [
-   "input /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png",
+   "input ~/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png",
    "set Face Track 1"
   ],
   "settle_frames": 60,
@@ -5011,7 +5011,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/SciFi Helmet/SciFiHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/SciFi Helmet/SciFiHelmet.gltf",
    "wait_loaded 60",
    "set Smoke Engine 1",
    "set Smoke Ambient 1",
@@ -5774,7 +5774,7 @@
   "needs_motion": false,
   "recipe": [
    "set Model Source 2",
-   "text Logo File /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_logos/test_emblem.svg"
+   "text Logo File ~/Documents/claude/ffgl/LoadEhr/test_logos/test_emblem.svg"
   ],
   "settle_frames": 150,
   "suspect": null,
@@ -5797,8 +5797,8 @@
   "settle_frames": 150,
   "suspect": null,
   "test": [
-   "/Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_logos/test_emblem.svg",
-   "/Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_logos/test_emblem.png"
+   "~/Documents/claude/ffgl/LoadEhr/test_logos/test_emblem.svg",
+   "~/Documents/claude/ffgl/LoadEhr/test_logos/test_emblem.png"
   ]
  },
  "Low Poly": {
@@ -5945,7 +5945,7 @@
   "needs_motion": false,
   "realtime": 1,
   "recipe": [
-   "input /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png",
+   "input ~/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png",
    "set Face Track 1"
   ],
   "settle_frames": 60,
@@ -5959,7 +5959,7 @@
   "gates": "Only textures LARGER than the cap are cut (ModelLoader.cpp:1422 '> maxTexture'): 4K needs > 4096 px, 2K needs > 2048 px. Skull and SciFi Helmet textures are exactly 2048 -> no effect at all. Needs e.g. the Ram Mask (8192 px textures) in slot A, and a close camera so the on-screen sampling uses the top mips. Triggers a full reload.",
   "needs_motion": false,
   "recipe": [
-   "text Model A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Ram Mask/scene.gltf",
+   "text Model A ~/Documents/Resolume Arena/MaskEhr Library/Masks/Ram Mask/scene.gltf",
    "set Distance 0.6"
   ],
   "settle_frames": 600,
@@ -6082,8 +6082,8 @@
   "settle_frames": 180,
   "suspect": null,
   "test": [
-   "/Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Skulls/Deer Skull/scene.gltf",
-   "/Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Skulls/Lion Skull/scene.gltf"
+   "~/Documents/Resolume Arena/MaskEhr Library/Skulls/Deer Skull/scene.gltf",
+   "~/Documents/Resolume Arena/MaskEhr Library/Skulls/Lion Skull/scene.gltf"
   ]
  },
  "Model B": {
@@ -6101,8 +6101,8 @@
   "settle_frames": 180,
   "suspect": null,
   "test": [
-   "/Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Skulls/Deer Skull/scene.gltf",
-   "/Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Skulls/Lion Skull/scene.gltf"
+   "~/Documents/Resolume Arena/MaskEhr Library/Skulls/Deer Skull/scene.gltf",
+   "~/Documents/Resolume Arena/MaskEhr Library/Skulls/Lion Skull/scene.gltf"
   ]
  },
  "Model C": {
@@ -6120,8 +6120,8 @@
   "settle_frames": 180,
   "suspect": null,
   "test": [
-   "/Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Skulls/Deer Skull/scene.gltf",
-   "/Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Skulls/Lion Skull/scene.gltf"
+   "~/Documents/Resolume Arena/MaskEhr Library/Skulls/Deer Skull/scene.gltf",
+   "~/Documents/Resolume Arena/MaskEhr Library/Skulls/Lion Skull/scene.gltf"
   ]
  },
  "Model D": {
@@ -6139,8 +6139,8 @@
   "settle_frames": 180,
   "suspect": null,
   "test": [
-   "/Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Skulls/Deer Skull/scene.gltf",
-   "/Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Skulls/Lion Skull/scene.gltf"
+   "~/Documents/Resolume Arena/MaskEhr Library/Skulls/Deer Skull/scene.gltf",
+   "~/Documents/Resolume Arena/MaskEhr Library/Skulls/Lion Skull/scene.gltf"
   ]
  },
  "Model Source": {
@@ -6355,7 +6355,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6375,7 +6375,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6395,7 +6395,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "input bars",
    "set Input Use 2",
@@ -6419,7 +6419,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "set Glass 1"
   ],
@@ -6441,7 +6441,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6461,7 +6461,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6481,7 +6481,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6501,7 +6501,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "input bars",
    "set Input Use 2"
@@ -6524,7 +6524,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "set Glass 1"
   ],
@@ -6546,7 +6546,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6566,7 +6566,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6586,7 +6586,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6606,7 +6606,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "input bars",
    "set Input Use 2"
@@ -6629,7 +6629,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "set Glass 1"
   ],
@@ -6651,7 +6651,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6671,7 +6671,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6691,7 +6691,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6711,7 +6711,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "input bars",
    "set Input Use 2"
@@ -6734,7 +6734,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "set Glass 1"
   ],
@@ -6756,7 +6756,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6776,7 +6776,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6796,7 +6796,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6816,7 +6816,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "input bars",
    "set Input Use 2"
@@ -6839,7 +6839,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "set Glass 1"
   ],
@@ -6861,7 +6861,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6881,7 +6881,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6901,7 +6901,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6921,7 +6921,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "input bars",
    "set Input Use 2"
@@ -6944,7 +6944,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "set Glass 1"
   ],
@@ -6966,7 +6966,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -6986,7 +6986,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -7006,7 +7006,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -7026,7 +7026,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "input bars",
    "set Input Use 2"
@@ -7049,7 +7049,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "set Glass 1"
   ],
@@ -7071,7 +7071,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -7091,7 +7091,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -7112,7 +7112,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -7133,7 +7133,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "input bars",
    "set Input Use 2"
@@ -7157,7 +7157,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60",
    "set Glass 1"
   ],
@@ -7180,7 +7180,7 @@
   "needs_motion": false,
   "recipe": [
    "mark",
-   "text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
+   "text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Helmets/Flight Helmet/FlightHelmet.gltf",
    "wait_loaded 60"
   ],
   "settle_frames": 93,
@@ -7661,7 +7661,7 @@
   "suspect": null,
   "test": [
    "",
-   "/Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png"
+   "~/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png"
   ]
  },
  "Proj Focus": {
@@ -7672,7 +7672,7 @@
   "recipe": [
    "set Proj Enable 1",
    "set Proj Source 1",
-   "text Proj File /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png"
+   "text Proj File ~/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png"
   ],
   "settle_frames": 60,
   "suspect": null,
@@ -7764,7 +7764,7 @@
   "recipe": [
    "set Proj Enable 1",
    "input bars",
-   "text Proj File /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png"
+   "text Proj File ~/Documents/claude/ffgl/LoadEhr/test_media/faces_1080.png"
   ],
   "settle_frames": 60,
   "suspect": null,
@@ -7937,7 +7937,7 @@
   "needs_motion": false,
   "nonvisual": "re-reads the same file (slot empty in the test)",
   "recipe": [
-   "text Model C /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Skulls/Deer Skull/scene.gltf",
+   "text Model C ~/Documents/Resolume Arena/MaskEhr Library/Skulls/Deer Skull/scene.gltf",
    "set Transition 1"
   ],
   "settle_frames": 180,
@@ -7953,7 +7953,7 @@
   "needs_motion": false,
   "nonvisual": "re-reads the same file (slot empty in the test)",
   "recipe": [
-   "text Model D /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Skulls/Deer Skull/scene.gltf",
+   "text Model D ~/Documents/Resolume Arena/MaskEhr Library/Skulls/Deer Skull/scene.gltf",
    "set Transition 1"
   ],
   "settle_frames": 180,
@@ -9817,7 +9817,7 @@
   "needs_motion": false,
   "recipe": [
    "set Model Source 2",
-   "text Logo File /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_logos/test_emblem.png"
+   "text Logo File ~/Documents/claude/ffgl/LoadEhr/test_logos/test_emblem.png"
   ],
   "settle_frames": 150,
   "suspect": null,
@@ -9836,7 +9836,7 @@
   "needs_motion": false,
   "recipe": [
    "set Model Source 2",
-   "text Logo File /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_logos/test_emblem.png"
+   "text Logo File ~/Documents/claude/ffgl/LoadEhr/test_logos/test_emblem.png"
   ],
   "settle_frames": 150,
   "suspect": null,
@@ -9855,7 +9855,7 @@
   "needs_motion": false,
   "recipe": [
    "set Model Source 2",
-   "text Logo File /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_logos/test_emblem.png"
+   "text Logo File ~/Documents/claude/ffgl/LoadEhr/test_logos/test_emblem.png"
   ],
   "settle_frames": 150,
   "suspect": null,
@@ -10889,7 +10889,7 @@
   "recipe": [
    "set Proj Enable 1",
    "set Proj Source 1",
-   "text Proj File /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_media/gen/hapalpha_1080.mov"
+   "text Proj File ~/Documents/claude/ffgl/LoadEhr/test_media/gen/hapalpha_1080.mov"
   ],
   "settle_frames": 90,
   "suspect": null,
@@ -10906,7 +10906,7 @@
   "recipe": [
    "set Proj Enable 1",
    "set Proj Source 1",
-   "text Proj File /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_media/gen/hap_1080.mov"
+   "text Proj File ~/Documents/claude/ffgl/LoadEhr/test_media/gen/hap_1080.mov"
   ],
   "settle_frames": 90,
   "suspect": null,
@@ -10923,7 +10923,7 @@
   "recipe": [
    "set Proj Enable 1",
    "set Proj Source 1",
-   "text Proj File /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_media/gen/w4/code_dxv_1080.mov",
+   "text Proj File ~/Documents/claude/ffgl/LoadEhr/test_media/gen/w4/code_dxv_1080.mov",
    "frames 30",
    "set Video Loop 3"
   ],
@@ -10942,7 +10942,7 @@
   "recipe": [
    "set Proj Enable 1",
    "set Proj Source 1",
-   "text Proj File /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_media/gen/hap_1080.mov"
+   "text Proj File ~/Documents/claude/ffgl/LoadEhr/test_media/gen/hap_1080.mov"
   ],
   "settle_frames": 2,
   "suspect": null,
@@ -10956,7 +10956,7 @@
   "recipe": [
    "set Proj Enable 1",
    "set Proj Source 1",
-   "text Proj File /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_media/gen/hap_1080.mov"
+   "text Proj File ~/Documents/claude/ffgl/LoadEhr/test_media/gen/hap_1080.mov"
   ],
   "settle_frames": 90,
   "suspect": null,

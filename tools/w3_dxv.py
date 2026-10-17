@@ -15,7 +15,7 @@ import math, os, re, subprocess, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BUILD = os.environ.get('LOADEHR_BUILD', os.path.join(ROOT, 'build'))
-MASK = '/Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Skulls/Human Skull/scene.gltf'
+MASK = os.path.expanduser('~/Documents/Resolume Arena/MaskEhr Library/Skulls/Human Skull/scene.gltf')
 LOG = os.path.expanduser('~/Library/Logs/LoadEhr/LoadEhr.log')
 MOV = os.path.expanduser('~/Movies')
 VEC = os.path.join(ROOT, 'third_party', 'dxvkit', 'test_vectors', 'streams', 'resolume')

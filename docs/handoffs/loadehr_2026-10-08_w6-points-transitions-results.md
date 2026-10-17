@@ -159,10 +159,10 @@ LoadEhrWow: stats COLD frames 634 | plugin wall ms avg 5.45 p99 29.49 max 48.65 
 LoadEhrWow: stats WARM frames 642 | plugin wall ms avg 5.63 p99 13.28 max 43.76 | GPU ms avg 3.36 p99  9.21 max 41.66
 
 $ ls -la ~/Documents/Resolume\ Arena/Extra\ Effects/LoadEhr*.bundle/Contents/MacOS/
--rwxr-xr-x  1 amritrosell  staff  4588016 Oct  8 20:13 LoadEhr
--rwxr-xr-x  1 amritrosell  staff  4660400 Oct  8 20:13 LoadEhrFX
--rwxr-xr-x  1 amritrosell  staff  4588016 Oct  8 20:13 LoadEhrWow
--rwxr-xr-x  1 amritrosell  staff  4660400 Oct  8 20:13 LoadEhrWowFX
+-rwxr-xr-x  1 <user>  staff  4588016 Oct  8 20:13 LoadEhr
+-rwxr-xr-x  1 <user>  staff  4660400 Oct  8 20:13 LoadEhrFX
+-rwxr-xr-x  1 <user>  staff  4588016 Oct  8 20:13 LoadEhrWow
+-rwxr-xr-x  1 <user>  staff  4660400 Oct  8 20:13 LoadEhrWowFX
 
 $ ls -la verify/w6   (evidence, local; selection)
 drwxr-xr-x  60 ... 1920 Oct  8 19:50 s2_strips

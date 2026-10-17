@@ -3,7 +3,7 @@ bundle build/LoadEhr.bundle
 size 960 540
 instance
 params
-text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
 wait_loaded 60
 get Model A
 # spin continuity on Y: -30, 0, +30, then the top of the range again on X and Z

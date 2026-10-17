@@ -2,7 +2,7 @@
 bundle build/LoadEhr.bundle
 size 1920 1080
 instance
-text Model_A /Users/amritrosell/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
+text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Masks/Plague Mask/scene.gltf
 wait_loaded 60
 realtime 1.5
 set Rotate Y -20
@@ -91,7 +91,7 @@ shot verify/w6/f4_dust_reformed.png
 delete
 bundle build/LoadEhr.bundle
 instance
-text Model_A /Users/amritrosell/Documents/claude/ffgl/LoadEhr/test_models/DamagedHelmet/DamagedHelmet.glb
+text Model_A ~/Documents/claude/ffgl/LoadEhr/test_models/DamagedHelmet/DamagedHelmet.glb
 wait_loaded 60
 realtime 1
 pulse Shatter

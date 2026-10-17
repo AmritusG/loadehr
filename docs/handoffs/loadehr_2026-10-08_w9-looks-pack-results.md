@@ -216,10 +216,10 @@ $ tools/w9_shape.py same (Sphere vs W8 Spherize)
 | text | 1 | 0 |
 $ pgrep Arena (before -> after the restart): 27709 -> 15450
 $ ls -la ~/Documents/Resolume\ Arena/Extra\ Effects | grep LoadEhr
-drwxr-xr-x@  3 amritrosell  staff     96 Oct  7 20:05 LoadEhr.bundle
-drwxr-xr-x@  3 amritrosell  staff     96 Oct  7 20:05 LoadEhrFX.bundle
-drwxr-xr-x@  3 amritrosell  staff     96 Oct  7 20:05 LoadEhrWow.bundle
-drwxr-xr-x@  3 amritrosell  staff     96 Oct  7 20:05 LoadEhrWowFX.bundle
+drwxr-xr-x@  3 <user>  staff     96 Oct  7 20:05 LoadEhr.bundle
+drwxr-xr-x@  3 <user>  staff     96 Oct  7 20:05 LoadEhrFX.bundle
+drwxr-xr-x@  3 <user>  staff     96 Oct  7 20:05 LoadEhrWow.bundle
+drwxr-xr-x@  3 <user>  staff     96 Oct  7 20:05 LoadEhrWowFX.bundle
 $ ls -la verify/w9 (sizes, B)
 288 a_combos;160 a_cost;462352 a_montage.png;320 a_regress;992 a_renders;448 a_same;160 a_same_dxv;1381118 a_strip_montage.png;800 a_strips;288 a_times;256 a_wraps;1664 arena_perf.md;1211728 b_combo_montage.png;416 b_combos;160 b_cost;1088 b_deform_same;586701 b_montage.png;320 b_regress;1248 b_renders;320 b_same;160 b_same2;1344 b_strips;224 b_wraps;416 c_combos;160 c_cost;1059551 c_montage.png;320 c_regress;992 c_renders;320 c_same;160 c_same2;672 c_strips;224 c_wraps;480 d_combos;160 d_cost;1956566 d_montage.png;320 d_regress;1760 d_renders;320 d_same;1024 d_strips;224 d_wraps;160 d_wraps2;160 e_cost;910583 e_montage.png;320 e_regress;1248 e_renders;672 e_same;448 e_same_all;1568 e_strips;
 $ verify/w9/arena_perf.md (MBP M3 Max, Wire closed, 120 Hz, the selected clip, not triggered)
