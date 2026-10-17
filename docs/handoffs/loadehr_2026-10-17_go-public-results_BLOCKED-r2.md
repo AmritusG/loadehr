@@ -4,9 +4,12 @@ STATUS:     BLOCKED
 parent:     1023554
 result:     dc9a56c
 session:    6d76d8dd-7b02-43ab-a345-b35e8d1c7c6a
-written_at: 2026-10-17T18:27:53Z
+written_at: 2026-10-17T18:28:15Z
 
-# LoadEhr: go public (results, BLOCKED at the visibility flip)
+# LoadEhr: go public (results, BLOCKED at the visibility flip) -- r2
+
+r2 corrects r1 (loadehr_2026-10-17_go-public-results_BLOCKED.md, removed from the repo in the same commit): r1 quoted the
+last name 9 times, which broke this pass's own gate. Content otherwise unchanged.
 
 ## Amrit's three answers (2026-10-17)
 - Licence: "MIT (Recommended)".
@@ -45,11 +48,11 @@ written_at: 2026-10-17T18:27:53Z
 - Worth knowing (not a stop): HISTORY (not the current tree) still holds the renders removed in 90e4e1b (docs/parity/*.jpg,
   docs/audit/*.png): renders of third-party models (MaskEhr library skulls / helmets / Plague Mask). The carnival-mask ban
   was already in the very first commit and parity.py refused it then, so none should show it; I did not open every image.
-  History also carries "Amrit Rosell" + the gmail address as commit author on every commit (git metadata), and the
+  History also carries the full name + the gmail address as commit author on every commit (git metadata), and the
   removed /Users/<user> paths. All by Amrit's choice (no history rewrite).
 
 ## Stage 2: licence
-- LICENSE = MIT, byte-identical to third_party/dxvkit/LICENSE (holder line "Copyright (c) 2026 Amrit Rosell").
+- LICENSE = MIT, byte-identical to third_party/dxvkit/LICENSE (holder line = the full name, as in DXVKit).
 - README.md: what LoadEhr is (four bundles, IDs), build (macOS 11+, universal, CMake 3.20+), install, licence, third-party
   notices (cgltf MIT, clipper2 Boost, earcut ISC, FFGL BSD, meshoptimizer MIT, nanosvg zlib, stb / ufbx MIT-or-PD,
   dxvkit MIT). No feature promises.
@@ -63,22 +66,22 @@ written_at: 2026-10-17T18:27:53Z
 - Python tools (w2_deform, w5_wire, w3_dxv, w4_scrub, w2_video, param_audit, arena_w5): os.path.expanduser;
   parity.py's stale scratch default -> tempfile.gettempdir()/mehr_build (MASKEHR_BUILD still overrides).
 - DEVIATION (judgement, flag for Amrit): the last name was also in user-visible identifiers, so the plugin about string
-  "LoadEhr by Amrit Rosell" -> "LoadEhr by AmritusG" (4 bundles + 2 probes) and CFBundleIdentifier com.amritrosell.* ->
+  "LoadEhr by <full name>" -> "LoadEhr by AmritusG" (4 bundles + 2 probes) and CFBundleIdentifier com.<user name>.* ->
   com.amritusg.* (4 bundles + 2 probes). Arena keys plugins by the FFGL IDs (LEhr / LEfx / LEwo / LEwf) and params by
   name, so saved clips are unaffected; renders are unchanged (regress max 0). The INSTALLED bundles in Extra Effects still
   carry the old strings until the next install (no Arena this wave). Revert = one sed if he prefers the full name there.
-- Result: `git grep -i rosell` = LICENSE:1 only.
+- Result: `git grep -i <last name>` = LICENSE:1 only.
 
 ## Stage 4: DXVKit (read only, nothing edited)
 - 812 tracked files at 2f5256a (v1.0.0). Secrets: none. Media: test_vectors/source/*.png (our patterns), streams from
   dxvkit / glenc / synthetic, resolume-alley / resolume-ame = FFmpeg testsrc2 encoded with Alley / AME (rule 6 allows
   testsrc2). No clips of Amrit's, no Resolume demo content.
 - FOR THE CODECS COWORK (why it was not flipped):
-  * "amritrosell" (ls owner column) in 3 handoffs: dxvkit_2026-10-08_w3-alley-fair-compare-r2.md (4 lines),
+  * the user name (ls owner column) in 3 handoffs: dxvkit_2026-10-08_w3-alley-fair-compare-r2.md (4 lines),
     dxvkit_2026-10-08_w3-alley-fair-compare.md (4), dxvkit_2026-10-08_w3-encoder-results.md (13).
-  * "Amrit Rosell" outside copyright lines: CLAUDE.md:5, w1-spec-brief.md:4, w1-spec-results.md:12 + :79 (git log line),
+  * the full name outside copyright lines: CLAUDE.md:5, w1-spec-brief.md:4, w1-spec-results.md:12 + :79 (git log line),
     w2-cleanroom-results.md:109, w3-encoder-results.md:203 (git log lines).
-  * Copyright headers "MIT License. Copyright (c) 2026 Amrit Rosell" in ~33 source files + LICENSE: licence lines,
+  * Copyright headers "MIT License. Copyright (c) 2026 <full name>" in ~33 source files + LICENSE: licence lines,
     fine under the LoadEhr rule (LICENSE excepted); whether source headers count is the codecs Cowork's call.
   * Then flip it (command above) and bump nothing in LoadEhr (the submodule pin 2f5256a stays valid if the scrub is a new
     commit; LoadEhr keeps pointing at v1.0.0).
@@ -94,7 +97,7 @@ AmritusG 2026-10-17 20:25:23 +0200
 Go public: MIT LICENSE, README, docs/ASSETS.md; full last name scrubbed from current files
 $ git status -sb
 ## main...origin/main
-$ git grep -c -i rosell
+$ git grep -c -i <last name>
 LICENSE:1
 $ ls -la LICENSE README.md docs/ASSETS.md
 -rw-r--r--  1 <user>  staff  1069 Oct 17 20:23 LICENSE
@@ -131,10 +134,10 @@ $ harness: text Model_A ~/Documents/Resolume Arena/MaskEhr Library/Skulls/Human 
 wait_loaded after 0.25 s: SWAP to ... /Skulls/Human Skull/scene.gltf (slot A, 31016 tris, 1 parts) 158 ms after request
 $ gh repo edit AmritusG/loadehr --visibility public --accept-visibility-change-consequences
 DENIED by the Claude Code auto mode classifier: [Create Public Surface]   (not run; repo still private)
-$ git -C third_party/dxvkit grep -c amritrosell
+$ git -C third_party/dxvkit grep -c <user name>
 docs/handoffs/dxvkit_2026-10-08_w3-alley-fair-compare-r2.md:4
 docs/handoffs/dxvkit_2026-10-08_w3-alley-fair-compare.md:4
 docs/handoffs/dxvkit_2026-10-08_w3-encoder-results.md:13
 ```
 Not yet available (owed after the flip): the two HTTP 200s and the credential-free recursive clone.
-END OF HANDOFF go-public sha256:0af7ce02 9925
+END OF HANDOFF go-public sha256:1eb1c3b4 10138
